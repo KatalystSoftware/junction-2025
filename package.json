@@ -6,8 +6,10 @@
   "scripts": {
     "test": "node --env-file=.env src/test-game.ts",
     "test:game": "node --env-file=.env src/test-game.ts",
-    "dev": "mastra dev",
-    "build": "mastra build",
+    "dev": "concurrently \"pnpm:dev:backend\" \"pnpm:dev:frontend\"",
+    "dev:backend": "mastra dev",
+    "dev:frontend": "cd frontend && pnpm dev",
+    "build": "mastra build && cd frontend && pnpm build",
     "start": "mastra start",
     "format": "prettier --write .",
     "check": "tsc --noEmit"
@@ -29,6 +31,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
+    "concurrently": "^9.2.1",
     "mastra": "1.0.0-beta.1",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3"

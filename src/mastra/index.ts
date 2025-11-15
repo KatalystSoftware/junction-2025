@@ -13,6 +13,9 @@ import { invokeScammerTool } from "./tools/invoke-scammer.ts";
 import { invokeFriendTool } from "./tools/invoke-friend.ts";
 import { invokeParentTool } from "./tools/invoke-parent.ts";
 
+// API Routes
+import { gameMessageRoute, gameStartRoute } from "./api/game-routes.ts";
+
 export const mastra = new Mastra({
   agents: {
     gameMasterAgent,
@@ -34,4 +37,7 @@ export const mastra = new Mastra({
     name: "Elämäpeli-2025",
     level: "info",
   }),
+  server: {
+    apiRoutes: [gameMessageRoute, gameStartRoute],
+  },
 });

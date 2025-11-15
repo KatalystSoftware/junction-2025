@@ -4,7 +4,7 @@
  * Handles player input, updates state, and coordinates agents
  */
 
-import { mastra } from "../index.ts";
+import type { Mastra } from "@mastra/core/mastra";
 import type {
   PlayerState,
   GameMasterDecision,
@@ -113,6 +113,7 @@ function analyzePlayerChoice(
 export async function processPlayerInput(
   playerId: string,
   playerMessage: string,
+  mastra: Mastra,
   currentState?: PlayerState,
 ): Promise<GameResponse> {
   // Load or create player state
