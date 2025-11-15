@@ -14,6 +14,7 @@ import { evaluatorAgent } from "./agents/evaluator-agent.ts";
 import { invokeCharacterTool } from "./tools/invoke-character-tool.ts";
 import { invokeGodBossTool } from "./tools/invoke-god-boss-tool.ts";
 import { evaluateAdviceTool } from "./tools/evaluate-advice-tool.ts";
+import { queryFinnishKnowledgeTool } from "./tools/query-finnish-knowledge-tool.ts";
 
 // Character Pool Manager
 import { characterPool } from "./game/character-pool-manager.ts";
@@ -33,6 +34,7 @@ export const mastra = new Mastra({
     invokeCharacterTool,
     invokeGodBossTool,
     evaluateAdviceTool,
+    queryFinnishKnowledgeTool,
   },
   storage: new LibSQLStore({
     id: "mastra-agent-store",
