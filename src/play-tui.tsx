@@ -854,11 +854,7 @@ function App() {
             : null;
 
         // Create new thread
-        const messages: Array<{
-          role: "user" | "assistant" | "system";
-          content: string;
-          timestamp: Date;
-        }> = [
+        const messages: Message[] = [
           {
             role: "system",
             content: `New client: ${characterName}, ${consultation.characterInfo.age}, ${consultation.characterInfo.occupation}`,
