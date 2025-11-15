@@ -15,7 +15,90 @@
     "incomeLevel": "low",
     "typicalMonthlyIncome": 1900,
     "hasDebt": true,
-    "hasSavings": "none"
+    "hasSavings": "none",
+    "bankAccounts": [
+      {
+        "accountId": "acc_jukka_001",
+        "bankName": "OP",
+        "accountType": "checking",
+        "balance": 87.35,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [
+      {
+        "cardId": "cc_jukka_001",
+        "issuer": "Nordea Visa",
+        "balance": 2450.00,
+        "creditLimit": 3000,
+        "interestRate": 18.9,
+        "minimumPayment": 75,
+        "currency": "EUR"
+      },
+      {
+        "cardId": "cc_jukka_002",
+        "issuer": "S-Pankki Mastercard",
+        "balance": 1820.00,
+        "creditLimit": 2000,
+        "interestRate": 17.5,
+        "minimumPayment": 60,
+        "currency": "EUR"
+      }
+    ],
+    "debts": [
+      {
+        "debtId": "debt_jukka_001",
+        "type": "personal_loan",
+        "creditor": "Ferratum Bank",
+        "totalAmount": 5000,
+        "remainingAmount": 3730,
+        "monthlyPayment": 185,
+        "interestRate": 15.9,
+        "currency": "EUR",
+        "startDate": "2022-03-15"
+      }
+    ],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_jukka_001",
+        "name": "Spotify Premium",
+        "monthlyCost": 10.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2021-06-01"
+      },
+      {
+        "subscriptionId": "sub_jukka_002",
+        "name": "Netflix Standard",
+        "monthlyCost": 13.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2020-11-01"
+      },
+      {
+        "subscriptionId": "sub_jukka_003",
+        "name": "PlayStation Plus",
+        "monthlyCost": 8.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2023-01-01"
+      },
+      {
+        "subscriptionId": "sub_jukka_004",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 29.90,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2022-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "rent": 650,
+      "groceries": 280,
+      "transportation": 65,
+      "utilities": 85,
+      "other": 120
+    }
   },
   "communicationStyle": {
     "formality": "casual",

@@ -17,11 +17,67 @@ export interface CharacterPersonality {
   emotionality: number; // 0-1: How emotional they get about money
 }
 
+// ============================================================================
+// FINANCIAL DATA STRUCTURES
+// ============================================================================
+
+export interface BankAccount {
+  accountId: string;
+  bankName: string;
+  accountType: "checking" | "savings";
+  balance: number; // Current balance in EUR
+  currency: "EUR";
+}
+
+export interface CreditCard {
+  cardId: string;
+  issuer: string;
+  balance: number; // Current debt in EUR
+  creditLimit: number; // Maximum credit in EUR
+  interestRate: number; // Annual percentage rate (e.g., 18.9)
+  minimumPayment: number; // Monthly minimum payment in EUR
+  currency: "EUR";
+}
+
+export interface Subscription {
+  subscriptionId: string;
+  name: string; // e.g., "Spotify Premium", "Netflix"
+  monthlyCost: number; // Monthly cost in EUR
+  category: "entertainment" | "utilities" | "fitness" | "software" | "other";
+  currency: "EUR";
+  startDate: string; // ISO date when subscription started
+}
+
+export interface Debt {
+  debtId: string;
+  type: "student_loan" | "personal_loan" | "car_loan" | "mortgage" | "other";
+  creditor: string; // Who they owe money to
+  totalAmount: number; // Total amount owed in EUR
+  remainingAmount: number; // How much is left to pay in EUR
+  monthlyPayment: number; // Required monthly payment in EUR
+  interestRate: number; // Annual percentage rate
+  currency: "EUR";
+  startDate: string; // ISO date when debt was taken
+}
+
 export interface CharacterFinancialProfile {
   incomeLevel: "low" | "medium" | "high";
   typicalMonthlyIncome: number;
   hasDebt: boolean;
   hasSavings: "none" | "minimal" | "moderate" | "good";
+
+  // Detailed financial data
+  bankAccounts: BankAccount[];
+  creditCards: CreditCard[];
+  debts: Debt[];
+  subscriptions: Subscription[];
+  monthlyExpenses: {
+    rent?: number;
+    groceries?: number;
+    transportation?: number;
+    utilities?: number;
+    other?: number;
+  };
 }
 
 export interface CharacterCommunicationStyle {

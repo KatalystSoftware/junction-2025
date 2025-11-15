@@ -15,7 +15,65 @@
     "incomeLevel": "low",
     "typicalMonthlyIncome": 900,
     "hasDebt": true,
-    "hasSavings": "none"
+    "hasSavings": "none",
+    "bankAccounts": [
+      {
+        "accountId": "acc_mikko_001",
+        "bankName": "Nordea",
+        "accountType": "checking",
+        "balance": 42.50,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [
+      {
+        "cardId": "cc_mikko_001",
+        "issuer": "S-Pankki Student Card",
+        "balance": 890.00,
+        "creditLimit": 1000,
+        "interestRate": 16.9,
+        "minimumPayment": 30,
+        "currency": "EUR"
+      }
+    ],
+    "debts": [
+      {
+        "debtId": "debt_mikko_001",
+        "type": "student_loan",
+        "creditor": "Kela",
+        "totalAmount": 12000,
+        "remainingAmount": 11200,
+        "monthlyPayment": 0,
+        "interestRate": 0.5,
+        "currency": "EUR",
+        "startDate": "2022-06-01"
+      }
+    ],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_mikko_001",
+        "name": "Spotify Student",
+        "monthlyCost": 5.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2022-09-01"
+      },
+      {
+        "subscriptionId": "sub_mikko_002",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 19.90,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2023-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "rent": 380,
+      "groceries": 200,
+      "transportation": 55,
+      "utilities": 45,
+      "other": 80
+    }
   },
   "communicationStyle": {
     "formality": "casual",

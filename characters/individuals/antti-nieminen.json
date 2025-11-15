@@ -15,7 +15,108 @@
     "incomeLevel": "medium",
     "typicalMonthlyIncome": 3500,
     "hasDebt": true,
-    "hasSavings": "minimal"
+    "hasSavings": "minimal",
+    "bankAccounts": [
+      {
+        "accountId": "acc_antti_001",
+        "bankName": "OP Business",
+        "accountType": "checking",
+        "balance": 4200.00,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_antti_002",
+        "bankName": "OP",
+        "accountType": "savings",
+        "balance": 2800.00,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [
+      {
+        "cardId": "cc_antti_001",
+        "issuer": "OP Business Visa",
+        "balance": 8500.00,
+        "creditLimit": 15000,
+        "interestRate": 16.9,
+        "minimumPayment": 250,
+        "currency": "EUR"
+      },
+      {
+        "cardId": "cc_antti_002",
+        "issuer": "Nordea Mastercard",
+        "balance": 3200.00,
+        "creditLimit": 8000,
+        "interestRate": 15.9,
+        "minimumPayment": 100,
+        "currency": "EUR"
+      }
+    ],
+    "debts": [
+      {
+        "debtId": "debt_antti_001",
+        "type": "personal_loan",
+        "creditor": "Nordea Business Loan",
+        "totalAmount": 45000,
+        "remainingAmount": 32000,
+        "monthlyPayment": 850,
+        "interestRate": 5.9,
+        "currency": "EUR",
+        "startDate": "2020-03-01"
+      },
+      {
+        "debtId": "debt_antti_002",
+        "type": "mortgage",
+        "creditor": "OP Mortgage",
+        "totalAmount": 220000,
+        "remainingAmount": 175000,
+        "monthlyPayment": 920,
+        "interestRate": 2.5,
+        "currency": "EUR",
+        "startDate": "2015-06-01"
+      }
+    ],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_antti_001",
+        "name": "Spotify Family",
+        "monthlyCost": 16.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2020-01-01"
+      },
+      {
+        "subscriptionId": "sub_antti_002",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 34.90,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2019-01-01"
+      },
+      {
+        "subscriptionId": "sub_antti_003",
+        "name": "Netflix Premium",
+        "monthlyCost": 19.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2021-05-01"
+      },
+      {
+        "subscriptionId": "sub_antti_004",
+        "name": "Business Insurance",
+        "monthlyCost": 285.00,
+        "category": "other",
+        "currency": "EUR",
+        "startDate": "2018-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "rent": 0,
+      "groceries": 650,
+      "transportation": 280,
+      "utilities": 220,
+      "other": 400
+    }
   },
   "communicationStyle": {
     "formality": "semi-formal",

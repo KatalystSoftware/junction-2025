@@ -15,7 +15,61 @@
     "incomeLevel": "low",
     "typicalMonthlyIncome": 800,
     "hasDebt": false,
-    "hasSavings": "minimal"
+    "hasSavings": "minimal",
+    "bankAccounts": [
+      {
+        "accountId": "acc_minna_001",
+        "bankName": "Nordea",
+        "accountType": "checking",
+        "balance": 247.50,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [
+      {
+        "cardId": "cc_minna_001",
+        "issuer": "S-Pankki Student Card",
+        "balance": 185.00,
+        "creditLimit": 500,
+        "interestRate": 12.9,
+        "minimumPayment": 25,
+        "currency": "EUR"
+      }
+    ],
+    "debts": [],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_minna_001",
+        "name": "Spotify Student",
+        "monthlyCost": 5.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2024-09-01"
+      },
+      {
+        "subscriptionId": "sub_minna_002",
+        "name": "Netflix Basic",
+        "monthlyCost": 7.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2024-10-15"
+      },
+      {
+        "subscriptionId": "sub_minna_003",
+        "name": "Gym Membership",
+        "monthlyCost": 29.90,
+        "category": "fitness",
+        "currency": "EUR",
+        "startDate": "2024-08-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "rent": 450,
+      "groceries": 180,
+      "transportation": 55,
+      "utilities": 35,
+      "other": 50
+    }
   },
   "communicationStyle": {
     "formality": "casual",

@@ -15,7 +15,97 @@
     "incomeLevel": "low",
     "typicalMonthlyIncome": 2000,
     "hasDebt": true,
-    "hasSavings": "none"
+    "hasSavings": "none",
+    "bankAccounts": [
+      {
+        "accountId": "acc_sofia_001",
+        "bankName": "Holvi Business",
+        "accountType": "checking",
+        "balance": 1850.00,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_sofia_002",
+        "bankName": "Nordea Personal",
+        "accountType": "checking",
+        "balance": 320.00,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [
+      {
+        "cardId": "cc_sofia_001",
+        "issuer": "Nordea Visa",
+        "balance": 5400.00,
+        "creditLimit": 6000,
+        "interestRate": 17.9,
+        "minimumPayment": 160,
+        "currency": "EUR"
+      },
+      {
+        "cardId": "cc_sofia_002",
+        "issuer": "OP Business Mastercard",
+        "balance": 3200.00,
+        "creditLimit": 5000,
+        "interestRate": 16.9,
+        "minimumPayment": 100,
+        "currency": "EUR"
+      }
+    ],
+    "debts": [
+      {
+        "debtId": "debt_sofia_001",
+        "type": "personal_loan",
+        "creditor": "Nordea Business Development Loan",
+        "totalAmount": 25000,
+        "remainingAmount": 22000,
+        "monthlyPayment": 450,
+        "interestRate": 7.9,
+        "currency": "EUR",
+        "startDate": "2023-05-01"
+      }
+    ],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_sofia_001",
+        "name": "Adobe Creative Cloud",
+        "monthlyCost": 61.49,
+        "category": "software",
+        "currency": "EUR",
+        "startDate": "2023-03-01"
+      },
+      {
+        "subscriptionId": "sub_sofia_002",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 29.90,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2022-01-01"
+      },
+      {
+        "subscriptionId": "sub_sofia_003",
+        "name": "Spotify Premium",
+        "monthlyCost": 10.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2021-01-01"
+      },
+      {
+        "subscriptionId": "sub_sofia_004",
+        "name": "LinkedIn Premium",
+        "monthlyCost": 39.99,
+        "category": "software",
+        "currency": "EUR",
+        "startDate": "2023-06-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "rent": 720,
+      "groceries": 280,
+      "transportation": 75,
+      "utilities": 55,
+      "other": 150
+    }
   },
   "communicationStyle": {
     "formality": "casual",

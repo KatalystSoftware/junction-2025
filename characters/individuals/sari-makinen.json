@@ -15,7 +15,88 @@
     "incomeLevel": "medium",
     "typicalMonthlyIncome": 2800,
     "hasDebt": false,
-    "hasSavings": "moderate"
+    "hasSavings": "moderate",
+    "bankAccounts": [
+      {
+        "accountId": "acc_sari_001",
+        "bankName": "OP",
+        "accountType": "checking",
+        "balance": 1850.00,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_sari_002",
+        "bankName": "OP",
+        "accountType": "savings",
+        "balance": 8200.00,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [
+      {
+        "cardId": "cc_sari_001",
+        "issuer": "OP Visa",
+        "balance": 0,
+        "creditLimit": 5000,
+        "interestRate": 14.9,
+        "minimumPayment": 0,
+        "currency": "EUR"
+      }
+    ],
+    "debts": [
+      {
+        "debtId": "debt_sari_001",
+        "type": "mortgage",
+        "creditor": "OP Mortgage",
+        "totalAmount": 185000,
+        "remainingAmount": 142000,
+        "monthlyPayment": 720,
+        "interestRate": 2.8,
+        "currency": "EUR",
+        "startDate": "2018-06-01"
+      }
+    ],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_sari_001",
+        "name": "Netflix Family",
+        "monthlyCost": 17.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2019-03-01"
+      },
+      {
+        "subscriptionId": "sub_sari_002",
+        "name": "Spotify Family",
+        "monthlyCost": 16.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2020-01-01"
+      },
+      {
+        "subscriptionId": "sub_sari_003",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 24.90,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2021-01-01"
+      },
+      {
+        "subscriptionId": "sub_sari_004",
+        "name": "Elisa Viihde",
+        "monthlyCost": 19.90,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2022-09-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "rent": 0,
+      "groceries": 550,
+      "transportation": 150,
+      "utilities": 180,
+      "other": 300
+    }
   },
   "communicationStyle": {
     "formality": "semi-formal",
