@@ -9,8 +9,19 @@ import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 import { mastra } from "./mastra/index.ts";
 import { gameRoutes } from "./mastra/api/routes.ts";
+import { checkPostgresHealth } from "./mastra/config/postgres-health.ts";
 
 const app = new Hono();
+
+app.get("/health/db", async (c) => {
+  const healthy = await checkPostgresHealth();
+
+  if (!healthy) {
+    return c.json({ status: "error" }, 500);
+  }
+
+  return c.json({ status: "ok" });
+});
 
 // Mount custom game API routes first
 app.route("/api/game", gameRoutes);

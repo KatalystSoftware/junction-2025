@@ -80,5 +80,5 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: financial-advisor-sim
-          image: ${{ env.IMAGE_NAME }}:latest
+          image: ${{ env.IMAGE_NAME }}:${{ github.sha }}
           region: europe-north1
