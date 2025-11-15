@@ -2,4 +2,7 @@ packages:
   - frontend
 
 onlyBuiltDependencies:
+  - '@swc/core'
   - better-sqlite3
+  - esbuild
+  - unrs-resolver
