@@ -24,6 +24,14 @@ import {
   generateSessionId,
   formatSessionId,
 } from "./mastra/persistence/session-store.ts";
+import {
+  getSkillTrend,
+  createSkillTrendGraph,
+  getBossReviewStatus,
+  ACHIEVEMENTS,
+  type Milestone,
+  type Achievement,
+} from "./mastra/game/progress-system.ts";
 import type {
   AdvisorState,
   ConversationThread,
@@ -66,6 +74,8 @@ function App() {
   const [showStats, setShowStats] = useState(false);
   const [showAllThreads, setShowAllThreads] = useState(false); // Toggle active/all threads
   const [showRelationships, setShowRelationships] = useState(false);
+  const [showProgress, setShowProgress] = useState(false);
+  const [showAchievements, setShowAchievements] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [bossReview, setBossReview] = useState<any>(null);
   const [quiz, setQuiz] = useState<any>(null);
@@ -77,6 +87,9 @@ function App() {
     characterName: string;
     response: GameResponse;
   } | null>(null);
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const [newAchievements, setNewAchievements] = useState<Achievement[]>([]);
+  const [miniFeedback, setMiniFeedback] = useState<string | null>(null);
 
   // Helper: Convert threads to format for saving (filter system messages, remove timestamps)
   const getThreadHistoriesForSave = (
@@ -193,6 +206,8 @@ function App() {
     if (input === "s" && !inputValue) {
       setShowStats(!showStats);
       setShowRelationships(false);
+      setShowProgress(false);
+      setShowAchievements(false);
       return;
     }
 
@@ -200,6 +215,26 @@ function App() {
     if (input === "r" && !inputValue) {
       setShowRelationships(!showRelationships);
       setShowStats(false);
+      setShowProgress(false);
+      setShowAchievements(false);
+      return;
+    }
+
+    // Toggle progress
+    if (input === "p" && !inputValue) {
+      setShowProgress(!showProgress);
+      setShowStats(false);
+      setShowRelationships(false);
+      setShowAchievements(false);
+      return;
+    }
+
+    // Toggle achievements
+    if (input === "a" && !inputValue) {
+      setShowAchievements(!showAchievements);
+      setShowStats(false);
+      setShowRelationships(false);
+      setShowProgress(false);
       return;
     }
 
@@ -385,6 +420,23 @@ function App() {
       setQuizAnswers([]);
       setShowQuizFeedback(false);
       setLastQuizAnswer(null);
+      setStatusMessage("Ready! Press 'n' for new consultation");
+      return;
+    }
+
+    // Close milestones modal
+    if (milestones.length > 0 && input === " ") {
+      setMilestones([]);
+      // Check if there are achievements to show next
+      if (newAchievements.length === 0) {
+        setStatusMessage("Ready! Press 'n' for new consultation");
+      }
+      return;
+    }
+
+    // Close achievements modal
+    if (newAchievements.length > 0 && input === " ") {
+      setNewAchievements([]);
       setStatusMessage("Ready! Press 'n' for new consultation");
       return;
     }
@@ -661,7 +713,26 @@ function App() {
 
       // Check if conversation ended
       if (response.type === "conversation_end") {
-        // Show final results modal with relationship changes
+        // Capture progress data
+        if (response.miniFeedback) {
+          setMiniFeedback(response.miniFeedback);
+        }
+
+        // Check for milestones first (highest priority modal)
+        if (response.milestonesAchieved && response.milestonesAchieved.length > 0) {
+          setMilestones(response.milestonesAchieved);
+          setStatusMessage("Milestone achieved! Press SPACE to continue");
+          return;
+        }
+
+        // Then check for achievements
+        if (response.achievementsUnlocked && response.achievementsUnlocked.length > 0) {
+          setNewAchievements(response.achievementsUnlocked);
+          setStatusMessage("New achievement unlocked! Press SPACE to continue");
+          return;
+        }
+
+        // Finally show final results modal with relationship changes and financial impact
         let statusMsg = "Consultation complete!";
 
         // Add tier change to status message
@@ -710,7 +781,17 @@ function App() {
     );
   }
 
-  // Final results modal
+  // Milestone modal (highest priority)
+  if (milestones.length > 0) {
+    return <MilestoneModal milestones={milestones} />;
+  }
+
+  // Achievement modal (second priority)
+  if (newAchievements.length > 0) {
+    return <AchievementModal achievements={newAchievements} />;
+  }
+
+  // Final results modal (third priority)
   if (finalResults) {
     return (
       <FinalResultsModal
@@ -819,6 +900,10 @@ function App() {
             <StatsPanel advisorState={advisorState} />
           ) : showRelationships ? (
             <RelationshipsPanel advisorState={advisorState} />
+          ) : showProgress ? (
+            <ProgressPanel advisorState={advisorState} />
+          ) : showAchievements ? (
+            <AchievementsPanel advisorState={advisorState} />
           ) : (
             <>
               <Text dimColor>Commands:</Text>
@@ -827,6 +912,8 @@ function App() {
               <Text dimColor>h History</Text>
               <Text dimColor>s Stats</Text>
               <Text dimColor>r Relationships</Text>
+              <Text dimColor>p Progress</Text>
+              <Text dimColor>a Achievements</Text>
               <Text dimColor>q Quit</Text>
             </>
           )}
@@ -853,10 +940,13 @@ function App() {
         justifyContent="space-between"
       >
         <Text color={isLoading ? "yellow" : "cyan"}>{statusMessage}</Text>
-        <Text dimColor>
-          Rep: {advisorState.reputation} | Skill:{" "}
-          {advisorState.skillLevel.toFixed(1)}
-        </Text>
+        <Box>
+          <Text dimColor>
+            Rep: {advisorState.reputation} | Skill:{" "}
+            {advisorState.skillLevel.toFixed(1)} |{" "}
+          </Text>
+          <Text dimColor>{getBossReviewStatus(advisorState)}</Text>
+        </Box>
       </Box>
 
       {/* Input box */}
@@ -1074,6 +1164,155 @@ function RelationshipsPanel({ advisorState }: { advisorState: AdvisorState }) {
       <Text dimColor>Legend:</Text>
       <Text dimColor>📈=improving 🤝=referred</Text>
       <Text dimColor>v=visits ✅=helped</Text>
+    </Box>
+  );
+}
+
+// ============================================================================
+// Progress Panel Component
+// ============================================================================
+
+function ProgressPanel({ advisorState }: { advisorState: AdvisorState }) {
+  const trend = getSkillTrend(advisorState.sessionHistory);
+  const graph = createSkillTrendGraph(trend);
+
+  return (
+    <Box flexDirection="column">
+      <Text bold color="yellow">
+        📈 Progress
+      </Text>
+      <Text dimColor> </Text>
+      <Text dimColor>Skill Trend:</Text>
+      {graph.map((line, i) => (
+        <Text key={i} dimColor>
+          {line}
+        </Text>
+      ))}
+      <Text dimColor> </Text>
+      <Text dimColor>Sessions: {advisorState.totalSessions}</Text>
+      <Text dimColor>Clients: {advisorState.totalClientsHelped}</Text>
+      <Text dimColor>Coins: {advisorState.advisorCoins}</Text>
+    </Box>
+  );
+}
+
+// ============================================================================
+// Achievements Panel Component
+// ============================================================================
+
+function AchievementsPanel({ advisorState }: { advisorState: AdvisorState }) {
+  const unlockedIds = new Set(advisorState.achievementsUnlocked);
+  const unlocked = ACHIEVEMENTS.filter((a) => unlockedIds.has(a.id));
+  const locked = ACHIEVEMENTS.filter((a) => !unlockedIds.has(a.id));
+
+  return (
+    <Box flexDirection="column">
+      <Text bold color="yellow">
+        🏆 Achievements
+      </Text>
+      <Text dimColor> </Text>
+      <Text color="green">
+        Unlocked: {unlocked.length}/{ACHIEVEMENTS.length}
+      </Text>
+      <Text dimColor> </Text>
+      {unlocked.slice(0, 3).map((achievement, index) => (
+        <Box key={index} flexDirection="column">
+          <Text color="green">
+            {achievement.icon} {achievement.name}
+          </Text>
+          <Text dimColor>{achievement.description}</Text>
+        </Box>
+      ))}
+      {unlocked.length === 0 && (
+        <Text dimColor>No achievements yet</Text>
+      )}
+      {unlocked.length > 3 && (
+        <Text dimColor>...and {unlocked.length - 3} more</Text>
+      )}
+      <Text dimColor> </Text>
+      <Text dimColor>Next to unlock:</Text>
+      {locked.slice(0, 2).map((achievement, index) => (
+        <Box key={index} flexDirection="column">
+          <Text dimColor>
+            🔒 {achievement.name}
+          </Text>
+          <Text dimColor>{achievement.description}</Text>
+        </Box>
+      ))}
+    </Box>
+  );
+}
+
+// ============================================================================
+// Milestone Modal Component
+// ============================================================================
+
+function MilestoneModal({ milestones }: { milestones: Milestone[] }) {
+  return (
+    <Box
+      flexDirection="column"
+      padding={2}
+      borderStyle="double"
+      borderColor="yellow"
+    >
+      <Text bold color="yellow">
+        🎯 MILESTONE ACHIEVED!
+      </Text>
+      <Text> </Text>
+
+      {milestones.map((milestone, index) => (
+        <Box key={index} flexDirection="column" paddingY={1}>
+          <Text bold color="green">
+            {milestone.icon} {milestone.title}
+          </Text>
+          <Text color="cyan">{milestone.message}</Text>
+          <Text> </Text>
+        </Box>
+      ))}
+
+      <Text dimColor>Press SPACE to continue</Text>
+    </Box>
+  );
+}
+
+// ============================================================================
+// Achievement Modal Component
+// ============================================================================
+
+function AchievementModal({ achievements }: { achievements: Achievement[] }) {
+  const totalCoins = achievements.reduce((sum, a) => sum + a.coinReward, 0);
+
+  return (
+    <Box
+      flexDirection="column"
+      padding={2}
+      borderStyle="double"
+      borderColor="magenta"
+    >
+      <Text bold color="magenta">
+        🏆 ACHIEVEMENT UNLOCKED!
+      </Text>
+      <Text> </Text>
+
+      {achievements.map((achievement, index) => (
+        <Box key={index} flexDirection="column" paddingY={1}>
+          <Text bold color="green">
+            {achievement.icon} {achievement.name}
+          </Text>
+          <Text color="cyan">{achievement.description}</Text>
+          <Text color="yellow">
+            Reward: +{achievement.coinReward} coins
+          </Text>
+          <Text> </Text>
+        </Box>
+      ))}
+
+      <Text bold color="green">
+        Total coins earned: {totalCoins}
+      </Text>
+      <Text> </Text>
+
+      <Text dimColor>Press SPACE to continue</Text>
     </Box>
   );
 }

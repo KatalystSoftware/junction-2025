@@ -13,6 +13,13 @@ import {
   generateAdviceChoices,
   type AdviceChoice,
 } from "./choice-generator.ts";
+import {
+  checkForNewAchievements,
+  checkForMilestones,
+  generateMiniFeedback,
+  type Achievement,
+  type Milestone,
+} from "./progress-system.ts";
 import type {
   AdvisorState,
   GameMasterDecision,
@@ -407,6 +414,9 @@ export async function handleAdvisorResponse(
 
   // If conversation is ending, save session
   if (characterResponse.conversationEnding) {
+    // Save previous state for milestone detection
+    const previousState = { ...currentState };
+
     // Collect all advisor advice from the conversation
     const allAdvisorAdvice = conversationHistory
       ? conversationHistory
@@ -679,6 +689,25 @@ export async function handleAdvisorResponse(
       }
     }
 
+    // Check for milestones and achievements
+    const milestonesAchieved = checkForMilestones(previousState, advisorState, session);
+    const newAchievements = checkForNewAchievements(advisorState, session);
+
+    // Add achievements to unlocked list and award coins
+    for (const achievement of newAchievements) {
+      advisorState.achievementsUnlocked.push(achievement.id);
+      advisorState.advisorCoins += achievement.coinReward;
+      achievement.unlockedAt = new Date().toISOString();
+    }
+
+    // Generate mini-feedback for this session
+    const miniFeedback = generateMiniFeedback(session);
+
+    // Store progress data in session for later display
+    (session as any).miniFeedback = miniFeedback;
+    (session as any).milestonesAchieved = milestonesAchieved;
+    (session as any).achievementsUnlocked = newAchievements;
+
     // Mark thread as resolved
     threadInfo.status = "resolved";
 
@@ -704,8 +733,12 @@ export async function handleAdvisorResponse(
   // Get all active threads for UI
   const activeThreads = getActiveThreads(advisorState);
 
-  // If conversation is ending, include financial results from the last session
+  // If conversation is ending, include financial results and progress data from the last session
   let financialResults;
+  let miniFeedback;
+  let milestonesAchieved;
+  let achievementsUnlocked;
+
   if (
     characterResponse.conversationEnding &&
     advisorState.sessionHistory.length > 0
@@ -721,6 +754,11 @@ export async function handleAdvisorResponse(
         coinsEarned: lastSession.coinsEarned,
       };
     }
+
+    // Get progress data from session
+    miniFeedback = (lastSession as any).miniFeedback;
+    milestonesAchieved = (lastSession as any).milestonesAchieved;
+    achievementsUnlocked = (lastSession as any).achievementsUnlocked;
   }
 
   return {
@@ -735,6 +773,9 @@ export async function handleAdvisorResponse(
     recommendationMessage,
     tierChangeNotification,
     financialResults,
+    miniFeedback,
+    milestonesAchieved,
+    achievementsUnlocked,
   };
 }
 
