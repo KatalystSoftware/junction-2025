@@ -21,14 +21,14 @@
         "accountId": "acc_petri_001",
         "bankName": "Nordea",
         "accountType": "checking",
-        "balance": 430.00,
+        "balance": 430.0,
         "currency": "EUR"
       },
       {
         "accountId": "acc_petri_002",
         "bankName": "Nordea",
         "accountType": "savings",
-        "balance": 850.00,
+        "balance": 850.0,
         "currency": "EUR"
       }
     ],
@@ -54,7 +54,7 @@
       {
         "subscriptionId": "sub_petri_003",
         "name": "Mobile Phone Plan",
-        "monthlyCost": 19.90,
+        "monthlyCost": 19.9,
         "category": "utilities",
         "currency": "EUR",
         "startDate": "2024-01-01"

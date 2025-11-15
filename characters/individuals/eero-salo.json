@@ -21,14 +21,14 @@
         "accountId": "acc_eero_001",
         "bankName": "Nordea",
         "accountType": "checking",
-        "balance": 3200.00,
+        "balance": 3200.0,
         "currency": "EUR"
       },
       {
         "accountId": "acc_eero_002",
         "bankName": "Nordea",
         "accountType": "savings",
-        "balance": 82000.00,
+        "balance": 82000.0,
         "currency": "EUR"
       }
     ],
@@ -38,7 +38,7 @@
       {
         "subscriptionId": "sub_eero_001",
         "name": "Elisa Viihde",
-        "monthlyCost": 19.90,
+        "monthlyCost": 19.9,
         "category": "entertainment",
         "currency": "EUR",
         "startDate": "2018-01-01"
@@ -46,7 +46,7 @@
       {
         "subscriptionId": "sub_eero_002",
         "name": "Mobile Phone Plan",
-        "monthlyCost": 19.90,
+        "monthlyCost": 19.9,
         "category": "utilities",
         "currency": "EUR",
         "startDate": "2015-01-01"
@@ -54,7 +54,7 @@
       {
         "subscriptionId": "sub_eero_003",
         "name": "Newspaper Subscription",
-        "monthlyCost": 32.00,
+        "monthlyCost": 32.0,
         "category": "other",
         "currency": "EUR",
         "startDate": "2010-01-01"

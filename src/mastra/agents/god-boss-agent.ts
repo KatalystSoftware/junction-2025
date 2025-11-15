@@ -31,9 +31,10 @@ function detectLanguage(messages: string[]): "finnish" | "english" {
 /**
  * Get language-specific instructions and examples
  */
-function getLanguageInstructions(
-  language: "finnish" | "english",
-): { languageRule: string; exampleOutput: any } {
+function getLanguageInstructions(language: "finnish" | "english"): {
+  languageRule: string;
+  exampleOutput: any;
+} {
   if (language === "finnish") {
     return {
       languageRule: "- Always respond in Finnish",
@@ -70,9 +71,7 @@ function getLanguageInstructions(
 /**
  * Create God/Boss agent with dynamic language support
  */
-export function createGodBossAgent(
-  advisorMessages: string[] = [],
-): Agent {
+export function createGodBossAgent(advisorMessages: string[] = []): Agent {
   const language = detectLanguage(advisorMessages);
   const { languageRule, exampleOutput } = getLanguageInstructions(language);
 

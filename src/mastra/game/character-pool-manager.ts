@@ -361,8 +361,7 @@ export class CharacterPoolManager {
           !this.usedScenarios.has(s.scenarioId) &&
           advisorState.skillLevel >=
             s.triggerConditions.advisorSkillLevel.min &&
-          advisorState.skillLevel <=
-            s.triggerConditions.advisorSkillLevel.max,
+          advisorState.skillLevel <= s.triggerConditions.advisorSkillLevel.max,
       );
 
       if (initialScenarios.length === 0) {
@@ -443,6 +442,189 @@ export class CharacterPoolManager {
     return Array.from(characterIds)
       .map((id) => this.characters.get(id))
       .filter((char): char is Character => char !== undefined);
+  }
+
+  /**
+   * Get character relationships for display
+   */
+  getCharacterRelationships(advisorId?: string): Array<{
+    characterId: string;
+    name: string;
+    trustLevel: number;
+    visitCount: number;
+    lastOutcome: "helped" | "struggling" | "pending" | "unknown";
+  }> {
+    const relationships: Array<{
+      characterId: string;
+      name: string;
+      trustLevel: number;
+      visitCount: number;
+      lastOutcome: "helped" | "struggling" | "pending" | "unknown";
+    }> = [];
+
+    for (const char of this.characters.values()) {
+      // Only include characters that have been met
+      if (char.relationshipState.visitCount > 0) {
+        // Determine last outcome
+        let lastOutcome: "helped" | "struggling" | "pending" | "unknown" =
+          "unknown";
+        const history = char.relationshipState.adviceFollowedHistory;
+
+        if (history.length > 0) {
+          const lastAdvice = history[history.length - 1];
+          if (lastAdvice.outcome === "positive" && lastAdvice.followed) {
+            lastOutcome = "helped";
+          } else if (
+            lastAdvice.outcome === "negative" ||
+            !lastAdvice.followed
+          ) {
+            lastOutcome = "struggling";
+          } else {
+            lastOutcome = "pending";
+          }
+        } else {
+          lastOutcome = "pending";
+        }
+
+        relationships.push({
+          characterId: char.characterId,
+          name: char.name,
+          trustLevel: char.relationshipState.trustLevel,
+          visitCount: char.relationshipState.visitCount,
+          lastOutcome,
+        });
+      }
+    }
+
+    // Sort by visit count (most visits first)
+    relationships.sort((a, b) => b.visitCount - a.visitCount);
+
+    return relationships;
+  }
+
+  /**
+   * Update relationship based on advice outcome
+   * Returns true if character might recommend you
+   */
+  updateRelationship(
+    characterId: string,
+    adviceOutcome: {
+      scenarioId: string;
+      adviceGiven: string[];
+      followed: boolean;
+      outcome: "positive" | "negative" | "neutral";
+    },
+  ): { willRecommend: boolean; newTrustLevel: number } {
+    const char = this.characters.get(characterId);
+    if (!char) {
+      return { willRecommend: false, newTrustLevel: 0 };
+    }
+
+    let trustChange = 0;
+
+    // Calculate trust level change
+    if (adviceOutcome.outcome === "positive" && adviceOutcome.followed) {
+      // Good advice followed: +0.1
+      trustChange = 0.1;
+    } else if (
+      adviceOutcome.outcome === "negative" ||
+      !adviceOutcome.followed
+    ) {
+      // Bad advice or not followed: -0.05
+      trustChange = -0.05;
+    }
+
+    const newTrustLevel = Math.max(
+      0,
+      Math.min(1, char.relationshipState.trustLevel + trustChange),
+    );
+
+    // Update the relationship
+    this.updateCharacterRelationship(characterId, {
+      trustLevel: newTrustLevel,
+      visitCount: char.relationshipState.visitCount + 1,
+      adviceFollowed: adviceOutcome,
+    });
+
+    // Check if character will recommend (high trust + good outcome)
+    const willRecommend =
+      newTrustLevel > 0.8 &&
+      adviceOutcome.outcome === "positive" &&
+      adviceOutcome.followed &&
+      Math.random() < 0.3; // 30% chance
+
+    return { willRecommend, newTrustLevel };
+  }
+
+  /**
+   * Handle character recommendation - unlock a new character
+   */
+  async handleRecommendation(recommendingCharacterId: string): Promise<{
+    success: boolean;
+    newCharacterName?: string;
+    recommendingCharacterName?: string;
+  }> {
+    const recommendingChar = this.characters.get(recommendingCharacterId);
+    if (!recommendingChar) {
+      return { success: false };
+    }
+
+    // Find a character that hasn't been met yet
+    const unmetCharacters = Array.from(this.characters.values()).filter(
+      (char) =>
+        char.relationshipState.visitCount === 0 &&
+        char.characterId !== recommendingCharacterId,
+    );
+
+    if (unmetCharacters.length === 0) {
+      return { success: false };
+    }
+
+    // Randomly select one to "unlock"
+    const newChar =
+      unmetCharacters[Math.floor(Math.random() * unmetCharacters.length)];
+
+    // Mark character as "recommended" by setting initial trust slightly higher
+    const updatedNewChar = { ...newChar };
+    updatedNewChar.relationshipState.trustLevel = 0.6; // Start with slightly higher trust
+    this.characters.set(newChar.characterId, updatedNewChar);
+
+    return {
+      success: true,
+      newCharacterName: newChar.name,
+      recommendingCharacterName: recommendingChar.name,
+    };
+  }
+
+  /**
+   * Apply trust decay for characters ignored too long
+   */
+  applyTrustDecay(currentSessionNumber: number): void {
+    for (const char of this.characters.values()) {
+      if (char.relationshipState.visitCount === 0) continue;
+
+      // Calculate sessions since last visit
+      const lastVisit = char.relationshipState.lastVisit;
+      if (!lastVisit) continue;
+
+      // For simplicity, use session count difference
+      // In a real implementation, you'd track session numbers per character
+      const sessionsSinceVisit =
+        currentSessionNumber - char.relationshipState.visitCount;
+
+      if (sessionsSinceVisit > 10) {
+        // Apply decay: -0.02 per session over 10
+        const decayAmount = (sessionsSinceVisit - 10) * 0.02;
+        const newTrustLevel = Math.max(
+          0,
+          char.relationshipState.trustLevel - decayAmount,
+        );
+
+        this.updateCharacterRelationship(char.characterId, {
+          trustLevel: newTrustLevel,
+        });
+      }
+    }
   }
 
   /**

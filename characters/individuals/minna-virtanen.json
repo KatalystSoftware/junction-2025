@@ -21,7 +21,7 @@
         "accountId": "acc_minna_001",
         "bankName": "Nordea",
         "accountType": "checking",
-        "balance": 247.50,
+        "balance": 247.5,
         "currency": "EUR"
       }
     ],
@@ -29,7 +29,7 @@
       {
         "cardId": "cc_minna_001",
         "issuer": "S-Pankki Student Card",
-        "balance": 185.00,
+        "balance": 185.0,
         "creditLimit": 500,
         "interestRate": 12.9,
         "minimumPayment": 25,
@@ -57,7 +57,7 @@
       {
         "subscriptionId": "sub_minna_003",
         "name": "Gym Membership",
-        "monthlyCost": 29.90,
+        "monthlyCost": 29.9,
         "category": "fitness",
         "currency": "EUR",
         "startDate": "2024-08-01"

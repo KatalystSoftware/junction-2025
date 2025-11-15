@@ -64,6 +64,11 @@ export async function startNewConsultation(
   // Load or create advisor state
   let advisorState = currentState || createNewAdvisor(advisorId);
 
+  // Apply trust decay for characters not visited recently
+  if (advisorState.totalSessions > 0) {
+    characterPool.applyTrustDecay(advisorState.totalSessions);
+  }
+
   // Get Game Master agent
   const gmAgent = mastra.getAgent("gameMasterAgent");
   if (!gmAgent) {
@@ -255,6 +260,7 @@ export async function handleAdvisorResponse(
   conversationHistory?: Array<{ role: "user" | "assistant"; content: string }>,
 ): Promise<GameResponse> {
   let advisorState = { ...currentState };
+  let recommendationMessage: string | undefined;
 
   // Get thread info
   const threadInfo = advisorState.activeThreads[threadId];
@@ -375,19 +381,31 @@ export async function handleAdvisorResponse(
       outcome: adviceEvaluation.outcome,
     });
 
-    // Update character relationship
-    characterPool.updateCharacterRelationship(character.characterId, {
-      visitCount: character.relationshipState.visitCount + 1,
-      trustLevel:
-        character.relationshipState.trustLevel +
-        (adviceEvaluation.willFollowAdvice ? 0.1 : -0.05),
-      adviceFollowed: {
+    // Update character relationship and check for recommendations
+    const relationshipUpdate = characterPool.updateRelationship(
+      character.characterId,
+      {
         scenarioId: scenario.scenarioId,
         adviceGiven: allAdvisorAdvice,
         followed: adviceEvaluation.willFollowAdvice,
         outcome: adviceEvaluation.outcome,
       },
-    });
+    );
+
+    // Handle character recommendation
+    if (relationshipUpdate.willRecommend) {
+      const recommendation = await characterPool.handleRecommendation(
+        character.characterId,
+      );
+      if (recommendation.success && recommendation.newCharacterName) {
+        recommendationMessage = `🎉 ${recommendation.recommendingCharacterName} was so happy with your help, they recommended you to their friend ${recommendation.newCharacterName}!`;
+      }
+    }
+
+    // Store recommendation message in session for display
+    if (recommendationMessage) {
+      (session as any).recommendationMessage = recommendationMessage;
+    }
 
     // Schedule follow-up if appropriate
     if (
@@ -498,6 +516,7 @@ export async function handleAdvisorResponse(
     voiceNeeded: characterResponse.voiceNeeded,
     stateUpdate: advisorState,
     activeThreads,
+    recommendationMessage,
   };
 }
 

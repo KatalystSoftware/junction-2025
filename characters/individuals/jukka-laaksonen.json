@@ -29,7 +29,7 @@
       {
         "cardId": "cc_jukka_001",
         "issuer": "Nordea Visa",
-        "balance": 2450.00,
+        "balance": 2450.0,
         "creditLimit": 3000,
         "interestRate": 18.9,
         "minimumPayment": 75,
@@ -38,7 +38,7 @@
       {
         "cardId": "cc_jukka_002",
         "issuer": "S-Pankki Mastercard",
-        "balance": 1820.00,
+        "balance": 1820.0,
         "creditLimit": 2000,
         "interestRate": 17.5,
         "minimumPayment": 60,
@@ -86,7 +86,7 @@
       {
         "subscriptionId": "sub_jukka_004",
         "name": "Mobile Phone Plan",
-        "monthlyCost": 29.90,
+        "monthlyCost": 29.9,
         "category": "utilities",
         "currency": "EUR",
         "startDate": "2022-01-01"

@@ -405,6 +405,9 @@ export interface GameResponse {
 
   // Thread management
   activeThreads?: ConversationThread[];
+
+  // Character recommendation notification
+  recommendationMessage?: string;
 }
 
 // ============================================================================

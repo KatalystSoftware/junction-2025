@@ -21,14 +21,14 @@
         "accountId": "acc_sofia_001",
         "bankName": "Holvi Business",
         "accountType": "checking",
-        "balance": 1850.00,
+        "balance": 1850.0,
         "currency": "EUR"
       },
       {
         "accountId": "acc_sofia_002",
         "bankName": "Nordea Personal",
         "accountType": "checking",
-        "balance": 320.00,
+        "balance": 320.0,
         "currency": "EUR"
       }
     ],
@@ -36,7 +36,7 @@
       {
         "cardId": "cc_sofia_001",
         "issuer": "Nordea Visa",
-        "balance": 5400.00,
+        "balance": 5400.0,
         "creditLimit": 6000,
         "interestRate": 17.9,
         "minimumPayment": 160,
@@ -45,7 +45,7 @@
       {
         "cardId": "cc_sofia_002",
         "issuer": "OP Business Mastercard",
-        "balance": 3200.00,
+        "balance": 3200.0,
         "creditLimit": 5000,
         "interestRate": 16.9,
         "minimumPayment": 100,
@@ -77,7 +77,7 @@
       {
         "subscriptionId": "sub_sofia_002",
         "name": "Mobile Phone Plan",
-        "monthlyCost": 29.90,
+        "monthlyCost": 29.9,
         "category": "utilities",
         "currency": "EUR",
         "startDate": "2022-01-01"
