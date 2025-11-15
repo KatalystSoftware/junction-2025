@@ -1,4 +1,4 @@
-const DEFAULT_AGENT_MODEL = "google/gemini-2.0-flash";
+const DEFAULT_AGENT_MODEL = "google/gemini-2.5-flash";
 
 export function getAgentModel(): string {
   const envModel = process.env.AGENT_LLM_MODEL;
