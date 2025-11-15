@@ -1,0 +1,32 @@
+{
+  "characterId": "char_antti_005",
+  "name": "Antti Nieminen",
+  "age": 45,
+  "occupation": "Entrepreneur",
+  "background": "Runs a small construction company in Espoo with 8 employees. Business has been running for 7 years but recently facing cash flow issues due to late client payments. Married with two teenage children. Stressed about keeping business afloat while maintaining family stability.",
+  "personality": {
+    "impulsiveness": 0.4,
+    "trustingness": 0.5,
+    "financial_literacy": 0.6,
+    "stubbornness": 0.7,
+    "emotionality": 0.5
+  },
+  "financialProfile": {
+    "incomeLevel": "medium",
+    "typicalMonthlyIncome": 3500,
+    "hasDebt": true,
+    "hasSavings": "minimal"
+  },
+  "communicationStyle": {
+    "formality": "semi-formal",
+    "language": "casual_adult_finnish",
+    "prefersVoice": 0.6,
+    "callsWhenEmotional": true
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

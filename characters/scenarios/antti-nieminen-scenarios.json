@@ -1,0 +1,162 @@
+[
+  {
+    "scenarioId": "scenario_antti_cashflow_001",
+    "characterId": "char_antti_005",
+    "scenarioType": "business_cashflow",
+    "difficulty": 0.7,
+    "topic": "loans",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "Hello, I need some advice urgently. I run a construction company and three major clients are 60 days late on payments totaling €45,000. I have payroll coming up in two weeks and I'm not sure I can make it. Should I take out a business loan or... I don't know what to do.",
+      "voiceMessage": {
+        "enabled": true,
+        "transcription": "Hello, I need some advice urgently. I run a construction company and three major clients are 60 days late on payments totaling €45,000. I have payroll coming up in two weeks and I'm not sure I can make it. Should I take out a business loan or... I don't know what to do.",
+        "urgency": "urgent"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Severe cash flow crisis due to late payments, payroll deadline approaching",
+      "emotionalState": "stressed, anxious, feeling responsible for employees",
+      "urgency": "high",
+      "specificDetails": {
+        "outstandingReceivables": 45000,
+        "daysOverdue": 60,
+        "upcomingPayroll": 22000,
+        "currentCash": 8000,
+        "numberOfEmployees": 8,
+        "businessAge": 7
+      }
+    },
+    "idealAdvice": [
+      "Acknowledge the stress and validate concern for employees",
+      "Immediate action: contact clients directly about payment schedules",
+      "Consider invoice factoring or short-term business line of credit",
+      "Review payment terms and implement stricter policies (deposits, progress payments)",
+      "Separate immediate crisis from long-term cash flow management",
+      "Consider speaking with accountant about tax payment deferral if needed",
+      "Create cash flow forecast for next 3-6 months",
+      "Discuss payment plan with critical suppliers if necessary"
+    ],
+    "commonMistakes": [
+      "Suggesting personal loans to cover business expenses (bad practice)",
+      "Recommending firing employees without exploring all options",
+      "Not addressing the urgent payroll deadline",
+      "Focusing only on loan without addressing receivables collection",
+      "Being judgmental about business management",
+      "Ignoring the human element (employees, family stress)"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_antti_cashflow_recovery_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 4
+      },
+      {
+        "scenarioId": "scenario_antti_cashflow_crisis_003",
+        "triggeredBy": "bad_advice_or_not_followed",
+        "delayInSessions": 2
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_antti_cashflow_recovery_002",
+    "characterId": "char_antti_005",
+    "scenarioType": "business_cashflow_followup",
+    "difficulty": 0.6,
+    "topic": "loans",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_antti_cashflow_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Thanks for the advice! I secured a business line of credit and collected €30,000 from two clients. Payroll is covered. Now I want to make sure this never happens again. How do I build a better cash flow buffer?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Immediate crisis resolved, wants to prevent future problems",
+      "emotionalState": "relieved, motivated to improve",
+      "urgency": "low",
+      "specificDetails": {
+        "lineOfCreditAmount": 25000,
+        "collected": 30000,
+        "stillOwed": 15000,
+        "wantsToImprove": true
+      }
+    },
+    "idealAdvice": [
+      "Celebrate solving the immediate crisis",
+      "Build cash reserve equal to 2-3 months of operating expenses",
+      "Implement stricter payment terms (50% deposit, progress payments)",
+      "Set up automated payment reminders and follow-up system",
+      "Consider offering small discount for early payment",
+      "Regular cash flow forecasting (weekly/monthly reviews)",
+      "Separate business and personal finances completely",
+      "Meet with accountant quarterly to review financial health"
+    ],
+    "commonMistakes": [
+      "Not acknowledging the successful crisis management",
+      "Suggesting overly conservative approach that limits growth",
+      "Ignoring the need for working capital in construction business"
+    ]
+  },
+  {
+    "scenarioId": "scenario_antti_cashflow_crisis_003",
+    "characterId": "char_antti_005",
+    "scenarioType": "business_cashflow_worsened",
+    "difficulty": 0.8,
+    "topic": "loans",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_antti_cashflow_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "I... I had to miss payroll. Two employees quit. My wife is furious because I took money from our savings. The clients still haven't paid. I don't know if I should close the business or keep fighting. This is destroying my family.",
+      "voiceMessage": {
+        "enabled": true,
+        "transcription": "I... I had to miss payroll. Two employees quit. My wife is furious because I took money from our savings. The clients still haven't paid. I don't know if I should close the business or keep fighting. This is destroying my family.",
+        "urgency": "urgent"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Crisis escalated, employee loss, family conflict, considering closing business",
+      "emotionalState": "desperate, ashamed, overwhelmed",
+      "urgency": "high",
+      "specificDetails": {
+        "missedPayroll": true,
+        "employeesQuit": 2,
+        "usedPersonalSavings": 12000,
+        "marriageStrained": true,
+        "stillOwed": 45000
+      }
+    },
+    "idealAdvice": [
+      "Provide emotional support - this is a crisis point",
+      "Immediate: legal advice on collecting overdue payments",
+      "Consider hiring collection agency for severely overdue invoices",
+      "Meet with business advisor to assess if business is viable",
+      "If closing: proper procedures to minimize personal liability",
+      "If continuing: radical restructuring needed",
+      "Family counseling - business stress affecting marriage",
+      "Don't make permanent decisions in crisis mode - get professional help first"
+    ],
+    "commonMistakes": [
+      "Immediately saying to close business without assessment",
+      "Ignoring the severe emotional and family toll",
+      "Not addressing the immediate legal/collection issues",
+      "Being judgmental about using personal savings"
+    ]
+  }
+]

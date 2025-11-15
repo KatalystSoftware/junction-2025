@@ -1,0 +1,173 @@
+[
+  {
+    "scenarioId": "scenario_sofia_personal_business_001",
+    "characterId": "char_sofia_012",
+    "scenarioType": "business_personal_finance_separation",
+    "difficulty": 0.8,
+    "topic": "loans",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "I'm in over my head. I've been running my startup for 18 months and my personal finances are a disaster. I've put €15,000 of personal expenses on my business credit card and €8,000 of business expenses on my personal card. I pay myself irregularly - sometimes €3,000, sometimes nothing. I have no idea what's business money and what's mine. My accountant is frustrated. Help!",
+      "voiceMessage": {
+        "enabled": true,
+        "transcription": "I'm in over my head. I've been running my startup for 18 months and my personal finances are a disaster. I've put €15,000 of personal expenses on my business credit card and €8,000 of business expenses on my personal card. I pay myself irregularly - sometimes €3,000, sometimes nothing. I have no idea what's business money and what's mine. My accountant is frustrated. Help!",
+        "urgency": "urgent"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Personal and business finances completely mixed, accountant frustrated, financial chaos",
+      "emotionalState": "overwhelmed, stressed, defensive about business",
+      "urgency": "high",
+      "specificDetails": {
+        "personalOnBusinessCard": 15000,
+        "businessOnPersonalCard": 8000,
+        "irregularSalary": true,
+        "companyAge": 18,
+        "fundingRaised": 200000,
+        "numberOfEmployees": 3,
+        "accountantFrustrated": true
+      }
+    },
+    "idealAdvice": [
+      "Acknowledge this is common for new founders but needs fixing now",
+      "URGENT: Stop using cards interchangeably immediately",
+      "Work with accountant to untangle and categorize all past expenses",
+      "Reimburse yourself properly for business expenses on personal card",
+      "Pay back the personal expenses from business account",
+      "Set consistent founder salary (even if low) - never €0, never varies",
+      "Separate bank accounts, separate credit cards, no exceptions",
+      "This isn't just bookkeeping - investors and taxes require separation",
+      "Consider business line of credit instead of personal cards",
+      "Meet with accountant weekly until this is resolved"
+    ],
+    "commonMistakes": [
+      "Not emphasizing the legal/tax seriousness of mixing finances",
+      "Suggesting to just \"be more careful\" without concrete systems",
+      "Being too harsh about the mistake (common founder error)",
+      "Not addressing investor/legal implications",
+      "Recommending complex solutions before basic separation",
+      "Ignoring the accountant relationship that needs repair"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_sofia_organized_growth_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 4
+      },
+      {
+        "scenarioId": "scenario_sofia_crisis_003",
+        "triggeredBy": "bad_advice_or_not_followed",
+        "delayInSessions": 2
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_sofia_organized_growth_002",
+    "characterId": "char_sofia_012",
+    "scenarioType": "startup_growth_planning",
+    "difficulty": 0.7,
+    "topic": "loans",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_sofia_personal_business_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Update! I completely separated business and personal finances. My accountant is happy! I pay myself €2,200/month consistently now. The business is doing well - we're growing 30% monthly. Investors want us to raise Series A (€1.5M) but I'd need to take more founder salary. How do I plan my personal finances around startup equity vs salary?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Finances organized, business growing, planning for larger fundraise and salary increase",
+      "emotionalState": "excited, optimistic, wanting to plan smartly",
+      "urgency": "low",
+      "specificDetails": {
+        "currentSalary": 2200,
+        "growthRate": 0.3,
+        "plannedFundraising": 1500000,
+        "financesOrganized": true,
+        "consideringSalaryIncrease": true
+      }
+    },
+    "idealAdvice": [
+      "Congratulate on successful financial organization!",
+      "Founder salary should be market-reasonable but not excessive before profitability",
+      "Consider €3,500-4,500 range for founder with funding (Helsinki market)",
+      "Don't optimize for tax at expense of personal financial security",
+      "Build personal emergency fund (6 months) separate from equity",
+      "Startup equity is illiquid - don't count on it for years",
+      "Plan personal life (apartment, family) on salary only, not equity",
+      "Discuss salary expectations with investors before Series A",
+      "Balance runway extension vs. founder well-being"
+    ],
+    "commonMistakes": [
+      "Suggesting minimal salary to extend runway at personal expense",
+      "Counting equity as if it's liquid money",
+      "Not addressing founder burnout from financial stress",
+      "Recommending excessive salary that hurts company"
+    ]
+  },
+  {
+    "scenarioId": "scenario_sofia_crisis_003",
+    "characterId": "char_sofia_012",
+    "scenarioType": "startup_financial_crisis",
+    "difficulty": 0.8,
+    "topic": "loans",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_sofia_personal_business_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "Everything is falling apart. The mixed finances created a tax mess - I owe €22,000 personally because of improperly categorized expenses. The company is also in trouble - we're burning through cash faster than expected and have 3 months runway left. Investors are angry. I haven't paid myself in two months. I'm thinking of taking a personal loan to pay the tax bill. Should I shut down the company?",
+      "voiceMessage": {
+        "enabled": true,
+        "transcription": "Everything is falling apart. The mixed finances created a tax mess - I owe €22,000 personally because of improperly categorized expenses. The company is also in trouble - we're burning through cash faster than expected and have 3 months runway left. Investors are angry. I haven't paid myself in two months. I'm thinking of taking a personal loan to pay the tax bill. Should I shut down the company?",
+        "urgency": "urgent"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Severe personal tax issue from mixed finances, company running out of money, investor pressure",
+      "emotionalState": "panicked, desperate, considering giving up",
+      "urgency": "high",
+      "specificDetails": {
+        "personalTaxOwed": 22000,
+        "companyRunway": 3,
+        "unpaidSalaryMonths": 2,
+        "investorsAngry": true,
+        "consideringPersonalLoan": true,
+        "consideringShutdown": true
+      }
+    },
+    "idealAdvice": [
+      "Don't make permanent decisions in crisis mode",
+      "Personal tax: negotiate payment plan with tax authority (don't take personal loan)",
+      "Company: emergency board meeting to discuss options",
+      "Options: bridge financing, pivot, controlled shutdown, or acquisition",
+      "Separate personal crisis from company crisis - solve each distinctly",
+      "Pay yourself immediately if company has ANY cash - you need to survive",
+      "Consult startup lawyer about personal liability",
+      "Personal loans for tax bills rarely good idea - payment plans better",
+      "If shutdown needed, do it properly to protect yourself legally",
+      "Reach out to startup community/mentors who've been through this"
+    ],
+    "commonMistakes": [
+      "Immediately saying to shut down without exploring all options",
+      "Approving personal loan for tax debt",
+      "Not separating personal vs company problems",
+      "Being judgmental during crisis",
+      "Not mentioning legal protection importance",
+      "Ignoring founder's mental health and immediate needs"
+    ]
+  }
+]

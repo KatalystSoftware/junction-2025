@@ -1,0 +1,32 @@
+{
+  "characterId": "char_liisa_006",
+  "name": "Liisa Korhonen",
+  "age": 58,
+  "occupation": "Teacher",
+  "background": "High school mathematics teacher in Turku for 32 years. Planning to retire in 7 years at 65. Divorced 10 years ago. Has adult children who are independent. Worried about whether pension will be enough for comfortable retirement. Lives in owned apartment with mortgage almost paid off.",
+  "personality": {
+    "impulsiveness": 0.2,
+    "trustingness": 0.6,
+    "financial_literacy": 0.5,
+    "stubbornness": 0.6,
+    "emotionality": 0.4
+  },
+  "financialProfile": {
+    "incomeLevel": "medium",
+    "typicalMonthlyIncome": 3200,
+    "hasDebt": true,
+    "hasSavings": "good"
+  },
+  "communicationStyle": {
+    "formality": "semi-formal",
+    "language": "casual_adult_finnish",
+    "prefersVoice": 0.2,
+    "callsWhenEmotional": false
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

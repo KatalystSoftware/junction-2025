@@ -1,0 +1,159 @@
+[
+  {
+    "scenarioId": "scenario_ville_taxes_001",
+    "characterId": "char_ville_009",
+    "scenarioType": "freelance_tax_issues",
+    "difficulty": 0.7,
+    "topic": "loans",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I'm in trouble. I've been freelancing for 5 years and haven't been setting aside money for taxes properly. I just got my tax decision and I owe €12,000. I have about €5,000 saved but that's my emergency fund. My income varies wildly - last month I made €6,000, this month only €2,000. How do I deal with this?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Large unexpected tax bill, irregular freelance income, insufficient savings",
+      "emotionalState": "panicked, regretful, stressed",
+      "urgency": "high",
+      "specificDetails": {
+        "taxOwed": 12000,
+        "emergencyFund": 5000,
+        "lastMonthIncome": 6000,
+        "thisMonthIncome": 2000,
+        "averageMonthlyIncome": 4200,
+        "yearsFreelancing": 5
+      }
+    },
+    "idealAdvice": [
+      "Don't panic - this is solvable",
+      "Contact tax authorities immediately to set up payment plan (they're usually flexible)",
+      "Keep emergency fund intact if possible - negotiate payment terms instead",
+      "Set up separate tax account NOW - save 30-35% of each invoice immediately",
+      "Implement proper bookkeeping/accounting system",
+      "Consider hiring accountant for quarterly tax planning",
+      "Create irregular income budget based on lowest expected month",
+      "Set up prepayment plan for next year to avoid this again"
+    ],
+    "commonMistakes": [
+      "Suggesting to drain emergency fund completely",
+      "Not mentioning payment plan options with tax authorities",
+      "Being judgmental about past tax mistakes",
+      "Not addressing the irregular income budgeting challenge",
+      "Recommending overly complex accounting without professional help",
+      "Not emphasizing urgency of contacting tax office"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_ville_taxes_organized_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 4
+      },
+      {
+        "scenarioId": "scenario_ville_income_drought_003",
+        "triggeredBy": "bad_advice_or_not_followed",
+        "delayInSessions": 2
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_ville_taxes_organized_002",
+    "characterId": "char_ville_009",
+    "scenarioType": "freelance_organized",
+    "difficulty": 0.5,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_ville_taxes_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Update: I set up a payment plan with the tax office - €500/month for 24 months. What a relief! I also hired an accountant and set up a separate tax account. Now I'm saving 35% of every invoice. But I'm struggling to budget with income that varies so much. Some months are feast, some are famine. Tips?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Tax issue resolved, wants to master irregular income budgeting",
+      "emotionalState": "relieved, proactive, wanting to improve",
+      "urgency": "low",
+      "specificDetails": {
+        "taxPaymentPlan": 500,
+        "hasAccountant": true,
+        "taxSavingsRate": 0.35,
+        "incomeVariability": "high"
+      }
+    },
+    "idealAdvice": [
+      "Great job taking control of the situation!",
+      "Use \"baseline budgeting\" - budget based on lowest typical month",
+      "Treat high-income months as windfalls, not regular income",
+      "Build income smoothing fund (3-6 months of baseline expenses)",
+      "Separate accounts: operating, tax, emergency, income smoothing",
+      "Track 12-month rolling average to understand true average income",
+      "Plan annual expenses and save monthly for them",
+      "Consider business insurance for income protection"
+    ],
+    "commonMistakes": [
+      "Suggesting to budget on average income (leads to overspending)",
+      "Not acknowledging successful problem resolution",
+      "Overly complicated multi-account systems",
+      "Not considering seasonal business patterns"
+    ]
+  },
+  {
+    "scenarioId": "scenario_ville_income_drought_003",
+    "characterId": "char_ville_009",
+    "scenarioType": "freelance_income_crisis",
+    "difficulty": 0.6,
+    "topic": "emergency_fund",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_ville_taxes_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Things got worse. Two big clients delayed projects and I've had almost no income for two months. I used my emergency fund to pay the tax bill and now I have nothing left. My wife is stressed because she's carrying all our expenses. I'm thinking of taking a permanent job just for stability. Should I give up freelancing?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Income drought, emergency fund depleted by tax bill, relationship strain",
+      "emotionalState": "defeated, considering giving up freelancing",
+      "urgency": "high",
+      "specificDetails": {
+        "monthsLowIncome": 2,
+        "emergencyFundDepleted": true,
+        "relationshipStrain": true,
+        "consideringEmployment": true
+      }
+    },
+    "idealAdvice": [
+      "Don't make major career decisions in crisis mode",
+      "Immediate: actively pursue new clients, lower rates temporarily if needed",
+      "Explore freelancer unemployment fund if eligible",
+      "Part-time employment + freelancing might be middle ground",
+      "Honest conversation with wife about finances and timelines",
+      "This is exactly why income smoothing fund is critical",
+      "Diversify client base to reduce risk of simultaneous delays",
+      "Have financial plan before abandoning freelancing",
+      "Consider if permanent role is what you really want long-term"
+    ],
+    "commonMistakes": [
+      "Immediately saying to quit freelancing",
+      "Not addressing the relationship stress",
+      "Ignoring that this crisis could have been prevented with better planning",
+      "Not validating that freelancing is genuinely harder financially"
+    ]
+  }
+]

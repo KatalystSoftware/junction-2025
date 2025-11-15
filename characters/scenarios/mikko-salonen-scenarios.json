@@ -1,0 +1,159 @@
+[
+  {
+    "scenarioId": "scenario_mikko_unemployment_001",
+    "characterId": "char_mikko_007",
+    "scenarioType": "unemployment_crisis",
+    "difficulty": 0.4,
+    "topic": "emergency_fund",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Hey... I lost my job 3 months ago and my savings are gone. I'm on unemployment benefits (€900/month) but my rent is €550 and I have student loan payments of €150. I literally have €50 left. I don't know how to survive until I find a new job. Help?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Unemployed for 3 months, emergency fund depleted, income insufficient for expenses",
+      "emotionalState": "stressed, embarrassed, desperate",
+      "urgency": "high",
+      "specificDetails": {
+        "monthlyBenefits": 900,
+        "rent": 550,
+        "studentLoanPayment": 150,
+        "currentCash": 50,
+        "monthsUnemployed": 3,
+        "hasStudentDebt": true
+      }
+    },
+    "idealAdvice": [
+      "Acknowledge how stressful this situation is",
+      "Immediate: apply for student loan payment pause/reduction (available in Finland)",
+      "Review all unemployment benefits eligibility (housing allowance, etc.)",
+      "Create bare minimum survival budget for job search period",
+      "Look into food assistance programs if needed",
+      "Focus job search efforts on immediate income (any job better than no job)",
+      "Consider gig work/temp agencies while searching for career position",
+      "Reach out to KELA about additional support options"
+    ],
+    "commonMistakes": [
+      "Suggesting to just \"get any job\" without specific advice on how",
+      "Not addressing the student loan payment issue immediately",
+      "Being judgmental about savings running out",
+      "Recommending expensive solutions (courses, certifications)",
+      "Not validating the emotional stress",
+      "Ignoring available social support systems in Finland"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_mikko_job_found_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 3
+      },
+      {
+        "scenarioId": "scenario_mikko_deeper_trouble_003",
+        "triggeredBy": "bad_advice_or_not_followed",
+        "delayInSessions": 2
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_mikko_job_found_002",
+    "characterId": "char_mikko_007",
+    "scenarioType": "unemployment_recovery",
+    "difficulty": 0.3,
+    "topic": "emergency_fund",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_mikko_unemployment_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Good news! I got a job! 🎉 It's not my dream job but it pays €2,400/month and I start next week. I paused my student loan payments like you suggested. Now I want to make sure I never end up in that situation again. How do I rebuild my emergency fund?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Found new job, wants to rebuild financial security",
+      "emotionalState": "relieved, motivated, determined",
+      "urgency": "low",
+      "specificDetails": {
+        "newSalary": 2400,
+        "studentLoanPaused": true,
+        "currentSavings": 0,
+        "rentExpense": 550
+      }
+    },
+    "idealAdvice": [
+      "Celebrate the achievement!",
+      "Start emergency fund immediately - even €50/month matters",
+      "Aim for 3-6 months of expenses (€2,500-5,000 as initial goal)",
+      "Resume student loan payments but at comfortable level",
+      "Use \"pay yourself first\" method - automate savings",
+      "Keep living frugally at first to build buffer quickly",
+      "Once emergency fund stable, then focus on debt payoff",
+      "Learn from experience: emergency fund is not optional"
+    ],
+    "commonMistakes": [
+      "Suggesting to pay off all debt before building emergency fund",
+      "Not celebrating the successful job search",
+      "Recommending overly aggressive savings that leaves no room for life",
+      "Ignoring student loan completely"
+    ]
+  },
+  {
+    "scenarioId": "scenario_mikko_deeper_trouble_003",
+    "characterId": "char_mikko_007",
+    "scenarioType": "unemployment_crisis_escalated",
+    "difficulty": 0.5,
+    "topic": "emergency_fund",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_mikko_unemployment_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I'm behind on rent. My landlord is threatening eviction. I couldn't make the student loan payment and they're calling me. I'm applying to jobs but getting rejected everywhere. I'm thinking of taking a payday loan just to get through this month. Is that a terrible idea?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Facing eviction, debt collectors calling, considering payday loan",
+      "emotionalState": "desperate, panicked, ashamed",
+      "urgency": "high",
+      "specificDetails": {
+        "rentArrears": 550,
+        "evictionThreat": true,
+        "debtCollectorsCalling": true,
+        "consideringPaydayLoan": true
+      }
+    },
+    "idealAdvice": [
+      "STRONGLY advise against payday loan (debt trap with extreme interest)",
+      "Contact landlord immediately to negotiate payment plan",
+      "Contact student loan provider about financial hardship",
+      "Seek help from municipal social services (they can help with rent)",
+      "Look into debt counseling services (free in Finland)",
+      "Temporary crisis: food banks, community support",
+      "Register with multiple temp agencies for immediate work",
+      "This is serious but there are safety nets - use them"
+    ],
+    "commonMistakes": [
+      "Not strongly warning against payday loans",
+      "Suggesting bankruptcy prematurely",
+      "Not providing concrete immediate actions",
+      "Ignoring the eviction threat urgency",
+      "Being judgmental instead of supportive"
+    ]
+  }
+]
