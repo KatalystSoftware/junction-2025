@@ -6,3 +6,8 @@ dist
 .env
 *.db
 *.db-*
+
+# Exception: Include pre-generated knowledge base
+!knowledge-base.db
+!knowledge-base.db-shm
+!knowledge-base.db-wal

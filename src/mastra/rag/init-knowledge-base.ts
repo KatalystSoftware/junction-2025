@@ -220,7 +220,7 @@ export async function initializeKnowledgeBase() {
   console.log("🗄️  Initializing LibSQL Vector store...");
   const vectorStore = new LibSQLVector({
     id: "finnish-financial-literacy",
-    connectionUrl: "file:../knowledge-base.db",
+    connectionUrl: "file:./knowledge-base.db",
   });
 
   // 4. Create index if it doesn't exist
