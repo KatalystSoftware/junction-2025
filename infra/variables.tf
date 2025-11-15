@@ -15,6 +15,12 @@ variable "container_image" {
   default     = "ghcr.io/katalystsoftware/financial-advisor-sim:latest"
 }
 
+variable "github_repository" {
+  description = "GitHub repository (owner/name) for OIDC trust (e.g. KatalystSoftware/junction-2025)"
+  type        = string
+  default     = "KatalystSoftware/junction-2025"
+}
+
 variable "google_generative_ai_api_key" {
   description = "API key for Google Generative AI (Gemini)"
   type        = string
