@@ -917,6 +917,8 @@ export class CharacterPoolManager {
           lastVisit: null,
           adviceFollowedHistory: [],
           progressionHistory: [],
+          hasReceivedVoiceMessage: false,
+          currentScenarioNumber: 0,
           decayApplied: 0,
           wasRecommended: false,
         },

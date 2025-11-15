@@ -23,6 +23,31 @@
    GOOGLE_GENERATIVE_AI_API_KEY=AIzaXXXXXXXXXXXXXXXXXXXXXXXX
    ```
 
+## Get Your ElevenLabs API Key (Optional - For Voice Integration)
+
+Voice integration adds emotional character voice messages to enhance the experience.
+
+1. **Sign up at ElevenLabs:**
+   - Visit: **https://elevenlabs.io/**
+   - Create a free account
+
+2. **Get your API key:**
+   - Go to your profile settings
+   - Navigate to the API section
+   - Copy your API key
+
+3. **Add to your .env file:**
+
+   ```bash
+   # Edit .env file
+   nano .env
+
+   # Add ElevenLabs API key:
+   ELEVENLABS_API_KEY=your_elevenlabs_api_key_here
+   ```
+
+**Note:** Voice integration is optional. The game will work without it, but characters won't send voice messages.
+
 ### Option 2: Google Cloud Platform (For Cloud Credits)
 
 If you want to use Vertex AI with your Google Cloud credits:

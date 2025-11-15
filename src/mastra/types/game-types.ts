@@ -110,6 +110,8 @@ export interface CharacterRelationshipState {
   progressionHistory: RelationshipProgression[]; // Track trust changes over time
   decayApplied: number; // Total decay applied
   wasRecommended: boolean; // True if character was unlocked via recommendation
+  hasReceivedVoiceMessage?: boolean; // Track if character has received a voice message
+  currentScenarioNumber?: number; // Current scenario number in their story arc
 }
 
 export interface CharacterConversationMemory {
@@ -412,6 +414,7 @@ export interface GameMasterDecision {
 export interface CharacterResponse {
   messages: string[];
   voiceNeeded?: boolean;
+  voiceConfig?: VoiceMessageConfig;
   emotionalState?: string;
   willFollowAdvice?: boolean; // AI's assessment
   conversationEnding?: boolean; // Character ready to leave
@@ -530,6 +533,7 @@ export interface GameResponse {
   threadId?: string;
   messages?: string[];
   voiceNeeded?: boolean;
+  voiceConfig?: VoiceMessageConfig;
   isNewThread?: boolean;
   characterInfo?: {
     name: string;

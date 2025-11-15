@@ -519,10 +519,12 @@ async function translateToEnglish(finnishText: string): Promise<string> {
 
 /**
  * Get character's initial message, optionally translated to match advisor language
+ * Also generates voice messages for emotional initial contacts
  */
 export async function getCharacterInitialMessage(
   scenario: Scenario,
   advisorLanguage?: "finnish" | "english",
+  character?: Character,
 ): Promise<{
   message: string;
   isVoice: boolean;
@@ -538,11 +540,53 @@ export async function getCharacterInitialMessage(
     }
   }
 
+  // Check if initial contact should have voice
+  const isVoiceMethod =
+    scenario.initialContact.method === "voice" ||
+    scenario.initialContact.method === "call";
+
+  let voiceConfig = scenario.initialContact.voiceMessage;
+
+  // Generate voice message if it's a voice method and character is provided
+  if (isVoiceMethod && character && !voiceConfig?.audioUrl) {
+    // Import voice service
+    const {
+      shouldGenerateVoiceMessage,
+      generateVoiceMessage,
+      inferEmotionalStateFromContext,
+    } = await import("../services/voice-service.ts");
+
+    const emotionalState = inferEmotionalStateFromContext(
+      character,
+      scenario.problemContext.emotionalState,
+    );
+
+    // Determine scenario number (visitCount + 1, since first visit is visitCount=0)
+    const scenarioNumber = (character.relationshipState.visitCount ?? 0) + 1;
+    const shouldGenerateVoice = shouldGenerateVoiceMessage(
+      character,
+      emotionalState,
+      scenarioNumber,
+    );
+
+    if (shouldGenerateVoice) {
+      voiceConfig = await generateVoiceMessage(
+        character,
+        message,
+        emotionalState,
+      );
+
+      // Mark that this character has received a voice message
+      if (voiceConfig?.enabled) {
+        character.relationshipState.hasReceivedVoiceMessage = true;
+      }
+    }
+  }
+
   return {
     message,
-    isVoice:
-      scenario.initialContact.method === "voice" ||
-      scenario.initialContact.method === "call",
-    voiceConfig: scenario.initialContact.voiceMessage,
+    // Only mark as voice if we actually generated voice audio
+    isVoice: voiceConfig?.enabled ?? false,
+    voiceConfig,
   };
 }
