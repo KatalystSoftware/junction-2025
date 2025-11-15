@@ -23,6 +23,13 @@ import { characterPool } from "./game/character-pool-manager.ts";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Create storage instance (shared between mastra and session store)
+export const storage = new LibSQLStore({
+  id: "mastra-agent-store",
+  // Use file storage for persistence
+  url: "file:../elamapeli.db",
+});
+
 export const mastra = new Mastra({
   agents: {
     gameMasterAgent,
@@ -36,11 +43,7 @@ export const mastra = new Mastra({
     evaluateAdviceTool,
     queryFinnishKnowledgeTool,
   },
-  storage: new LibSQLStore({
-    id: "mastra-agent-store",
-    // Use file storage for persistence
-    url: "file:../elamapeli.db",
-  }),
+  storage,
   logger: new PinoLogger({
     name: "Financial-Advisor-Simulator",
     level: "info",

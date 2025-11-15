@@ -15,6 +15,12 @@ import {
   createNewAdvisor,
   getActiveThreads,
 } from "./mastra/game/orchestrator.ts";
+import {
+  loadSession,
+  saveSession,
+  generateSessionId,
+  formatSessionId,
+} from "./mastra/persistence/session-store.ts";
 import type {
   AdvisorState,
   ConversationThread,
@@ -47,6 +53,7 @@ interface ThreadData {
 
 function App() {
   const { exit } = useApp();
+  const [sessionId, setSessionId] = useState<string>("");
   const [advisorState, setAdvisorState] = useState<AdvisorState | null>(null);
   const [threads, setThreads] = useState<Map<string, ThreadData>>(new Map());
   const [currentThreadId, setCurrentThreadId] = useState<string | null>(null);
@@ -67,13 +74,103 @@ function App() {
     response: GameResponse;
   } | null>(null);
 
+  // Helper: Convert threads to format for saving (filter system messages, remove timestamps)
+  const getThreadHistoriesForSave = (
+    threadMap: Map<string, ThreadData>,
+  ): Map<string, Array<{ role: "user" | "assistant"; content: string }>> => {
+    const histories = new Map<
+      string,
+      Array<{ role: "user" | "assistant"; content: string }>
+    >();
+
+    threadMap.forEach((thread, threadId) => {
+      const history = thread.messages
+        .filter((m) => m.role !== "system")
+        .map((m) => ({
+          role: m.role as "user" | "assistant",
+          content: m.content,
+        }));
+      histories.set(threadId, history);
+    });
+
+    return histories;
+  };
+
   // Initialize game
   useEffect(() => {
     const init = async () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      const advisor = createNewAdvisor(`advisor_${Date.now()}`);
+
+      // Parse command line arguments for --uuid flag
+      const args = process.argv.slice(2);
+      const uuidIndex = args.indexOf("--uuid");
+      const providedUuid = uuidIndex !== -1 ? args[uuidIndex + 1] : null;
+
+      let currentSessionId: string;
+      let savedState: Awaited<ReturnType<typeof loadSession>> = null;
+
+      if (providedUuid) {
+        // Try to load existing session
+        setStatusMessage(`Loading session ${formatSessionId(providedUuid)}...`);
+        savedState = await loadSession(providedUuid);
+        currentSessionId = providedUuid;
+
+        if (savedState) {
+          setStatusMessage(
+            `✅ Loaded session from ${new Date(savedState.savedAt).toLocaleString()}`,
+          );
+        } else {
+          setStatusMessage(
+            `⚠️ Session not found, creating new session with UUID ${formatSessionId(providedUuid)}`,
+          );
+        }
+      } else {
+        // Generate new session UUID
+        currentSessionId = generateSessionId();
+        setStatusMessage(
+          `✨ New session: ${formatSessionId(currentSessionId)}`,
+        );
+      }
+
+      // Create or restore advisor state
+      const advisor = savedState
+        ? savedState.advisorState
+        : createNewAdvisor(currentSessionId);
+
+      // Restore thread histories if available
+      if (savedState?.threadHistories) {
+        const restoredThreads = new Map<string, ThreadData>();
+        savedState.threadHistories.forEach((history, threadId) => {
+          // Find thread info from advisor state
+          const threadInfo = advisor.activeThreads[threadId];
+          if (threadInfo) {
+            const messages: Message[] = history.map((msg) => ({
+              role: msg.role,
+              content: msg.content,
+              timestamp: new Date(),
+            }));
+
+            restoredThreads.set(threadId, {
+              threadId,
+              characterName: threadInfo.characterId, // We'll update this when we have character data
+              messages,
+              unreadCount: 0,
+              status:
+                threadInfo.status === "resolved" ? "completed" : "active",
+            });
+          }
+        });
+        setThreads(restoredThreads);
+      }
+
+      setSessionId(currentSessionId);
       setAdvisorState(advisor);
-      setStatusMessage("Ready! Press 'n' for new consultation");
+
+      const sessionInfo = savedState
+        ? `Session: ${formatSessionId(currentSessionId)} | Rep: ${advisor.reputation}/100 | Skill: ${advisor.skillLevel.toFixed(1)}/10`
+        : `Session: ${formatSessionId(currentSessionId)} | To continue later: pnpm play:tui --uuid ${currentSessionId}`;
+
+      setStatusMessage(`${sessionInfo}\nReady! Press 'n' for new consultation`);
     };
     init();
   }, []);
@@ -176,7 +273,11 @@ function App() {
         setBossReview(null);
         setStatusMessage("Quiz started! Select your answer (1-4)");
       } else {
+        // Boss review completed without quiz - auto-save
         setBossReview(null);
+        if (advisorState && sessionId) {
+          saveSession(sessionId, advisorState, getThreadHistoriesForSave(threads));
+        }
       }
       return;
     }
@@ -253,6 +354,11 @@ function App() {
           }
 
           setAdvisorState(updatedState);
+
+          // Auto-save after quiz completion
+          if (sessionId) {
+            saveSession(sessionId, updatedState, getThreadHistoriesForSave(threads));
+          }
         }
 
         // Show results (will be handled by QuizResultsModal)
@@ -353,6 +459,11 @@ function App() {
         setAdvisorState(consultation.stateUpdate);
         setStatusMessage("Boss review received! Press SPACE to continue");
         setIsLoading(false);
+
+        // Auto-save after boss review state update
+        if (sessionId) {
+          await saveSession(sessionId, consultation.stateUpdate, getThreadHistoriesForSave(threads));
+        }
         return;
       }
 
@@ -392,6 +503,11 @@ function App() {
         setCurrentThreadId(newThreadId);
         setAdvisorState(consultation.stateUpdate);
         setStatusMessage(`New client: ${characterName}`);
+
+        // Auto-save after new consultation
+        if (sessionId) {
+          await saveSession(sessionId, consultation.stateUpdate, getThreadHistoriesForSave(updated));
+        }
       } else {
         setStatusMessage("No characters available");
       }
@@ -533,6 +649,11 @@ function App() {
         messages: updatedMessages,
       });
       setThreads(updated);
+
+      // Auto-save after message exchange
+      if (sessionId) {
+        await saveSession(sessionId, response.stateUpdate, getThreadHistoriesForSave(updated));
+      }
 
       // Check if conversation ended
       if (response.type === "conversation_end") {
