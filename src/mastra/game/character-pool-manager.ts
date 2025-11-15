@@ -13,6 +13,7 @@ import type {
   AdvisorState,
   ConsultationSession,
   FinancialTopic,
+  CharacterConversationMemory,
 } from "../types/game-types.ts";
 
 export interface PendingFollowUp {
@@ -47,7 +48,12 @@ export class CharacterPoolManager {
 
       this.characters.clear();
       for (const char of characterArray) {
-        this.characters.set(char.characterId, char);
+        // Ensure new memory fields are initialized
+        this.characters.set(char.characterId, {
+          ...char,
+          conversationHistory: char.conversationHistory || [],
+          advisorNotes: char.advisorNotes || "",
+        });
       }
 
       // Load scenarios - support both single file and directory
@@ -186,6 +192,66 @@ export class CharacterPoolManager {
     updatedChar.relationshipState.lastVisit = new Date().toISOString();
 
     this.characters.set(characterId, updatedChar);
+  }
+
+  /**
+   * Save character memory after a consultation session
+   */
+  saveCharacterMemory(
+    characterId: string,
+    sessionData: CharacterConversationMemory,
+  ): void {
+    const char = this.characters.get(characterId);
+    if (!char) return;
+
+    const updatedChar = { ...char };
+
+    // Add to conversation history
+    updatedChar.conversationHistory.push(sessionData);
+
+    // Update advisor notes based on the session
+    const outcomeText =
+      sessionData.outcome === "positive"
+        ? "The advice helped"
+        : sessionData.outcome === "negative"
+          ? "The advice didn't work well"
+          : "Mixed results";
+
+    const newNote = `Session ${new Date(sessionData.timestamp).toLocaleDateString()}: ${outcomeText}. `;
+
+    // Keep notes concise - only last 3 sessions
+    const recentNotes = updatedChar.conversationHistory
+      .slice(-3)
+      .map((mem) => {
+        const outcome =
+          mem.outcome === "positive"
+            ? "helpful"
+            : mem.outcome === "negative"
+              ? "unhelpful"
+              : "mixed";
+        return `${new Date(mem.timestamp).toLocaleDateString()}: ${outcome}`;
+      })
+      .join("; ");
+
+    updatedChar.advisorNotes = recentNotes;
+
+    this.characters.set(characterId, updatedChar);
+  }
+
+  /**
+   * Get character memory for a returning character
+   */
+  getCharacterMemory(characterId: string): {
+    conversationHistory: CharacterConversationMemory[];
+    advisorNotes: string;
+  } | null {
+    const char = this.characters.get(characterId);
+    if (!char) return null;
+
+    return {
+      conversationHistory: char.conversationHistory || [],
+      advisorNotes: char.advisorNotes || "",
+    };
   }
 
   /**
@@ -401,6 +467,8 @@ export class CharacterPoolManager {
           lastVisit: null,
           adviceFollowedHistory: [],
         },
+        conversationHistory: [],
+        advisorNotes: "",
       });
     }
   }
