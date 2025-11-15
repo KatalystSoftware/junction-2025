@@ -45,7 +45,7 @@ export function createNewAdvisor(advisorId: string): AdvisorState {
   return {
     advisorId,
     reputation: 70, // Start higher to give more buffer for early mistakes
-    skillLevel: 1, // Beginner
+    skillLevel: 0, // Beginner (level 1 when displayed as Math.floor(0) + 1)
     specializations: [],
     topicsExpertise: {
       budgeting: 1,
