@@ -15,7 +15,58 @@
     "incomeLevel": "low",
     "typicalMonthlyIncome": 600,
     "hasDebt": false,
-    "hasSavings": "minimal"
+    "hasSavings": "minimal",
+    "bankAccounts": [
+      {
+        "accountId": "acc_petri_001",
+        "bankName": "Nordea",
+        "accountType": "checking",
+        "balance": 430.00,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_petri_002",
+        "bankName": "Nordea",
+        "accountType": "savings",
+        "balance": 850.00,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [],
+    "debts": [],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_petri_001",
+        "name": "Spotify Student",
+        "monthlyCost": 5.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2024-09-01"
+      },
+      {
+        "subscriptionId": "sub_petri_002",
+        "name": "Xbox Game Pass",
+        "monthlyCost": 12.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2024-06-01"
+      },
+      {
+        "subscriptionId": "sub_petri_003",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 19.90,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2024-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "rent": 0,
+      "groceries": 50,
+      "transportation": 30,
+      "utilities": 0,
+      "other": 80
+    }
   },
   "communicationStyle": {
     "formality": "casual",
