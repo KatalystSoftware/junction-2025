@@ -87,7 +87,31 @@ You will receive transcripts of the last 3-5 consultation sessions the advisor c
       - 0 to +5 for acceptable
       - -5 to 0 for poor performance
 
-   g) ENCOURAGING MESSAGE:
+   g) INTERACTIVE QUIZ (3-5 questions):
+      - Generate quiz questions based on advisor's WEAK TOPICS identified in review
+      - Questions should test UNDERSTANDING, not just memorization
+      - Use real Finnish financial concepts:
+        * ASP-tili (Finnish housing savings account)
+        * Indeksirahasto (index fund)
+        * Yhdistelylaina (combined loan)
+        * TER (Total Expense Ratio)
+        * Omavastuuosuus (deductible)
+        * Verotili (tax account)
+        * Kuoletus (amortization)
+      - Each question should have:
+        * Clear question text in Finnish
+        * 4 multiple choice options
+        * Correct answer index (0-3)
+        * Detailed explanation that teaches the concept
+      - Link questions to real Finnish learning resources:
+        * OP.fi: https://www.op.fi/henkiloasiakkaat/saastot-ja-sijoitukset/sijoittaminen
+        * Nordea.fi: https://www.nordea.fi/henkiloasiakkaat/palvelumme/saasto-sijoitus.html
+        * Talous.fi: https://www.talous.fi/
+        * Vero.fi: https://www.vero.fi/
+        * Finanssivalvonta: https://www.finanssivalvonta.fi/kuluttajille/
+        * Include specific page URLs in learning materials, not just homepages
+
+   h) ENCOURAGING MESSAGE:
       - End with motivating message in Finnish
       - Acknowledge progress
       - Set expectation for continued growth
@@ -136,19 +160,51 @@ You must respond with a valid JSON object in this exact format (NO markdown, NO 
   "learningMaterials": [
     {
       "materialId": "mat_001",
-      "title": "Kuluttajaliiton budjetointiopas",
-      "description": "Kattava opas budjetin tekemiseen ja menojen seurantaan",
-      "topic": "budgeting",
+      "title": "OP.fi: Sijoittamisen ABC",
+      "description": "Perusteellinen opas sijoittamiseen aloittelijoille",
+      "topic": "investing",
+      "url": "https://www.op.fi/henkiloasiakkaat/saastot-ja-sijoitukset/sijoittaminen",
       "type": "article"
     },
     {
       "materialId": "mat_002",
-      "title": "Talouden ABC: 50/30/20 sääntö",
-      "description": "Yksityiskohtainen selitys budjetointimenetelmästä",
+      "title": "Talous.fi: Budjetoinnin perusteet",
+      "description": "Kattava opas budjetin tekemiseen ja menojen seurantaan",
       "topic": "budgeting",
+      "url": "https://www.talous.fi/budjetointi",
       "type": "article"
     }
   ],
+  "quiz": {
+    "quizId": "quiz_001",
+    "topic": "investing",
+    "questions": [
+      {
+        "questionId": "q1",
+        "question": "Mikä on indeksirahaston tärkein etu aktiivisesti hoidettuun rahastoon verrattuna?",
+        "options": [
+          "Korkeammat taatut tuotot",
+          "Matalammat kulut (TER)",
+          "Parempi lyhyen aikavälin tuotto",
+          "Ei markkinariskiä"
+        ],
+        "correctAnswer": 1,
+        "explanation": "Indeksirahastot seuraavat markkinaa passiivisesti, joten niiden kulut (TER) ovat tyypillisesti matalammat kuin aktiivisesti hoidettujen rahastojen. Tämä tarkoittaa, että suurempi osa sijoituksestasi pysyy töissä."
+      },
+      {
+        "questionId": "q2",
+        "question": "Mikä on ASP-tilin suurin etu?",
+        "options": [
+          "Korkea säästökorko",
+          "Valtion 10% lisä säästöihin",
+          "Ei veroseuraamuksia",
+          "Voi nostaa rahaa milloin vain"
+        ],
+        "correctAnswer": 1,
+        "explanation": "ASP-tilin tärkein etu on valtion 10% lisä säästöihin (max 4000€ säästöistä = 400€ lisä). Tämä on merkittävä bonus ensiasunnon ostajalle."
+      }
+    ]
+  },
   "encouragingMessage": "Hyvää työtä! Olet selvästi edistynyt budjettiasioiden neuvonnassa. Jatka samaan malliin ja muista kysyä tarkentavia kysymyksiä asiakkaalta ennen neuvon antamista. Seuraava asiakas odottaa! 💪",
   "reputationChange": 10,
   "skillLevelChange": 0.3,
