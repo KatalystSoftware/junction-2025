@@ -162,11 +162,3 @@ export async function runErrorRecoveryTests() {
     throw error;
   }
 }
-
-// Run tests if this file is executed directly
-if (import.meta.url === `file://${process.argv[1]}`) {
-  runErrorRecoveryTests().catch((error) => {
-    console.error("Test suite failed:", error);
-    process.exit(1);
-  });
-}
