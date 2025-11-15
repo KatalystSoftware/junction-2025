@@ -231,8 +231,25 @@ Respond with ONLY valid JSON (NO markdown):
       advisorState.activeClients.push(character.characterId);
     }
 
-    // Get character's initial message
-    const initialContact = getCharacterInitialMessage(scenario);
+    // Detect advisor's preferred language from previous conversations
+    let advisorLanguage: "finnish" | "english" = "english"; // Default to English
+    const allPreviousAdvice = advisorState.sessionHistory.flatMap(
+      session => session.playerAdvice
+    );
+    if (allPreviousAdvice.length > 0) {
+      // Simple detection from previous messages
+      const allText = allPreviousAdvice.join(" ").toLowerCase();
+      const hasFinnish = /[äö]/.test(allText);
+      const finnishWords = ['hei', 'moi', 'kiitos', 'että', 'voin', 'pitää', 'kannattaa'].filter(
+        word => new RegExp(`\\b${word}\\b`).test(allText)
+      ).length;
+      if (hasFinnish || finnishWords >= 2) {
+        advisorLanguage = "finnish";
+      }
+    }
+
+    // Get character's initial message (translated if needed)
+    const initialContact = await getCharacterInitialMessage(scenario, advisorLanguage);
 
     // Get all active threads for UI
     const activeThreads = getActiveThreads(advisorState);

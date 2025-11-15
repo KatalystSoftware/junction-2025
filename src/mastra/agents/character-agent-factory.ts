@@ -171,20 +171,30 @@ IMPORTANT: You naturally remember these previous interactions and may reference 
 
 /**
  * Detect language from advisor's message
+ * Requires multiple Finnish indicators to avoid false positives
  */
 function detectLanguage(message?: string): "finnish" | "english" {
   if (!message) return "english"; // Default to English
 
-  // Simple heuristic: check for common Finnish words/patterns
-  const finnishPatterns = [
-    /\b(hei|moi|kiitos|ole|on|ja|mutta|että|voin|pitää|kannattaa|pitäisi)\b/i,
-    /ä|ö/i, // Finnish characters
-  ];
+  const lowerText = message.toLowerCase();
 
-  const hasFinnishPatterns = finnishPatterns.some((pattern) =>
-    pattern.test(message),
-  );
-  return hasFinnishPatterns ? "finnish" : "english";
+  // Count Finnish indicators
+  let finnishScore = 0;
+
+  // Finnish-specific characters (strong indicator)
+  if (/[äö]/i.test(message)) finnishScore += 2;
+
+  // Common Finnish words (must match multiple)
+  const finnishWords = ['hei', 'moi', 'kiitos', 'että', 'voin', 'pitää', 'kannattaa', 'pitäisi', 'sinun', 'budjetointi', 'säästö', 'velka', 'sijoittaminen', 'tarvitsen', 'auttaa', 'neuvoa'];
+  const wordMatches = finnishWords.filter(word => new RegExp(`\\b${word}\\b`, 'i').test(lowerText));
+  finnishScore += wordMatches.length;
+
+  // English indicators (counter-evidence)
+  const englishWords = ['the', 'you', 'your', 'need', 'help', 'advice', 'should', 'would', 'could', 'budget', 'saving', 'debt'];
+  const englishMatches = englishWords.filter(word => new RegExp(`\\b${word}\\b`, 'i').test(lowerText));
+
+  // Decide: Need at least 3 Finnish points and more Finnish than English indicators
+  return (finnishScore >= 3 && finnishScore > englishMatches.length) ? "finnish" : "english";
 }
 
 /**
@@ -203,7 +213,7 @@ function getLanguageStyleForAdvisor(
       formal:
         "Use formal Finnish. Complete sentences, correct grammar, no slang, professional but warm.",
     };
-    return `RESPOND IN FINNISH (the advisor is using Finnish):\n${styles[formality]}`;
+    return `**CRITICAL - LANGUAGE RULE**: You MUST respond ONLY in Finnish because the advisor is using Finnish. ALL your messages must be in Finnish. DO NOT use English.\n\nStyle: ${styles[formality]}`;
   } else {
     const styles = {
       casual:
@@ -213,7 +223,7 @@ function getLanguageStyleForAdvisor(
       formal:
         "Use formal English. Complete sentences, correct grammar, professional but warm.",
     };
-    return `RESPOND IN ENGLISH (the advisor is using English):\n${styles[formality]}`;
+    return `**CRITICAL - LANGUAGE RULE**: You MUST respond ONLY in English because the advisor is using English. ALL your messages must be in English. DO NOT use Finnish.\n\nStyle: ${styles[formality]}`;
   }
 }
 
@@ -450,13 +460,50 @@ IMPORTANT:
 /**
  * Helper to format character's initial message for the thread
  */
-export function getCharacterInitialMessage(scenario: Scenario): {
+/**
+ * Translate Finnish text to English using simple AI call
+ */
+async function translateToEnglish(finnishText: string): Promise<string> {
+  try {
+    const { generateText } = await import("ai");
+    const { google } = await import("@ai-sdk/google");
+
+    const result = await generateText({
+      model: google("gemini-2.0-flash-exp"),
+      prompt: `Translate this Finnish message to casual English. Keep the same tone and style. Only output the English translation, nothing else:\n\n${finnishText}`,
+    });
+
+    return result.text.trim();
+  } catch (error) {
+    console.error("Translation failed:", error);
+    // Fallback: return original if translation fails
+    return finnishText;
+  }
+}
+
+/**
+ * Get character's initial message, optionally translated to match advisor language
+ */
+export async function getCharacterInitialMessage(
+  scenario: Scenario,
+  advisorLanguage?: "finnish" | "english"
+): Promise<{
   message: string;
   isVoice: boolean;
   voiceConfig?: any;
-} {
+}> {
+  let message = scenario.initialContact.message;
+
+  // If advisor is using English and message is in Finnish, translate it
+  if (advisorLanguage === "english") {
+    // Simple detection: if message contains ä or ö, it's likely Finnish
+    if (/[äö]/i.test(message)) {
+      message = await translateToEnglish(message);
+    }
+  }
+
   return {
-    message: scenario.initialContact.message,
+    message,
     isVoice:
       scenario.initialContact.method === "voice" ||
       scenario.initialContact.method === "call",
