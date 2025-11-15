@@ -70,7 +70,7 @@ pnpm test
 
 ## Models Currently Used
 
-All agents use **Gemini 2.5 Flash** (`google/gemini-2.5-flash`) - the latest and greatest:
+All agents default to **Gemini 2.5 Flash** (`google/gemini-2.5-flash`), configurable via the `AGENT_LLM_MODEL` environment variable:
 
 - **Game Master Agent**: Orchestrator making decisions
 - **Scammer Agent**: Generates scam scenarios

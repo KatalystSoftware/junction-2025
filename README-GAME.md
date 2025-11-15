@@ -167,27 +167,25 @@ Each player has:
 
 ### Current Setup: Google Gemini 2.5 Flash
 
-All agents currently use `google/gemini-2.5-flash` which is:
+By default all agents use `google/gemini-2.5-flash` (see `src/mastra/agents/agent-model.ts`), which is:
 
 - Fast and responsive
 - Cost-effective with Google Cloud credits
 - Great for real-time character generation
 
+You can override the default for all agents by setting the `AGENT_LLM_MODEL` environment variable. If the value does not include a provider prefix, `google/` is added automatically:
+
+```bash
+# Uses google/gemini-2.0-flash
+AGENT_LLM_MODEL=gemini-2.0-flash
+
+# Uses OpenAI explicitly
+AGENT_LLM_MODEL=openai/gpt-4.1-mini
+```
+
 ### Alternative Models
 
-You can switch models by editing the agent files:
-
-**For better quality (higher cost):**
-
-```typescript
-model: "google/gemini-1.5-pro";
-```
-
-**For faster/cheaper:**
-
-```typescript
-model: "google/gemini-1.5-flash";
-```
+To change the default permanently in code, update `DEFAULT_AGENT_MODEL` in `src/mastra/agents/agent-model.ts`.
 
 ### Using OpenAI or Anthropic Instead
 

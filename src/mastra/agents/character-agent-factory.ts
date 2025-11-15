@@ -6,6 +6,7 @@
  */
 
 import { Agent } from "@mastra/core/agent";
+import { getAgentModel } from "./agent-model.ts";
 import type {
   Character,
   Scenario,
@@ -488,7 +489,7 @@ IMPORTANT:
 
   return new Agent({
     name: `character_${character.characterId}`,
-    model: "google/gemini-2.5-flash",
+    model: getAgentModel(),
     instructions,
   });
 }

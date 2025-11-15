@@ -1,4 +1,5 @@
 import { Agent } from "@mastra/core/agent";
+import { getAgentModel } from "./agent-model.ts";
 
 /**
  * Game Master Agent - ORCHESTRATOR
@@ -156,6 +157,6 @@ They only interact with characters. You make the magic happen behind the scenes.
 export const gameMasterAgent = new Agent({
   name: "game-master",
   instructions: gameMasterInstructions,
-  model: "google/gemini-2.5-flash",
+  model: getAgentModel(),
   tools: {},
 });

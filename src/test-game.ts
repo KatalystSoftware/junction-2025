@@ -83,7 +83,26 @@ async function testAdvisorSimulator() {
     // Start first consultation - Game Master sends a character
     console.log("🤖 Game Master is selecting a client for you...\n");
 
-    const consultation1 = await startNewConsultation(advisorId, advisorState);
+    let consultation1 = await startNewConsultation(advisorId, advisorState);
+
+    if (
+      consultation1.type === "onboarding" &&
+      consultation1.onboardingMessage
+    ) {
+      const onboarding = consultation1.onboardingMessage;
+      console.log("👋 Boss onboarding message:");
+      console.log(`\n${onboarding.welcomeTitle}\n`);
+      console.log(onboarding.introduction);
+      console.log(onboarding.roleExplanation);
+      console.log(onboarding.howItWorks);
+      console.log(onboarding.expectations);
+      console.log(`\n${onboarding.encouragement}`);
+      console.log(`\n${onboarding.readyMessage}\n`);
+
+      advisorState = consultation1.stateUpdate;
+      console.log("📱 Starting first client after onboarding...\n");
+      consultation1 = await startNewConsultation(advisorId, advisorState);
+    }
 
     if (
       consultation1.type === "character_message" &&

@@ -9,6 +9,7 @@
  */
 
 import { Agent } from "@mastra/core/agent";
+import { getAgentModel } from "./agent-model.ts";
 
 /**
  * Detect language from advisor messages
@@ -129,7 +130,7 @@ export function createGodBossAgent(advisorMessages: string[] = []): Agent {
 
   return new Agent({
     name: "godBossAgent",
-    model: "google/gemini-2.5-flash",
+    model: getAgentModel(),
     instructions: `
 ═══════════════════════════════════════════════════════════════════════
 YOU ARE THE BOSS - SENIOR MENTOR

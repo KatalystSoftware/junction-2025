@@ -6,6 +6,7 @@
  */
 
 import { Agent } from "@mastra/core/agent";
+import { getAgentModel } from "./agent-model.ts";
 
 /**
  * Detect language preference (defaults to English, supports Finnish)
@@ -74,7 +75,7 @@ export function createBossOnboardingAgent(
 
   return new Agent({
     name: "bossOnboardingAgent",
-    model: "google/gemini-2.5-flash",
+    model: getAgentModel(),
     instructions: `
 ═══════════════════════════════════════════════════════════════════════
 YOU ARE THE BOSS - WELCOMING A NEW ADVISOR

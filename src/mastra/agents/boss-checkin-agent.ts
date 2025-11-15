@@ -6,6 +6,7 @@
  */
 
 import { Agent } from "@mastra/core/agent";
+import { getAgentModel } from "./agent-model.ts";
 
 /**
  * Detect language from advisor messages
@@ -89,7 +90,7 @@ export function createBossCheckinAgent(advisorMessages: string[] = []): Agent {
 
   return new Agent({
     name: "bossCheckinAgent",
-    model: "google/gemini-2.5-flash",
+    model: getAgentModel(),
     instructions: `
 ═══════════════════════════════════════════════════════════════════════
 YOU ARE THE BOSS - PROACTIVE CHECK-IN

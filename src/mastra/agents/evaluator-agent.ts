@@ -13,11 +13,12 @@
  */
 
 import { Agent } from "@mastra/core/agent";
+import { getAgentModel } from "./agent-model.ts";
 import { queryFinnishKnowledgeTool } from "../tools/query-finnish-knowledge-tool.ts";
 
 export const evaluatorAgent = new Agent({
   name: "evaluatorAgent",
-  model: "google/gemini-2.5-flash",
+  model: getAgentModel(),
   tools: {
     queryFinnishKnowledge: queryFinnishKnowledgeTool,
   },
