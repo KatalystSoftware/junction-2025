@@ -4,52 +4,108 @@
 
 The error recovery system ensures that AI failures never crash the game. It implements:
 
-1. **Retry logic with exponential backoff** (3 attempts by default)
+1. **Retry logic with exponential backoff** (agent calls: 2 retries, RAG: 3 retries)
 2. **Graceful fallback messages** when all retries fail
 3. **Progress preservation** - game state is never lost on error
 4. **Comprehensive error logging** for debugging
 
 ## Architecture
 
+### Retry Layer Architecture
+
+The system uses a two-layer approach to avoid double retries:
+
+```
+┌─────────────────────────────────────────────────┐
+│ Orchestrator Layer                              │
+│ - Calls tool.execute()                          │
+│ - Handles fallbacks on error                    │
+└──────────────────┬──────────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────────┐
+│ Tool Layer (invoke-character-tool, etc.)        │
+│ - Calls cachedGenerate()                        │
+│ - Has fallback error handling                   │
+└──────────────────┬──────────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────────┐
+│ Agent Execution Layer (agent-execution.ts)      │
+│ - runAgentOperation wraps with:                 │
+│   * Concurrency limiting                        │
+│   * Retry logic (2 retries, exp backoff)        │
+└──────────────────┬──────────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────────┐
+│ Agent Layer                                      │
+│ - agent.generate() makes AI call                │
+└─────────────────────────────────────────────────┘
+```
+
 ### Core Components
 
-#### 1. Error Recovery Utilities (`src/mastra/utils/error-recovery.ts`)
+#### 1. Agent Execution (`src/mastra/agent-execution.ts`)
 
-- `withRetry()` - Wraps async operations with retry logic
-- `withRetryAndFallback()` - Wraps operations with a fallback value
-- `isRetryableError()` - Classifies errors as retryable or not
+Primary retry logic for all agent calls:
+- `runAgentOperation()` - Wraps agent calls with concurrency limiting + retry
+- `runWithRetry()` - Exponential backoff retry (2 retries, 250ms base delay)
+- `defaultIsRetryable()` - Classifies errors (rate limits, network, server errors)
+- `ConcurrencyLimiter` - Limits concurrent agent calls (default: 5)
+
+#### 2. Error Recovery Utilities (`src/mastra/utils/error-recovery.ts`)
+
+Complementary utilities for special cases:
+- `withRetry()` - For non-agent operations (RAG queries, etc.)
 - `getUserFriendlyError()` - Converts technical errors to user-friendly messages
 - Error logging functions for debugging
+- Used by: query-finnish-knowledge-tool for embed() and vectorStore.query()
 
-#### 2. Protected Components
+#### 3. Protected Components
 
-All AI agent calls and tools are protected:
+All AI operations are protected with retry + fallback:
 
 - **Game Master Agent** - Character selection and game flow
 - **Character Agents** - Character responses and interactions
 - **Evaluator Agent** - Advice quality evaluation
 - **God/Boss Agent** - Performance reviews
-- **Finnish Knowledge Tool** - RAG queries
+- **Finnish Knowledge Tool** - RAG queries (uses custom withRetry)
 
 ### How It Works
 
-#### Retry Logic
+#### Retry Logic for Agent Calls
+
+All agent calls go through `cachedGenerate` which uses `runAgentOperation`:
 
 ```typescript
-const result = await withRetry(
-  () => someAsyncOperation(),
-  "Operation Name",
+// In agent-execution.ts
+export function runAgentOperation<T>(
+  fn: () => Promise<T>,
+  options?: RetryOptions,
+): Promise<T> {
+  return defaultAgentLimiter.run(() => runWithRetry(fn, options));
+}
+```
+
+**Retry sequence (2 retries, exponential backoff):**
+1. First attempt fails → wait 250ms → retry
+2. Second attempt fails → wait 500ms → retry
+3. Third attempt fails → throw error (caught by tool/orchestrator)
+
+#### Retry Logic for RAG Queries
+
+RAG operations use custom `withRetry` from error-recovery.ts:
+
+```typescript
+const { embedding } = await withRetry(
+  () => embed({ value: query, model }),
+  "Embedding Generation",
   {
     maxAttempts: 3,
-    initialDelayMs: 1000,
-    maxDelayMs: 10000,
-    backoffMultiplier: 2,
     shouldRetry: isRetryableError,
   }
 );
 ```
 
-**Retry sequence:**
+**Retry sequence (3 retries, configurable backoff):**
 1. First attempt fails → wait 1s → retry
 2. Second attempt fails → wait 2s → retry
 3. Third attempt fails → throw error or use fallback
@@ -88,19 +144,34 @@ When all retries fail, the system uses graceful fallbacks:
 
 ## Usage Examples
 
-### Example 1: Character Response with Error Recovery
+### Example 1: Agent Call (Automatic Retry)
+
+```typescript
+// In invoke-character-tool.ts
+// cachedGenerate automatically wraps with runAgentOperation (retry + concurrency)
+const response = await cachedGenerate(
+  "agent",
+  `character_${character.characterId}`,
+  prompt,
+  () => characterAgent.generate(prompt),
+);
+// If all retries fail, error is thrown and caught by orchestrator
+```
+
+### Example 2: Tool Call with Fallback (Orchestrator)
 
 ```typescript
 // In orchestrator.ts
 let characterResponse: any;
 try {
-  characterResponse = await withRetry(
-    () => characterTool.execute({ character, scenario, advisorMessage }),
-    `Character Tool (${character.name})`,
-    { maxAttempts: 3, shouldRetry: isRetryableError }
-  );
+  // Tool internally uses cachedGenerate (automatic retry)
+  characterResponse = await characterTool.execute({
+    character,
+    scenario,
+    advisorMessage,
+  });
 } catch (error) {
-  // Fallback: graceful response
+  // Fallback: graceful response after all retries failed
   characterResponse = {
     messages: ["Thanks for your advice! I'll think about this."],
     conversationEnding: true,
@@ -108,26 +179,16 @@ try {
 }
 ```
 
-### Example 2: Advice Evaluation with Error Recovery
+### Example 3: RAG Query with Custom Retry
 
 ```typescript
-// In orchestrator.ts
-let adviceEvaluation: any;
-try {
-  adviceEvaluation = await withRetry(
-    () => evaluateTool.execute({ advice, scenario, character }),
-    "Advice Evaluation Tool",
-    { maxAttempts: 3, shouldRetry: isRetryableError }
-  );
-} catch (error) {
-  // Fallback: neutral evaluation
-  adviceEvaluation = {
-    qualityScore: 5,
-    outcome: "neutral",
-    strengths: ["Provided guidance"],
-    // ... other default values
-  };
-}
+// In query-finnish-knowledge-tool.ts
+// Custom retry for operations that don't use cachedGenerate
+const { embedding } = await withRetry(
+  () => embed({ value: query, model }),
+  "Embedding Generation",
+  { maxAttempts: 3, shouldRetry: isRetryableError }
+);
 ```
 
 ## Error Logging
@@ -176,64 +237,83 @@ Tests cover:
 
 ## Best Practices
 
-### 1. Always Use Retry Wrappers
+### 1. Use cachedGenerate for Agent Calls
 
 ✅ **Good:**
 ```typescript
-const result = await withRetry(
-  () => agent.generate(prompt),
-  "Agent Name",
-  { shouldRetry: isRetryableError }
+// Automatic retry + concurrency limiting
+const result = await cachedGenerate(
+  "agent",
+  "agent_name",
+  prompt,
+  () => agent.generate(prompt)
 );
 ```
 
 ❌ **Bad:**
 ```typescript
-const result = await agent.generate(prompt); // No retry!
+// No retry or concurrency limiting!
+const result = await agent.generate(prompt);
 ```
 
-### 2. Provide Meaningful Context Names
-
-✅ **Good:**
-```typescript
-await withRetry(fn, "Character Agent (Anna)", config);
-```
-
-❌ **Bad:**
-```typescript
-await withRetry(fn, "agent", config);
-```
-
-### 3. Always Have Fallbacks
+### 2. Always Have Fallbacks in Orchestrator
 
 ✅ **Good:**
 ```typescript
 try {
-  return await withRetry(...);
+  return await tool.execute(...);
 } catch (error) {
+  console.error("Tool failed:", error);
   return fallbackValue; // Never crash!
 }
 ```
 
 ❌ **Bad:**
 ```typescript
-return await withRetry(...); // Could crash!
+return await tool.execute(...); // Could crash game!
 ```
 
-### 4. Log Errors for Debugging
+### 3. Don't Add Double Retry
 
+❌ **Bad:**
 ```typescript
-catch (error) {
-  logError("Context", error, 3, 3, false);
-  return fallbackValue;
-}
+// Double retry! cachedGenerate already retries
+await withRetry(
+  () => cachedGenerate(...),
+  "Context"
+);
+```
+
+✅ **Good:**
+```typescript
+// Single retry layer
+await cachedGenerate(...);
+```
+
+### 4. Use withRetry for Non-Agent Operations
+
+✅ **Good:**
+```typescript
+// RAG operations need custom retry
+const { embedding } = await withRetry(
+  () => embed({ value: query, model }),
+  "Embedding Generation"
+);
 ```
 
 ## Performance Considerations
 
-- **Test Mode:** No retries (fail fast for debugging)
-- **Production:** 3 retries with exponential backoff
-- **Max Delay:** Capped at 10 seconds to prevent long waits
+- **Agent Calls:**
+  - 2 retries with exponential backoff (250ms base delay)
+  - Concurrency limited to 5 concurrent operations (configurable via AGENT_CONCURRENCY)
+  - Total max time: ~875ms for 3 attempts (250ms + 500ms + network time)
+
+- **RAG Queries:**
+  - 3 retries with exponential backoff (1s base delay)
+  - Max delay capped at 10 seconds
+  - Total max time: ~7s for 4 attempts (1s + 2s + 4s + network time)
+
+- **Test Mode:** No retries in test cache mode (fail fast for debugging)
 - **Error Log Size:** Limited to 100 entries (in-memory)
 
 ## Future Improvements
@@ -251,9 +331,19 @@ Potential enhancements:
 The error recovery system ensures a smooth player experience by:
 
 ✅ **Never crashing** - All AI failures are caught and handled
-✅ **Smart retries** - Exponential backoff with error classification
+✅ **Smart retries** - Two-layer retry system:
+  - Agent calls: runAgentOperation (2 retries, 250ms backoff)
+  - RAG queries: withRetry (3 retries, 1s backoff)
+✅ **Concurrency control** - Limits concurrent agent calls to prevent overload
 ✅ **Graceful degradation** - Sensible fallbacks maintain game flow
 ✅ **Progress safety** - Game state is always preserved
 ✅ **Debug visibility** - Comprehensive error logging
+✅ **No double retry** - Single retry layer per operation
+
+**Architecture Benefits:**
+- Agent execution layer handles retry + concurrency for all AI calls
+- Error recovery layer provides fallbacks and user-friendly messages
+- RAG operations use custom retry for non-agent operations
+- Clear separation prevents double retry (was 9 attempts, now 3)
 
 **Result:** Players can always continue playing, even when AI services fail temporarily.
