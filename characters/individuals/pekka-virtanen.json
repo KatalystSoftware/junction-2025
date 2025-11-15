@@ -21,14 +21,14 @@
         "accountId": "acc_pekka_001",
         "bankName": "Nordea",
         "accountType": "checking",
-        "balance": 5400.0,
+        "balance": 5400,
         "currency": "EUR"
       },
       {
         "accountId": "acc_pekka_002",
         "bankName": "Nordea",
         "accountType": "savings",
-        "balance": 85000.0,
+        "balance": 85000,
         "currency": "EUR"
       }
     ],
@@ -63,7 +63,8 @@
     "formality": "formal",
     "language": "formal_finnish",
     "prefersVoice": 0.2,
-    "callsWhenEmotional": false
+    "callsWhenEmotional": false,
+    "voiceId": "SOYHLrjzK2X1ezoPC6cr"
   },
   "relationshipState": {
     "trustLevel": 0.5,

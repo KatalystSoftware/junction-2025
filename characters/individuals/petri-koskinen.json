@@ -21,14 +21,14 @@
         "accountId": "acc_petri_001",
         "bankName": "Nordea",
         "accountType": "checking",
-        "balance": 430.0,
+        "balance": 430,
         "currency": "EUR"
       },
       {
         "accountId": "acc_petri_002",
         "bankName": "Nordea",
         "accountType": "savings",
-        "balance": 850.0,
+        "balance": 850,
         "currency": "EUR"
       }
     ],
@@ -72,7 +72,8 @@
     "formality": "casual",
     "language": "teen",
     "prefersVoice": 0.4,
-    "callsWhenEmotional": false
+    "callsWhenEmotional": false,
+    "voiceId": "ErXwobaYiN019PkySvjV"
   },
   "relationshipState": {
     "trustLevel": 0.5,

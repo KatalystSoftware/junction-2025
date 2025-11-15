@@ -21,14 +21,14 @@
         "accountId": "acc_olivia_001",
         "bankName": "Nordea",
         "accountType": "checking",
-        "balance": 1850.0,
+        "balance": 1850,
         "currency": "EUR"
       },
       {
         "accountId": "acc_olivia_002",
         "bankName": "Nordea",
         "accountType": "savings",
-        "balance": 15600.0,
+        "balance": 15600,
         "currency": "EUR"
       }
     ],
@@ -54,7 +54,7 @@
       {
         "subscriptionId": "sub_olivia_003",
         "name": "Yoga Studio",
-        "monthlyCost": 79.0,
+        "monthlyCost": 79,
         "category": "fitness",
         "currency": "EUR",
         "startDate": "2023-01-01"
@@ -72,7 +72,8 @@
     "formality": "semi-formal",
     "language": "casual_adult_finnish",
     "prefersVoice": 0.3,
-    "callsWhenEmotional": true
+    "callsWhenEmotional": true,
+    "voiceId": "EXAVITQu4vr4xnSDxMaL"
   },
   "relationshipState": {
     "trustLevel": 0.5,

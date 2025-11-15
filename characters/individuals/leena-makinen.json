@@ -21,14 +21,14 @@
         "accountId": "acc_leena_001",
         "bankName": "Danske Bank",
         "accountType": "checking",
-        "balance": 890.0,
+        "balance": 890,
         "currency": "EUR"
       },
       {
         "accountId": "acc_leena_002",
         "bankName": "Danske Bank",
         "accountType": "savings",
-        "balance": 18500.0,
+        "balance": 18500,
         "currency": "EUR"
       }
     ],
@@ -64,7 +64,8 @@
     "formality": "semi-formal",
     "language": "casual_adult_finnish",
     "prefersVoice": 0.3,
-    "callsWhenEmotional": true
+    "callsWhenEmotional": true,
+    "voiceId": "pNInz6obpgDQGcFmaJgB"
   },
   "relationshipState": {
     "trustLevel": 0.5,

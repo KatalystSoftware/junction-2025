@@ -21,14 +21,14 @@
         "accountId": "acc_liisa_001",
         "bankName": "Nordea",
         "accountType": "checking",
-        "balance": 2400.0,
+        "balance": 2400,
         "currency": "EUR"
       },
       {
         "accountId": "acc_liisa_002",
         "bankName": "Nordea",
         "accountType": "savings",
-        "balance": 42000.0,
+        "balance": 42000,
         "currency": "EUR"
       }
     ],
@@ -76,7 +76,7 @@
       {
         "subscriptionId": "sub_liisa_003",
         "name": "Newspaper Subscription",
-        "monthlyCost": 28.0,
+        "monthlyCost": 28,
         "category": "other",
         "currency": "EUR",
         "startDate": "2015-01-01"
@@ -94,7 +94,8 @@
     "formality": "semi-formal",
     "language": "casual_adult_finnish",
     "prefersVoice": 0.2,
-    "callsWhenEmotional": false
+    "callsWhenEmotional": false,
+    "voiceId": "ThT5KcBeYPX3keUQqHPh"
   },
   "relationshipState": {
     "trustLevel": 0.5,

@@ -21,14 +21,14 @@
         "accountId": "acc_tuomas_001",
         "bankName": "OP",
         "accountType": "checking",
-        "balance": 2400.0,
+        "balance": 2400,
         "currency": "EUR"
       },
       {
         "accountId": "acc_tuomas_002",
         "bankName": "OP",
         "accountType": "savings",
-        "balance": 18500.0,
+        "balance": 18500,
         "currency": "EUR"
       }
     ],
@@ -62,7 +62,7 @@
       {
         "subscriptionId": "sub_tuomas_004",
         "name": "Climbing Gym",
-        "monthlyCost": 59.0,
+        "monthlyCost": 59,
         "category": "fitness",
         "currency": "EUR",
         "startDate": "2023-06-01"
@@ -70,7 +70,7 @@
       {
         "subscriptionId": "sub_tuomas_005",
         "name": "GitHub Pro",
-        "monthlyCost": 7.0,
+        "monthlyCost": 7,
         "category": "software",
         "currency": "EUR",
         "startDate": "2022-01-01"
@@ -88,7 +88,8 @@
     "formality": "casual",
     "language": "casual_adult_finnish",
     "prefersVoice": 0.1,
-    "callsWhenEmotional": false
+    "callsWhenEmotional": false,
+    "voiceId": "pqHfZKP75CvOlQylNhV4"
   },
   "relationshipState": {
     "trustLevel": 0.5,

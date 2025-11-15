@@ -21,14 +21,14 @@
         "accountId": "acc_hannu_001",
         "bankName": "OP",
         "accountType": "checking",
-        "balance": 3800.0,
+        "balance": 3800,
         "currency": "EUR"
       },
       {
         "accountId": "acc_hannu_002",
         "bankName": "OP",
         "accountType": "savings",
-        "balance": 42000.0,
+        "balance": 42000,
         "currency": "EUR"
       }
     ],
@@ -79,7 +79,8 @@
     "formality": "semi-formal",
     "language": "casual_adult_finnish",
     "prefersVoice": 0.2,
-    "callsWhenEmotional": false
+    "callsWhenEmotional": false,
+    "voiceId": "SOYHLrjzK2X1ezoPC6cr"
   },
   "relationshipState": {
     "trustLevel": 0.5,

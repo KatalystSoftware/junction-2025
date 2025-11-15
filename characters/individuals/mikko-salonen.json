@@ -29,7 +29,7 @@
       {
         "cardId": "cc_mikko_001",
         "issuer": "S-Pankki Student Card",
-        "balance": 890.0,
+        "balance": 890,
         "creditLimit": 1000,
         "interestRate": 16.9,
         "minimumPayment": 30,
@@ -79,7 +79,8 @@
     "formality": "casual",
     "language": "casual_adult_finnish",
     "prefersVoice": 0.3,
-    "callsWhenEmotional": false
+    "callsWhenEmotional": false,
+    "voiceId": "ErXwobaYiN019PkySvjV"
   },
   "relationshipState": {
     "trustLevel": 0.5,

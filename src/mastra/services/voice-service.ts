@@ -45,11 +45,103 @@ interface EmotionalVoiceMapping {
 
 /**
  * Get appropriate voice based on character and emotional state
+ * Uses character's assigned voiceId if available, otherwise falls back to personality-based selection
  */
 function getVoiceForEmotion(
   character: Character,
   emotionalState: string,
 ): EmotionalVoiceMapping {
+  // If character has a specific voice assigned, use it with emotion-adjusted settings
+  if (character.communicationStyle.voiceId) {
+    const lowerEmotion = emotionalState.toLowerCase();
+
+    // Adjust voice parameters based on emotional state
+    // Scared/anxious states
+    if (
+      lowerEmotion.includes("scared") ||
+      lowerEmotion.includes("anxious") ||
+      lowerEmotion.includes("nervous") ||
+      lowerEmotion.includes("worried")
+    ) {
+      return {
+        voiceId: character.communicationStyle.voiceId,
+        stability: 0.3, // More variation for anxiety
+        similarityBoost: 0.5,
+        style: 0.7, // High style for emotional expression
+      };
+    }
+
+    // Crying/upset states
+    if (
+      lowerEmotion.includes("crying") ||
+      lowerEmotion.includes("sad") ||
+      lowerEmotion.includes("upset") ||
+      lowerEmotion.includes("devastated") ||
+      lowerEmotion.includes("depressed")
+    ) {
+      return {
+        voiceId: character.communicationStyle.voiceId,
+        stability: 0.2, // Very emotional, unstable
+        similarityBoost: 0.6,
+        style: 0.8, // Maximum emotion
+      };
+    }
+
+    // Frustrated/angry states
+    if (
+      lowerEmotion.includes("frustrated") ||
+      lowerEmotion.includes("angry") ||
+      lowerEmotion.includes("annoyed") ||
+      lowerEmotion.includes("irritated")
+    ) {
+      return {
+        voiceId: character.communicationStyle.voiceId,
+        stability: 0.4,
+        similarityBoost: 0.6,
+        style: 0.7,
+      };
+    }
+
+    // Excited/happy states
+    if (
+      lowerEmotion.includes("excited") ||
+      lowerEmotion.includes("happy") ||
+      lowerEmotion.includes("thrilled") ||
+      lowerEmotion.includes("ecstatic") ||
+      lowerEmotion.includes("relieved")
+    ) {
+      return {
+        voiceId: character.communicationStyle.voiceId,
+        stability: 0.5,
+        similarityBoost: 0.7,
+        style: 0.6,
+      };
+    }
+
+    // Concerned/worried but not panicked
+    if (
+      lowerEmotion.includes("concerned") ||
+      lowerEmotion.includes("uncertain") ||
+      lowerEmotion.includes("unsure")
+    ) {
+      return {
+        voiceId: character.communicationStyle.voiceId,
+        stability: 0.5,
+        similarityBoost: 0.7,
+        style: 0.5,
+      };
+    }
+
+    // Default: Calm or neutral with character's voice
+    return {
+      voiceId: character.communicationStyle.voiceId,
+      stability: 0.7, // More stable for calm states
+      similarityBoost: 0.8,
+      style: 0.3,
+    };
+  }
+
+  // FALLBACK: If no voiceId assigned, use old personality-based selection
   const lowerEmotion = emotionalState.toLowerCase();
 
   // Scared/anxious states
@@ -144,6 +236,109 @@ function getVoiceForEmotion(
     similarityBoost: 0.8,
     style: 0.3,
   };
+}
+
+/**
+ * Enhance text with expressive ElevenLabs tags based on emotional state and character personality
+ * Makes voice messages more fun and expressive
+ */
+export function enhanceTextWithVoiceTags(
+  text: string,
+  emotionalState: string,
+  personality: Character["personality"],
+): string {
+  const lowerEmotion = emotionalState.toLowerCase();
+  const lowerText = text.toLowerCase();
+
+  let enhancedText = text;
+
+  // Add emotional tags based on state
+  // Scared/anxious - add nervous sounds
+  if (
+    lowerEmotion.includes("scared") ||
+    lowerEmotion.includes("anxious") ||
+    lowerEmotion.includes("panicked")
+  ) {
+    // Add nervous gulp/swallow at start
+    if (Math.random() < 0.4) {
+      enhancedText = `[gulps] ${enhancedText}`;
+    }
+    // Occasional whispers for anxiety
+    if (personality.emotionality > 0.7 && Math.random() < 0.3) {
+      enhancedText = enhancedText.replace(/\.$/, "... [whispers] En tiedä mitä tehdä.");
+    }
+  }
+
+  // Crying/sad - add crying/sighs
+  if (
+    lowerEmotion.includes("crying") ||
+    lowerEmotion.includes("sad") ||
+    lowerEmotion.includes("devastated")
+  ) {
+    // Add crying tag if very emotional
+    if (personality.emotionality > 0.6 && Math.random() < 0.5) {
+      enhancedText = `[crying] ${enhancedText}`;
+    } else if (Math.random() < 0.4) {
+      enhancedText = `[sighs] ${enhancedText}`;
+    }
+  }
+
+  // Frustrated/angry - add sarcastic or exasperated sounds
+  if (
+    lowerEmotion.includes("frustrated") ||
+    lowerEmotion.includes("angry") ||
+    lowerEmotion.includes("annoyed")
+  ) {
+    // Add exhale or sigh
+    if (Math.random() < 0.4) {
+      enhancedText = `[exhales] ${enhancedText}`;
+    }
+    // Make sarcastic comments more sarcastic
+    if ((lowerText.includes("joo") || lowerText.includes("yeah")) && Math.random() < 0.3) {
+      enhancedText = enhancedText.replace(/(joo|yeah)/i, "[sarcastic] $1");
+    }
+  }
+
+  // Excited/happy - add laughs and excited sounds
+  if (
+    lowerEmotion.includes("excited") ||
+    lowerEmotion.includes("thrilled") ||
+    lowerEmotion.includes("ecstatic") ||
+    lowerEmotion.includes("relieved")
+  ) {
+    // Add laughs to happy messages
+    if (
+      (lowerText.includes("kiitos") || lowerText.includes("thanks") || lowerText.includes("great")) &&
+      Math.random() < 0.4
+    ) {
+      enhancedText = enhancedText.replace(/!/, "! [laughs]");
+    }
+    // Add excited exclamations
+    if (personality.emotionality > 0.6 && Math.random() < 0.3) {
+      enhancedText = `[excited] ${enhancedText}`;
+    }
+  }
+
+  // Curious/questioning - add curious tone
+  if (
+    (lowerText.includes("?") || lowerText.includes("mitä") || lowerText.includes("miten")) &&
+    lowerEmotion.includes("uncertain")
+  ) {
+    if (Math.random() < 0.3) {
+      enhancedText = enhancedText.replace(/^/, "[curious] ");
+    }
+  }
+
+  // Add occasional mischievous tag for impulsive personalities
+  if (
+    personality.impulsiveness > 0.7 &&
+    (lowerText.includes("ehkä") || lowerText.includes("maybe")) &&
+    Math.random() < 0.2
+  ) {
+    enhancedText = enhancedText.replace(/(ehkä|maybe)/i, "[mischievously] $1");
+  }
+
+  return enhancedText;
 }
 
 /**
@@ -250,6 +445,18 @@ export async function generateVoiceMessage(
 
     console.log("✅ ElevenLabs API key found, generating voice...");
 
+    // Enhance text with expressive voice tags
+    const enhancedText = enhanceTextWithVoiceTags(
+      messageText,
+      emotionalState,
+      character.personality,
+    );
+
+    console.log(`🎨 Enhanced text with voice tags:`, {
+      original: messageText,
+      enhanced: enhancedText,
+    });
+
     // Get appropriate voice for emotion
     const voiceConfig = getVoiceForEmotion(character, emotionalState);
 
@@ -260,9 +467,9 @@ export async function generateVoiceMessage(
       apiKey: apiKey,
     });
 
-    // Generate speech using ElevenLabs streaming API
+    // Generate speech using ElevenLabs streaming API with enhanced text
     const audio = await client.textToSpeech.convert(voiceConfig.voiceId, {
-      text: messageText,
+      text: enhancedText,
       modelId: "eleven_multilingual_v2", // Supports Finnish and English
       voiceSettings: {
         stability: voiceConfig.stability,

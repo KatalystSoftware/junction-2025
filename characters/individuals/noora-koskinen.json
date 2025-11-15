@@ -21,14 +21,14 @@
         "accountId": "acc_noora_001",
         "bankName": "Nordea",
         "accountType": "checking",
-        "balance": 680.0,
+        "balance": 680,
         "currency": "EUR"
       },
       {
         "accountId": "acc_noora_002",
         "bankName": "Nordea",
         "accountType": "savings",
-        "balance": 1200.0,
+        "balance": 1200,
         "currency": "EUR"
       }
     ],
@@ -38,8 +38,8 @@
         "debtId": "debt_noora_001",
         "type": "student_loan",
         "creditor": "KELA Student Loan",
-        "totalAmount": 12000.0,
-        "remainingAmount": 12000.0,
+        "totalAmount": 12000,
+        "remainingAmount": 12000,
         "monthlyPayment": 0,
         "interestRate": 0.5,
         "currency": "EUR",
@@ -84,7 +84,8 @@
     "formality": "semi-formal",
     "language": "casual_adult_finnish",
     "prefersVoice": 0.2,
-    "callsWhenEmotional": false
+    "callsWhenEmotional": false,
+    "voiceId": "MF3mGyEYCl7XYWbV9V6O"
   },
   "relationshipState": {
     "trustLevel": 0.5,

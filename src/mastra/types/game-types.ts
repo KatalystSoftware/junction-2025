@@ -85,6 +85,7 @@ export interface CharacterCommunicationStyle {
   language: "teen_finnish" | "casual_adult_finnish" | "formal_finnish";
   prefersVoice: number; // 0-1: How often they use voice messages
   callsWhenEmotional: boolean; // Use voice when upset/excited
+  voiceId?: string; // ElevenLabs voice ID for consistent voice across sessions
 }
 
 export type TrustTier =

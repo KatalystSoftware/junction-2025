@@ -21,14 +21,14 @@
         "accountId": "acc_maija_001",
         "bankName": "OP",
         "accountType": "checking",
-        "balance": 280.0,
+        "balance": 280,
         "currency": "EUR"
       },
       {
         "accountId": "acc_maija_002",
         "bankName": "OP",
         "accountType": "savings",
-        "balance": 1400.0,
+        "balance": 1400,
         "currency": "EUR"
       }
     ],
@@ -56,7 +56,8 @@
     "formality": "casual",
     "language": "casual_adult_finnish",
     "prefersVoice": 0.5,
-    "callsWhenEmotional": true
+    "callsWhenEmotional": true,
+    "voiceId": "ThT5KcBeYPX3keUQqHPh"
   },
   "relationshipState": {
     "trustLevel": 0.5,

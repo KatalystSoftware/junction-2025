@@ -21,14 +21,14 @@
         "accountId": "acc_tiina_001",
         "bankName": "OP",
         "accountType": "checking",
-        "balance": 2100.0,
+        "balance": 2100,
         "currency": "EUR"
       },
       {
         "accountId": "acc_tiina_002",
         "bankName": "OP",
         "accountType": "savings",
-        "balance": 5500.0,
+        "balance": 5500,
         "currency": "EUR"
       }
     ],
@@ -38,9 +38,9 @@
         "debtId": "debt_tiina_001",
         "type": "other",
         "creditor": "OP Business Loan",
-        "totalAmount": 45000.0,
-        "remainingAmount": 38000.0,
-        "monthlyPayment": 520.0,
+        "totalAmount": 45000,
+        "remainingAmount": 38000,
+        "monthlyPayment": 520,
         "interestRate": 4.5,
         "currency": "EUR",
         "startDate": "2022-03-01"
@@ -50,7 +50,7 @@
       {
         "subscriptionId": "sub_tiina_001",
         "name": "Accounting Software",
-        "monthlyCost": 39.0,
+        "monthlyCost": 39,
         "category": "software",
         "currency": "EUR",
         "startDate": "2022-03-01"
@@ -75,7 +75,8 @@
     "formality": "semi-formal",
     "language": "casual_adult_finnish",
     "prefersVoice": 0.4,
-    "callsWhenEmotional": true
+    "callsWhenEmotional": true,
+    "voiceId": "EXAVITQu4vr4xnSDxMaL"
   },
   "relationshipState": {
     "trustLevel": 0.5,

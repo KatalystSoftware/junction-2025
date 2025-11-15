@@ -21,14 +21,14 @@
         "accountId": "acc_markku_001",
         "bankName": "Danske Bank",
         "accountType": "checking",
-        "balance": 950.0,
+        "balance": 950,
         "currency": "EUR"
       },
       {
         "accountId": "acc_markku_002",
         "bankName": "Danske Bank",
         "accountType": "savings",
-        "balance": 3400.0,
+        "balance": 3400,
         "currency": "EUR"
       }
     ],
@@ -36,10 +36,10 @@
       {
         "cardId": "card_markku_001",
         "issuer": "Danske Visa",
-        "balance": 1200.0,
-        "creditLimit": 5000.0,
+        "balance": 1200,
+        "creditLimit": 5000,
         "interestRate": 13.9,
-        "minimumPayment": 35.0,
+        "minimumPayment": 35,
         "currency": "EUR"
       }
     ],
@@ -48,9 +48,9 @@
         "debtId": "debt_markku_001",
         "type": "personal_loan",
         "creditor": "Ferratum",
-        "totalAmount": 6000.0,
-        "remainingAmount": 4200.0,
-        "monthlyPayment": 180.0,
+        "totalAmount": 6000,
+        "remainingAmount": 4200,
+        "monthlyPayment": 180,
         "interestRate": 8.5,
         "currency": "EUR",
         "startDate": "2023-06-01"
@@ -86,7 +86,8 @@
     "formality": "semi-formal",
     "language": "casual_adult_finnish",
     "prefersVoice": 0.3,
-    "callsWhenEmotional": true
+    "callsWhenEmotional": true,
+    "voiceId": "pqHfZKP75CvOlQylNhV4"
   },
   "relationshipState": {
     "trustLevel": 0.5,

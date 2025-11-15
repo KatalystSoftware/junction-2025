@@ -21,14 +21,14 @@
         "accountId": "acc_jani_001",
         "bankName": "OP",
         "accountType": "checking",
-        "balance": 1240.0,
+        "balance": 1240,
         "currency": "EUR"
       },
       {
         "accountId": "acc_jani_002",
         "bankName": "OP",
         "accountType": "savings",
-        "balance": 8900.0,
+        "balance": 8900,
         "currency": "EUR"
       }
     ],
@@ -38,9 +38,9 @@
         "debtId": "debt_jani_001",
         "type": "mortgage",
         "creditor": "OP Home Loan",
-        "totalAmount": 85000.0,
-        "remainingAmount": 52000.0,
-        "monthlyPayment": 480.0,
+        "totalAmount": 85000,
+        "remainingAmount": 52000,
+        "monthlyPayment": 480,
         "interestRate": 3.2,
         "currency": "EUR",
         "startDate": "2015-06-01"
@@ -75,7 +75,8 @@
     "formality": "casual",
     "language": "casual_adult_finnish",
     "prefersVoice": 0.1,
-    "callsWhenEmotional": false
+    "callsWhenEmotional": false,
+    "voiceId": "pqHfZKP75CvOlQylNhV4"
   },
   "relationshipState": {
     "trustLevel": 0.5,

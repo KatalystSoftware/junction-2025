@@ -21,14 +21,14 @@
         "accountId": "acc_sara_001",
         "bankName": "Nordea",
         "accountType": "checking",
-        "balance": 980.0,
+        "balance": 980,
         "currency": "EUR"
       },
       {
         "accountId": "acc_sara_002",
         "bankName": "Nordea",
         "accountType": "savings",
-        "balance": 4200.0,
+        "balance": 4200,
         "currency": "EUR"
       }
     ],
@@ -38,9 +38,9 @@
         "debtId": "debt_sara_001",
         "type": "student_loan",
         "creditor": "KELA Student Loan",
-        "totalAmount": 8500.0,
-        "remainingAmount": 8500.0,
-        "monthlyPayment": 85.0,
+        "totalAmount": 8500,
+        "remainingAmount": 8500,
+        "monthlyPayment": 85,
         "interestRate": 0.5,
         "currency": "EUR",
         "startDate": "2024-08-01"
@@ -84,7 +84,8 @@
     "formality": "semi-formal",
     "language": "casual_adult_finnish",
     "prefersVoice": 0.2,
-    "callsWhenEmotional": false
+    "callsWhenEmotional": false,
+    "voiceId": "MF3mGyEYCl7XYWbV9V6O"
   },
   "relationshipState": {
     "trustLevel": 0.5,

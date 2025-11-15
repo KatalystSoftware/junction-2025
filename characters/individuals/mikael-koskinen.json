@@ -21,14 +21,14 @@
         "accountId": "acc_mikael_001",
         "bankName": "OP",
         "accountType": "checking",
-        "balance": 4200.0,
+        "balance": 4200,
         "currency": "EUR"
       },
       {
         "accountId": "acc_mikael_002",
         "bankName": "OP",
         "accountType": "savings",
-        "balance": 28000.0,
+        "balance": 28000,
         "currency": "EUR"
       }
     ],
@@ -36,10 +36,10 @@
       {
         "cardId": "card_mikael_001",
         "issuer": "OP Gold",
-        "balance": 0.0,
-        "creditLimit": 8000.0,
+        "balance": 0,
+        "creditLimit": 8000,
         "interestRate": 12.9,
-        "minimumPayment": 0.0,
+        "minimumPayment": 0,
         "currency": "EUR"
       }
     ],
@@ -48,9 +48,9 @@
         "debtId": "debt_mikael_001",
         "type": "mortgage",
         "creditor": "OP Home Loan",
-        "totalAmount": 250000.0,
-        "remainingAmount": 210000.0,
-        "monthlyPayment": 980.0,
+        "totalAmount": 250000,
+        "remainingAmount": 210000,
+        "monthlyPayment": 980,
         "interestRate": 2.7,
         "currency": "EUR",
         "startDate": "2020-08-01"
@@ -84,7 +84,7 @@
       {
         "subscriptionId": "sub_mikael_004",
         "name": "Gym Premium",
-        "monthlyCost": 69.0,
+        "monthlyCost": 69,
         "category": "fitness",
         "currency": "EUR",
         "startDate": "2022-01-01"
@@ -101,7 +101,8 @@
     "formality": "semi-formal",
     "language": "casual_adult_finnish",
     "prefersVoice": 0.2,
-    "callsWhenEmotional": false
+    "callsWhenEmotional": false,
+    "voiceId": "pNInz6obpgDQGcFmaJgB"
   },
   "relationshipState": {
     "trustLevel": 0.5,

@@ -21,14 +21,14 @@
         "accountId": "acc_aleksi_001",
         "bankName": "OP",
         "accountType": "checking",
-        "balance": 1420.0,
+        "balance": 1420,
         "currency": "EUR"
       },
       {
         "accountId": "acc_aleksi_002",
         "bankName": "OP",
         "accountType": "savings",
-        "balance": 3200.0,
+        "balance": 3200,
         "currency": "EUR"
       }
     ],
@@ -36,10 +36,10 @@
       {
         "cardId": "card_aleksi_001",
         "issuer": "OP Visa",
-        "balance": 800.0,
-        "creditLimit": 3000.0,
+        "balance": 800,
+        "creditLimit": 3000,
         "interestRate": 12.9,
-        "minimumPayment": 25.0,
+        "minimumPayment": 25,
         "currency": "EUR"
       }
     ],
@@ -90,7 +90,8 @@
     "formality": "casual",
     "language": "casual_adult_finnish",
     "prefersVoice": 0.2,
-    "callsWhenEmotional": false
+    "callsWhenEmotional": false,
+    "voiceId": "pqHfZKP75CvOlQylNhV4"
   },
   "relationshipState": {
     "trustLevel": 0.5,

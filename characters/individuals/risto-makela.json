@@ -21,14 +21,14 @@
         "accountId": "acc_risto_001",
         "bankName": "OP",
         "accountType": "checking",
-        "balance": 680.0,
+        "balance": 680,
         "currency": "EUR"
       },
       {
         "accountId": "acc_risto_002",
         "bankName": "OP",
         "accountType": "savings",
-        "balance": 6200.0,
+        "balance": 6200,
         "currency": "EUR"
       }
     ],
@@ -38,9 +38,9 @@
         "debtId": "debt_risto_001",
         "type": "car_loan",
         "creditor": "Santander Consumer Finance",
-        "totalAmount": 12000.0,
-        "remainingAmount": 5400.0,
-        "monthlyPayment": 245.0,
+        "totalAmount": 12000,
+        "remainingAmount": 5400,
+        "monthlyPayment": 245,
         "interestRate": 5.9,
         "currency": "EUR",
         "startDate": "2022-08-01"
@@ -75,7 +75,8 @@
     "formality": "casual",
     "language": "casual_adult_finnish",
     "prefersVoice": 0.2,
-    "callsWhenEmotional": false
+    "callsWhenEmotional": false,
+    "voiceId": "SOYHLrjzK2X1ezoPC6cr"
   },
   "relationshipState": {
     "trustLevel": 0.5,

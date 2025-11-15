@@ -21,14 +21,14 @@
         "accountId": "acc_raija_001",
         "bankName": "OP",
         "accountType": "checking",
-        "balance": 1680.0,
+        "balance": 1680,
         "currency": "EUR"
       },
       {
         "accountId": "acc_raija_002",
         "bankName": "OP",
         "accountType": "savings",
-        "balance": 22000.0,
+        "balance": 22000,
         "currency": "EUR"
       }
     ],
@@ -63,7 +63,8 @@
     "formality": "semi-formal",
     "language": "formal_finnish",
     "prefersVoice": 0.4,
-    "callsWhenEmotional": true
+    "callsWhenEmotional": true,
+    "voiceId": "ThT5KcBeYPX3keUQqHPh"
   },
   "relationshipState": {
     "trustLevel": 0.5,

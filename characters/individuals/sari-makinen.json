@@ -21,14 +21,14 @@
         "accountId": "acc_sari_001",
         "bankName": "OP",
         "accountType": "checking",
-        "balance": 1850.0,
+        "balance": 1850,
         "currency": "EUR"
       },
       {
         "accountId": "acc_sari_002",
         "bankName": "OP",
         "accountType": "savings",
-        "balance": 8200.0,
+        "balance": 8200,
         "currency": "EUR"
       }
     ],
@@ -102,7 +102,8 @@
     "formality": "semi-formal",
     "language": "casual_adult",
     "prefersVoice": 0.2,
-    "callsWhenEmotional": false
+    "callsWhenEmotional": false,
+    "voiceId": "EXAVITQu4vr4xnSDxMaL"
   },
   "relationshipState": {
     "trustLevel": 0.5,

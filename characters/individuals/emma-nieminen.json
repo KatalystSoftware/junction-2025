@@ -21,14 +21,14 @@
         "accountId": "acc_emma_001",
         "bankName": "Danske Bank",
         "accountType": "checking",
-        "balance": 950.0,
+        "balance": 950,
         "currency": "EUR"
       },
       {
         "accountId": "acc_emma_002",
         "bankName": "Danske Bank",
         "accountType": "savings",
-        "balance": 5200.0,
+        "balance": 5200,
         "currency": "EUR"
       }
     ],
@@ -72,7 +72,8 @@
     "formality": "casual",
     "language": "casual_adult_finnish",
     "prefersVoice": 0.3,
-    "callsWhenEmotional": false
+    "callsWhenEmotional": false,
+    "voiceId": "MF3mGyEYCl7XYWbV9V6O"
   },
   "relationshipState": {
     "trustLevel": 0.5,

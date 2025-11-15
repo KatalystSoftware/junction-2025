@@ -29,7 +29,7 @@
       {
         "cardId": "cc_jukka_001",
         "issuer": "Nordea Visa",
-        "balance": 2450.0,
+        "balance": 2450,
         "creditLimit": 3000,
         "interestRate": 18.9,
         "minimumPayment": 75,
@@ -38,7 +38,7 @@
       {
         "cardId": "cc_jukka_002",
         "issuer": "S-Pankki Mastercard",
-        "balance": 1820.0,
+        "balance": 1820,
         "creditLimit": 2000,
         "interestRate": 17.5,
         "minimumPayment": 60,
@@ -104,7 +104,8 @@
     "formality": "casual",
     "language": "casual_adult",
     "prefersVoice": 0.5,
-    "callsWhenEmotional": true
+    "callsWhenEmotional": true,
+    "voiceId": "pqHfZKP75CvOlQylNhV4"
   },
   "relationshipState": {
     "trustLevel": 0.5,

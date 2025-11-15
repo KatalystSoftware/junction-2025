@@ -21,14 +21,14 @@
         "accountId": "acc_kaisa_001",
         "bankName": "OP",
         "accountType": "checking",
-        "balance": 950.0,
+        "balance": 950,
         "currency": "EUR"
       },
       {
         "accountId": "acc_kaisa_002",
         "bankName": "OP",
         "accountType": "savings",
-        "balance": 2100.0,
+        "balance": 2100,
         "currency": "EUR"
       }
     ],
@@ -36,7 +36,7 @@
       {
         "cardId": "cc_kaisa_001",
         "issuer": "OP Visa",
-        "balance": 420.0,
+        "balance": 420,
         "creditLimit": 3000,
         "interestRate": 14.9,
         "minimumPayment": 30,
@@ -64,7 +64,7 @@
       {
         "subscriptionId": "sub_kaisa_003",
         "name": "Daycare for Children",
-        "monthlyCost": 320.0,
+        "monthlyCost": 320,
         "category": "other",
         "currency": "EUR",
         "startDate": "2024-05-01"
@@ -82,7 +82,8 @@
     "formality": "casual",
     "language": "casual_adult_finnish",
     "prefersVoice": 0.4,
-    "callsWhenEmotional": true
+    "callsWhenEmotional": true,
+    "voiceId": "EXAVITQu4vr4xnSDxMaL"
   },
   "relationshipState": {
     "trustLevel": 0.5,

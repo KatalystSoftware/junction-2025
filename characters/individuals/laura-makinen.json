@@ -21,14 +21,14 @@
         "accountId": "acc_laura_001",
         "bankName": "OP",
         "accountType": "checking",
-        "balance": 380.0,
+        "balance": 380,
         "currency": "EUR"
       },
       {
         "accountId": "acc_laura_002",
         "bankName": "OP",
         "accountType": "savings",
-        "balance": 1200.0,
+        "balance": 1200,
         "currency": "EUR"
       }
     ],
@@ -64,7 +64,8 @@
     "formality": "semi-formal",
     "language": "casual_adult_finnish",
     "prefersVoice": 0.4,
-    "callsWhenEmotional": true
+    "callsWhenEmotional": true,
+    "voiceId": "AZnzlk1XvdvUeBnXmlld"
   },
   "relationshipState": {
     "trustLevel": 0.5,

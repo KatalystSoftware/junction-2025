@@ -21,14 +21,14 @@
         "accountId": "acc_katri_001",
         "bankName": "Nordea",
         "accountType": "checking",
-        "balance": 8400.0,
+        "balance": 8400,
         "currency": "EUR"
       },
       {
         "accountId": "acc_katri_002",
         "bankName": "Nordea",
         "accountType": "savings",
-        "balance": 45000.0,
+        "balance": 45000,
         "currency": "EUR"
       }
     ],
@@ -36,10 +36,10 @@
       {
         "cardId": "card_katri_001",
         "issuer": "Nordea Gold",
-        "balance": 0.0,
-        "creditLimit": 10000.0,
+        "balance": 0,
+        "creditLimit": 10000,
         "interestRate": 11.9,
-        "minimumPayment": 0.0,
+        "minimumPayment": 0,
         "currency": "EUR"
       }
     ],
@@ -48,9 +48,9 @@
         "debtId": "debt_katri_001",
         "type": "mortgage",
         "creditor": "Nordea Home Loan",
-        "totalAmount": 320000.0,
-        "remainingAmount": 245000.0,
-        "monthlyPayment": 1250.0,
+        "totalAmount": 320000,
+        "remainingAmount": 245000,
+        "monthlyPayment": 1250,
         "interestRate": 2.8,
         "currency": "EUR",
         "startDate": "2019-03-01"
@@ -84,7 +84,7 @@
       {
         "subscriptionId": "sub_katri_004",
         "name": "Gym Family Membership",
-        "monthlyCost": 89.0,
+        "monthlyCost": 89,
         "category": "fitness",
         "currency": "EUR",
         "startDate": "2022-01-01"
@@ -101,7 +101,8 @@
     "formality": "formal",
     "language": "formal_finnish",
     "prefersVoice": 0.2,
-    "callsWhenEmotional": false
+    "callsWhenEmotional": false,
+    "voiceId": "EXAVITQu4vr4xnSDxMaL"
   },
   "relationshipState": {
     "trustLevel": 0.5,

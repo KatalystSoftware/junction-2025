@@ -21,14 +21,14 @@
         "accountId": "acc_esko_001",
         "bankName": "Nordea",
         "accountType": "checking",
-        "balance": 4200.0,
+        "balance": 4200,
         "currency": "EUR"
       },
       {
         "accountId": "acc_esko_002",
         "bankName": "Nordea",
         "accountType": "savings",
-        "balance": 58000.0,
+        "balance": 58000,
         "currency": "EUR"
       }
     ],
@@ -63,7 +63,8 @@
     "formality": "formal",
     "language": "formal_finnish",
     "prefersVoice": 0.3,
-    "callsWhenEmotional": true
+    "callsWhenEmotional": true,
+    "voiceId": "SOYHLrjzK2X1ezoPC6cr"
   },
   "relationshipState": {
     "trustLevel": 0.5,

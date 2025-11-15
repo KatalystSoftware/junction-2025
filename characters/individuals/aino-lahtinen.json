@@ -21,14 +21,14 @@
         "accountId": "acc_aino_001",
         "bankName": "Nordea",
         "accountType": "checking",
-        "balance": 380.0,
+        "balance": 380,
         "currency": "EUR"
       },
       {
         "accountId": "acc_aino_002",
         "bankName": "Nordea",
         "accountType": "savings",
-        "balance": 850.0,
+        "balance": 850,
         "currency": "EUR"
       }
     ],
@@ -61,7 +61,8 @@
     "formality": "casual",
     "language": "teen_finnish",
     "prefersVoice": 0.3,
-    "callsWhenEmotional": false
+    "callsWhenEmotional": false,
+    "voiceId": "MF3mGyEYCl7XYWbV9V6O"
   },
   "relationshipState": {
     "trustLevel": 0.5,

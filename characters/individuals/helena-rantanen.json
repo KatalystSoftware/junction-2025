@@ -21,14 +21,14 @@
         "accountId": "acc_helena_001",
         "bankName": "Nordea",
         "accountType": "checking",
-        "balance": 2850.0,
+        "balance": 2850,
         "currency": "EUR"
       },
       {
         "accountId": "acc_helena_002",
         "bankName": "Nordea",
         "accountType": "savings",
-        "balance": 28500.0,
+        "balance": 28500,
         "currency": "EUR"
       }
     ],
@@ -80,7 +80,8 @@
     "formality": "semi-formal",
     "language": "casual_adult_finnish",
     "prefersVoice": 0.2,
-    "callsWhenEmotional": false
+    "callsWhenEmotional": false,
+    "voiceId": "MF3mGyEYCl7XYWbV9V6O"
   },
   "relationshipState": {
     "trustLevel": 0.5,

@@ -21,14 +21,14 @@
         "accountId": "acc_anna_001",
         "bankName": "Nordea",
         "accountType": "checking",
-        "balance": 3200.0,
+        "balance": 3200,
         "currency": "EUR"
       },
       {
         "accountId": "acc_anna_002",
         "bankName": "Nordea",
         "accountType": "savings",
-        "balance": 32000.0,
+        "balance": 32000,
         "currency": "EUR"
       }
     ],
@@ -38,9 +38,9 @@
         "debtId": "debt_anna_001",
         "type": "mortgage",
         "creditor": "Nordea Home Loan",
-        "totalAmount": 180000.0,
-        "remainingAmount": 95000.0,
-        "monthlyPayment": 720.0,
+        "totalAmount": 180000,
+        "remainingAmount": 95000,
+        "monthlyPayment": 720,
         "interestRate": 2.9,
         "currency": "EUR",
         "startDate": "2012-05-01"
@@ -83,7 +83,8 @@
     "formality": "formal",
     "language": "formal_finnish",
     "prefersVoice": 0.1,
-    "callsWhenEmotional": false
+    "callsWhenEmotional": false,
+    "voiceId": "ThT5KcBeYPX3keUQqHPh"
   },
   "relationshipState": {
     "trustLevel": 0.5,

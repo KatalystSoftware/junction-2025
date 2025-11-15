@@ -21,14 +21,14 @@
         "accountId": "acc_eero_001",
         "bankName": "Nordea",
         "accountType": "checking",
-        "balance": 3200.0,
+        "balance": 3200,
         "currency": "EUR"
       },
       {
         "accountId": "acc_eero_002",
         "bankName": "Nordea",
         "accountType": "savings",
-        "balance": 82000.0,
+        "balance": 82000,
         "currency": "EUR"
       }
     ],
@@ -54,7 +54,7 @@
       {
         "subscriptionId": "sub_eero_003",
         "name": "Newspaper Subscription",
-        "monthlyCost": 32.0,
+        "monthlyCost": 32,
         "category": "other",
         "currency": "EUR",
         "startDate": "2010-01-01"
@@ -72,7 +72,8 @@
     "formality": "semi-formal",
     "language": "casual_adult_finnish",
     "prefersVoice": 0.4,
-    "callsWhenEmotional": false
+    "callsWhenEmotional": false,
+    "voiceId": "SOYHLrjzK2X1ezoPC6cr"
   },
   "relationshipState": {
     "trustLevel": 0.5,

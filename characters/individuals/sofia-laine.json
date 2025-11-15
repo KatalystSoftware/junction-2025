@@ -21,14 +21,14 @@
         "accountId": "acc_sofia_001",
         "bankName": "Holvi Business",
         "accountType": "checking",
-        "balance": 1850.0,
+        "balance": 1850,
         "currency": "EUR"
       },
       {
         "accountId": "acc_sofia_002",
         "bankName": "Nordea Personal",
         "accountType": "checking",
-        "balance": 320.0,
+        "balance": 320,
         "currency": "EUR"
       }
     ],
@@ -36,7 +36,7 @@
       {
         "cardId": "cc_sofia_001",
         "issuer": "Nordea Visa",
-        "balance": 5400.0,
+        "balance": 5400,
         "creditLimit": 6000,
         "interestRate": 17.9,
         "minimumPayment": 160,
@@ -45,7 +45,7 @@
       {
         "cardId": "cc_sofia_002",
         "issuer": "OP Business Mastercard",
-        "balance": 3200.0,
+        "balance": 3200,
         "creditLimit": 5000,
         "interestRate": 16.9,
         "minimumPayment": 100,
@@ -111,7 +111,8 @@
     "formality": "casual",
     "language": "casual_adult_finnish",
     "prefersVoice": 0.5,
-    "callsWhenEmotional": true
+    "callsWhenEmotional": true,
+    "voiceId": "AZnzlk1XvdvUeBnXmlld"
   },
   "relationshipState": {
     "trustLevel": 0.5,

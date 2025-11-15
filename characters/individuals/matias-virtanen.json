@@ -21,7 +21,7 @@
         "accountId": "acc_matias_001",
         "bankName": "OP",
         "accountType": "checking",
-        "balance": 420.0,
+        "balance": 420,
         "currency": "EUR"
       }
     ],
@@ -31,8 +31,8 @@
         "debtId": "debt_matias_001",
         "type": "student_loan",
         "creditor": "KELA/Student Loan",
-        "totalAmount": 2500.0,
-        "remainingAmount": 2500.0,
+        "totalAmount": 2500,
+        "remainingAmount": 2500,
         "monthlyPayment": 0,
         "interestRate": 0.5,
         "currency": "EUR",
@@ -69,7 +69,8 @@
     "formality": "casual",
     "language": "teen_finnish",
     "prefersVoice": 0.2,
-    "callsWhenEmotional": false
+    "callsWhenEmotional": false,
+    "voiceId": "ErXwobaYiN019PkySvjV"
   },
   "relationshipState": {
     "trustLevel": 0.5,

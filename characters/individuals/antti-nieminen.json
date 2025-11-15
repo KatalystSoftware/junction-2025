@@ -21,14 +21,14 @@
         "accountId": "acc_antti_001",
         "bankName": "OP Business",
         "accountType": "checking",
-        "balance": 4200.0,
+        "balance": 4200,
         "currency": "EUR"
       },
       {
         "accountId": "acc_antti_002",
         "bankName": "OP",
         "accountType": "savings",
-        "balance": 2800.0,
+        "balance": 2800,
         "currency": "EUR"
       }
     ],
@@ -36,7 +36,7 @@
       {
         "cardId": "cc_antti_001",
         "issuer": "OP Business Visa",
-        "balance": 8500.0,
+        "balance": 8500,
         "creditLimit": 15000,
         "interestRate": 16.9,
         "minimumPayment": 250,
@@ -45,7 +45,7 @@
       {
         "cardId": "cc_antti_002",
         "issuer": "Nordea Mastercard",
-        "balance": 3200.0,
+        "balance": 3200,
         "creditLimit": 8000,
         "interestRate": 15.9,
         "minimumPayment": 100,
@@ -104,7 +104,7 @@
       {
         "subscriptionId": "sub_antti_004",
         "name": "Business Insurance",
-        "monthlyCost": 285.0,
+        "monthlyCost": 285,
         "category": "other",
         "currency": "EUR",
         "startDate": "2018-01-01"
@@ -122,7 +122,8 @@
     "formality": "semi-formal",
     "language": "casual_adult_finnish",
     "prefersVoice": 0.6,
-    "callsWhenEmotional": true
+    "callsWhenEmotional": true,
+    "voiceId": "pqHfZKP75CvOlQylNhV4"
   },
   "relationshipState": {
     "trustLevel": 0.5,
