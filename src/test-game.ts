@@ -1,93 +1,150 @@
 /**
- * Test script for Elämäpeli 2025 game system
+ * Test script for Financial Advisor Simulator
  *
- * This demonstrates the multi-agent system in action
+ * Demonstrates the new advisor-character interaction system
  */
 
-import { mastra } from "./mastra/index.ts";
+import { characterPool } from "./mastra/index.ts";
 import {
-  processPlayerInput,
-  createNewPlayer,
-  getPlayerSummary,
+  startNewConsultation,
+  handleAdvisorResponse,
+  createNewAdvisor,
+  getAdvisorSummary,
 } from "./mastra/game/orchestrator.ts";
 
-async function testGameFlow() {
-  console.log("🎮 Elämäpeli 2025 - Testing Multi-Agent System\n");
-  console.log("=".repeat(60));
+async function testAdvisorSimulator() {
+  console.log("🎮 Financial Advisor Simulator - Testing Multi-Agent System\n");
+  console.log("=".repeat(70));
 
-  // Create a new player
-  const playerId = "test-player-001";
-  let playerState = createNewPlayer(playerId);
+  // Wait a moment for character pool to initialize
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
-  console.log("\n✅ Created new player:");
-  console.log(JSON.stringify(getPlayerSummary(playerState), null, 2));
+  // Create a new advisor
+  const advisorId = "test-advisor-001";
+  let advisorState = createNewAdvisor(advisorId);
 
-  console.log("\n" + "=".repeat(60));
-  console.log("📱 Simulating Game Scenario...\n");
+  console.log("\n✅ Created new financial advisor:");
+  console.log(JSON.stringify(getAdvisorSummary(advisorState), null, 2));
 
-  // Simulate first interaction - player just got their first paycheck
-  console.log("👤 Player: 'I just got my first paycheck! 500 euros!'");
+  console.log("\n" + "=".repeat(70));
+  console.log("📱 Starting first consultation...\n");
 
   try {
-    const response1 = await processPlayerInput(
-      playerId,
-      "I just got my first paycheck! 500 euros!",
-      playerState,
-    );
+    // Start first consultation - Game Master sends a character
+    console.log("🤖 Game Master is selecting a client for you...\n");
 
-    console.log("\n🤖 Game Response:");
-    console.log(`📊 Scenario: ${response1.scenarioType}`);
-    console.log(`📨 Messages:`);
-    response1.messages.forEach((msg, i) => {
-      console.log(`   ${i + 1}. ${msg}`);
-    });
+    const consultation1 = await startNewConsultation(advisorId, advisorState);
 
-    if (response1.voiceNeeded) {
-      console.log("🔊 Voice message recommended");
+    if (
+      consultation1.type === "character_message" &&
+      consultation1.characterInfo
+    ) {
+      console.log(`\n📨 NEW CLIENT: ${consultation1.characterInfo.name}`);
+      console.log(`   Age: ${consultation1.characterInfo.age}`);
+      console.log(`   Occupation: ${consultation1.characterInfo.occupation}`);
+      console.log(
+        `   ${consultation1.voiceNeeded ? "🔊 Voice message" : "💬 Text message"}\n`,
+      );
+      console.log(`Character: "${consultation1.messages?.[0]}"\n`);
+
+      advisorState = consultation1.stateUpdate;
+
+      // Simulate advisor's response
+      const advisorAdvice = `Hei! Ymmärrän tilanteesi. Aloitetaan seuraamalla menojasi viikon ajan, jotta nähdään mihin rahat menevät. Sen jälkeen voimme tehdä yksinkertaisen budjetin. Kokeile vaikkapa 50/30/20 sääntöä: 50% tuloista pakollisiin menoihin (vuokra, ruoka), 30% haluihin, ja 20% säästöihin. Suosittelen lataamaan jonkun budjetointiappin, esim. Nordea Wallet tai Spendee. Mitä mieltä olet?`;
+
+      console.log("=".repeat(70));
+      console.log("💼 You (Advisor):");
+      console.log(`"${advisorAdvice}"\n`);
+
+      // Get character's response
+      const response1 = await handleAdvisorResponse(
+        consultation1.threadId || "thread_1",
+        advisorAdvice,
+        advisorState,
+        [],
+      );
+
+      console.log("📨 Character responds:");
+      response1.messages?.forEach((msg) => {
+        console.log(`   "${msg}"`);
+      });
+
+      advisorState = response1.stateUpdate;
+
+      if (response1.type === "conversation_end") {
+        console.log("\n✅ Consultation ended");
+      } else {
+        console.log("\n↔️  Conversation continuing...");
+      }
+
+      console.log("\n📈 Updated Advisor State:");
+      console.log(JSON.stringify(getAdvisorSummary(advisorState), null, 2));
+
+      // Try to start a second consultation
+      console.log("\n" + "=".repeat(70));
+      console.log("📱 Starting second consultation...\n");
+
+      const consultation2 = await startNewConsultation(advisorId, advisorState);
+
+      if (
+        consultation2.type === "character_message" &&
+        consultation2.characterInfo
+      ) {
+        console.log(
+          `\n📨 ${consultation2.isNewThread ? "NEW" : "RETURNING"} CLIENT: ${consultation2.characterInfo.name}`,
+        );
+        console.log(
+          `   ${consultation2.voiceNeeded ? "🔊 Voice message" : "💬 Text message"}\n`,
+        );
+        console.log(`Character: "${consultation2.messages?.[0]}"\n`);
+
+        advisorState = consultation2.stateUpdate;
+      } else if (
+        consultation2.type === "god_boss_review" &&
+        consultation2.review
+      ) {
+        console.log("\n📊 GOD/BOSS REVIEW!\n");
+        console.log(`Overall Score: ${consultation2.review.overallScore}/10`);
+        console.log(`\nStrengths:`);
+        consultation2.review.strengthsIdentified.forEach((s) =>
+          console.log(`  ✅ ${s}`),
+        );
+        console.log(`\nAreas for Improvement:`);
+        consultation2.review.areasForImprovement.forEach((a) =>
+          console.log(`  ⚠️  ${a}`),
+        );
+        console.log(`\nLearning Materials:`);
+        consultation2.review.learningMaterials.forEach((m) =>
+          console.log(`  📚 ${m.title} - ${m.description}`),
+        );
+        console.log(
+          `\nBoss says: "${consultation2.review.encouragingMessage}"`,
+        );
+
+        advisorState = consultation2.stateUpdate;
+      }
+
+      console.log("\n" + "=".repeat(70));
+      console.log("\n✅ Test completed successfully!");
+
+      console.log("\n🎯 Key observations:");
+      console.log(`   - Sessions completed: ${advisorState.totalSessions}`);
+      console.log(`   - Clients helped: ${advisorState.totalClientsHelped}`);
+      console.log(`   - Reputation: ${advisorState.reputation}/100`);
+      console.log(`   - Skill level: ${advisorState.skillLevel.toFixed(1)}/10`);
+      console.log(
+        `   - Budgeting expertise: ${advisorState.topicsExpertise.budgeting.toFixed(1)}/10`,
+      );
+
+      // Show character pool stats
+      const poolStats = characterPool.getPoolStats();
+      console.log("\n📊 Character Pool Stats:");
+      console.log(`   - Total characters: ${poolStats.totalCharacters}`);
+      console.log(`   - Total scenarios: ${poolStats.totalScenarios}`);
+      console.log(`   - Characters met: ${poolStats.charactersMetCount}`);
+      console.log(`   - Scenarios used: ${poolStats.usedScenarios}`);
+      console.log(`   - Pending follow-ups: ${poolStats.pendingFollowUps}`);
     }
-
-    playerState = response1.stateUpdate;
-
-    console.log("\n📈 Updated Player State:");
-    console.log(JSON.stringify(getPlayerSummary(playerState), null, 2));
-
-    console.log("\n" + "=".repeat(60));
-    console.log("📱 Player responds with interest...\n");
-
-    // Simulate player responding positively (showing some risk)
-    console.log("👤 Player: 'Yeah that sounds interesting! Tell me more'");
-
-    const response2 = await processPlayerInput(
-      playerId,
-      "Yeah that sounds interesting! Tell me more",
-      playerState,
-    );
-
-    console.log("\n🤖 Game Response:");
-    console.log(`📊 Scenario: ${response2.scenarioType}`);
-    console.log(`📨 Messages:`);
-    response2.messages.forEach((msg, i) => {
-      console.log(`   ${i + 1}. ${msg}`);
-    });
-
-    playerState = response2.stateUpdate;
-
-    console.log("\n📈 Final Player State:");
-    console.log(JSON.stringify(getPlayerSummary(playerState), null, 2));
-
-    console.log("\n" + "=".repeat(60));
-    console.log("\n✅ Test completed successfully!");
-    console.log("\n🎯 Key observations:");
-    console.log(
-      `   - Player went through ${playerState.scenarioHistory.length} scenarios`,
-    );
-    console.log(
-      `   - Risk tolerance: ${(playerState.personalityProfile.risk_tolerance * 100).toFixed(0)}%`,
-    );
-    console.log(
-      `   - Scam awareness: ${(playerState.personalityProfile.scam_awareness * 100).toFixed(0)}%`,
-    );
-    console.log(`   - Total messages: ${playerState.totalMessages}`);
   } catch (error) {
     console.error("\n❌ Error during test:", error);
     if (error instanceof Error) {
@@ -98,8 +155,8 @@ async function testGameFlow() {
 }
 
 // Run the test
-console.log("Starting Elämäpeli 2025 test...\n");
-testGameFlow()
+console.log("Starting Financial Advisor Simulator test...\n");
+testAdvisorSimulator()
   .then(() => {
     console.log("\n✅ All tests completed!");
     process.exit(0);

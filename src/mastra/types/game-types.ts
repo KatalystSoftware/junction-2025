@@ -1,116 +1,329 @@
 /**
- * Elämäpeli 2025 - Game Type Definitions
- * Financial literacy game for Finnish youth
+ * Elämäpeli 2025 - Financial Advisor Simulator
+ * Type Definitions
+ *
+ * Player role: Financial advisor helping AI characters with their money problems
  */
 
-export interface PlayerFinancialState {
-  savings: number;
-  debt: number;
-  monthlyIncome: number;
-  creditScore: number;
+// ============================================================================
+// CHARACTER DEFINITIONS
+// ============================================================================
+
+export interface CharacterPersonality {
+  impulsiveness: number; // 0-1: How impulsive with money
+  trustingness: number; // 0-1: How likely to follow advice
+  financial_literacy: number; // 0-1: Current understanding of finance
+  stubbornness: number; // 0-1: Resistance to changing habits
+  emotionality: number; // 0-1: How emotional they get about money
 }
 
-export interface PlayerPersonalityProfile {
-  risk_tolerance: number; // 0-1
-  confidence: number; // 0-1
-  peer_influence: number; // 0-1
-  scam_awareness: number; // 0-1
-  planning_ability: number; // 0-1
+export interface CharacterFinancialProfile {
+  incomeLevel: "low" | "medium" | "high";
+  typicalMonthlyIncome: number;
+  hasDebt: boolean;
+  hasSavings: "none" | "minimal" | "moderate" | "good";
 }
 
-export interface ScenarioHistoryItem {
-  type: string;
-  outcome: string;
+export interface CharacterCommunicationStyle {
+  formality: "casual" | "semi-formal" | "formal";
+  language: "teen_finnish" | "casual_adult_finnish" | "formal_finnish";
+  prefersVoice: number; // 0-1: How often they use voice messages
+  callsWhenEmotional: boolean; // Use voice when upset/excited
+}
+
+export interface CharacterRelationshipState {
+  trustLevel: number; // 0-1: How much they trust the advisor
+  visitCount: number;
+  lastVisit: string | null; // ISO date
+  adviceFollowedHistory: AdviceOutcome[];
+}
+
+export interface AdviceOutcome {
+  scenarioId: string;
+  adviceGiven: string[];
+  followed: boolean;
+  outcome: "positive" | "negative" | "neutral";
   timestamp: string;
 }
 
-export interface ChoiceHistoryItem {
-  choice: string;
-  consequence: string;
-  pattern?: "impulsive" | "risky" | "cautious" | "overconfident";
+export interface Character {
+  characterId: string;
+  name: string;
+  age: number;
+  occupation: string;
+  background: string;
+  personality: CharacterPersonality;
+  financialProfile: CharacterFinancialProfile;
+  communicationStyle: CharacterCommunicationStyle;
+  relationshipState: CharacterRelationshipState;
 }
 
-export interface AgentMemory {
-  scammer: {
-    player_engaged_before: boolean;
-    rejection_count: number;
-  };
-  friend: {
-    times_validated_spending: number;
-    debt_level: number;
-    relationship_strength: number;
-  };
-  parent: {
-    knows_about_debt: boolean;
-    trust_level: number;
-  };
+// ============================================================================
+// SCENARIO DEFINITIONS
+// ============================================================================
+
+export interface VoiceMessageConfig {
+  enabled: boolean;
+  transcription?: string;
+  audioUrl?: string;
+  urgency?: "calm" | "concerned" | "urgent" | "excited";
 }
 
-export interface PlayerState {
-  playerId: string;
-  financialState: PlayerFinancialState;
-  personalityProfile: PlayerPersonalityProfile;
-  scenarioHistory: ScenarioHistoryItem[];
-  choiceHistory: ChoiceHistoryItem[];
-  agentStates: AgentMemory;
-  currentMonth: number; // 0-120 (10 years)
-  totalMessages: number;
-  currentScenario: string | null;
+export interface InitialContact {
+  method: "text" | "voice" | "call";
+  message: string;
+  voiceMessage?: VoiceMessageConfig;
 }
 
-export type ScenarioType =
-  | "crypto_scam"
-  | "peer_pressure_purchase"
-  | "parent_finds_debt"
-  | "friend_asks_loan"
-  | "emergency_expense"
-  | "bnpl_temptation"
-  | "gambling_ad"
-  | "housing_loan_confusion"
-  | "first_paycheck"
-  | "savings_opportunity";
+export interface ProblemContext {
+  currentSituation: string;
+  emotionalState: string;
+  urgency: "low" | "medium" | "high";
+  specificDetails: Record<string, any>;
+}
 
-export type AgentType = "scammer" | "friend" | "parent" | "teacher";
+export interface TriggerConditions {
+  advisorSkillLevel: { min: number; max: number };
+  isFollowUp: boolean;
+  requiresPreviousScenario?: string | null;
+  characterMinVisits?: number;
+}
 
-export type ScamApproach = "aggressive_fomo" | "patient_trust" | "social_proof";
+export interface FollowUpScenario {
+  scenarioId: string;
+  triggeredBy:
+    | "good_advice_followed"
+    | "bad_advice_or_not_followed"
+    | "mixed_results";
+  delayInSessions: number; // How many other sessions before this follow-up
+}
 
-export type FriendScenarioType =
-  | "peer_pressure_purchase"
-  | "asking_for_loan"
-  | "confession_of_debt"
-  | "seeking_advice";
+export interface Scenario {
+  scenarioId: string;
+  characterId: string;
+  scenarioType: string;
+  difficulty: number; // 0-1
+  topic: FinancialTopic;
+  triggerConditions: TriggerConditions;
+  initialContact: InitialContact;
+  problemContext: ProblemContext;
+  idealAdvice: string[];
+  commonMistakes: string[];
+  followUpScenarios?: FollowUpScenario[];
+}
 
-export type ParentScenarioType =
-  | "parent_finds_debt"
-  | "offering_help"
-  | "emergency_support"
-  | "casual_check_in";
+export type FinancialTopic =
+  | "budgeting"
+  | "saving"
+  | "debt_management"
+  | "investing"
+  | "loans"
+  | "insurance"
+  | "retirement"
+  | "emergency_fund"
+  | "credit_score"
+  | "scam_awareness";
+
+// ============================================================================
+// ADVISOR STATE (replaces PlayerState)
+// ============================================================================
+
+export interface TopicExpertise {
+  budgeting: number; // 0-10
+  saving: number;
+  debt_management: number;
+  investing: number;
+  loans: number;
+  insurance: number;
+  retirement: number;
+  emergency_fund: number;
+  credit_score: number;
+  scam_awareness: number;
+}
+
+export interface ConsultationSession {
+  sessionId: string;
+  characterId: string;
+  characterName: string;
+  scenarioId: string;
+  timestamp: string;
+  playerAdvice: string[];
+  characterReactions: string[];
+  adviceQualityScore: number; // 0-10: AI-evaluated quality
+  topicsCovered: FinancialTopic[];
+  followUpScheduled: boolean;
+  outcomeRevealed: boolean;
+  duration?: number; // Number of message exchanges
+}
+
+export interface CompletedMaterial {
+  materialId: string;
+  title: string;
+  topic: FinancialTopic;
+  completedAt: string;
+  quizScore?: number;
+}
+
+export interface AdvisorState {
+  advisorId: string;
+  reputation: number; // 0-100
+  skillLevel: number; // 0-10 overall skill
+  specializations: FinancialTopic[]; // Topics they're good at
+  topicsExpertise: TopicExpertise;
+  sessionHistory: ConsultationSession[];
+  totalClientsHelped: number;
+  currentClient: string | null; // characterId
+  currentScenario: string | null; // scenarioId
+  godBossRelationship: number; // 0-10: how pleased your boss is
+  learningMaterials: CompletedMaterial[];
+  totalSessions: number;
+  lastReviewSession: number; // Session count when last reviewed
+}
+
+// ============================================================================
+// CONVERSATION THREAD (for messaging UI)
+// ============================================================================
+
+export interface ConversationMessage {
+  messageId: string;
+  sender: "character" | "advisor" | "god_boss";
+  content: string;
+  timestamp: string;
+  isVoice?: boolean;
+  voiceConfig?: VoiceMessageConfig;
+}
+
+export interface ConversationThread {
+  threadId: string;
+  characterId: string;
+  characterName: string;
+  scenarioId: string;
+  messages: ConversationMessage[];
+  status: "active" | "awaiting_response" | "resolved";
+  unreadCount: number;
+  createdAt: string;
+  lastMessageAt: string;
+}
+
+// ============================================================================
+// GAME MASTER DECISIONS
+// ============================================================================
 
 export interface GameMasterDecision {
-  scenario_type: ScenarioType;
-  agent_to_invoke: AgentType;
-  difficulty: number; // 0-1
+  action: "send_character" | "god_boss_review" | "no_action";
+  phase?: "scenario_start" | "review_phase" | "waiting"; // Consultation phase tracking
   reasoning: string;
-  context_for_agent: {
-    player_type?: string;
-    approach?: ScamApproach;
-    player_risk_level?: number;
-    player_recent_success?: boolean;
-    suggested_approach?: string;
-    [key: string]: any;
+
+  // If action is 'send_character'
+  characterId?: string;
+  scenarioId?: string;
+  isNewCharacter?: boolean; // true = new thread, false = returning
+  difficulty?: number;
+
+  // If action is 'god_boss_review'
+  sessionsToReview?: string[]; // sessionIds to review
+}
+
+// ============================================================================
+// AGENT RESPONSES
+// ============================================================================
+
+export interface CharacterResponse {
+  messages: string[];
+  voiceNeeded?: boolean;
+  emotionalState?: string;
+  willFollowAdvice?: boolean; // AI's assessment
+  conversationEnding?: boolean; // Character ready to leave
+  adviceQualityFeedback?: {
+    score: number; // 0-10
+    reasoning: string;
   };
 }
 
-export interface AgentResponse {
-  messages: string[];
-  voice_needed?: boolean;
-  scam_sophistication?: number;
-  expected_player_response?: "engage" | "ignore" | "report";
+export interface GodBossReview {
+  overallScore: number; // 0-10
+  strengthsIdentified: string[];
+  areasForImprovement: string[];
+  learningMaterials: LearningMaterial[];
+  quiz?: Quiz;
+  encouragingMessage: string;
+  reputationChange: number; // +/- reputation points
+  skillLevelChange: number; // +/- skill level
+  topicsExpertiseUpdates: Partial<TopicExpertise>;
 }
 
+export interface LearningMaterial {
+  materialId: string;
+  title: string;
+  description: string;
+  topic: FinancialTopic;
+  url?: string;
+  type: "article" | "video" | "tool" | "calculator" | "quiz";
+}
+
+export interface Quiz {
+  quizId: string;
+  topic: FinancialTopic;
+  questions: QuizQuestion[];
+}
+
+export interface QuizQuestion {
+  questionId: string;
+  question: string;
+  options: string[];
+  correctAnswer: number; // index
+  explanation: string;
+}
+
+// ============================================================================
+// GAME RESPONSES
+// ============================================================================
+
 export interface GameResponse {
-  messages: string[];
+  type: "character_message" | "god_boss_review" | "conversation_end";
+
+  // For character messages
+  threadId?: string;
+  messages?: string[];
   voiceNeeded?: boolean;
-  stateUpdate: PlayerState;
-  scenarioType: ScenarioType;
+  isNewThread?: boolean;
+  characterInfo?: {
+    name: string;
+    age: number;
+    occupation: string;
+  };
+
+  // For god boss reviews
+  review?: GodBossReview;
+
+  // State updates
+  stateUpdate: AdvisorState;
+
+  // Thread management
+  activeThreads?: ConversationThread[];
+}
+
+// ============================================================================
+// ADVICE EVALUATION
+// ============================================================================
+
+export interface AdviceEvaluation {
+  qualityScore: number; // 0-10
+  strengths: string[];
+  weaknesses: string[];
+  missedOpportunities: string[];
+  topicsCovered: FinancialTopic[];
+  wasActionable: boolean;
+  wasEmpathetic: boolean;
+  wasAccurate: boolean;
+}
+
+// ============================================================================
+// BACKWARD COMPATIBILITY (for migration)
+// ============================================================================
+
+// Keep old types temporarily for migration purposes
+export interface PlayerState {
+  playerId: string;
+  // ... old fields (to be removed after migration)
 }

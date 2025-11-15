@@ -1,0 +1,130 @@
+[
+  {
+    "characterId": "char_minna_001",
+    "name": "Minna Virtanen",
+    "age": 22,
+    "occupation": "Yliopisto-opiskelija",
+    "background": "Ensimmäisen vuoden opiskelija Helsingissä. Muuttanut juuri kotoa pois ja asuu yksin ensimmäistä kertaa. Töissä kahvilassa osa-aikaisesti. Ei ole koskaan tehnyt budjettia.",
+    "personality": {
+      "impulsiveness": 0.7,
+      "trustingness": 0.6,
+      "financial_literacy": 0.3,
+      "stubbornness": 0.4,
+      "emotionality": 0.6
+    },
+    "financialProfile": {
+      "incomeLevel": "low",
+      "typicalMonthlyIncome": 800,
+      "hasDebt": false,
+      "hasSavings": "minimal"
+    },
+    "communicationStyle": {
+      "formality": "casual",
+      "language": "teen_finnish",
+      "prefersVoice": 0.3,
+      "callsWhenEmotional": false
+    },
+    "relationshipState": {
+      "trustLevel": 0.5,
+      "visitCount": 0,
+      "lastVisit": null,
+      "adviceFollowedHistory": []
+    }
+  },
+  {
+    "characterId": "char_jukka_002",
+    "name": "Jukka Laaksonen",
+    "age": 28,
+    "occupation": "Kaupan myyjä",
+    "background": "Työskentelee vähittäiskaupassa kokopäiväisesti. Kasautunut 8000€ kulutusluottoa viimeisen kolmen vuoden aikana. Stressaantunut tilanteesta. Asuu Tampereella vuokralla.",
+    "personality": {
+      "impulsiveness": 0.5,
+      "trustingness": 0.7,
+      "financial_literacy": 0.4,
+      "stubbornness": 0.5,
+      "emotionality": 0.8
+    },
+    "financialProfile": {
+      "incomeLevel": "low",
+      "typicalMonthlyIncome": 1900,
+      "hasDebt": true,
+      "hasSavings": "none"
+    },
+    "communicationStyle": {
+      "formality": "casual",
+      "language": "casual_adult_finnish",
+      "prefersVoice": 0.5,
+      "callsWhenEmotional": true
+    },
+    "relationshipState": {
+      "trustLevel": 0.5,
+      "visitCount": 0,
+      "lastVisit": null,
+      "adviceFollowedHistory": []
+    }
+  },
+  {
+    "characterId": "char_sari_003",
+    "name": "Sari Mäkinen",
+    "age": 35,
+    "occupation": "Sairaanhoitaja",
+    "background": "Kahden lapsen äiti. Puoliso töissä rakennusalalla. Haluaa alkaa säästämään lasten tulevaisuuteen ja omaan eläkkeeseen, mutta ei tiedä mistä aloittaa. Asuu Oulussa omistusasunnossa.",
+    "personality": {
+      "impulsiveness": 0.3,
+      "trustingness": 0.8,
+      "financial_literacy": 0.5,
+      "stubbornness": 0.3,
+      "emotionality": 0.5
+    },
+    "financialProfile": {
+      "incomeLevel": "medium",
+      "typicalMonthlyIncome": 2800,
+      "hasDebt": false,
+      "hasSavings": "moderate"
+    },
+    "communicationStyle": {
+      "formality": "semi-formal",
+      "language": "casual_adult_finnish",
+      "prefersVoice": 0.2,
+      "callsWhenEmotional": false
+    },
+    "relationshipState": {
+      "trustLevel": 0.5,
+      "visitCount": 0,
+      "lastVisit": null,
+      "adviceFollowedHistory": []
+    }
+  },
+  {
+    "characterId": "char_petri_004",
+    "name": "Petri Koskinen",
+    "age": 19,
+    "occupation": "Lukiolainen",
+    "background": "Viimeisen vuoden lukiolainen. Nähnyt paljon kryptohuijauksia somessa ja kaveripiirissä. Epävarma rahoista yleensä. Saanut juuri ensimmäisen kesätyöpaikan ja haluaa oppia tekemään hyviä päätöksiä.",
+    "personality": {
+      "impulsiveness": 0.6,
+      "trustingness": 0.5,
+      "financial_literacy": 0.2,
+      "stubbornness": 0.6,
+      "emotionality": 0.4
+    },
+    "financialProfile": {
+      "incomeLevel": "low",
+      "typicalMonthlyIncome": 600,
+      "hasDebt": false,
+      "hasSavings": "minimal"
+    },
+    "communicationStyle": {
+      "formality": "casual",
+      "language": "teen_finnish",
+      "prefersVoice": 0.4,
+      "callsWhenEmotional": false
+    },
+    "relationshipState": {
+      "trustLevel": 0.5,
+      "visitCount": 0,
+      "lastVisit": null,
+      "adviceFollowedHistory": []
+    }
+  }
+]

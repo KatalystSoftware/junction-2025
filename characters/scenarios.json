@@ -1,0 +1,434 @@
+[
+  {
+    "scenarioId": "scenario_minna_budget_001",
+    "characterId": "char_minna_001",
+    "scenarioType": "budgeting_basics",
+    "difficulty": 0.3,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Hei! Mun rahat tuppaa loppuu aina ennen kuun loppua, vaikka mulla on osa-aikatyö kahvilassa. En oikee osaa budjetoida... Voisitko auttaa? 😅",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Money runs out before month ends, no budget system",
+      "emotionalState": "confused, slightly frustrated",
+      "urgency": "medium",
+      "specificDetails": {
+        "monthlyIncome": 800,
+        "currentSavings": 200,
+        "rent": 450,
+        "knownExpenses": "ei tiedä tarkkoja menoja"
+      }
+    },
+    "idealAdvice": [
+      "Track all expenses for 1-2 weeks to see where money goes",
+      "Create simple budget categories (fixed costs, food, fun, savings)",
+      "Use 50/30/20 rule or similar budgeting framework",
+      "Set up automatic savings right after payday",
+      "Recommend budgeting app (Nordea Wallet, Spendee, or even Excel)",
+      "Start small with realistic savings goal (5-10% of income)"
+    ],
+    "commonMistakes": [
+      "Just saying 'spend less' without actionable steps",
+      "Recommending overly complex budgeting systems",
+      "Setting unrealistic savings goals (>30% for low income)",
+      "Not asking about her actual expenses first",
+      "Being judgmental about past spending"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_minna_budget_success_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 3
+      },
+      {
+        "scenarioId": "scenario_minna_budget_struggle_003",
+        "triggeredBy": "bad_advice_or_not_followed",
+        "delayInSessions": 2
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_minna_budget_success_002",
+    "characterId": "char_minna_001",
+    "scenarioType": "budgeting_followup_success",
+    "difficulty": 0.4,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_minna_budget_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Hei taas! 😊 Kiitos tosi paljon niistä neuvoista! Mä oon nyt seuraanu menoja kaksi viikkoo ja tein budjettiin. Huomasin et mä käytän tosi paljon rahaa ulkona syömiseen... Voisinko mä jotenkin vähentää sitä mut silti nähä kavereita? 🤔",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Successfully started budgeting, identified eating out as major expense, wants to optimize without sacrificing social life",
+      "emotionalState": "motivated, proud of progress",
+      "urgency": "low",
+      "specificDetails": {
+        "eatingOutMonthly": 180,
+        "hasTrackedExpensesFor": "2 weeks",
+        "newSavings": 50
+      }
+    },
+    "idealAdvice": [
+      "Praise progress made (positive reinforcement)",
+      "Suggest meal prepping and bringing lunch to campus",
+      "Recommend rotating between eating out and home-cooked group meals with friends",
+      "Set a monthly eating-out budget and stick to it",
+      "Suggest cheaper alternatives (student lunch deals, happy hours)",
+      "Help set next savings goal"
+    ],
+    "commonMistakes": [
+      "Saying to completely stop socializing (unrealistic)",
+      "Not acknowledging the progress made",
+      "Being too restrictive"
+    ]
+  },
+  {
+    "scenarioId": "scenario_minna_budget_struggle_003",
+    "characterId": "char_minna_001",
+    "scenarioType": "budgeting_followup_struggle",
+    "difficulty": 0.3,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_minna_budget_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Hei... mä yritin tehä sitä budjettii mut se on jotenkin niin vaikeeta 😔 Rahat loppuu edelleen ja en oikee ymmärrä mihin ne menee. Oonks mä vaan huono rahojen kanssa?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Struggled to implement budget, feeling discouraged",
+      "emotionalState": "frustrated, self-doubting",
+      "urgency": "medium",
+      "specificDetails": {
+        "didNotTrackExpenses": true,
+        "feltOverwhelmed": true
+      }
+    },
+    "idealAdvice": [
+      "Reassure that budgeting takes practice (empathy)",
+      "Start even simpler: just track for one week without changing anything",
+      "Focus on one category at a time",
+      "Suggest automatic budgeting tools that do tracking for you",
+      "Set a smaller, more achievable first goal",
+      "Offer to break it down into smaller steps"
+    ],
+    "commonMistakes": [
+      "Being judgmental or implying they're lazy",
+      "Giving the same complex advice again",
+      "Not addressing the emotional aspect"
+    ]
+  },
+  {
+    "scenarioId": "scenario_jukka_debt_001",
+    "characterId": "char_jukka_002",
+    "scenarioType": "debt_management",
+    "difficulty": 0.6,
+    "topic": "debt_management",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "Hei. Mulla on nyt kasautunut 8000 euroa kulutusluottoa viimeisen kolmen vuoden aikana. Korko on joku 15% ja mä en oikein tiedä miten pääsis tästä eroon. Alkaa painaa mieltä tosi paljon. Voitko auttaa?",
+      "voiceMessage": {
+        "enabled": true,
+        "transcription": "Hei. Mulla on nyt kasautunut 8000 euroa kulutusluottoa viimeisen kolmen vuoden aikana. Korko on joku 15% ja mä en oikein tiedä miten pääsis tästä eroon. Alkaa painaa mieltä tosi paljon. Voitko auttaa?",
+        "urgency": "concerned"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "8000€ consumer debt at 15% interest, feeling overwhelmed",
+      "emotionalState": "stressed, worried, ashamed",
+      "urgency": "high",
+      "specificDetails": {
+        "totalDebt": 8000,
+        "interestRate": 0.15,
+        "monthlyIncome": 1900,
+        "hasTrackedExpenses": false
+      }
+    },
+    "idealAdvice": [
+      "Empathize and normalize the situation (many people have debt)",
+      "First understand full financial picture (all debts, income, expenses)",
+      "Explain debt consolidation options (yhdistelylaina with lower interest)",
+      "Create debt payoff plan (snowball or avalanche method)",
+      "Look for ways to increase income or reduce expenses",
+      "Consider contacting Takuu-Säätiö or financial counseling",
+      "Emphasize this is solvable and provide hope"
+    ],
+    "commonMistakes": [
+      "Being judgmental about how debt was accumulated",
+      "Suggesting bankruptcy immediately (too extreme for 8k)",
+      "Not addressing the emotional weight",
+      "Giving vague advice without actionable steps",
+      "Ignoring high interest rate problem"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_jukka_debt_progress_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 4
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_jukka_debt_progress_002",
+    "characterId": "char_jukka_002",
+    "scenarioType": "debt_management_followup",
+    "difficulty": 0.5,
+    "topic": "debt_management",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_jukka_debt_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Hei! Mä sain sen yhdistelylainan! Korko putosi 15%:sta 7%:iin 🎉 Kiitos avusta. Nyt mulla ois kysymys: kuinka paljon mun kannattais maksaa kuussa pois velkaa? Mietin et voinko maksaa enemmän kun minimi.",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Successfully consolidated debt, now optimizing payoff strategy",
+      "emotionalState": "relieved, hopeful, motivated",
+      "urgency": "low",
+      "specificDetails": {
+        "newInterestRate": 0.07,
+        "minimumPayment": 200,
+        "hasExtraIncome": 150
+      }
+    },
+    "idealAdvice": [
+      "Celebrate the progress (big win!)",
+      "Explain minimum vs. accelerated payoff tradeoffs",
+      "Help create emergency fund while paying debt (balanced approach)",
+      "Calculate interest savings from extra payments",
+      "Make sure basic needs are still covered",
+      "Set realistic payoff timeline"
+    ],
+    "commonMistakes": [
+      "Suggesting to pay all extra money to debt without emergency fund",
+      "Not acknowledging the great progress made",
+      "Being too aggressive with payoff plan"
+    ]
+  },
+  {
+    "scenarioId": "scenario_sari_savings_001",
+    "characterId": "char_sari_003",
+    "scenarioType": "savings_investing_basics",
+    "difficulty": 0.5,
+    "topic": "saving",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 2, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Hei. Olen 35-vuotias sairaanhoitaja ja kahden lapsen äiti. Meillä on nyt talous hallussa, mutta haluaisin alkaa säästämään lasten tulevaisuuteen ja omaan eläkkeeseen. Mistä kannattaisi aloittaa? Onko säästötili paras vai pitäisikö jo sijoittaa johonkin?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Financially stable, wants to start saving/investing for kids' future and retirement",
+      "emotionalState": "motivated, curious, slightly overwhelmed by options",
+      "urgency": "low",
+      "specificDetails": {
+        "monthlyIncome": 2800,
+        "currentSavings": 5000,
+        "hasEmergencyFund": true,
+        "childrenAges": [5, 8]
+      }
+    },
+    "idealAdvice": [
+      "Confirm emergency fund is solid first (3-6 months expenses)",
+      "Explain different savings goals (short-term vs long-term)",
+      "For kids: suggest ASP-tili if they'll buy apartment someday",
+      "For retirement: explain index funds, ETFs, voluntary pension insurance",
+      "Mention tax benefits (tuloverovähennys for pension savings)",
+      "Start with small amounts to learn (50-100€/month)",
+      "Diversification basics"
+    ],
+    "commonMistakes": [
+      "Recommending complex investment strategies immediately",
+      "Not asking about risk tolerance",
+      "Ignoring short-term vs long-term goal differences",
+      "Not mentioning tax advantages",
+      "Being too cautious (just savings account)"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_sari_investment_choice_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 3
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_sari_investment_choice_002",
+    "characterId": "char_sari_003",
+    "scenarioType": "investment_decision",
+    "difficulty": 0.6,
+    "topic": "investing",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 2, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_sari_savings_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Hei! Olen nyt tutkinut niitä indeksirahastoja joista puhuttiin. Nordnetissä on paljon vaihtoehtoja... Mihin rahastoihin kannattaisi sijoittaa? Onko joku tietty hyvä vai pitääkö hajautaa moneen?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Ready to invest, researched options, needs help choosing specific funds",
+      "emotionalState": "motivated but uncertain",
+      "urgency": "low",
+      "specificDetails": {
+        "monthlyInvestmentAmount": 150,
+        "timeHorizon": "20+ years",
+        "riskTolerance": "moderate"
+      }
+    },
+    "idealAdvice": [
+      "Explain broad market index funds (world index) are good starting point",
+      "Discuss expense ratios (TER) - lower is better",
+      "Suggest diversification (maybe 80% world, 20% bonds for moderate risk)",
+      "Explain €uro-cost averaging through monthly investing",
+      "Mention tax-efficient options (osinkorahastot vs kasvurahastot)",
+      "Recommend starting simple, can adjust later"
+    ],
+    "commonMistakes": [
+      "Recommending specific stocks (too risky for beginner)",
+      "Making it too complicated with many funds",
+      "Not explaining fees and their long-term impact",
+      "Pushing aggressive strategy without understanding risk tolerance"
+    ]
+  },
+  {
+    "scenarioId": "scenario_petri_scam_001",
+    "characterId": "char_petri_004",
+    "scenarioType": "scam_awareness",
+    "difficulty": 0.4,
+    "topic": "scam_awareness",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Moikka! Yks mun kaveri laitto viestiä et on tehny 5000€ jollain kryptojutulla viikossa 😳 Pitääks mun pelätä et se on huijaus vai voinks mäki yrittää? En haluu tehä tyhmää mut en haluu myöskään jäädä paitsi jos se on oikeesti hyvä juttu...",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Friend claims to have made quick money with crypto, uncertain if it's real or scam",
+      "emotionalState": "FOMO, curious, uncertain",
+      "urgency": "medium",
+      "specificDetails": {
+        "friendClaimedProfit": 5000,
+        "timeframe": "one week",
+        "hasInvestmentExperience": false
+      }
+    },
+    "idealAdvice": [
+      "Explain red flags: unrealistic returns, pressure to join quickly, friend recruitment",
+      "If it sounds too good to be true, it probably is",
+      "Friend might be scammed too (Ponzi scheme)",
+      "Legitimate investing takes time and has risks",
+      "How to verify investment opportunities (regulation, FIN-FSA)",
+      "Suggest learning basics before investing any money",
+      "Protect against FOMO - it's a manipulation tactic"
+    ],
+    "commonMistakes": [
+      "Immediately saying crypto is always a scam (it's not, but this likely is)",
+      "Not explaining WHY it's probably a scam",
+      "Being condescending about not knowing",
+      "Not addressing the FOMO emotion"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_petri_first_paycheck_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 2
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_petri_first_paycheck_002",
+    "characterId": "char_petri_004",
+    "scenarioType": "first_paycheck",
+    "difficulty": 0.3,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_petri_scam_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Hei! Kiitos muuten siitä varoituksesta, mun kaveri olikin eksynyt pyramidihuijaukseen 😬 Mut nyt mulla on hyvii uutisii - sain kesätyöpaikan! Palkka on about 1200€/kk. Mitä mun pitäis tehä ekalla palkalla? Haluun oppia tekee oikein! 💪",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Got first summer job, wants to make smart financial decisions from the start",
+      "emotionalState": "excited, motivated to learn",
+      "urgency": "low",
+      "specificDetails": {
+        "monthlyIncome": 1200,
+        "livingWithParents": true,
+        "lowExpenses": true
+      }
+    },
+    "idealAdvice": [
+      "Celebrate the achievement!",
+      "Set up savings automatically (10-20% since low expenses)",
+      "Create simple budget even with low expenses (builds habit)",
+      "Open separate savings account to avoid temptation",
+      "It's okay to enjoy some of it (balance)",
+      "Avoid lifestyle inflation when money comes in",
+      "Build emergency fund basics"
+    ],
+    "commonMistakes": [
+      "Saying to save everything (unrealistic for a teen)",
+      "Not celebrating the achievement",
+      "Making it too complicated for first job"
+    ]
+  }
+]

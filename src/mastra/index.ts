@@ -1,29 +1,38 @@
 import { Mastra } from "@mastra/core/mastra";
 import { PinoLogger } from "@mastra/loggers";
 import { LibSQLStore } from "@mastra/libsql";
+import path from "path";
+import { fileURLToPath } from "url";
 
-// Elämäpeli 2025 Game Agents
+// Financial Advisor Simulator Agents
 import { gameMasterAgent } from "./agents/game-master.ts";
-import { scammerAgent } from "./agents/scammer-agent.ts";
-import { friendAgent } from "./agents/friend-agent.ts";
-import { parentAgent } from "./agents/parent-agent.ts";
+import { godBossAgent } from "./agents/god-boss-agent.ts";
+import { evaluatorAgent } from "./agents/evaluator-agent.ts";
+// Note: Character agents are created dynamically via character-agent-factory
 
 // Game Tools
-import { invokeScammerTool } from "./tools/invoke-scammer.ts";
-import { invokeFriendTool } from "./tools/invoke-friend.ts";
-import { invokeParentTool } from "./tools/invoke-parent.ts";
+import { invokeCharacterTool } from "./tools/invoke-character-tool.ts";
+import { invokeGodBossTool } from "./tools/invoke-god-boss-tool.ts";
+import { evaluateAdviceTool } from "./tools/evaluate-advice-tool.ts";
+
+// Character Pool Manager
+import { characterPool } from "./game/character-pool-manager.ts";
+
+// Get current file path for resolving character files
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const mastra = new Mastra({
   agents: {
     gameMasterAgent,
-    scammerAgent,
-    friendAgent,
-    parentAgent,
+    godBossAgent,
+    evaluatorAgent,
+    // Character agents are created dynamically as needed
   },
   tools: {
-    invokeScammerTool,
-    invokeFriendTool,
-    invokeParentTool,
+    invokeCharacterTool,
+    invokeGodBossTool,
+    evaluateAdviceTool,
   },
   storage: new LibSQLStore({
     id: "mastra-agent-store",
@@ -31,7 +40,28 @@ export const mastra = new Mastra({
     url: "file:../elamapeli.db",
   }),
   logger: new PinoLogger({
-    name: "Elämäpeli-2025",
+    name: "Financial-Advisor-Simulator",
     level: "info",
   }),
 });
+
+// Initialize character pool on startup
+async function initializeCharacterPool() {
+  const charactersPath = path.join(
+    __dirname,
+    "../../characters/characters.json",
+  );
+  const scenariosPath = path.join(__dirname, "../../characters/scenarios.json");
+
+  try {
+    await characterPool.loadFromFiles(charactersPath, scenariosPath);
+    console.log("✅ Character pool initialized successfully");
+  } catch (error) {
+    console.error("❌ Failed to initialize character pool:", error);
+  }
+}
+
+// Initialize on module load
+initializeCharacterPool().catch(console.error);
+
+export { characterPool };

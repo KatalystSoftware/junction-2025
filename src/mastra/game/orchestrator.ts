@@ -1,125 +1,64 @@
 /**
- * Game Orchestrator - Main game loop for Elämäpeli 2025
+ * Game Orchestrator - Financial Advisor Simulator
  *
- * Handles player input, updates state, and coordinates agents
+ * Handles the flow of characters visiting the advisor,
+ * manages consultations, and triggers reviews.
  */
 
 import { mastra } from "../index.ts";
+import { characterPool } from "./character-pool-manager.ts";
+import { getCharacterInitialMessage } from "../agents/character-agent-factory.ts";
 import type {
-  PlayerState,
+  AdvisorState,
   GameMasterDecision,
   GameResponse,
+  ConsultationSession,
+  FinancialTopic,
+  Character,
+  Scenario,
 } from "../types/game-types.ts";
 
 /**
- * Initialize a new player with default state
+ * Initialize a new advisor with default state
  */
-export function createNewPlayer(playerId: string): PlayerState {
+export function createNewAdvisor(advisorId: string): AdvisorState {
   return {
-    playerId,
-    financialState: {
-      savings: 500, // Starting savings
-      debt: 0,
-      monthlyIncome: 0, // Will increase when they get first job
-      creditScore: 100, // Perfect score to start
+    advisorId,
+    reputation: 50, // Start at middle reputation
+    skillLevel: 1, // Beginner
+    specializations: [],
+    topicsExpertise: {
+      budgeting: 1,
+      saving: 1,
+      debt_management: 1,
+      investing: 1,
+      loans: 1,
+      insurance: 1,
+      retirement: 1,
+      emergency_fund: 1,
+      credit_score: 1,
+      scam_awareness: 1,
     },
-    personalityProfile: {
-      risk_tolerance: 0.5,
-      confidence: 0.5,
-      peer_influence: 0.5,
-      scam_awareness: 0.5,
-      planning_ability: 0.5,
-    },
-    scenarioHistory: [],
-    choiceHistory: [],
-    agentStates: {
-      scammer: {
-        player_engaged_before: false,
-        rejection_count: 0,
-      },
-      friend: {
-        times_validated_spending: 0,
-        debt_level: 0,
-        relationship_strength: 0.8,
-      },
-      parent: {
-        knows_about_debt: false,
-        trust_level: 0.9,
-      },
-    },
-    currentMonth: 0,
-    totalMessages: 0,
+    sessionHistory: [],
+    totalClientsHelped: 0,
+    currentClient: null,
     currentScenario: null,
+    godBossRelationship: 5, // Neutral start
+    learningMaterials: [],
+    totalSessions: 0,
+    lastReviewSession: 0,
   };
 }
 
 /**
- * Analyze player's choice and update personality profile
+ * Start a new consultation - Game Master decides which character to send
  */
-function analyzePlayerChoice(
-  playerMessage: string,
-  playerState: PlayerState,
-): PlayerState {
-  const messageLower = playerMessage.toLowerCase();
-
-  // Simple pattern detection (can be enhanced with ML)
-  const patterns = {
-    impulsive: /\b(yea|yes|kyl|joo|ostetaan|lets go)\b/i.test(playerMessage),
-    cautious: /\b(no|ei|mietin|en tiedä|not sure)\b/i.test(playerMessage),
-    scam_aware: /\b(scam|huijaus|epäilyttävä|suspicious)\b/i.test(
-      playerMessage,
-    ),
-  };
-
-  // Update personality based on patterns
-  const updatedProfile = { ...playerState.personalityProfile };
-
-  if (patterns.impulsive) {
-    updatedProfile.risk_tolerance = Math.min(
-      1,
-      updatedProfile.risk_tolerance + 0.05,
-    );
-    updatedProfile.confidence = Math.min(1, updatedProfile.confidence + 0.03);
-  }
-
-  if (patterns.cautious) {
-    updatedProfile.risk_tolerance = Math.max(
-      0,
-      updatedProfile.risk_tolerance - 0.05,
-    );
-    updatedProfile.planning_ability = Math.min(
-      1,
-      updatedProfile.planning_ability + 0.05,
-    );
-  }
-
-  if (patterns.scam_aware) {
-    updatedProfile.scam_awareness = Math.min(
-      1,
-      updatedProfile.scam_awareness + 0.1,
-    );
-  }
-
-  return {
-    ...playerState,
-    personalityProfile: updatedProfile,
-    totalMessages: playerState.totalMessages + 1,
-  };
-}
-
-/**
- * Main game loop - processes player input and returns response
- */
-export async function processPlayerInput(
-  playerId: string,
-  playerMessage: string,
-  currentState?: PlayerState,
+export async function startNewConsultation(
+  advisorId: string,
+  currentState?: AdvisorState,
 ): Promise<GameResponse> {
-  // Load or create player state
-  let playerState = currentState || createNewPlayer(playerId);
-
-  // Update state based on player's message
-  playerState = analyzePlayerChoice(playerMessage, playerState);
+  // Load or create advisor state
+  let advisorState = currentState || createNewAdvisor(advisorId);
 
   // Get Game Master agent
   const gmAgent = mastra.getAgent("gameMasterAgent");
@@ -127,30 +66,54 @@ export async function processPlayerInput(
     throw new Error("Game Master agent not found");
   }
 
-  // Ask Game Master to decide next scenario
+  // Check if we should trigger God/Boss review
+  const sessionsSinceReview =
+    advisorState.totalSessions - advisorState.lastReviewSession;
+  const shouldReview = sessionsSinceReview >= 3 && sessionsSinceReview <= 5;
+
+  // Get pool stats
+  const poolStats = characterPool.getPoolStats();
+
+  // Get ready follow-ups
+  const readyFollowUps = characterPool.getReadyFollowUps(
+    advisorState.totalSessions,
+  );
+
+  // Build GM prompt
   const gmPrompt = `
-PLAYER STATE:
-${JSON.stringify(playerState, null, 2)}
+ADVISOR STATE:
+- Skill Level: ${advisorState.skillLevel}/10
+- Reputation: ${advisorState.reputation}/100
+- Total Sessions: ${advisorState.totalSessions}
+- Sessions Since Last Review: ${sessionsSinceReview}
+- Last 5 Topics Covered: ${advisorState.sessionHistory
+    .slice(-5)
+    .map((s) => s.topicsCovered.join(", "))
+    .join("; ")}
 
-PLAYER MESSAGE: "${playerMessage}"
+AVAILABLE CHARACTERS:
+- Total Characters: ${poolStats.totalCharacters}
+- Characters Met: ${poolStats.charactersMetCount}
+- Pending Follow-ups: ${poolStats.pendingFollowUps}
+- Ready Follow-ups: ${readyFollowUps.length}
 
-Analyze the player's state and decide:
-1. What scenario should happen next?
-2. Which agent should handle it?
-3. What difficulty level?
-4. What context should the agent receive?
+RECENT PERFORMANCE:
+${advisorState.sessionHistory
+  .slice(-3)
+  .map(
+    (session, idx) => `
+Session ${idx + 1}:
+- Character: ${session.characterName}
+- Topics: ${session.topicsCovered.join(", ")}
+- Advice Quality: ${session.adviceQualityScore}/10
+`,
+  )
+  .join("\n")}
 
-Respond with ONLY valid JSON matching this structure:
-{
-  "scenario_type": "crypto_scam",
-  "agent_to_invoke": "scammer",
-  "difficulty": 0.6,
-  "reasoning": "Player shows overconfidence...",
-  "context_for_agent": {
-    "player_type": "overconfident_risk_taker",
-    "approach": "aggressive_fomo"
-  }
-}
+DECISION NEEDED:
+Should you: send a new character, send a returning character (follow-up), or trigger God/Boss review?
+
+Respond with ONLY valid JSON (NO markdown):
 `;
 
   const gmResult = await gmAgent.generate(gmPrompt);
@@ -158,144 +121,352 @@ Respond with ONLY valid JSON matching this structure:
   // Parse Game Master's decision
   let decision: GameMasterDecision;
   try {
-    // Strip markdown code blocks if present
     let jsonText = gmResult.text.trim();
-    if (jsonText.startsWith("```json")) {
-      jsonText = jsonText.replace(/^```json\n/, "").replace(/\n```$/, "");
-    } else if (jsonText.startsWith("```")) {
-      jsonText = jsonText.replace(/^```\n/, "").replace(/\n```$/, "");
-    }
+    // Strip markdown code blocks
+    jsonText = jsonText
+      .replace(/```json\n?/g, "")
+      .replace(/```\n?/g, "")
+      .trim();
 
     decision = JSON.parse(jsonText);
   } catch (error) {
     console.error("Failed to parse GM decision:", gmResult.text);
-    // Fallback decision
-    decision = {
-      scenario_type: "first_paycheck",
-      agent_to_invoke: "friend",
-      difficulty: 0.5,
-      reasoning: "Fallback scenario",
-      context_for_agent: {},
-    };
-  }
 
-  // Invoke the chosen agent via tool
-  let agentResponse: any;
-
-  try {
-    switch (decision.agent_to_invoke) {
-      case "scammer":
-        const scammerTool = mastra.getTool("invokeScammerTool");
-        if (!scammerTool) throw new Error("Scammer tool not found");
-        agentResponse = await scammerTool.execute({
-          player_type:
-            decision.context_for_agent.player_type || "average_risk_taker",
-          difficulty: decision.difficulty,
-          approach: decision.context_for_agent.approach || "aggressive_fomo",
-          context: {
-            player_savings: playerState.financialState.savings,
-            player_risk_tolerance:
-              playerState.personalityProfile.risk_tolerance,
-            player_recent_success: playerState.choiceHistory.length > 0,
-          },
-        });
-        break;
-
-      case "friend":
-        const friendTool = mastra.getTool("invokeFriendTool");
-        if (!friendTool) throw new Error("Friend tool not found");
-        agentResponse = await friendTool.execute({
-          scenario_type: decision.scenario_type.includes("peer_pressure")
-            ? "peer_pressure_purchase"
-            : decision.scenario_type.includes("loan")
-              ? "asking_for_loan"
-              : "seeking_advice",
-          friend_state: {
-            debt_level: playerState.agentStates.friend.debt_level,
-            relationship_strength:
-              playerState.agentStates.friend.relationship_strength,
-          },
-          player_history: playerState.choiceHistory.map((c) => c.choice),
-          times_player_validated_spending:
-            playerState.agentStates.friend.times_validated_spending,
-        });
-        break;
-
-      case "parent":
-        const parentTool = mastra.getTool("invokeParentTool");
-        if (!parentTool) throw new Error("Parent tool not found");
-        agentResponse = await parentTool.execute({
-          scenario_type: decision.scenario_type.includes("finds_debt")
-            ? "parent_finds_debt"
-            : decision.scenario_type.includes("help")
-              ? "offering_help"
-              : "casual_check_in",
-          player_debt: playerState.financialState.debt,
-          parent_knows_debt: playerState.agentStates.parent.knows_about_debt,
-          trust_level: playerState.agentStates.parent.trust_level,
-          player_tried_hiding_it: playerState.financialState.debt > 0,
-        });
-        break;
-
-      default:
-        // Fallback to friend agent for system events
-        const defaultTool = mastra.getTool("invokeFriendTool");
-        if (!defaultTool) throw new Error("Default tool not found");
-        agentResponse = await defaultTool.execute({
-          scenario_type: "seeking_advice",
-          friend_state: {
-            debt_level: 0,
-            relationship_strength: 0.8,
-          },
-          player_history: [],
-        });
+    // Fallback: send a new character
+    const newCharResult = characterPool.getNewCharacter(advisorState);
+    if (!newCharResult) {
+      throw new Error("No characters available");
     }
-  } catch (error) {
-    console.error("Failed to invoke agent:", error);
-    agentResponse = {
-      messages: ["Hei! Miten menee? 😊"],
-      voice_needed: false,
+
+    decision = {
+      action: "send_character",
+      reasoning: "Fallback decision after parse error",
+      characterId: newCharResult.character.characterId,
+      scenarioId: newCharResult.scenario.scenarioId,
+      isNewCharacter: true,
+      difficulty: newCharResult.scenario.difficulty,
     };
   }
 
-  // Update scenario history
-  playerState.scenarioHistory.push({
-    type: decision.scenario_type,
-    outcome: "pending", // Will be updated based on player's response
-    timestamp: new Date().toISOString(),
-  });
+  // Handle decision
+  if (decision.action === "god_boss_review") {
+    return await triggerGodBossReview(advisorState);
+  }
 
-  playerState.currentScenario = decision.scenario_type;
-  playerState.currentMonth += 1; // Advance time
+  if (decision.action === "send_character") {
+    // Get character and scenario
+    let character: Character;
+    let scenario: Scenario;
 
+    if (decision.isNewCharacter) {
+      // Get new character
+      const result = characterPool.getNewCharacter(advisorState);
+      if (!result) {
+        throw new Error("No new characters available");
+      }
+      character = result.character;
+      scenario = result.scenario;
+    } else {
+      // Get returning character
+      const result = characterPool.getReturningCharacter(
+        advisorState.totalSessions,
+        advisorState,
+      );
+      if (!result) {
+        // Fallback to new character
+        const newResult = characterPool.getNewCharacter(advisorState);
+        if (!newResult) throw new Error("No characters available");
+        character = newResult.character;
+        scenario = newResult.scenario;
+      } else {
+        character = result.character;
+        scenario = result.scenario;
+      }
+    }
+
+    // Mark scenario as used
+    characterPool.markScenarioUsed(scenario.scenarioId);
+
+    // Update advisor state
+    advisorState.currentClient = character.characterId;
+    advisorState.currentScenario = scenario.scenarioId;
+
+    // Get character's initial message
+    const initialContact = getCharacterInitialMessage(scenario);
+
+    // Create new thread
+    const threadId = `thread_${Date.now()}`;
+
+    // Return initial character message
+    return {
+      type: "character_message",
+      threadId,
+      messages: [initialContact.message],
+      voiceNeeded: initialContact.isVoice,
+      isNewThread: true,
+      characterInfo: {
+        name: character.name,
+        age: character.age,
+        occupation: character.occupation,
+      },
+      stateUpdate: advisorState,
+    };
+  }
+
+  // No action
   return {
-    messages: agentResponse?.messages || ["Hei! Miten menee?"],
-    voiceNeeded: agentResponse?.voice_needed || false,
-    stateUpdate: playerState,
-    scenarioType: decision.scenario_type,
+    type: "conversation_end",
+    stateUpdate: advisorState,
   };
 }
 
 /**
- * Get player state summary for display
+ * Handle advisor's response to character
  */
-export function getPlayerSummary(playerState: PlayerState) {
+export async function handleAdvisorResponse(
+  threadId: string,
+  advisorMessage: string,
+  currentState: AdvisorState,
+  conversationHistory?: Array<{ role: "user" | "assistant"; content: string }>,
+): Promise<GameResponse> {
+  let advisorState = { ...currentState };
+
+  if (!advisorState.currentClient || !advisorState.currentScenario) {
+    throw new Error("No active consultation");
+  }
+
+  // Get character and scenario
+  const character = characterPool.getCharacter(advisorState.currentClient);
+  const scenario = characterPool.getScenario(advisorState.currentScenario);
+
+  if (!character || !scenario) {
+    throw new Error("Character or scenario not found");
+  }
+
+  // Invoke character agent
+  const characterTool = mastra.getTool("invokeCharacterTool");
+  if (!characterTool) {
+    throw new Error("Character tool not found");
+  }
+
+  const characterResponse = await characterTool.execute({
+    character,
+    scenario,
+    advisorMessage,
+    conversationHistory: conversationHistory || [],
+  });
+
+  // Evaluate advice quality
+  const evaluateTool = mastra.getTool("evaluateAdviceTool");
+  let adviceEvaluation: any = {
+    qualityScore: 5,
+    willFollowAdvice: false,
+    outcome: "neutral",
+    strengths: [],
+    weaknesses: [],
+  };
+
+  if (evaluateTool) {
+    adviceEvaluation = await evaluateTool.execute({
+      advice: advisorMessage,
+      scenario,
+      characterPersonality: character.personality,
+    });
+  }
+
+  // If conversation is ending, save session
+  if (characterResponse.conversationEnding) {
+    // Create consultation session record
+    const session: ConsultationSession = {
+      sessionId: `session_${Date.now()}`,
+      characterId: character.characterId,
+      characterName: character.name,
+      scenarioId: scenario.scenarioId,
+      timestamp: new Date().toISOString(),
+      playerAdvice: [advisorMessage], // Would accumulate all advice in full implementation
+      characterReactions: characterResponse.messages,
+      adviceQualityScore: adviceEvaluation.qualityScore,
+      topicsCovered: [scenario.topic],
+      followUpScheduled: false,
+      outcomeRevealed: false,
+      duration: (conversationHistory?.length || 0) + 1,
+    };
+
+    // Add to session history
+    advisorState.sessionHistory.push(session);
+    advisorState.totalSessions += 1;
+    advisorState.totalClientsHelped += 1;
+
+    // Update character relationship
+    characterPool.updateCharacterRelationship(character.characterId, {
+      visitCount: character.relationshipState.visitCount + 1,
+      trustLevel:
+        character.relationshipState.trustLevel +
+        (adviceEvaluation.willFollowAdvice ? 0.1 : -0.05),
+      adviceFollowed: {
+        scenarioId: scenario.scenarioId,
+        adviceGiven: [advisorMessage],
+        followed: adviceEvaluation.willFollowAdvice,
+        outcome: adviceEvaluation.outcome,
+      },
+    });
+
+    // Schedule follow-up if appropriate
+    if (
+      scenario.followUpScenarios &&
+      scenario.followUpScenarios.length > 0 &&
+      adviceEvaluation.willFollowAdvice
+    ) {
+      const followUpDef = scenario.followUpScenarios.find((f) =>
+        adviceEvaluation.outcome === "positive"
+          ? f.triggeredBy === "good_advice_followed"
+          : f.triggeredBy === "bad_advice_or_not_followed",
+      );
+
+      if (followUpDef) {
+        characterPool.scheduleFollowUp(
+          character.characterId,
+          followUpDef.scenarioId,
+          advisorState.totalSessions,
+          followUpDef.delayInSessions,
+          followUpDef.triggeredBy,
+        );
+        session.followUpScheduled = true;
+      }
+    }
+
+    // Update skill and reputation based on performance
+    const skillChange = (adviceEvaluation.qualityScore - 5) * 0.02; // -0.1 to +0.1
+    const repChange = Math.round((adviceEvaluation.qualityScore - 5) * 2); // -10 to +10
+
+    advisorState.skillLevel = Math.max(
+      0,
+      Math.min(10, advisorState.skillLevel + skillChange),
+    );
+    advisorState.reputation = Math.max(
+      0,
+      Math.min(100, advisorState.reputation + repChange),
+    );
+
+    // Update topic expertise
+    const topicChange = (adviceEvaluation.qualityScore - 5) * 0.05;
+    advisorState.topicsExpertise[scenario.topic] = Math.max(
+      0,
+      Math.min(10, advisorState.topicsExpertise[scenario.topic] + topicChange),
+    );
+
+    // Clear current client
+    advisorState.currentClient = null;
+    advisorState.currentScenario = null;
+  }
+
   return {
-    playerId: playerState.playerId,
-    financial: {
-      savings: `€${playerState.financialState.savings}`,
-      debt: `€${playerState.financialState.debt}`,
-      creditScore: playerState.financialState.creditScore,
+    type: characterResponse.conversationEnding
+      ? "conversation_end"
+      : "character_message",
+    threadId,
+    messages: characterResponse.messages,
+    voiceNeeded: characterResponse.voiceNeeded,
+    stateUpdate: advisorState,
+  };
+}
+
+/**
+ * Trigger God/Boss performance review
+ */
+async function triggerGodBossReview(
+  advisorState: AdvisorState,
+): Promise<GameResponse> {
+  // Get sessions to review (last 3-5)
+  const sessionsToReview = advisorState.sessionHistory.slice(-5);
+
+  if (sessionsToReview.length === 0) {
+    // Not enough sessions yet
+    return {
+      type: "conversation_end",
+      stateUpdate: advisorState,
+    };
+  }
+
+  // Invoke God/Boss tool
+  const godBossTool = mastra.getTool("invokeGodBossTool");
+  if (!godBossTool) {
+    throw new Error("God/Boss tool not found");
+  }
+
+  const review = await godBossTool.execute({
+    sessionsToReview,
+    advisorReputation: advisorState.reputation,
+    advisorSkillLevel: advisorState.skillLevel,
+  });
+
+  // Update advisor state based on review
+  advisorState.reputation = Math.max(
+    0,
+    Math.min(100, advisorState.reputation + review.reputationChange),
+  );
+  advisorState.skillLevel = Math.max(
+    0,
+    Math.min(10, advisorState.skillLevel + review.skillLevelChange),
+  );
+  advisorState.godBossRelationship = Math.max(
+    0,
+    Math.min(10, advisorState.godBossRelationship + review.skillLevelChange),
+  );
+
+  // Update topic expertise
+  for (const [topic, change] of Object.entries(review.topicsExpertiseUpdates)) {
+    const topicKey = topic as FinancialTopic;
+    const changeValue = typeof change === "number" ? change : 0;
+    advisorState.topicsExpertise[topicKey] = Math.max(
+      0,
+      Math.min(10, advisorState.topicsExpertise[topicKey] + changeValue),
+    );
+  }
+
+  // Add learning materials
+  if (review.learningMaterials && review.learningMaterials.length > 0) {
+    review.learningMaterials.forEach((material: any) => {
+      advisorState.learningMaterials.push({
+        materialId: material.materialId,
+        title: material.title,
+        topic: material.topic as FinancialTopic,
+        completedAt: new Date().toISOString(),
+      });
+    });
+  }
+
+  // Update last review session
+  advisorState.lastReviewSession = advisorState.totalSessions;
+
+  return {
+    type: "god_boss_review",
+    review,
+    stateUpdate: advisorState,
+  };
+}
+
+/**
+ * Get advisor state summary for display
+ */
+export function getAdvisorSummary(advisorState: AdvisorState) {
+  return {
+    advisorId: advisorState.advisorId,
+    performance: {
+      reputation: `${advisorState.reputation}/100`,
+      skillLevel: `${advisorState.skillLevel.toFixed(1)}/10`,
+      godBossRelationship: `${advisorState.godBossRelationship}/10`,
     },
-    gameProgress: {
-      month: playerState.currentMonth,
-      scenariosCompleted: playerState.scenarioHistory.length,
-      messagesExchanged: playerState.totalMessages,
+    progress: {
+      totalSessions: advisorState.totalSessions,
+      totalClientsHelped: advisorState.totalClientsHelped,
+      learningMaterialsCompleted: advisorState.learningMaterials.length,
     },
-    personality: {
-      riskTolerance: `${(playerState.personalityProfile.risk_tolerance * 100).toFixed(0)}%`,
-      scamAwareness: `${(playerState.personalityProfile.scam_awareness * 100).toFixed(0)}%`,
-      confidence: `${(playerState.personalityProfile.confidence * 100).toFixed(0)}%`,
+    expertise: {
+      budgeting: `${advisorState.topicsExpertise.budgeting.toFixed(1)}/10`,
+      debtManagement: `${advisorState.topicsExpertise.debt_management.toFixed(1)}/10`,
+      investing: `${advisorState.topicsExpertise.investing.toFixed(1)}/10`,
     },
+    specializations: advisorState.specializations,
   };
 }
