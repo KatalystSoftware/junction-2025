@@ -87,6 +87,6 @@ Always respond with valid JSON containing a "messages" array.
 export const scammerAgent = new Agent({
   name: "scammer",
   instructions: scammerInstructions,
-  model: "openai/gpt-4o-mini", // Fast and cheap for character generation
+  model: "google/gemini-2.5-flash", // Latest Gemini 2.5 Flash - best performance!
   tools: {},
 });

@@ -85,6 +85,6 @@ Always respond with valid JSON containing a "messages" array.
 export const friendAgent = new Agent({
   name: "friend",
   instructions: friendInstructions,
-  model: "openai/gpt-4o-mini",
+  model: "google/gemini-2.5-flash",
   tools: {},
 });

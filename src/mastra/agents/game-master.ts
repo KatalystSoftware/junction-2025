@@ -1,5 +1,4 @@
 import { Agent } from "@mastra/core/agent";
-import { z } from "zod";
 
 /**
  * Game Master Agent - Orchestrator for Elämäpeli 2025
@@ -80,7 +79,6 @@ IMPORTANT:
 export const gameMasterAgent = new Agent({
   name: "game-master",
   instructions: gameMasterInstructions,
-  model: "openai/gpt-4o", // Using OpenAI since Anthropic isn't configured yet
-  // TODO: Switch to "anthropic/claude-sonnet-4-5-20250929" when Anthropic key is added
+  model: "google/gemini-2.5-flash", // Latest Gemini 2.5 Flash - fast and powerful!
   tools: {}, // Tools will be added for invoking other agents
 });

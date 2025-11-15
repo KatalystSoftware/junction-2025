@@ -52,7 +52,7 @@ src/mastra/
 
 - Node.js >= 22.13.0
 - pnpm (recommended) or npm
-- OpenAI API key (or Anthropic API key for Claude)
+- Google Gemini API key (using Google Cloud credits)
 
 ### Installation
 
@@ -61,8 +61,16 @@ src/mastra/
 pnpm install
 
 # Set up environment variables
-echo "OPENAI_API_KEY=your_key_here" > .env
+# Get your API key from: https://aistudio.google.com/app/apikey
+echo "GOOGLE_GENERATIVE_AI_API_KEY=your_gemini_api_key_here" > .env
 ```
+
+**Getting your Gemini API Key:**
+
+1. Go to [Google AI Studio](https://aistudio.google.com/app/apikey)
+2. Click "Get API Key" or "Create API Key"
+3. Copy the key (starts with `AIza...`)
+4. Add it to your `.env` file
 
 ### Running the Test
 
@@ -157,17 +165,49 @@ Each player has:
 
 ## 🔧 Configuration
 
-### Using Claude (Anthropic) instead of GPT
+### Current Setup: Google Gemini 2.5 Flash
 
-1. Add Anthropic API key to `.env`:
+All agents currently use `google/gemini-2.5-flash` which is:
+
+- Fast and responsive
+- Cost-effective with Google Cloud credits
+- Great for real-time character generation
+
+### Alternative Models
+
+You can switch models by editing the agent files:
+
+**For better quality (higher cost):**
+
+```typescript
+model: "google/gemini-1.5-pro";
+```
+
+**For faster/cheaper:**
+
+```typescript
+model: "google/gemini-1.5-flash";
+```
+
+### Using OpenAI or Anthropic Instead
+
+1. Add the appropriate API key to `.env`:
 
 ```bash
+# For OpenAI
+OPENAI_API_KEY=your_key_here
+
+# For Anthropic Claude
 ANTHROPIC_API_KEY=your_key_here
 ```
 
-2. Update Game Master agent in `src/mastra/agents/game-master.ts`:
+2. Update model in agent files:
 
 ```typescript
+// OpenAI
+model: "openai/gpt-4o";
+
+// Anthropic Claude
 model: "anthropic/claude-sonnet-4-5-20250929";
 ```
 
