@@ -214,9 +214,6 @@ export async function listSessions(): Promise<
   Array<{ sessionId: string; metadata: SessionMetadata }>
 > {
   try {
-    // LibSQLStore doesn't have a built-in list method,
-    // so we'd need to query SQLite directly
-    // For now, return empty array (can be enhanced later)
     console.warn("⚠️ listSessions() not yet implemented");
     return [];
   } catch (error) {

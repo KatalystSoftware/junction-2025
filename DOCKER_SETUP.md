@@ -272,8 +272,6 @@ Ensure:
 Update your application's database configuration to use the PostgreSQL connection:
 
 ```typescript
-// Instead of SQLite file path
-const dbPath = "saves/advisor_123.db";
 
 // Use PostgreSQL connection string
 const connectionString =

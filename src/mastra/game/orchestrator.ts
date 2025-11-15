@@ -101,7 +101,7 @@ function getCurrentMonth(advisorState?: AdvisorState): string {
  */
 export async function startNewConsultation(
   advisorId: string,
-  currentState?: AdvisorState
+  currentState?: AdvisorState,
 ): Promise<GameResponse> {
   // Load or create advisor state
   let advisorState = currentState || createNewAdvisor(advisorId);
@@ -187,7 +187,7 @@ export async function startNewConsultation(
 
   // Get ready follow-ups
   const readyFollowUps = characterPool.getReadyFollowUps(
-    advisorState.totalSessions
+    advisorState.totalSessions,
   );
 
   // Build GM prompt
@@ -221,7 +221,7 @@ Session ${idx + 1}:
 - Character: ${session.characterName}
 - Topics: ${session.topicsCovered.join(", ")}
 - Advice Quality: ${session.adviceQualityScore}/10
-`
+`,
   )
   .join("\n")}
 
@@ -239,7 +239,7 @@ Respond with ONLY valid JSON (NO markdown):
       "agent",
       "gameMaster_decision",
       gmPrompt,
-      () => gmAgent.generate(gmPrompt)
+      () => gmAgent.generate(gmPrompt),
     );
 
     // Parse Game Master's decision
@@ -275,7 +275,7 @@ Respond with ONLY valid JSON (NO markdown):
     // Hard enforcement: Only allow review if it's actually time
     if (!shouldReview) {
       console.warn(
-        `🚫 Game Master tried to trigger review too early (sessionsSinceReview=${sessionsSinceReview}). Forcing character send instead.`
+        `🚫 Game Master tried to trigger review too early (sessionsSinceReview=${sessionsSinceReview}). Forcing character send instead.`,
       );
       // Override decision to send a character instead
       const newCharResult = characterPool.getNewCharacter(advisorState);
@@ -313,7 +313,7 @@ Respond with ONLY valid JSON (NO markdown):
       // Get returning character
       const result = characterPool.getReturningCharacter(
         advisorState.totalSessions,
-        advisorState
+        advisorState,
       );
       if (!result) {
         // Fallback to new character
@@ -335,7 +335,7 @@ Respond with ONLY valid JSON (NO markdown):
         const previousSessions = advisorState.sessionHistory.filter(
           (s) =>
             s.characterId === character.characterId &&
-            (s as any).financialBaseline
+            (s as any).financialBaseline,
         );
 
         if (previousSessions.length > 0) {
@@ -354,7 +354,7 @@ Respond with ONLY valid JSON (NO markdown):
           const engine = new SimulationEngine();
           const updatedOutcome = await updateOutcomeWithFollowUp(
             engine,
-            baseline
+            baseline,
           );
           await engine.close();
 
@@ -390,7 +390,7 @@ Respond with ONLY valid JSON (NO markdown):
     // Detect advisor's preferred language from previous conversations
     let advisorLanguage: "finnish" | "english" = "english"; // Default to English
     const allPreviousAdvice = advisorState.sessionHistory.flatMap(
-      (session) => session.playerAdvice
+      (session) => session.playerAdvice,
     );
     if (allPreviousAdvice.length > 0) {
       // Simple detection from previous messages
@@ -414,7 +414,7 @@ Respond with ONLY valid JSON (NO markdown):
     const initialContact = await getCharacterInitialMessage(
       scenario,
       advisorLanguage,
-      character
+      character,
     );
 
     // Get all active threads for UI
@@ -439,7 +439,7 @@ Respond with ONLY valid JSON (NO markdown):
         ? generateAdviceChoices(
             scenario,
             character.personality,
-            [] // No conversation history yet (first turn)
+            [], // No conversation history yet (first turn)
           )
         : undefined;
 
@@ -479,7 +479,7 @@ export async function handleAdvisorResponse(
   threadId: string,
   advisorMessage: string,
   currentState: AdvisorState,
-  conversationHistory?: Array<{ role: "user" | "assistant"; content: string }>
+  conversationHistory?: Array<{ role: "user" | "assistant"; content: string }>,
 ): Promise<GameResponse> {
   let advisorState = { ...currentState };
   let recommendationMessage: string | undefined;
@@ -559,7 +559,7 @@ export async function handleAdvisorResponse(
       5,
       false,
       0.3,
-      undefined // No actions in default fallback
+      undefined, // No actions in default fallback
     ),
   };
 
@@ -651,7 +651,7 @@ export async function handleAdvisorResponse(
           character.characterId,
           session.sessionId,
           actions,
-          followProbability
+          followProbability,
         );
 
         // Store effects in database
@@ -673,13 +673,13 @@ export async function handleAdvisorResponse(
         const baseline = await recordBaseline(
           engine,
           character,
-          session.sessionId
+          session.sessionId,
         );
         if (baseline) {
           // Store baseline in session for later comparison
           (session as any).financialBaseline = baseline;
           console.log(
-            `📊 Recorded financial baseline for ${character.name}: €${baseline.baselineExpenses.toFixed(2)}/month expenses`
+            `📊 Recorded financial baseline for ${character.name}: €${baseline.baselineExpenses.toFixed(2)}/month expenses`,
           );
         }
 
@@ -711,7 +711,7 @@ export async function handleAdvisorResponse(
         adviceGiven: allAdvisorAdvice,
         followed: adviceEvaluation.willFollowAdvice,
         outcome: adviceEvaluation.outcome,
-      }
+      },
     );
 
     // Check for tier change
@@ -727,7 +727,7 @@ export async function handleAdvisorResponse(
     // Handle character recommendation
     if (relationshipUpdate.willRecommend) {
       const recommendation = await characterPool.handleRecommendation(
-        character.characterId
+        character.characterId,
       );
       if (recommendation.success && recommendation.newCharacterName) {
         recommendationMessage = `🎉 ${recommendation.recommendingCharacterName} was so happy with your help, they recommended you to their friend ${recommendation.newCharacterName}!`;
@@ -748,7 +748,7 @@ export async function handleAdvisorResponse(
       const followUpDef = scenario.followUpScenarios.find((f) =>
         adviceEvaluation.outcome === "positive"
           ? f.triggeredBy === "good_advice_followed"
-          : f.triggeredBy === "bad_advice_or_not_followed"
+          : f.triggeredBy === "bad_advice_or_not_followed",
       );
 
       if (followUpDef) {
@@ -757,7 +757,7 @@ export async function handleAdvisorResponse(
           followUpDef.scenarioId,
           advisorState.totalSessions,
           followUpDef.delayInSessions,
-          followUpDef.triggeredBy
+          followUpDef.triggeredBy,
         );
         session.followUpScheduled = true;
       }
@@ -817,24 +817,24 @@ export async function handleAdvisorResponse(
       const actionableBonus = isBeginner ? 0.02 : 0.01; // Double skill gain for beginners
       advisorState.skillLevel = Math.min(
         10,
-        advisorState.skillLevel + actionableBonus
+        advisorState.skillLevel + actionableBonus,
       );
     }
     if (!adviceEvaluation.wasAccurate) {
       const accuracyPenalty = isBeginner ? 2 : 5; // Gentler penalty for beginners
       advisorState.reputation = Math.max(
         0,
-        advisorState.reputation - accuracyPenalty
+        advisorState.reputation - accuracyPenalty,
       );
     }
 
     advisorState.skillLevel = Math.max(
       0,
-      Math.min(10, advisorState.skillLevel + skillChange)
+      Math.min(10, advisorState.skillLevel + skillChange),
     );
     advisorState.reputation = Math.max(
       0,
-      Math.min(100, advisorState.reputation + repChange)
+      Math.min(100, advisorState.reputation + repChange),
     );
 
     // Update performance streak
@@ -867,8 +867,8 @@ export async function handleAdvisorResponse(
         0,
         Math.min(
           10,
-          advisorState.topicsExpertise[topic as FinancialTopic] + topicChange
-        )
+          advisorState.topicsExpertise[topic as FinancialTopic] + topicChange,
+        ),
       );
     }
 
@@ -876,7 +876,7 @@ export async function handleAdvisorResponse(
     // Calculate coins earned and update state
     const { coinsEarned, updatedState } = calculateCoinsEarned(
       adviceEvaluation,
-      advisorState
+      advisorState,
     );
     advisorState = updatedState;
 
@@ -894,7 +894,7 @@ export async function handleAdvisorResponse(
     const milestonesAchieved = checkForMilestones(
       previousState,
       advisorState,
-      session
+      session,
     );
     const newAchievements = checkForNewAchievements(advisorState, session);
 
@@ -918,16 +918,16 @@ export async function handleAdvisorResponse(
 
     // Remove from active clients if no other active threads
     const hasOtherActiveThreads = Object.values(
-      advisorState.activeThreads
+      advisorState.activeThreads,
     ).some(
       (t) =>
         t.characterId === character.characterId &&
         t.threadId !== threadId &&
-        t.status !== "resolved"
+        t.status !== "resolved",
     );
     if (!hasOtherActiveThreads) {
       advisorState.activeClients = advisorState.activeClients.filter(
-        (id) => id !== character.characterId
+        (id) => id !== character.characterId,
       );
     }
 
@@ -1010,7 +1010,7 @@ export async function handleAdviceChoice(
   threadId: string,
   choiceIndex: number,
   currentState: AdvisorState,
-  conversationHistory?: Array<{ role: "user" | "assistant"; content: string }>
+  conversationHistory?: Array<{ role: "user" | "assistant"; content: string }>,
 ): Promise<GameResponse> {
   let advisorState = { ...currentState };
 
@@ -1032,7 +1032,7 @@ export async function handleAdviceChoice(
   const choices = generateAdviceChoices(
     scenario,
     character.personality,
-    conversationHistory || []
+    conversationHistory || [],
   );
 
   const selectedChoice = choices[choiceIndex];
@@ -1088,7 +1088,7 @@ export async function handleAdviceChoice(
     characterReaction = generateAcceptanceResponse(
       character,
       adviceText,
-      scenario.topic
+      scenario.topic,
     );
   } else {
     // Rare case: character is hesitant
@@ -1102,7 +1102,7 @@ export async function handleAdviceChoice(
   // Calculate earnings based on financial projection
   const { coinsEarned, updatedState } = calculateCoinsEarned(
     adviceEvaluation,
-    advisorState
+    advisorState,
   );
   advisorState = updatedState;
 
@@ -1139,18 +1139,18 @@ export async function handleAdviceChoice(
   // Update topic expertise
   const topicExpertiseIncrease = Math.min(
     0.2,
-    adviceEvaluation.qualityScore / 50
+    adviceEvaluation.qualityScore / 50,
   );
   advisorState.topicsExpertise[scenario.topic] = Math.min(
     10,
-    advisorState.topicsExpertise[scenario.topic] + topicExpertiseIncrease
+    advisorState.topicsExpertise[scenario.topic] + topicExpertiseIncrease,
   );
 
   // Update reputation based on quality
   const reputationChange = Math.round((adviceEvaluation.qualityScore - 5) * 2);
   advisorState.reputation = Math.max(
     0,
-    Math.min(100, advisorState.reputation + reputationChange)
+    Math.min(100, advisorState.reputation + reputationChange),
   );
 
   // Update skill level gradually
@@ -1167,7 +1167,7 @@ export async function handleAdviceChoice(
   // Close the thread (consultation is done)
   threadInfo.status = "resolved";
   advisorState.activeClients = advisorState.activeClients.filter(
-    (id) => id !== character.characterId
+    (id) => id !== character.characterId,
   );
 
   // Get active threads for UI
@@ -1202,7 +1202,7 @@ export async function handleAdviceChoice(
 function generateAcceptanceResponse(
   character: Character,
   advice: string,
-  topic: FinancialTopic
+  topic: FinancialTopic,
 ): string {
   const responses = [
     `Kiitos! Tämä kuulostaa hyvältä suunnitelmalta. Aloitan heti!`,
@@ -1221,7 +1221,7 @@ function generateAcceptanceResponse(
  */
 function generateHesitantResponse(
   character: Character,
-  advice: string
+  advice: string,
 ): string {
   const responses = [
     `Hmm, en ole ihan varma... Mutta ehkä kokeilen.`,
@@ -1236,7 +1236,7 @@ function generateHesitantResponse(
  * Trigger God/Boss performance review
  */
 async function triggerGodBossReview(
-  advisorState: AdvisorState
+  advisorState: AdvisorState,
 ): Promise<GameResponse> {
   // Get sessions to review (last 3-5)
   const sessionsToReview = advisorState.sessionHistory.slice(-5);
@@ -1282,15 +1282,15 @@ async function triggerGodBossReview(
   // Update advisor state based on review
   advisorState.reputation = Math.max(
     0,
-    Math.min(100, advisorState.reputation + review.reputationChange)
+    Math.min(100, advisorState.reputation + review.reputationChange),
   );
   advisorState.skillLevel = Math.max(
     0,
-    Math.min(10, advisorState.skillLevel + review.skillLevelChange)
+    Math.min(10, advisorState.skillLevel + review.skillLevelChange),
   );
   advisorState.godBossRelationship = Math.max(
     0,
-    Math.min(10, advisorState.godBossRelationship + review.skillLevelChange)
+    Math.min(10, advisorState.godBossRelationship + review.skillLevelChange),
   );
 
   // Update topic expertise
@@ -1299,7 +1299,7 @@ async function triggerGodBossReview(
     const changeValue = typeof change === "number" ? change : 0;
     advisorState.topicsExpertise[topicKey] = Math.max(
       0,
-      Math.min(10, advisorState.topicsExpertise[topicKey] + changeValue)
+      Math.min(10, advisorState.topicsExpertise[topicKey] + changeValue),
     );
   }
 
@@ -1354,12 +1354,12 @@ export function getAdvisorSummary(advisorState: AdvisorState) {
  * Get all active conversation threads with character info
  */
 export function getActiveThreads(
-  advisorState: AdvisorState
+  advisorState: AdvisorState,
 ): ConversationThread[] {
   const threads: ConversationThread[] = [];
 
   for (const [threadId, threadInfo] of Object.entries(
-    advisorState.activeThreads
+    advisorState.activeThreads,
   )) {
     // Skip resolved threads
     if (threadInfo.status === "resolved") {
@@ -1393,7 +1393,7 @@ export function getActiveThreads(
   // Sort by last message time (most recent first)
   threads.sort(
     (a, b) =>
-      new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime()
+      new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime(),
   );
 
   return threads;
@@ -1404,7 +1404,7 @@ export function getActiveThreads(
  */
 export function switchThread(
   threadId: string,
-  advisorState: AdvisorState
+  advisorState: AdvisorState,
 ): ConversationThread | null {
   const threadInfo = advisorState.activeThreads[threadId];
   if (!threadInfo || threadInfo.status === "resolved") {
@@ -1442,7 +1442,7 @@ export function switchThread(
  */
 export function getThread(
   threadId: string,
-  advisorState: AdvisorState
+  advisorState: AdvisorState,
 ): ConversationThread | null {
   return switchThread(threadId, advisorState);
 }
@@ -1486,7 +1486,7 @@ async function runMonthlySimulation(advisorState: AdvisorState): Promise<void> {
       } catch (error) {
         console.error(
           `Error simulating ${nextMonth} for ${character.name}:`,
-          error
+          error,
         );
       }
     }
@@ -1496,7 +1496,7 @@ async function runMonthlySimulation(advisorState: AdvisorState): Promise<void> {
     advisorState.simulatedMonthsPassed += monthsToAdvance;
 
     console.log(
-      `⏰ Game time advanced: ${currentMonth} → ${nextMonth} (${advisorState.simulatedMonthsPassed} months total)`
+      `⏰ Game time advanced: ${currentMonth} → ${nextMonth} (${advisorState.simulatedMonthsPassed} months total)`,
     );
 
     await engine.close();

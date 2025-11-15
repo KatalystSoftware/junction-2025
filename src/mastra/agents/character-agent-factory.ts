@@ -116,26 +116,28 @@ async function buildTransactionContext(character: Character): Promise<string> {
       "../simulation/simulation-engine.ts"
     );
 
-    // Get database path from a hypothetical advisor state
-    // In practice, this should be passed down from the orchestrator
-    const dbPath = `saves/advisor_default.db`;
-
-    const engine = new SimulationEngine(dbPath);
-    const state = engine.getCharacterState(character.characterId);
+    const engine = new SimulationEngine();
+    const state = await engine.getCharacterState(character.characterId);
 
     if (!state) {
-      engine.close();
+      await engine.close();
       return "";
     }
 
     // Get recent transactions
-    const recentTxns = engine.getRecentTransactions(character.characterId, 10);
+    const recentTxns = await engine.getRecentTransactions(
+      character.characterId,
+      10,
+    );
 
     // Get monthly summary
-    const summaries = engine.getMonthlySummaries(character.characterId, 1);
+    const summaries = await engine.getMonthlySummaries(
+      character.characterId,
+      1,
+    );
     const currentMonth = summaries[0];
 
-    engine.close();
+    await engine.close();
 
     if (!recentTxns.length && !currentMonth) {
       return "";

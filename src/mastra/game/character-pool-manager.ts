@@ -159,10 +159,7 @@ export class CharacterPoolManager {
         "../simulation/initial-history-generator.ts"
       );
 
-      const dbPath =
-        process.env.DATABASE_URL ||
-        "postgresql://junction_user:junction_dev_password@localhost:5433/junction2025";
-      const engine = new SimulationEngine(dbPath);
+      const engine = new SimulationEngine();
 
       const allCharacters = this.getAllCharacters();
       let initializedCount = 0;

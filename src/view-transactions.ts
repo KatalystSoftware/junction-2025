@@ -9,8 +9,6 @@
 import { SimulationEngine } from "./mastra/simulation/simulation-engine.ts";
 import { characterPool } from "./mastra/game/character-pool-manager.ts";
 
-const DB_PATH = "saves/advisor_default.db";
-
 async function main() {
   // Load character pool
   await characterPool.loadFromFiles(
@@ -50,15 +48,15 @@ async function main() {
   console.log(`\n📊 Transactions for ${character.name}\n`);
   console.log("=".repeat(100));
 
-  const engine = new SimulationEngine(DB_PATH);
+  const engine = new SimulationEngine();
 
   // Get character state
-  const state = engine.getCharacterState(characterId);
+  const state = await engine.getCharacterState(characterId);
   if (!state) {
     console.log(
       `⚠️  No simulation data found for ${character.name}. Run the game first to generate transactions.`,
     );
-    engine.close();
+    await engine.close();
     return;
   }
 
@@ -67,7 +65,7 @@ async function main() {
   console.log("");
 
   // Get monthly summaries
-  const summaries = engine.getMonthlySummaries(characterId, 3);
+  const summaries = await engine.getMonthlySummaries(characterId, 3);
   if (summaries.length > 0) {
     console.log("📈 Monthly Summaries (Last 3 Months):");
     console.log("-".repeat(100));
@@ -83,10 +81,10 @@ async function main() {
   }
 
   // Get recent transactions
-  const transactions = engine.getRecentTransactions(characterId, 50);
+  const transactions = await engine.getRecentTransactions(characterId, 50);
   if (transactions.length === 0) {
     console.log("⚠️  No transactions found.");
-    engine.close();
+    await engine.close();
     return;
   }
 
@@ -115,17 +113,18 @@ async function main() {
   console.log(`\n✅ Total: ${transactions.length} transactions`);
 
   // Database stats
-  const stats = engine.getDatabase().getStats();
-  console.log(`\n📊 Database Stats:`);
-  console.log(
-    `   - Total Transactions: ${stats.totalTransactions.toLocaleString()}`,
-  );
-  console.log(`   - Total Characters: ${stats.totalCharacters}`);
-  console.log(
-    `   - Database Size: ${stats.databaseSizeKB.toLocaleString()} KB`,
-  );
+  const db = engine.getDatabase();
+  if (db) {
+    const stats = await db.getStats();
+    console.log(`\n📊 Database Stats:`);
+    console.log(
+      `   - Total Transactions: ${stats.totalTransactions.toLocaleString()}`,
+    );
+    console.log(`   - Total Characters: ${stats.totalCharacters}`);
+    console.log(`   - Total Advice Effects: ${stats.totalAdviceEffects}`);
+  }
 
-  engine.close();
+  await engine.close();
 }
 
 main().catch(console.error);

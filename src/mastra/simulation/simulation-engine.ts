@@ -46,7 +46,9 @@ export class SimulationEngine {
     this.transactionGenerator = new TransactionGenerator();
 
     if (!this.enabled) {
-      console.log("⚠️ Financial simulation disabled - DATABASE_URL not configured");
+      console.log(
+        "⚠️ Financial simulation disabled - DATABASE_URL not configured",
+      );
     }
   }
 
@@ -232,10 +234,12 @@ export class SimulationEngine {
       0,
     );
 
-    const summaries = await this.db.getMonthlySummaries(
-      character.characterId,
-      config.monthsToSimulate,
-    );
+    const summaries = this.db
+      ? await this.db.getMonthlySummaries(
+          character.characterId,
+          config.monthsToSimulate,
+        )
+      : [];
 
     return {
       characterId: character.characterId,

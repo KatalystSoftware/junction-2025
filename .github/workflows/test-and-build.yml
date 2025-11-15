@@ -75,3 +75,10 @@ jobs:
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Deploy new revision to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: financial-advisor-sim
+          image: ${{ env.IMAGE_NAME }}:latest
+          region: europe-north1

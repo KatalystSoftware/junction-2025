@@ -61,6 +61,22 @@ resource "google_cloud_run_v2_service" "app" {
         name  = "GOOGLE_GENERATIVE_AI_API_KEY"
         value = var.google_generative_ai_api_key
       }
+
+      env {
+        name  = "DATABASE_URL"
+        value = format(
+          "postgresql://%s:%s@%s:5432/%s",
+          var.db_user,
+          random_password.db_password.result,
+          google_sql_database_instance.app.private_ip_address,
+          var.db_name,
+        )
+      }
+    }
+
+    vpc_access {
+      connector = google_vpc_access_connector.serverless.id
+      egress    = "PRIVATE_RANGES_ONLY"
     }
   }
 
@@ -74,6 +90,8 @@ resource "google_cloud_run_v2_service" "app" {
 
   depends_on = [
     google_project_service.run,
+    google_vpc_access_connector.serverless,
+    google_sql_database_instance.app,
   ]
 }
 
