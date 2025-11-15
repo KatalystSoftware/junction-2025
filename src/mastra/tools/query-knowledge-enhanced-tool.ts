@@ -234,8 +234,7 @@ export const queryKnowledgeEnhancedTool = createTool({
         text: result.metadata?.text || "",
         section: result.metadata?.section || "Unknown",
         topic: result.metadata?.topic || "general",
-        source:
-          result.metadata?.source || "Financial Literacy Knowledge Base",
+        source: result.metadata?.source || "Financial Literacy Knowledge Base",
         language: result.metadata?.language || "unknown",
         score: result.score,
         metadata: result.metadata,
@@ -260,6 +259,7 @@ export const queryKnowledgeEnhancedTool = createTool({
             originalScore: c.score,
             rerankScore: c.score,
             finalScore: c.score,
+            relevanceExplanation: undefined,
           }));
       }
 

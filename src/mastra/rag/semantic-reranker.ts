@@ -15,6 +15,7 @@ export interface RerankCandidate {
   section?: string;
   topic?: string;
   source?: string;
+  language?: string;
   score: number;
   metadata?: Record<string, any>;
 }
@@ -66,10 +67,14 @@ export async function rerankResults(
             .number()
             .min(0)
             .max(1)
-            .describe("Relevance score from 0 (not relevant) to 1 (highly relevant)"),
+            .describe(
+              "Relevance score from 0 (not relevant) to 1 (highly relevant)",
+            ),
           explanation: z
             .string()
-            .describe("Brief explanation of why this result is relevant or not"),
+            .describe(
+              "Brief explanation of why this result is relevant or not",
+            ),
         }),
       ),
     });
@@ -108,28 +113,33 @@ Consider:
     );
 
     // Combine original vector scores with AI relevance scores
-    const rerankedResults: RerankedResult[] = candidates.map((candidate, index) => {
-      const aiScore = result.object.scores.find((s) => s.index === index);
-      const rerankScore = aiScore?.relevanceScore ?? candidate.score;
+    const rerankedResults: RerankedResult[] = candidates.map(
+      (candidate, index) => {
+        const aiScore = result.object.scores.find((s) => s.index === index);
+        const rerankScore = aiScore?.relevanceScore ?? candidate.score;
 
-      // Weighted combination: 40% original vector score, 60% AI relevance score
-      const finalScore = candidate.score * 0.4 + rerankScore * 0.6;
+        // Weighted combination: 40% original vector score, 60% AI relevance score
+        const finalScore = candidate.score * 0.4 + rerankScore * 0.6;
 
-      return {
-        ...candidate,
-        originalScore: candidate.score,
-        rerankScore,
-        finalScore,
-        relevanceExplanation: aiScore?.explanation,
-      };
-    });
+        return {
+          ...candidate,
+          originalScore: candidate.score,
+          rerankScore,
+          finalScore,
+          relevanceExplanation: aiScore?.explanation,
+        };
+      },
+    );
 
     // Sort by final score and return top K
     return rerankedResults
       .sort((a, b) => b.finalScore - a.finalScore)
       .slice(0, topK);
   } catch (error: any) {
-    console.error("Error during reranking, falling back to original scores:", error);
+    console.error(
+      "Error during reranking, falling back to original scores:",
+      error,
+    );
 
     // Fallback: just return top K by original score
     return candidates
