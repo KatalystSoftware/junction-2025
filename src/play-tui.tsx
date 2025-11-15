@@ -51,6 +51,9 @@ function App() {
   const [showStats, setShowStats] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [bossReview, setBossReview] = useState<any>(null);
+  const [quiz, setQuiz] = useState<any>(null);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [quizAnswers, setQuizAnswers] = useState<number[]>([]);
 
   // Initialize game
   useEffect(() => {
@@ -105,9 +108,94 @@ function App() {
       return;
     }
 
-    // Close boss review modal
+    // Close boss review modal and start quiz if available
     if (bossReview && input === " ") {
-      setBossReview(null);
+      if (bossReview.quiz) {
+        // Start quiz
+        setQuiz(bossReview.quiz);
+        setCurrentQuestionIndex(0);
+        setQuizAnswers([]);
+        setBossReview(null);
+        setStatusMessage("Quiz started! Select your answer (1-4)");
+      } else {
+        setBossReview(null);
+      }
+      return;
+    }
+
+    // Handle quiz answer input
+    if (quiz && !inputValue) {
+      if (/^[1-4]$/.test(input)) {
+        const answerIndex = parseInt(input) - 1;
+        const updatedAnswers = [...quizAnswers, answerIndex];
+        setQuizAnswers(updatedAnswers);
+
+        if (currentQuestionIndex + 1 < quiz.questions.length) {
+          // Move to next question
+          setCurrentQuestionIndex(currentQuestionIndex + 1);
+          setStatusMessage(
+            `Question ${currentQuestionIndex + 2}/${quiz.questions.length}`,
+          );
+        } else {
+          // Quiz complete - calculate results
+          const correctCount = quiz.questions.filter(
+            (q: any, i: number) => updatedAnswers[i] === q.correctAnswer,
+          ).length;
+          const scorePercentage = (correctCount / quiz.questions.length) * 100;
+
+          let skillBonus = 0;
+          let reputationBonus = 0;
+
+          if (scorePercentage >= 80) {
+            skillBonus = 0.3;
+            reputationBonus = 5;
+          } else if (scorePercentage >= 60) {
+            skillBonus = 0.2;
+            reputationBonus = 3;
+          } else if (scorePercentage >= 40) {
+            skillBonus = 0.1;
+            reputationBonus = 1;
+          }
+
+          // Apply bonuses
+          if (advisorState && (skillBonus > 0 || reputationBonus > 0)) {
+            const updatedState = {
+              ...advisorState,
+              skillLevel: advisorState.skillLevel + skillBonus,
+              reputation: advisorState.reputation + reputationBonus,
+            };
+
+            // Update topic expertise based on quiz topic
+            if (quiz.topic && updatedState.topicsExpertise) {
+              updatedState.topicsExpertise = {
+                ...updatedState.topicsExpertise,
+                [quiz.topic]:
+                  (updatedState.topicsExpertise[quiz.topic] || 0) + skillBonus,
+              };
+            }
+
+            setAdvisorState(updatedState);
+          }
+
+          // Show results (will be handled by QuizResultsModal)
+          setStatusMessage(
+            `Quiz complete! Score: ${scorePercentage.toFixed(0)}% (Press SPACE to continue)`,
+          );
+        }
+      }
+      return;
+    }
+
+    // Close quiz results
+    if (
+      quiz &&
+      currentQuestionIndex >= quiz.questions.length &&
+      input === " "
+    ) {
+      setQuiz(null);
+      setCurrentQuestionIndex(0);
+      setQuizAnswers([]);
+      setStatusMessage("Ready! Press 'n' for new consultation");
       return;
     }
 
@@ -291,6 +379,27 @@ function App() {
     return <BossReviewModal review={bossReview} />;
   }
 
+  // Quiz modal
+  if (quiz) {
+    if (currentQuestionIndex < quiz.questions.length) {
+      return (
+        <QuizQuestionModal
+          quiz={quiz}
+          currentQuestionIndex={currentQuestionIndex}
+          totalQuestions={quiz.questions.length}
+        />
+      );
+    } else {
+      return (
+        <QuizResultsModal
+          quiz={quiz}
+          answers={quizAnswers}
+          advisorState={advisorState}
+        />
+      );
+    }
+  }
+
   return (
     <Box flexDirection="column" height="100%">
       {/* Header */}
@@ -435,6 +544,166 @@ function StatsPanel({ advisorState }: { advisorState: AdvisorState }) {
 }
 
 // ============================================================================
+// Quiz Question Modal Component
+// ============================================================================
+
+function QuizQuestionModal({
+  quiz,
+  currentQuestionIndex,
+  totalQuestions,
+}: {
+  quiz: any;
+  currentQuestionIndex: number;
+  totalQuestions: number;
+}) {
+  const question = quiz.questions[currentQuestionIndex];
+
+  return (
+    <Box
+      flexDirection="column"
+      padding={2}
+      borderStyle="double"
+      borderColor="cyan"
+    >
+      <Text bold color="cyan">
+        📝 INTERACTIVE QUIZ
+      </Text>
+      <Text dimColor>
+        Question {currentQuestionIndex + 1} of {totalQuestions}
+      </Text>
+      <Text> </Text>
+
+      <Box
+        borderStyle="single"
+        borderColor="blue"
+        paddingX={1}
+        flexDirection="column"
+      >
+        <Text bold color="blue">
+          {question.question}
+        </Text>
+      </Box>
+      <Text> </Text>
+
+      <Text bold color="yellow">
+        Options:
+      </Text>
+      {question.options.map((opt: string, idx: number) => (
+        <Text key={idx} color="yellow">
+          {idx + 1}. {opt}
+        </Text>
+      ))}
+      <Text> </Text>
+
+      <Text dimColor>Press 1-4 to answer</Text>
+    </Box>
+  );
+}
+
+// ============================================================================
+// Quiz Results Modal Component
+// ============================================================================
+
+function QuizResultsModal({
+  quiz,
+  answers,
+  advisorState,
+}: {
+  quiz: any;
+  answers: number[];
+  advisorState: AdvisorState | null;
+}) {
+  const correctCount = quiz.questions.filter(
+    (q: any, i: number) => answers[i] === q.correctAnswer,
+  ).length;
+  const scorePercentage = (correctCount / quiz.questions.length) * 100;
+
+  let skillBonus = 0;
+  let reputationBonus = 0;
+  let message = "";
+
+  if (scorePercentage >= 80) {
+    skillBonus = 0.3;
+    reputationBonus = 5;
+    message = "🌟 Excellent! You really know your stuff!";
+  } else if (scorePercentage >= 60) {
+    skillBonus = 0.2;
+    reputationBonus = 3;
+    message = "✨ Good job! You're on the right track!";
+  } else if (scorePercentage >= 40) {
+    skillBonus = 0.1;
+    reputationBonus = 1;
+    message = "👍 Not bad, but there's room for improvement.";
+  } else {
+    message = "📚 You might want to review the learning materials!";
+  }
+
+  return (
+    <Box
+      flexDirection="column"
+      padding={2}
+      borderStyle="double"
+      borderColor="magenta"
+    >
+      <Text bold color="magenta">
+        📊 QUIZ RESULTS
+      </Text>
+      <Text> </Text>
+
+      <Text color="green" bold>
+        Score: {correctCount}/{quiz.questions.length} (
+        {scorePercentage.toFixed(0)}%)
+      </Text>
+      <Text> </Text>
+
+      <Text color="cyan">{message}</Text>
+      <Text> </Text>
+
+      {(skillBonus > 0 || reputationBonus > 0) && (
+        <>
+          <Text bold color="green">
+            🎁 Bonus Rewards:
+          </Text>
+          <Text color="green">• +{skillBonus} Skill Level</Text>
+          <Text color="green">• +{reputationBonus} Reputation</Text>
+          <Text> </Text>
+        </>
+      )}
+
+      <Text bold color="yellow">
+        Review:
+      </Text>
+      {quiz.questions.map((q: any, i: number) => {
+        const userAnswer = answers[i];
+        const isCorrect = userAnswer === q.correctAnswer;
+
+        return (
+          <Box key={i} flexDirection="column" paddingY={1}>
+            <Text color={isCorrect ? "green" : "red"}>
+              {i + 1}. {isCorrect ? "✅" : "❌"} {q.question}
+            </Text>
+            {!isCorrect && (
+              <Text color="yellow" dimColor>
+                Your answer: {q.options[userAnswer]}
+              </Text>
+            )}
+            <Text color="yellow" dimColor>
+              Correct: {q.options[q.correctAnswer]}
+            </Text>
+            <Text color="cyan" dimColor>
+              💡 {q.explanation}
+            </Text>
+          </Box>
+        );
+      })}
+      <Text> </Text>
+
+      <Text dimColor>Press SPACE to continue</Text>
+    </Box>
+  );
+}
+
+// ============================================================================
 // Boss Review Modal Component
 // ============================================================================
 
@@ -476,17 +745,37 @@ function BossReviewModal({ review }: { review: any }) {
       <Text bold color="cyan">
         📚 Learning Materials:
       </Text>
-      {review.learningMaterials.map((m: any, i: number) => (
-        <Text key={i} color="cyan">
-          • {m.title} - {m.description}
-        </Text>
-      ))}
+      {review.learningMaterials.map((m: any, i: number) => {
+        const urlText = m.url ? ` (${m.url})` : "";
+        return (
+          <Text key={i} color="cyan">
+            • {m.title} - {m.description}
+            {urlText}
+          </Text>
+        );
+      })}
       <Text> </Text>
 
       <Text color="magenta">💬 Boss says:</Text>
       <Text color="magenta">"{review.encouragingMessage}"</Text>
       <Text> </Text>
-      <Text dimColor>Press SPACE to continue</Text>
+
+      {review.quiz && (
+        <>
+          <Text bold color="cyan">
+            🎯 Quiz Available!
+          </Text>
+          <Text dimColor>
+            Your boss has prepared {review.quiz.questions.length} questions to
+            test your knowledge.
+          </Text>
+          <Text> </Text>
+        </>
+      )}
+
+      <Text dimColor>
+        Press SPACE to {review.quiz ? "start quiz" : "continue"}
+      </Text>
     </Box>
   );
 }

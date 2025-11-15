@@ -142,7 +142,8 @@ function printBossReview(review: any) {
 
   print("\n📚 Learning Materials:", colors.cyan);
   review.learningMaterials.forEach((m: any) => {
-    print(`   • ${m.title} - ${m.description}`, colors.cyan);
+    const urlText = m.url ? ` (${m.url})` : "";
+    print(`   • ${m.title} - ${m.description}${urlText}`, colors.cyan);
   });
 
   print(`\n💬 Boss says:`, colors.magenta);
@@ -150,9 +151,139 @@ function printBossReview(review: any) {
   print("═".repeat(70) + "\n", colors.magenta);
 }
 
+async function handleQuiz(
+  quiz: any,
+  advisorState: AdvisorState,
+): Promise<AdvisorState> {
+  print("\n" + "═".repeat(70), colors.cyan);
+  print("   📝 INTERACTIVE QUIZ", colors.cyan + colors.bright);
+  print("═".repeat(70), colors.cyan);
+  print(
+    "\nTime to test your knowledge! Answer these questions to earn bonus points.\n",
+    colors.cyan,
+  );
+
+  let correctCount = 0;
+  const totalQuestions = quiz.questions.length;
+
+  for (let i = 0; i < quiz.questions.length; i++) {
+    const q = quiz.questions[i];
+
+    print(`\n${"─".repeat(70)}`, colors.blue);
+    print(
+      `Question ${i + 1}/${totalQuestions}: ${q.question}`,
+      colors.blue + colors.bright,
+    );
+    print(`${"─".repeat(70)}`, colors.blue);
+
+    q.options.forEach((opt: string, idx: number) => {
+      print(`   ${idx + 1}. ${opt}`, colors.yellow);
+    });
+
+    let validAnswer = false;
+    let userAnswer = -1;
+
+    while (!validAnswer) {
+      const answer = await askQuestion(
+        `\n${colors.green}Your answer (1-${q.options.length}): ${colors.reset}`,
+      );
+      const answerNum = parseInt(answer);
+
+      if (answerNum >= 1 && answerNum <= q.options.length) {
+        userAnswer = answerNum - 1;
+        validAnswer = true;
+      } else {
+        print(
+          `Please enter a number between 1 and ${q.options.length}`,
+          colors.red,
+        );
+      }
+    }
+
+    // Check answer
+    if (userAnswer === q.correctAnswer) {
+      print("\n✅ Correct!", colors.green + colors.bright);
+      correctCount++;
+    } else {
+      print("\n❌ Incorrect.", colors.red);
+      print(
+        `   The correct answer was: ${q.options[q.correctAnswer]}`,
+        colors.yellow,
+      );
+    }
+
+    print(`\n💡 Explanation: ${q.explanation}`, colors.cyan);
+  }
+
+  // Calculate score and apply bonuses
+  const scorePercentage = (correctCount / totalQuestions) * 100;
+
+  print("\n" + "═".repeat(70), colors.magenta);
+  print("   📊 QUIZ RESULTS", colors.magenta + colors.bright);
+  print("═".repeat(70), colors.magenta);
+  print(
+    `\nYou got ${correctCount} out of ${totalQuestions} correct (${scorePercentage.toFixed(0)}%)`,
+    colors.green,
+  );
+
+  let skillBonus = 0;
+  let reputationBonus = 0;
+
+  if (scorePercentage >= 80) {
+    skillBonus = 0.3;
+    reputationBonus = 5;
+    print(
+      "\n🌟 Excellent! You really know your stuff!",
+      colors.green + colors.bright,
+    );
+  } else if (scorePercentage >= 60) {
+    skillBonus = 0.2;
+    reputationBonus = 3;
+    print("\n✨ Good job! You're on the right track!", colors.green);
+  } else if (scorePercentage >= 40) {
+    skillBonus = 0.1;
+    reputationBonus = 1;
+    print("\n👍 Not bad, but there's room for improvement.", colors.yellow);
+  } else {
+    print(
+      "\n📚 You might want to review the learning materials!",
+      colors.yellow,
+    );
+  }
+
+  if (skillBonus > 0 || reputationBonus > 0) {
+    print(
+      `\n🎁 Bonus: +${skillBonus} skill, +${reputationBonus} reputation`,
+      colors.green,
+    );
+
+    // Apply bonuses to advisor state
+    const updatedState = {
+      ...advisorState,
+      skillLevel: advisorState.skillLevel + skillBonus,
+      reputation: advisorState.reputation + reputationBonus,
+    };
+
+    // Update topic expertise based on quiz topic
+    if (quiz.topic && updatedState.topicsExpertise) {
+      const topic = quiz.topic as keyof typeof updatedState.topicsExpertise;
+      updatedState.topicsExpertise = {
+        ...updatedState.topicsExpertise,
+        [topic]: (updatedState.topicsExpertise[topic] || 0) + skillBonus,
+      };
+    }
+
+    print("═".repeat(70) + "\n", colors.magenta);
+    return updatedState;
+  }
+
+  print("═".repeat(70) + "\n", colors.magenta);
+  return advisorState;
+}
+
 async function askQuestion(prompt: string): Promise<string> {
   return new Promise((resolve) => {
-    rl.question(`${colors.green}💼 You: ${colors.reset}`, (answer) => {
+    rl.question(`${colors.green}💼 You: ${colors.reset}`, (answer: string) => {
       resolve(answer);
     });
   });
@@ -262,6 +393,19 @@ async function playGame() {
           // Boss review!
           printBossReview(consultation.review);
           advisorState = consultation.stateUpdate;
+
+          // Handle quiz if present
+          if (consultation.review.quiz) {
+            print("\n🎯 Your boss has prepared a quiz for you!\n", colors.cyan);
+            print("Press ENTER to start the quiz...", colors.yellow);
+            await askQuestion("");
+
+            advisorState = await handleQuiz(
+              consultation.review.quiz,
+              advisorState,
+            );
+          }
+
           printStats(advisorState);
           print("\nPress ENTER to continue...", colors.yellow);
           await askQuestion("");
