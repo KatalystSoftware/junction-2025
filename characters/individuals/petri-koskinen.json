@@ -1,0 +1,32 @@
+{
+  "characterId": "char_petri_004",
+  "name": "Petri Koskinen",
+  "age": 19,
+  "occupation": "High School Student",
+  "background": "Final year high school student. Has seen many crypto scams on social media and among friends. Uncertain about money in general. Just got his first summer job and wants to learn to make good decisions.",
+  "personality": {
+    "impulsiveness": 0.6,
+    "trustingness": 0.5,
+    "financial_literacy": 0.2,
+    "stubbornness": 0.6,
+    "emotionality": 0.4
+  },
+  "financialProfile": {
+    "incomeLevel": "low",
+    "typicalMonthlyIncome": 600,
+    "hasDebt": false,
+    "hasSavings": "minimal"
+  },
+  "communicationStyle": {
+    "formality": "casual",
+    "language": "teen",
+    "prefersVoice": 0.4,
+    "callsWhenEmotional": false
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

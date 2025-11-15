@@ -32,25 +32,29 @@ export class CharacterPoolManager {
   private pendingFollowUps: PendingFollowUp[] = [];
 
   /**
-   * Load characters and scenarios from JSON files
+   * Load characters and scenarios from JSON files or directories
    */
   async loadFromFiles(
     charactersPath: string,
     scenariosPath: string,
   ): Promise<void> {
     try {
-      // Load characters
-      const charactersData = await fs.readFile(charactersPath, "utf-8");
-      const characterArray: Character[] = JSON.parse(charactersData);
+      // Load characters - support both single file and directory
+      const charactersData = await this.loadJsonFromPathOrDirectory(
+        charactersPath,
+      );
+      const characterArray: Character[] = charactersData;
 
       this.characters.clear();
       for (const char of characterArray) {
         this.characters.set(char.characterId, char);
       }
 
-      // Load scenarios
-      const scenariosData = await fs.readFile(scenariosPath, "utf-8");
-      const scenarioArray: Scenario[] = JSON.parse(scenariosData);
+      // Load scenarios - support both single file and directory
+      const scenariosData = await this.loadJsonFromPathOrDirectory(
+        scenariosPath,
+      );
+      const scenarioArray: Scenario[] = scenariosData.flat(); // Flatten in case of multiple files
 
       this.scenarios.clear();
       for (const scenario of scenarioArray) {
@@ -62,6 +66,46 @@ export class CharacterPoolManager {
       );
     } catch (error) {
       console.error("❌ Error loading character/scenario files:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Load JSON data from a file or directory
+   * If directory, loads all .json files and combines them
+   */
+  private async loadJsonFromPathOrDirectory(filePath: string): Promise<any[]> {
+    try {
+      const stats = await fs.stat(filePath);
+
+      if (stats.isFile()) {
+        // Single file - load and parse
+        const data = await fs.readFile(filePath, "utf-8");
+        return JSON.parse(data);
+      } else if (stats.isDirectory()) {
+        // Directory - load all JSON files
+        const files = await fs.readdir(filePath);
+        const jsonFiles = files.filter((file) => file.endsWith(".json"));
+
+        const allData: any[] = [];
+        for (const file of jsonFiles) {
+          const fullPath = path.join(filePath, file);
+          const fileData = await fs.readFile(fullPath, "utf-8");
+          const parsed = JSON.parse(fileData);
+          // If parsed is an array, spread it; otherwise add as single item
+          if (Array.isArray(parsed)) {
+            allData.push(...parsed);
+          } else {
+            allData.push(parsed);
+          }
+        }
+
+        return allData;
+      } else {
+        throw new Error(`Path ${filePath} is neither a file nor a directory`);
+      }
+    } catch (error) {
+      console.error(`❌ Error loading JSON from ${filePath}:`, error);
       throw error;
     }
   }

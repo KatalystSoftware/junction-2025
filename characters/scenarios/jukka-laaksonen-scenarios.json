@@ -1,0 +1,100 @@
+[
+  {
+    "scenarioId": "scenario_jukka_debt_001",
+    "characterId": "char_jukka_002",
+    "scenarioType": "debt_management",
+    "difficulty": 0.6,
+    "topic": "debt_management",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "Hi. I've accumulated €8,000 in consumer debt over the past three years. The interest rate is about 15% and I don't really know how to get out of this. It's weighing heavily on my mind. Can you help?",
+      "voiceMessage": {
+        "enabled": true,
+        "transcription": "Hi. I've accumulated €8,000 in consumer debt over the past three years. The interest rate is about 15% and I don't really know how to get out of this. It's weighing heavily on my mind. Can you help?",
+        "urgency": "concerned"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "€8,000 consumer debt at 15% interest, feeling overwhelmed",
+      "emotionalState": "stressed, worried, ashamed",
+      "urgency": "high",
+      "specificDetails": {
+        "totalDebt": 8000,
+        "interestRate": 0.15,
+        "monthlyIncome": 1900,
+        "hasTrackedExpenses": false
+      }
+    },
+    "idealAdvice": [
+      "Empathize and normalize the situation (many people have debt)",
+      "First understand full financial picture (all debts, income, expenses)",
+      "Explain debt consolidation options (consolidation loan with lower interest)",
+      "Create debt payoff plan (snowball or avalanche method)",
+      "Look for ways to increase income or reduce expenses",
+      "Consider contacting financial counseling services",
+      "Emphasize this is solvable and provide hope"
+    ],
+    "commonMistakes": [
+      "Being judgmental about how debt was accumulated",
+      "Suggesting bankruptcy immediately (too extreme for €8k)",
+      "Not addressing the emotional weight",
+      "Giving vague advice without actionable steps",
+      "Ignoring high interest rate problem"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_jukka_debt_progress_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 4
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_jukka_debt_progress_002",
+    "characterId": "char_jukka_002",
+    "scenarioType": "debt_management_followup",
+    "difficulty": 0.5,
+    "topic": "debt_management",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_jukka_debt_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Hey! I got that consolidation loan! The interest dropped from 15% to 7% 🎉 Thanks for the help. Now I have a question: how much should I pay off per month? I'm wondering if I can pay more than the minimum.",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Successfully consolidated debt, now optimizing payoff strategy",
+      "emotionalState": "relieved, hopeful, motivated",
+      "urgency": "low",
+      "specificDetails": {
+        "newInterestRate": 0.07,
+        "minimumPayment": 200,
+        "hasExtraIncome": 150
+      }
+    },
+    "idealAdvice": [
+      "Celebrate the progress (big win!)",
+      "Explain minimum vs. accelerated payoff tradeoffs",
+      "Help create emergency fund while paying debt (balanced approach)",
+      "Calculate interest savings from extra payments",
+      "Make sure basic needs are still covered",
+      "Set realistic payoff timeline"
+    ],
+    "commonMistakes": [
+      "Suggesting to pay all extra money to debt without emergency fund",
+      "Not acknowledging the great progress made",
+      "Being too aggressive with payoff plan"
+    ]
+  }
+]
