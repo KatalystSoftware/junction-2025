@@ -1,0 +1,146 @@
+[
+  {
+    "scenarioId": "scenario_raija_downsizing_001",
+    "characterId": "char_raija_037",
+    "scenarioType": "senior_downsizing_decision",
+    "difficulty": 0.5,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 2, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "call",
+      "message": "I'm 67 and my apartment is too big now that I'm alone. It's 75m² and I heat rooms I never use. My kids live in other cities so they don't visit often. A smaller 45m² apartment would be cheaper to maintain and heat. But this has been my home for 30 years - my husband and I raised our children here. The apartment is worth maybe 180,000€ and a smaller one would be 120,000€. Should I downsize and invest the 60,000€ difference? Or stay in my home with all the memories?",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "calm"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Widowed retiree considering downsizing from family home with emotional attachment",
+      "emotionalState": "torn between practical and emotional, loneliness, memories",
+      "urgency": "low",
+      "specificDetails": {
+        "age": 67,
+        "widowed": 5,
+        "currentApartmentSize": 75,
+        "potentialNewSize": 45,
+        "currentValue": 180000,
+        "newApartmentCost": 120000,
+        "potentialProceeds": 60000,
+        "emotionalAttachment": true,
+        "childrenInOtherCities": true
+      }
+    },
+    "idealAdvice": [
+      "This is as much a life decision as financial one - both matter",
+      "Financial analysis:",
+      "Selling for 180k, buying for 120k = 60k€ proceeds (minus selling costs ~10k = 50k net)",
+      "Savings: Smaller apartment = ~100€/month less heating/maintenance = 1,200€/year",
+      "50k€ invested conservatively at 3% = 1,500€/year income",
+      "Total benefit: ~2,700€/year = 225€/month more in budget",
+      "On 2,100€/month pension, 225€ extra = 10% income increase - meaningful",
+      "Non-financial factors:",
+      "Emotional: 30 years of memories, husband's presence in every room",
+      "Practical: Smaller space easier to maintain as you age, less cleaning",
+      "Social: New neighborhood might be isolating OR opportunity for new connections",
+      "Health: Stairs? Elevator? Accessibility matters more as you age",
+      "Timeline: No rush to decide - you can stay or move, both are viable",
+      "Questions to consider:",
+      "Does this apartment bring you joy or remind you of loneliness?",
+      "Are you heating it to preserve memories or because you truly need the space?",
+      "Would smaller space feel cozy or cramped?",
+      "Is moving away from memories healing or painful?",
+      "Honest assessment: 22k€ savings is modest - you're not in financial distress",
+      "This move should be about quality of life, not financial necessity",
+      "No wrong answer: Stay if home brings comfort, move if it feels like burden",
+      "Consider: Trial visit to smaller apartments before deciding?"
+    ],
+    "commonMistakes": [
+      "Pushing financial optimization without addressing emotional attachment",
+      "Dismissing memories as irrational (they're real and important)",
+      "Not acknowledging grief of widowhood in housing decision",
+      "Failing to consider accessibility and aging-in-place factors",
+      "Rushing her to decide when there's no urgency",
+      "Not validating that both choices are completely valid"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_raija_inflation_worry_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 5
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_raija_inflation_worry_002",
+    "characterId": "char_raija_037",
+    "scenarioType": "senior_inflation_concern",
+    "difficulty": 0.4,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 1, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I'm worried about inflation. My teacher's pension is 2,100€/month which was comfortable 2 years ago. But groceries have gotten so expensive! I used to spend 280€/month, now it's 320€ for the same food. Electricity went from 60€ to 95€/month. My pension barely increased but costs keep rising. I have 22,000€ saved - should I invest it somewhere to keep up with inflation? Or is that too risky at my age?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Retired senior concerned about inflation eroding fixed pension income",
+      "emotionalState": "worried, feeling financial pressure, cautious about risk",
+      "urgency": "medium",
+      "specificDetails": {
+        "age": 67,
+        "pension": 2100,
+        "groceryCostIncrease": 40,
+        "electricityCostIncrease": 35,
+        "savings": 22000,
+        "concernAboutInflation": true,
+        "uncertainAboutInvesting": true,
+        "riskAverse": true
+      }
+    },
+    "idealAdvice": [
+      "Your concern is absolutely valid - inflation hits fixed-income retirees hardest",
+      "The reality: Pension increases lag behind inflation - this is real problem",
+      "Let's look at your options:",
+      "Budget adjustments:",
+      "- Groceries: 320€ for one person is actually quite high - room to optimize without sacrificing quality",
+      "- Shop sales, buy store brands, seasonal produce - could save 50€/month",
+      "- Electricity: Consider fixed-price contract vs variable to avoid spikes",
+      "Your 22k€ savings question:",
+      "At 67, you have potentially 20-25 years ahead - inflation will continue",
+      "Conservative investment approach for retirees:",
+      "1. Keep 6-12 months expenses in savings (12k€) - emergency fund stays liquid",
+      "2. Invest remaining 10k€ conservatively to fight inflation",
+      "Conservative options:",
+      "- Government bonds (valtionlainat): Very safe, 2-3% return",
+      "- Balanced fund (60% bonds, 40% stocks): More growth, moderate risk",
+      "- Bank deposits with higher interest (1.5-2%): Safe but barely keeps up with inflation",
+      "Finnish pension holders: Pension does get indexed to inflation but with 1-2 year lag",
+      "Risk considerations at your age:",
+      "You CAN afford some risk - you're not spending this money tomorrow",
+      "But you can't afford to lose it - need conservative approach",
+      "Recommendation: 10k€ in balanced fund, keep 12k€ liquid",
+      "Expected return: 3-4% average = 300-400€/year extra income",
+      "This isn't magic solution but helps maintain purchasing power",
+      "Important: You're not in crisis - pension is good, savings are solid",
+      "This is about maintaining quality of life over next 20 years"
+    ],
+    "commonMistakes": [
+      "Telling her not to invest at all because of age (20+ years is long term!)",
+      "Recommending aggressive stock investments (too risky for her needs)",
+      "Not acknowledging inflation concern is real and valid",
+      "Failing to separate emergency fund from investable funds",
+      "Not giving specific investment options appropriate for seniors",
+      "Missing grocery optimization opportunity"
+    ]
+  }
+]

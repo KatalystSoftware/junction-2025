@@ -1,0 +1,61 @@
+[
+  {
+    "scenarioId": "scenario_olivia_home_insurance_001",
+    "characterId": "char_olivia_025",
+    "scenarioType": "first_apartment_insurance",
+    "difficulty": 0.4,
+    "topic": "insurance",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I'm about to buy my first apartment! The bank approved my mortgage. I'm so excited but also overwhelmed. The real estate agent mentioned I need home insurance (kotivakuutus) before closing. What exactly do I need? The insurance company offered me like 5 different packages ranging from 15€ to 45€ per month. What's the difference and how much coverage do I actually need for a 55m² apartment?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "First-time home buyer needing to understand home insurance requirements before closing",
+      "emotionalState": "excited, overwhelmed, eager to do this right",
+      "urgency": "medium",
+      "specificDetails": {
+        "firstTimeHomeBuyer": true,
+        "apartmentSize": 55,
+        "mortgageApproved": true,
+        "insuranceQuoteRange": "15-45€",
+        "closingDateSoon": true
+      }
+    },
+    "idealAdvice": [
+      "Congratulations on the apartment!",
+      "Home insurance (kotivakuutus) is MANDATORY with mortgage - bank requires it to protect their investment",
+      "Basic coverage should include: building damage (water, fire), personal property, liability",
+      "For 55m² apartment, mid-tier coverage (25-30€/month) is usually appropriate",
+      "Key factors: replacement value of belongings, deductible amount, coverage limits",
+      "Higher premium packages often include: electronics coverage, glass damage, all-risk coverage for valuables",
+      "As nurse with modest belongings, mid-tier likely sufficient - can upgrade later",
+      "Check if covers water damage (very common in Finnish apartments)",
+      "Liability coverage (vastuuvakuutus) essential - covers if you damage neighbor's apartment",
+      "Document your belongings with photos for potential claims",
+      "Review coverage annually, especially as you acquire more valuables"
+    ],
+    "commonMistakes": [
+      "Not explaining that mortgage lender requires insurance",
+      "Recommending cheapest option without explaining coverage gaps",
+      "Recommending most expensive without justifying need",
+      "Not explaining what different tiers actually cover",
+      "Failing to mention water damage coverage importance in Finland",
+      "Not congratulating her on major life milestone"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_olivia_mortgage_planning_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 5
+      }
+    ]
+  }
+]

@@ -1,0 +1,78 @@
+[
+  {
+    "scenarioId": "scenario_aino_peer_pressure_spending_004",
+    "characterId": "char_aino_020",
+    "scenarioType": "teen_peer_pressure",
+    "difficulty": 0.3,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "All my friends are going shopping this weekend and getting new clothes for spring. They keep showing me stuff on Instagram and TikTok. I have 160€ budgeted for spending this month but I already used 80€. If I spend another 80€ on clothes, I won't have money for anything else this month. But I don't want to be the only one not shopping. What should I tell them?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Teen facing peer pressure to overspend budget on shopping trip",
+      "emotionalState": "FOMO, peer pressure, wanting to fit in, knows overspending is wrong",
+      "urgency": "low",
+      "specificDetails": {
+        "age": 17,
+        "monthlySpendingBudget": 160,
+        "alreadySpent": 80,
+        "remaining": 80,
+        "friendsShopping": true,
+        "socialMediaInfluence": true,
+        "fearOfMissingOut": true
+      }
+    },
+    "idealAdvice": [
+      "This is tough - peer pressure about money is real, especially at 17!",
+      "Let's think through your options:",
+      "Option 1: Go shopping, spend 80€, have 0€ rest of month",
+      "- Consequence: No money for anything unexpected, no going out later this month",
+      "- Risk: What if friends want to do something else later and you're broke?",
+      "Option 2: Skip shopping, save 80€, feel left out",
+      "- Consequence: FOMO, might feel excluded",
+      "- Benefit: Still have money for activities later in month",
+      "Option 3 (Best): Go shopping with LIMITED budget",
+      "- Bring ONLY 30-40€ in cash (leave card at home)",
+      "- Go for the hangout, not the haul",
+      "- Find 1-2 pieces you love within budget",
+      "- Remaining 40-50€ available for rest of month",
+      "The social media trap:",
+      "Instagram/TikTok showing you expensive hauls creates fake 'normal'",
+      "Reality: Most people can't afford huge shopping sprees every month",
+      "Your friends posting hauls: Might be maxing out parents' cards, getting into debt, or just showing off",
+      "What to tell friends:",
+      "DON'T say: 'I can't afford it' (creates shame)",
+      "DO say: 'I'm saving for Spain trip but I'll come hang and get one thing!'",
+      "Real friends: Will respect your goals",
+      "Friends who pressure you to overspend: Not looking out for you",
+      "Perspective:",
+      "You're 17 with 850€ saved and clear goals - you're ahead of most adults!",
+      "Shopping spree now: Temporarily fun, doesn't move you toward Spain",
+      "Staying on budget: Gets you closer to life-changing experience",
+      "Future you in Spain at 19: Won't remember this shopping trip in April 2025",
+      "Future you if broke and can't afford Spain: Will regret every impulse shopping trip",
+      "The skill you're learning:",
+      "Saying 'no' to peer pressure about money at 17: Will save you thousands of euros over lifetime",
+      "This isn't about one shopping trip - it's about who you want to be with money",
+      "Quick test: Would you rather have new shirt now OR be in Spain in 18 months?",
+      "That answer tells you what to do"
+    ],
+    "commonMistakes": [
+      "Telling her to just not go (misses social importance)",
+      "Not offering compromise option (limited budget shopping)",
+      "Dismissing peer pressure as unimportant (it's real for teens)",
+      "Not addressing social media influence explicitly",
+      "Missing opportunity to reinforce her good savings habit",
+      "Not giving specific phrases to use with friends"
+    ]
+  }
+]

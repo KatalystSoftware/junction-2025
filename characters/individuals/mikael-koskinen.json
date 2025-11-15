@@ -1,0 +1,112 @@
+{
+  "characterId": "char_mikael_035",
+  "name": "Mikael Koskinen",
+  "age": 36,
+  "occupation": "Sales Manager (Company Car)",
+  "background": "Sales manager at pharmaceutical company with company car benefit. Good salary but confused about company car taxation and whether it's actually beneficial. The taxable value seems high and he's paying a lot in taxes for the benefit. Wondering if he should negotiate for higher salary instead of car, or if there are ways to optimize this. Also has stock options from company that will vest soon and no idea how they're taxed in Finland.",
+  "personality": {
+    "impulsiveness": 0.4,
+    "trustingness": 0.5,
+    "financial_literacy": 0.5,
+    "stubbornness": 0.4,
+    "emotionality": 0.3
+  },
+  "financialProfile": {
+    "incomeLevel": "high",
+    "typicalMonthlyIncome": 5200,
+    "hasDebt": true,
+    "hasSavings": "good",
+    "bankAccounts": [
+      {
+        "accountId": "acc_mikael_001",
+        "bankName": "OP",
+        "accountType": "checking",
+        "balance": 4200.0,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_mikael_002",
+        "bankName": "OP",
+        "accountType": "savings",
+        "balance": 28000.0,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [
+      {
+        "cardId": "card_mikael_001",
+        "issuer": "OP Gold",
+        "balance": 0.0,
+        "creditLimit": 8000.0,
+        "interestRate": 12.9,
+        "minimumPayment": 0.0,
+        "currency": "EUR"
+      }
+    ],
+    "debts": [
+      {
+        "debtId": "debt_mikael_001",
+        "type": "mortgage",
+        "creditor": "OP Home Loan",
+        "totalAmount": 250000.0,
+        "remainingAmount": 210000.0,
+        "monthlyPayment": 980.0,
+        "interestRate": 2.7,
+        "currency": "EUR",
+        "startDate": "2020-08-01"
+      }
+    ],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_mikael_001",
+        "name": "Netflix Premium",
+        "monthlyCost": 17.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2021-01-01"
+      },
+      {
+        "subscriptionId": "sub_mikael_002",
+        "name": "Spotify Premium",
+        "monthlyCost": 10.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2020-01-01"
+      },
+      {
+        "subscriptionId": "sub_mikael_003",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 34.9,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2023-01-01"
+      },
+      {
+        "subscriptionId": "sub_mikael_004",
+        "name": "Gym Premium",
+        "monthlyCost": 69.0,
+        "category": "fitness",
+        "currency": "EUR",
+        "startDate": "2022-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "groceries": 450,
+      "transportation": 80,
+      "utilities": 120,
+      "other": 500
+    }
+  },
+  "communicationStyle": {
+    "formality": "semi-formal",
+    "language": "casual_adult_finnish",
+    "prefersVoice": 0.2,
+    "callsWhenEmotional": false
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

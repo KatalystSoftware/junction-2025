@@ -1,0 +1,183 @@
+[
+  {
+    "scenarioId": "scenario_tuomas_crypto_basics_001",
+    "characterId": "char_tuomas_024",
+    "scenarioType": "cryptocurrency_education",
+    "difficulty": 0.5,
+    "topic": "investing",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 2, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "All my developer friends are talking about Bitcoin and Ethereum. Some made good money, some lost money. I feel like I should understand crypto but honestly I don't really get it. Is it investing or gambling? Should I buy some Bitcoin? If yes, how much? Everyone says 'only invest what you can afford to lose' which makes it sound super risky. Help me understand what crypto actually is and if it makes sense for me.",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Tech-savvy developer wanting to understand cryptocurrency as investment but confused about risk and legitimacy",
+      "emotionalState": "curious, FOMO from peer pressure, cautious, wanting education",
+      "urgency": "low",
+      "specificDetails": {
+        "techSavvy": true,
+        "friendsInvestingInCrypto": true,
+        "lacksBasicCryptoUnderstanding": true,
+        "concernedAboutRisk": true,
+        "feelingPeerPressure": true,
+        "hasDisposableIncome": true
+      }
+    },
+    "idealAdvice": [
+      "Good that you're asking before jumping in - many don't!",
+      "Crypto basics: Bitcoin/Ethereum are digital currencies using blockchain technology",
+      "Is it investing or gambling? Somewhere in between - high risk, high volatility, some believe in long-term value",
+      "Key characteristics: No government backing, 24/7 trading, can swing 10-20% in a day, pure speculation on future adoption",
+      "Legitimate investment class? Increasingly yes - institutions now invest, but still MUCH riskier than stocks",
+      "For your situation (26, good income, 18.5k€ saved, no debt):",
+      "You CAN afford to experiment with crypto as small part of portfolio",
+      "Reasonable approach: 5-10% of investment portfolio in crypto (NOT savings!)",
+      "Specific: Maybe 1,000-2,000€ max to start - enough to learn, not enough to devastate you if goes to zero",
+      "Stick to Bitcoin and Ethereum to start - most established, avoid obscure 'altcoins' and definitely avoid 'meme coins'",
+      "NEVER invest based on FOMO or social media hype",
+      "Finnish tax treatment: Crypto sales are capital gains taxed at 30-34% - keep records of all transactions!",
+      "Critical: Use reputable exchange (Coinbase, Kraken), enable 2FA security, understand you could lose it all",
+      "Don't invest money you'll need in next 5 years - crypto is LONG-TERM speculation",
+      "Continue building traditional portfolio (index funds) as foundation - crypto is speculation portion only"
+    ],
+    "commonMistakes": [
+      "Dismissing crypto entirely as scam without nuanced explanation",
+      "Encouraging large crypto investment without warning of volatility",
+      "Not explaining what cryptocurrency actually is",
+      "Failing to mention Finnish tax implications",
+      "Not addressing the FOMO and peer pressure he's feeling",
+      "Recommending specific coins to buy (too risky to recommend)",
+      "Not emphasizing security and scam awareness"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_tuomas_crypto_volatility_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 5
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_tuomas_crypto_volatility_002",
+    "characterId": "char_tuomas_024",
+    "scenarioType": "crypto_market_crash",
+    "difficulty": 0.4,
+    "topic": "investing",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_tuomas_crypto_basics_001"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "So I bought 1,500€ worth of Bitcoin and Ethereum like you suggested - split 50/50. That was 2 months ago. Bitcoin just dropped 25% in the last week. My investment is now worth like 1,100€. I lost 400€! Part of me wants to sell before it gets worse, part of me thinks I should buy more while it's 'on sale'. My friend sold everything in panic. What should I do? This volatility is stressful!",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Crypto investor experiencing first major market drop, torn between panic selling and buying the dip",
+      "emotionalState": "stressed, anxious, second-guessing decision, seeking validation",
+      "urgency": "medium",
+      "specificDetails": {
+        "initialInvestment": 1500,
+        "currentValue": 1100,
+        "loss": 400,
+        "marketDropPercentage": 25,
+        "timeSinceInvestment": "2 months",
+        "friendPanicSold": true,
+        "uncertainWhatToDo": true
+      }
+    },
+    "idealAdvice": [
+      "First: Take a breath. This is completely normal for crypto",
+      "25% drop in a week is actually mild for crypto - it's dropped 50-80% before and recovered",
+      "Key questions: Has anything changed about WHY you invested?",
+      "You invested 1,500€ you could afford to lose as speculation",
+      "You're down 400€ which, while painful, doesn't hurt your financial security",
+      "Panic selling now = locking in losses and timing the market (which rarely works)",
+      "IMPORTANT: This is exactly the volatility we discussed - crypto is not for people who can't handle swings",
+      "Your choices:",
+      "1. HOLD: Stick to original plan, ignore short-term noise, check back in 1-2 years (recommended for most)",
+      "2. SELL: If this stress is affecting your sleep/life, sell and accept the lesson (also valid)",
+      "3. BUY MORE: Only if nothing has changed in your thesis AND you have more money you can truly afford to lose",
+      "What NOT to do: Make emotional decisions based on fear or FOMO",
+      "Perspective: You invested 1,500€ as speculation knowing it was risky. Nothing has changed.",
+      "Your friend panic selling: Classic mistake - selling low out of fear",
+      "If this level of volatility is too stressful, crypto might not be right for you - and that's completely fine!",
+      "Remember: You have 18.5k€ saved - this 400€ paper loss is ~2% of your savings. Keep perspective."
+    ],
+    "commonMistakes": [
+      "Telling him to definitely sell and cut losses (timing the market)",
+      "Telling him to definitely buy more (gambling fallacy)",
+      "Not acknowledging the stress is real and valid",
+      "Failing to remind him of original plan and reasoning",
+      "Not giving him permission to exit if stress is too high",
+      "Missing opportunity to teach about emotional investing discipline"
+    ]
+  },
+  {
+    "scenarioId": "scenario_tuomas_nft_craze_003",
+    "characterId": "char_tuomas_024",
+    "scenarioType": "nft_education",
+    "difficulty": 0.6,
+    "topic": "scam_awareness",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 3, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "My gaming company is exploring NFTs for in-game items. Some colleagues are also buying NFT art as investments - I saw one guy spent 5,000€ on a digital picture of an ape. He says it will be worth 50k€ in a year. This feels like the dot-com bubble but everyone's acting like it's the future. Are NFTs a real investment opportunity or is this mass delusion? Should I buy some?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Developer skeptical about NFT investment craze but experiencing workplace peer pressure",
+      "emotionalState": "skeptical, curious, concerned about missing out, analytical",
+      "urgency": "low",
+      "specificDetails": {
+        "companyExploringNFTs": true,
+        "colleagueSpent5000OnNFT": true,
+        "unrealisticExpectations": true,
+        "skepticalButCurious": true,
+        "comparingToDotComBubble": true
+      }
+    },
+    "idealAdvice": [
+      "Your dot-com bubble comparison is astute - there ARE similarities",
+      "NFT basics: Non-fungible tokens = unique digital items on blockchain (proof of ownership)",
+      "Legitimate use cases: Digital art ownership, game items, event tickets, authentication",
+      "Speculative bubble concern: Many NFTs trading at prices based purely on hype, not intrinsic value",
+      "Critical distinction: NFT technology (useful) vs. NFT as investment (highly speculative)",
+      "Your colleague's 5k€ ape expecting 10x return: Classic speculative bubble behavior",
+      "Red flags in NFT market: Wash trading, pump-and-dump schemes, celebrity endorsements, FOMO marketing",
+      "Comparison to traditional art: Unlike physical art, NFTs can be copied infinitely (you own 'original' but anyone can view identical copy)",
+      "For your situation:",
+      "Work context: Understanding NFT technology for gaming is professionally valuable",
+      "Investment context: NFTs are even MORE speculative than cryptocurrency - most will become worthless",
+      "If you want to participate: Small amount (200-500€ MAX) as learning experience, not investment",
+      "Focus on projects with actual utility (game items you'll use) not pure speculation (ape pictures)",
+      "Finnish tax: NFT sales are capital gains taxed 30-34% - and tracking cost basis is nightmare",
+      "Honest assessment: 90%+ of current NFT 'investments' will lose value - true for any bubble",
+      "Your skepticism is healthy - don't let workplace peer pressure override your analytical judgment"
+    ],
+    "commonMistakes": [
+      "Dismissing ALL NFTs as scam without nuance (technology has legitimate uses)",
+      "Encouraging NFT investment without strong warnings about speculation",
+      "Not addressing the workplace social pressure he's feeling",
+      "Failing to distinguish between NFT technology value and NFT investment risk",
+      "Not warning about scams and wash trading in NFT market",
+      "Missing his good intuition comparing it to dot-com bubble"
+    ]
+  }
+]

@@ -1,0 +1,95 @@
+{
+  "characterId": "char_sara_027",
+  "name": "Sara Nieminen",
+  "age": 24,
+  "occupation": "Elementary School Teacher",
+  "background": "Recently graduated elementary school teacher in Oulu starting her first permanent position. Good stable salary but modest compared to private sector friends. Student loans from university years. Interested in investing but intimidated by stock market. Friends talk about index funds and she wants to start but doesn't know where to begin. Also wondering about teacher's pension system and whether she should save additionally.",
+  "personality": {
+    "impulsiveness": 0.3,
+    "trustingness": 0.7,
+    "financial_literacy": 0.35,
+    "stubbornness": 0.3,
+    "emotionality": 0.4
+  },
+  "financialProfile": {
+    "incomeLevel": "medium",
+    "typicalMonthlyIncome": 2800,
+    "hasDebt": true,
+    "hasSavings": "minimal",
+    "bankAccounts": [
+      {
+        "accountId": "acc_sara_001",
+        "bankName": "Nordea",
+        "accountType": "checking",
+        "balance": 980.0,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_sara_002",
+        "bankName": "Nordea",
+        "accountType": "savings",
+        "balance": 4200.0,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [],
+    "debts": [
+      {
+        "debtId": "debt_sara_001",
+        "type": "student_loan",
+        "creditor": "KELA Student Loan",
+        "totalAmount": 8500.0,
+        "remainingAmount": 8500.0,
+        "monthlyPayment": 85.0,
+        "interestRate": 0.5,
+        "currency": "EUR",
+        "startDate": "2024-08-01"
+      }
+    ],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_sara_001",
+        "name": "Spotify Premium",
+        "monthlyCost": 10.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2022-01-01"
+      },
+      {
+        "subscriptionId": "sub_sara_002",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 22.9,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2023-01-01"
+      },
+      {
+        "subscriptionId": "sub_sara_003",
+        "name": "Gym Membership",
+        "monthlyCost": 39.9,
+        "category": "fitness",
+        "currency": "EUR",
+        "startDate": "2024-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "rent": 620,
+      "groceries": 270,
+      "transportation": 54,
+      "utilities": 35,
+      "other": 180
+    }
+  },
+  "communicationStyle": {
+    "formality": "semi-formal",
+    "language": "casual_adult_finnish",
+    "prefersVoice": 0.2,
+    "callsWhenEmotional": false
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

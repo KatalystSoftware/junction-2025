@@ -1,0 +1,79 @@
+[
+  {
+    "scenarioId": "scenario_pekka_healthcare_retirement_003",
+    "characterId": "char_pekka_036",
+    "scenarioType": "retirement_healthcare_planning",
+    "difficulty": 0.5,
+    "topic": "insurance",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 3, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I'm approaching retirement and concerned about healthcare costs. Right now I have occupational healthcare through the bank - free doctor visits, specialists, everything covered. When I retire, I lose that and go to public healthcare system. Should I get private health insurance for retirement? I'm 62 and healthy now, but I know healthcare needs increase with age. What do most retirees do?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Bank manager approaching retirement worried about losing occupational healthcare",
+      "emotionalState": "planning ahead, concerned about future costs, cautious",
+      "urgency": "low",
+      "specificDetails": {
+        "age": 62,
+        "currentlyHealthy": true,
+        "hasOccupationalHealthcare": true,
+        "willingLoseOccupationalCare": true,
+        "concernedAboutFutureCosts": true,
+        "financiallySecure": true
+      }
+    },
+    "idealAdvice": [
+      "Smart to think about this before retiring - healthcare is major retirement factor",
+      "What you're losing:",
+      "Occupational healthcare: Fast access, specialists, preventive care, minimal cost",
+      "What you're getting:",
+      "Public healthcare (Kela system): Same quality care, longer waits, small fees",
+      "Finnish public healthcare for retirees:",
+      "- Doctor visits: ~20-25€",
+      "- Specialist after referral: ~40€",
+      "- Medications: Kela reimbursement (40-100% depending on type)",
+      "- Hospital care: Daily fee ~50€, capped annually",
+      "- Annual maximum out-of-pocket: ~700€/year, then free",
+      "This is actually quite affordable compared to many countries!",
+      "Private health insurance in retirement:",
+      "Age 62: Premiums 100-150€/month = 1,200-1,800€/year",
+      "Age 70: Premiums 150-250€/month = 1,800-3,000€/year",
+      "Age 75: Premiums 200-350€/month = 2,400-4,200€/year",
+      "Pre-existing conditions: Often excluded or expensive add-ons",
+      "What private insurance gives:",
+      "- Faster access (no waiting lists)",
+      "- Choose your doctor/specialist",
+      "- Better facilities (private hospitals)",
+      "Cost-benefit analysis for your situation:",
+      "If you use healthcare moderately: Public system costs ~1,000-2,000€/year",
+      "Private insurance costs: 1,800-3,000€/year (and rising with age)",
+      "Unless you need frequent specialist care: Public is more cost-effective",
+      "Recommendation:",
+      "Start retirement with PUBLIC healthcare only - try it for 2 years",
+      "Put 150€/month you'd spend on insurance into healthcare savings account",
+      "If you find waits unbearable or need frequent care: Reassess private insurance",
+      "Important: Apply for private insurance BEFORE retiring if you want it",
+      "Once you have health issues, harder to get coverage/more expensive",
+      "Many Finnish retirees: Use public for routine care, pay private out-of-pocket for urgent specialist visits",
+      "This hybrid: More flexible than insurance, often cheaper",
+      "With 85k€ in savings and good pension: You can afford to self-insure for healthcare",
+      "For you specifically: Public healthcare is likely sufficient, private insurance is peace-of-mind luxury"
+    ],
+    "commonMistakes": [
+      "Pushing private insurance without explaining public system quality",
+      "Not mentioning insurance gets expensive with age",
+      "Failing to explain annual out-of-pocket maximum in public system",
+      "Missing hybrid approach (public + pay private when needed)",
+      "Not advising to apply before retiring if he wants insurance",
+      "Scaring him about public healthcare waits (they're manageable for most)"
+    ]
+  }
+]

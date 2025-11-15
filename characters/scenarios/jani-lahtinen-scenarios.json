@@ -1,0 +1,65 @@
+[
+  {
+    "scenarioId": "scenario_jani_early_retirement_001",
+    "characterId": "char_jani_029",
+    "scenarioType": "early_retirement_exploration",
+    "difficulty": 0.7,
+    "topic": "retirement",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 5, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I'm 42 and my body is breaking down from factory work. My back hurts every day. I heard about something called 'varhaiseläke' (early retirement) but when I looked it up, it seems like it doesn't really exist anymore? There's disability pension but I'm not disabled - I can still work, it just hurts. Can I retire early somehow or am I stuck working until 65? That's another 23 years of pain.",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Factory worker with chronic pain exploring early retirement options, confused about what exists in current Finnish system",
+      "emotionalState": "frustrated, in physical pain, feeling trapped, hopeless",
+      "urgency": "medium",
+      "specificDetails": {
+        "age": 42,
+        "physicallyDemandingJob": true,
+        "chronicPain": true,
+        "yearsUntilRetirement": 23,
+        "confusedAboutOptions": true,
+        "notFullyDisabled": true
+      }
+    },
+    "idealAdvice": [
+      "Your frustration is completely understandable - physical work is hard on the body",
+      "You're right that traditional 'varhaiseläke' was eliminated in 2005 pension reform",
+      "BUT - several options still exist depending on your situation:",
+      "1. Työkyvyttömyyseläke (disability pension) - if medical evidence shows work capacity significantly reduced",
+      "2. Osittainen työkyvyttömyyseläke (partial disability pension) - can work reduced hours while receiving partial pension",
+      "3. Kuntoutustuki (rehabilitation support) - if you could retrain for less physical work",
+      "4. Osa-aikaeläke (part-time pension) - available from age 61 if born before 1965",
+      "Key: You don't have to be 'fully disabled' for disability pension - 'significantly reduced work capacity' is enough",
+      "Document your pain: regular doctor visits, specialists, physical therapy - medical records crucial",
+      "Occupational health doctor can assess if your current job is sustainable",
+      "Consider: Could you transition to lighter role in factory? Supervisor, quality control, training?",
+      "Kela has advisors who help navigate disability pension applications - free service",
+      "Your employer might have responsibility to offer adapted work if health limits current role",
+      "Don't suffer in silence for 23 years - explore your options NOW while you can still work"
+    ],
+    "commonMistakes": [
+      "Just telling him early retirement doesn't exist anymore without offering alternatives",
+      "Not explaining partial disability pension option",
+      "Dismissing his pain as 'just part of the job'",
+      "Not mentioning importance of medical documentation",
+      "Failing to suggest retraining or role modification options",
+      "Not acknowledging the emotional and physical toll"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_jani_disability_assessment_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 6
+      }
+    ]
+  }
+]

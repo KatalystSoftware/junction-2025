@@ -1,0 +1,69 @@
+[
+  {
+    "scenarioId": "scenario_katri_tax_optimization_001",
+    "characterId": "char_katri_030",
+    "scenarioType": "tax_optimization_high_earner",
+    "difficulty": 0.7,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 5, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I'm paying about 38% in taxes on my income from my dental practice. My accountant mentioned there are 'legal ways to optimize' but was vague. I've heard about things like pension contributions, car leasing through company, spouse salary if they work for business... What actually makes sense for someone in my situation? I want to be smart about taxes but absolutely nothing illegal or questionable. What are legitimate strategies?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "High-earning business owner looking for legitimate tax optimization strategies",
+      "emotionalState": "practical, cautious about legality, wanting to be smart with money",
+      "urgency": "low",
+      "specificDetails": {
+        "ownsPrivatePractice": true,
+        "taxRate": 38,
+        "highIncome": true,
+        "married": true,
+        "accountantBeingVague": true,
+        "concernsAboutLegality": true
+      }
+    },
+    "idealAdvice": [
+      "Smart to ask! Lots of legal optimization exists within Finnish tax system",
+      "Key legitimate strategies for entrepreneurs:",
+      "1. YEL pension contributions: deductible from business income, builds your retirement",
+      "2. Voluntary pension savings (up to 5,000€/year): 25% tax deduction",
+      "3. Company car if used for business: deductible expense, though taxable benefit",
+      "4. Spouse/family salary: ONLY if they actually work in business at market-rate salary",
+      "5. Investment of business profits in stocks: pääomatulo-verotus (30%) lower than earned income tax",
+      "6. Timing of equipment purchases: accelerated depreciation deductions",
+      "7. Home office deductions: if you do admin work from home",
+      "8. Professional development/training: fully deductible",
+      "RED FLAGS to AVOID:",
+      "- Claiming personal expenses as business (illegal)",
+      "- Paying family members who don't actually work (illegal)",
+      "- Artificial arrangements just for tax benefit (aggressive, risky)",
+      "For dentist specifically: equipment upgrades, continuing education highly valuable AND deductible",
+      "Most important: Good accounting software and professional accountant worth the cost",
+      "Consider: Take mixture of salary (työtulo) and dividends (osinko) to optimize overall tax burden",
+      "Your accountant should be explaining this clearly - consider getting second opinion consultation"
+    ],
+    "commonMistakes": [
+      "Suggesting aggressive tax avoidance schemes",
+      "Recommending illegal strategies like fake family employment",
+      "Not being specific about what's legal vs illegal",
+      "Failing to mention dividend vs salary optimization for business owners",
+      "Not acknowledging her appropriate caution about legality",
+      "Overcomplicating with too many minor strategies"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_katri_investment_planning_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 5
+      }
+    ]
+  }
+]

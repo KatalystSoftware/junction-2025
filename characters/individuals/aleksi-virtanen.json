@@ -1,0 +1,101 @@
+{
+  "characterId": "char_aleksi_026",
+  "name": "Aleksi Virtanen",
+  "age": 29,
+  "occupation": "Freelance Graphic Designer",
+  "background": "Freelance graphic designer and illustrator working from home in Turku. Income varies wildly month to month - sometimes 4000€, sometimes 1500€. Loves the creative freedom but stressed about financial instability. Confused about YEL (entrepreneur pension insurance) requirements and tax prepayments. Has no employer benefits like occupational healthcare or pension. Wants to understand how to budget with irregular income and what insurances are essential.",
+  "personality": {
+    "impulsiveness": 0.5,
+    "trustingness": 0.5,
+    "financial_literacy": 0.3,
+    "stubbornness": 0.6,
+    "emotionality": 0.6
+  },
+  "financialProfile": {
+    "incomeLevel": "medium",
+    "typicalMonthlyIncome": 2600,
+    "hasDebt": true,
+    "hasSavings": "minimal",
+    "bankAccounts": [
+      {
+        "accountId": "acc_aleksi_001",
+        "bankName": "OP",
+        "accountType": "checking",
+        "balance": 1420.0,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_aleksi_002",
+        "bankName": "OP",
+        "accountType": "savings",
+        "balance": 3200.0,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [
+      {
+        "cardId": "card_aleksi_001",
+        "issuer": "OP Visa",
+        "balance": 800.0,
+        "creditLimit": 3000.0,
+        "interestRate": 12.9,
+        "minimumPayment": 25.0,
+        "currency": "EUR"
+      }
+    ],
+    "debts": [],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_aleksi_001",
+        "name": "Adobe Creative Cloud",
+        "monthlyCost": 60.49,
+        "category": "software",
+        "currency": "EUR",
+        "startDate": "2021-01-01"
+      },
+      {
+        "subscriptionId": "sub_aleksi_002",
+        "name": "Spotify Premium",
+        "monthlyCost": 10.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2020-01-01"
+      },
+      {
+        "subscriptionId": "sub_aleksi_003",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 19.9,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2022-01-01"
+      },
+      {
+        "subscriptionId": "sub_aleksi_004",
+        "name": "Dropbox Pro",
+        "monthlyCost": 11.99,
+        "category": "software",
+        "currency": "EUR",
+        "startDate": "2021-06-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "rent": 650,
+      "groceries": 280,
+      "transportation": 30,
+      "utilities": 55,
+      "other": 200
+    }
+  },
+  "communicationStyle": {
+    "formality": "casual",
+    "language": "casual_adult_finnish",
+    "prefersVoice": 0.2,
+    "callsWhenEmotional": false
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

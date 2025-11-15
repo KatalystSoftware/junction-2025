@@ -1,0 +1,66 @@
+[
+  {
+    "scenarioId": "scenario_sara_student_loan_repayment_001",
+    "characterId": "char_sara_027",
+    "scenarioType": "student_loan_repayment_strategy",
+    "difficulty": 0.4,
+    "topic": "debt_management",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 1, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I graduated last year and my student loan repayment just started - 8,500€ at 0.5% interest. The minimum payment is 85€/month which feels manageable. But I also want to start investing in index funds like my friends. Should I pay minimum on student loan and invest the rest? Or should I pay off the debt faster? The interest rate is so low that investing seems smarter, but I also hate being in debt.",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Young teacher with student loans deciding between debt payoff vs investing",
+      "emotionalState": "torn between math and emotions, wanting to optimize, debt-averse",
+      "urgency": "low",
+      "specificDetails": {
+        "studentLoan": 8500,
+        "interestRate": 0.5,
+        "minimumPayment": 85,
+        "newTeacher": true,
+        "wantsToInvest": true,
+        "emotionallyDebtAverse": true,
+        "friendsInvesting": true
+      }
+    },
+    "idealAdvice": [
+      "Classic personal finance dilemma - let's look at both sides",
+      "Mathematical analysis:",
+      "Student loan: 0.5% interest cost",
+      "Index fund investing: ~7% average annual return (historical)",
+      "Math says: Invest, pay minimum on loan - you're ahead ~6.5%/year",
+      "That's what your friends are probably doing",
+      "Emotional/life analysis:",
+      "Being debt-free: Priceless feeling of freedom and security",
+      "Market volatility: 7% is average over decades - could be down years when you need money",
+      "Life flexibility: No debt = easier to take lower-paying job, travel, career change",
+      "Mental overhead: Tracking investments + loan vs just being debt-free",
+      "For YOUR situation:",
+      "You have 4,200€ saved - good emergency fund",
+      "Salary 2,800€ - you can afford to do BOTH (some debt payoff + some investing)",
+      "Recommendation: Hybrid approach",
+      "Pay 200€/month to loan (instead of 85€ minimum) = paid off in 3.5 years instead of 10 years",
+      "PLUS invest 150€/month in index funds = building wealth simultaneously",
+      "This gets you debt-free quickly (emotional win) while starting investing (mathematical win)",
+      "After loan paid off: All 350€/month goes to investing - huge snowball effect",
+      "You're 24 - being completely debt-free by 27 sets you up incredibly well",
+      "There's no wrong answer here - but hybrid approach often best for debt-averse personalities"
+    ],
+    "commonMistakes": [
+      "Just saying 'always invest when interest rate is low' without considering emotions",
+      "Dismissing the value of being debt-free as 'irrational'",
+      "Not offering hybrid approach that balances both goals",
+      "Failing to acknowledge her specific situation and personality",
+      "Not calculating realistic numbers for her specific income",
+      "Missing that she's debt-averse - pure math answer won't satisfy her"
+    ]
+  }
+]

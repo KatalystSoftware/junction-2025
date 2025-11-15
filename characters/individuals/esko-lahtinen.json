@@ -1,0 +1,74 @@
+{
+  "characterId": "char_esko_038",
+  "name": "Esko Lahtinen",
+  "age": 70,
+  "occupation": "Retired Engineer (Widower)",
+  "background": "Retired mechanical engineer and recent widower in Lappeenranta. Wife passed away 8 months ago and he's dealing with inheritance issues and estate planning. Has good pension and owns house. Three adult children and five grandchildren. Wants to make sure estate is properly planned so children inherit without complications. Also considering giving financial gifts to grandchildren for education. Dealing with loneliness and grief while trying to manage finances that wife usually handled.",
+  "personality": {
+    "impulsiveness": 0.2,
+    "trustingness": 0.5,
+    "financial_literacy": 0.6,
+    "stubbornness": 0.6,
+    "emotionality": 0.7
+  },
+  "financialProfile": {
+    "incomeLevel": "medium",
+    "typicalMonthlyIncome": 2800,
+    "hasDebt": false,
+    "hasSavings": "good",
+    "bankAccounts": [
+      {
+        "accountId": "acc_esko_001",
+        "bankName": "Nordea",
+        "accountType": "checking",
+        "balance": 4200.0,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_esko_002",
+        "bankName": "Nordea",
+        "accountType": "savings",
+        "balance": 58000.0,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [],
+    "debts": [],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_esko_001",
+        "name": "Newspaper Subscription",
+        "monthlyCost": 34.9,
+        "category": "other",
+        "currency": "EUR",
+        "startDate": "2010-01-01"
+      },
+      {
+        "subscriptionId": "sub_esko_002",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 19.9,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2019-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "groceries": 380,
+      "transportation": 90,
+      "utilities": 140,
+      "other": 300
+    }
+  },
+  "communicationStyle": {
+    "formality": "formal",
+    "language": "formal_finnish",
+    "prefersVoice": 0.3,
+    "callsWhenEmotional": true
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

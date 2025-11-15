@@ -1,0 +1,94 @@
+{
+  "characterId": "char_anna_034",
+  "name": "Anna Lehtonen",
+  "age": 48,
+  "occupation": "Accountant",
+  "background": "Accountant at medium-sized company in Vantaa with good salary and benefits. Married with two children in high school. Started thinking seriously about retirement planning - only 17 years until retirement age. Has occupational pension but wondering if it will be enough. Heard about voluntary pension savings and investment options but unsure what's best. Also interested in optimizing family taxes and education savings for children's university years.",
+  "personality": {
+    "impulsiveness": 0.2,
+    "trustingness": 0.5,
+    "financial_literacy": 0.7,
+    "stubbornness": 0.3,
+    "emotionality": 0.3
+  },
+  "financialProfile": {
+    "incomeLevel": "medium",
+    "typicalMonthlyIncome": 3900,
+    "hasDebt": true,
+    "hasSavings": "good",
+    "bankAccounts": [
+      {
+        "accountId": "acc_anna_001",
+        "bankName": "Nordea",
+        "accountType": "checking",
+        "balance": 3200.0,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_anna_002",
+        "bankName": "Nordea",
+        "accountType": "savings",
+        "balance": 32000.0,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [],
+    "debts": [
+      {
+        "debtId": "debt_anna_001",
+        "type": "mortgage",
+        "creditor": "Nordea Home Loan",
+        "totalAmount": 180000.0,
+        "remainingAmount": 95000.0,
+        "monthlyPayment": 720.0,
+        "interestRate": 2.9,
+        "currency": "EUR",
+        "startDate": "2012-05-01"
+      }
+    ],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_anna_001",
+        "name": "Netflix Premium",
+        "monthlyCost": 17.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2021-01-01"
+      },
+      {
+        "subscriptionId": "sub_anna_002",
+        "name": "Spotify Family",
+        "monthlyCost": 17.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2022-01-01"
+      },
+      {
+        "subscriptionId": "sub_anna_003",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 29.9,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2023-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "groceries": 580,
+      "transportation": 120,
+      "utilities": 140,
+      "other": 350
+    }
+  },
+  "communicationStyle": {
+    "formality": "formal",
+    "language": "formal_finnish",
+    "prefersVoice": 0.1,
+    "callsWhenEmotional": false
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

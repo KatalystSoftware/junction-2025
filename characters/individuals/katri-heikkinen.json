@@ -1,0 +1,112 @@
+{
+  "characterId": "char_katri_030",
+  "name": "Katri Heikkinen",
+  "age": 38,
+  "occupation": "Dentist (Private Practice)",
+  "background": "Dentist with own private practice in Lahti. High income earner but also high expenses with business costs, staff salaries, and equipment. Married with one child. Household income very comfortable but paying significant taxes. Heard about various tax optimization strategies but unsure what's legal and beneficial. Also considering investments and retirement planning. Wants to be smart with money but doesn't have time to research everything.",
+  "personality": {
+    "impulsiveness": 0.2,
+    "trustingness": 0.5,
+    "financial_literacy": 0.6,
+    "stubbornness": 0.4,
+    "emotionality": 0.3
+  },
+  "financialProfile": {
+    "incomeLevel": "high",
+    "typicalMonthlyIncome": 7500,
+    "hasDebt": true,
+    "hasSavings": "good",
+    "bankAccounts": [
+      {
+        "accountId": "acc_katri_001",
+        "bankName": "Nordea",
+        "accountType": "checking",
+        "balance": 8400.0,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_katri_002",
+        "bankName": "Nordea",
+        "accountType": "savings",
+        "balance": 45000.0,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [
+      {
+        "cardId": "card_katri_001",
+        "issuer": "Nordea Gold",
+        "balance": 0.0,
+        "creditLimit": 10000.0,
+        "interestRate": 11.9,
+        "minimumPayment": 0.0,
+        "currency": "EUR"
+      }
+    ],
+    "debts": [
+      {
+        "debtId": "debt_katri_001",
+        "type": "mortgage",
+        "creditor": "Nordea Home Loan",
+        "totalAmount": 320000.0,
+        "remainingAmount": 245000.0,
+        "monthlyPayment": 1250.0,
+        "interestRate": 2.8,
+        "currency": "EUR",
+        "startDate": "2019-03-01"
+      }
+    ],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_katri_001",
+        "name": "Netflix Premium",
+        "monthlyCost": 17.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2021-01-01"
+      },
+      {
+        "subscriptionId": "sub_katri_002",
+        "name": "Spotify Family",
+        "monthlyCost": 17.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2022-01-01"
+      },
+      {
+        "subscriptionId": "sub_katri_003",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 34.9,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2023-01-01"
+      },
+      {
+        "subscriptionId": "sub_katri_004",
+        "name": "Gym Family Membership",
+        "monthlyCost": 89.0,
+        "category": "fitness",
+        "currency": "EUR",
+        "startDate": "2022-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "groceries": 650,
+      "transportation": 200,
+      "utilities": 150,
+      "other": 800
+    }
+  },
+  "communicationStyle": {
+    "formality": "formal",
+    "language": "formal_finnish",
+    "prefersVoice": 0.2,
+    "callsWhenEmotional": false
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

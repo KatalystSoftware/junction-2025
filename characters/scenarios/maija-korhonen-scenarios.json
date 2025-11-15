@@ -1,0 +1,83 @@
+[
+  {
+    "scenarioId": "scenario_maija_pension_budgeting_001",
+    "characterId": "char_maija_041",
+    "scenarioType": "senior_very_low_income",
+    "difficulty": 0.7,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 4, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "call",
+      "message": "I'm 72 and living on kansaneläke - 950€/month total. My rent is 420€ even with housing support. After groceries, utilities, phone, I have maybe 20€ left at end of month. Sometimes I skip meals to make food last. I'm too proud to ask my son for money - he has his own family. But I don't know how to make this work anymore. My friend says there are benefits I'm missing but I don't understand all the forms. Can you help me?",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "concerned"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Elderly woman on minimum pension struggling to afford basic needs, pride preventing asking for help",
+      "emotionalState": "stressed, ashamed, pride, desperate but trying to maintain dignity",
+      "urgency": "high",
+      "specificDetails": {
+        "age": 72,
+        "pension": 950,
+        "rent": 420,
+        "receivingHousingSupport": true,
+        "skippingMeals": true,
+        "tooproudToAskFamily": true,
+        "confusedByBenefitForms": true,
+        "extremelyLowIncome": true
+      }
+    },
+    "idealAdvice": [
+      "First: You are not alone and there is NO shame in needing help - you worked your whole life",
+      "Skipping meals is serious - let's fix this immediately",
+      "Benefits you may be missing:",
+      "1. Toimeentulotuki (social assistance) - FOR EXACTLY YOUR SITUATION",
+      "   - When pension doesn't cover basic needs, this fills the gap",
+      "   - You likely qualify for 200-300€/month extra",
+      "   - Apply at social services (sosiaalitoimisto) or Kela",
+      "2. Eläkkeensaajan asumistuki (housing benefit for pensioners) - are you getting maximum?",
+      "   - With 420€ rent and 950€ income, you should get significant support",
+      "   - Might cover 70-80% of rent instead of current amount",
+      "3. Free/subsidized services:",
+      "   - City meal services (ateria-apu): 5-7€ meals delivered or at senior center",
+      "   - Food banks (ruoka-apu): No shame, many pensioners use these",
+      "   - Public health nurse home visits: Free preventive care",
+      "   - Senior center activities: Free meals, social connection, warm place",
+      "4. Tax deduction for pension income under 14,000€/year - file tax return!",
+      "Your pride:",
+      "I understand not wanting to burden your son",
+      "But these public benefits: You PAID for them through years of work and taxes",
+      "This is not charity - this is the social safety net you contributed to building",
+      "Using toimeentulotuki is your RIGHT, not a failure",
+      "Immediate action:",
+      "1. Call Kela (020 634 0200) Monday and say 'I need help applying for toimeentulotuki'",
+      "   - They have Finnish-speaking advisors who help fill forms",
+      "2. Visit your local senior center - they help with benefit applications too",
+      "3. Contact food bank this week - don't skip meals while waiting for benefits",
+      "4. Tell your son not for money but so he knows situation (families want to help)",
+      "You've worked hard your whole life - accepting help you're entitled to is not weakness"
+    ],
+    "commonMistakes": [
+      "Not addressing emergency situation (skipping meals) first",
+      "Failing to validate her pride and dignity",
+      "Not explaining these are RIGHTS not charity",
+      "Overcomplicating benefit advice - she needs simple steps",
+      "Missing emotional aspect of poverty in old age",
+      "Not giving immediate actions she can take this week",
+      "Pushing family help without respecting her pride"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_maija_benefits_approved_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 3
+      }
+    ]
+  }
+]

@@ -1,0 +1,67 @@
+{
+  "characterId": "char_maija_041",
+  "name": "Maija Korhonen",
+  "age": 72,
+  "occupation": "Retired Cleaner (Living on Kansaneläke)",
+  "background": "Retired cleaner in Pori living on kansaneläke (national pension) with small työeläke. Worked most of life in low-paying cleaning jobs with some gaps. Pension is very modest. Lives in small rental apartment with housing supplement from Kela. Every euro counts. Worried about unexpected expenses like dental work or home repairs. Adult son helps sometimes but he has own family. Wants to understand all benefits she's entitled to and how to make pension stretch further. Proud and doesn't like asking for help.",
+  "personality": {
+    "impulsiveness": 0.2,
+    "trustingness": 0.7,
+    "financial_literacy": 0.25,
+    "stubbornness": 0.6,
+    "emotionality": 0.6
+  },
+  "financialProfile": {
+    "incomeLevel": "low",
+    "typicalMonthlyIncome": 950,
+    "hasDebt": false,
+    "hasSavings": "minimal",
+    "bankAccounts": [
+      {
+        "accountId": "acc_maija_001",
+        "bankName": "OP",
+        "accountType": "checking",
+        "balance": 280.0,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_maija_002",
+        "bankName": "OP",
+        "accountType": "savings",
+        "balance": 1400.0,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [],
+    "debts": [],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_maija_001",
+        "name": "Mobile Phone Plan Basic",
+        "monthlyCost": 9.9,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2020-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "rent": 420,
+      "groceries": 220,
+      "transportation": 25,
+      "utilities": 65,
+      "other": 80
+    }
+  },
+  "communicationStyle": {
+    "formality": "casual",
+    "language": "casual_adult_finnish",
+    "prefersVoice": 0.5,
+    "callsWhenEmotional": true
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

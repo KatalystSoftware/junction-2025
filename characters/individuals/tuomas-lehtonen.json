@@ -1,0 +1,99 @@
+{
+  "characterId": "char_tuomas_024",
+  "name": "Tuomas Lehtonen",
+  "age": 26,
+  "occupation": "Software Developer",
+  "background": "Software developer at a gaming company in Helsinki with good salary. Tech-savvy and interested in cryptocurrency and NFTs but realizes he doesn't actually understand them financially. Friends are all talking about crypto investments and he feels left out. Has disposable income but unsure how much to allocate to risky investments. Also interested in tax implications of crypto in Finland.",
+  "personality": {
+    "impulsiveness": 0.5,
+    "trustingness": 0.4,
+    "financial_literacy": 0.5,
+    "stubbornness": 0.4,
+    "emotionality": 0.3
+  },
+  "financialProfile": {
+    "incomeLevel": "medium",
+    "typicalMonthlyIncome": 3800,
+    "hasDebt": false,
+    "hasSavings": "good",
+    "bankAccounts": [
+      {
+        "accountId": "acc_tuomas_001",
+        "bankName": "OP",
+        "accountType": "checking",
+        "balance": 2400.0,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_tuomas_002",
+        "bankName": "OP",
+        "accountType": "savings",
+        "balance": 18500.0,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [],
+    "debts": [],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_tuomas_001",
+        "name": "Spotify Premium",
+        "monthlyCost": 10.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2020-01-01"
+      },
+      {
+        "subscriptionId": "sub_tuomas_002",
+        "name": "Netflix Premium",
+        "monthlyCost": 17.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2021-01-01"
+      },
+      {
+        "subscriptionId": "sub_tuomas_003",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 29.9,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2023-01-01"
+      },
+      {
+        "subscriptionId": "sub_tuomas_004",
+        "name": "Climbing Gym",
+        "monthlyCost": 59.0,
+        "category": "fitness",
+        "currency": "EUR",
+        "startDate": "2023-06-01"
+      },
+      {
+        "subscriptionId": "sub_tuomas_005",
+        "name": "GitHub Pro",
+        "monthlyCost": 7.0,
+        "category": "software",
+        "currency": "EUR",
+        "startDate": "2022-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "rent": 750,
+      "groceries": 350,
+      "transportation": 54,
+      "utilities": 45,
+      "other": 400
+    }
+  },
+  "communicationStyle": {
+    "formality": "casual",
+    "language": "casual_adult_finnish",
+    "prefersVoice": 0.1,
+    "callsWhenEmotional": false
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

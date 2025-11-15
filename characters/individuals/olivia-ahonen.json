@@ -1,0 +1,83 @@
+{
+  "characterId": "char_olivia_025",
+  "name": "Olivia Ahonen",
+  "age": 28,
+  "occupation": "Registered Nurse",
+  "background": "Nurse at Helsinki University Hospital working rotating shifts including nights and weekends. Earns decent salary with shift bonuses but irregular schedule makes budgeting challenging. Wants to buy her first apartment but concerned about mortgage approval with shift-based income. Also dealing with expensive work-related costs like scrubs and professional development. Single and independent.",
+  "personality": {
+    "impulsiveness": 0.3,
+    "trustingness": 0.6,
+    "financial_literacy": 0.4,
+    "stubbornness": 0.5,
+    "emotionality": 0.5
+  },
+  "financialProfile": {
+    "incomeLevel": "medium",
+    "typicalMonthlyIncome": 3200,
+    "hasDebt": false,
+    "hasSavings": "moderate",
+    "bankAccounts": [
+      {
+        "accountId": "acc_olivia_001",
+        "bankName": "Nordea",
+        "accountType": "checking",
+        "balance": 1850.0,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_olivia_002",
+        "bankName": "Nordea",
+        "accountType": "savings",
+        "balance": 15600.0,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [],
+    "debts": [],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_olivia_001",
+        "name": "Netflix",
+        "monthlyCost": 12.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2022-01-01"
+      },
+      {
+        "subscriptionId": "sub_olivia_002",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 24.9,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2021-01-01"
+      },
+      {
+        "subscriptionId": "sub_olivia_003",
+        "name": "Yoga Studio",
+        "monthlyCost": 79.0,
+        "category": "fitness",
+        "currency": "EUR",
+        "startDate": "2023-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "rent": 820,
+      "groceries": 320,
+      "transportation": 54,
+      "utilities": 40,
+      "other": 250
+    }
+  },
+  "communicationStyle": {
+    "formality": "semi-formal",
+    "language": "casual_adult_finnish",
+    "prefersVoice": 0.3,
+    "callsWhenEmotional": true
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

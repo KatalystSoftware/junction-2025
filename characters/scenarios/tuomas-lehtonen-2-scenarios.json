@@ -1,0 +1,98 @@
+[
+  {
+    "scenarioId": "scenario_tuomas_investment_basics_004",
+    "characterId": "char_tuomas_024",
+    "scenarioType": "investment_getting_started",
+    "difficulty": 0.5,
+    "topic": "investing",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 2, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I have 18,500€ just sitting in savings account earning basically nothing. I want to start investing but I'm completely lost. Index funds? ETFs? Nordnet? Osakesäästötili? I don't know where to start. I'm 26, good income, no debt - everyone says I should be investing but it seems complicated. Can you explain like I'm 5 how to actually start investing in Finland?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Software developer with savings ready to invest but overwhelmed by information and options",
+      "emotionalState": "motivated but confused, information overload, wanting simple start",
+      "urgency": "low",
+      "specificDetails": {
+        "age": 26,
+        "savings": 18500,
+        "noDebt": true,
+        "goodIncome": 3800,
+        "neverInvested": true,
+        "overwhelmedByOptions": true,
+        "wantsSimpleExplanation": true
+      }
+    },
+    "idealAdvice": [
+      "Great that you want to start! Let's make this super simple:",
+      "Step 1: Keep emergency fund",
+      "- Keep 6 months expenses in savings (~10,000€ for you)",
+      "- This stays liquid - don't invest ALL your money",
+      "- Investable amount: 8,500€ now + monthly contributions",
+      "Step 2: Choose investment account (pick ONE):",
+      "Option A: Osakesäästötili (ASK - Stock Savings Account)",
+      "- Finnish tax-advantaged account",
+      "- No taxes until you withdraw money (can compound tax-free)",
+      "- Maximum 50,000€ lifetime deposits",
+      "- Perfect for long-term investing",
+      "- Available at: Nordnet, Nordea, OP, others",
+      "Option B: Regular investment account",
+      "- Taxed yearly on dividends/sales (30-34%)",
+      "- No contribution limits",
+      "- More flexible but less tax-efficient",
+      "Recommendation for you: Open ASK at Nordnet (lowest fees, easy to use)",
+      "Step 3: What to invest in:",
+      "Don't overthink this! Start with ONE index fund:",
+      "VWCE (Vanguard FTSE All-World) or similar global index ETF",
+      "- Owns 3,000+ companies globally",
+      "- Diversified across countries, industries",
+      "- Low fees (0.22%/year)",
+      "- Historical return: ~7-8%/year average",
+      "Alternative: EUNL (iShares Core MSCI World)",
+      "Either one is fine - don't stress about picking 'perfect' one",
+      "Step 4: How much to invest:",
+      "Lump sum: 8,500€ into ASK immediately",
+      "Monthly: 500-1,000€ every month (automatic)",
+      "This is 'dollar cost averaging' - spreads out risk",
+      "Step 5: Actual execution:",
+      "1. Open Nordnet account online (10 minutes)",
+      "2. Choose ASK account type",
+      "3. Transfer 8,500€ to account",
+      "4. Search for 'VWCE' or 'EUNL'",
+      "5. Buy shares (enter amount, click buy)",
+      "6. Set up monthly automatic purchase",
+      "7. Don't look at it for 5-10 years",
+      "Common questions:",
+      "Q: 'Should I wait for market to drop?'",
+      "A: No one can time the market. Start now, invest regularly.",
+      "Q: 'What if market crashes after I invest?'",
+      "A: Keep investing monthly - you buy more shares when cheap!",
+      "Q: 'Is this gambling?'",
+      "A: No - you own real companies. Over 20+ years, markets go up.",
+      "Your specific plan:",
+      "Year 1: Invest 8,500€ now + 500€/month × 12 = 14,500€ invested",
+      "In 20 years at 7% average: ~56,000€ (without adding more)",
+      "In 30 years at 7%: ~110,000€",
+      "That's your retirement fund starting NOW at age 26",
+      "Simplest possible version:",
+      "Nordnet → ASK → VWCE → 8,500€ + 500€/month → Wait 20 years → Profit",
+      "You're a developer - this is like setting up automated deployment and forgetting about it!"
+    ],
+    "commonMistakes": [
+      "Overcomplicating with multiple funds and strategies",
+      "Not explaining ASK tax advantage clearly",
+      "Forgetting to mention keeping emergency fund",
+      "Making it sound scarier than it is",
+      "Not giving specific step-by-step instructions",
+      "Missing that he wants 'explain like I'm 5' simplicity"
+    ]
+  }
+]

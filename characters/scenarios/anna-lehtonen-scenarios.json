@@ -1,0 +1,57 @@
+[
+  {
+    "scenarioId": "scenario_anna_retirement_planning_001",
+    "characterId": "char_anna_034",
+    "scenarioType": "voluntary_pension_savings",
+    "difficulty": 0.5,
+    "topic": "retirement",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 3, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I'm 48 and starting to seriously think about retirement. I have good työeläke from my employer, but I'm wondering if I should save more. My bank is pushing 'vapaaehtoinen eläkesäästäminen' (voluntary pension savings) - they say it's tax-deductible up to 5,000€/year and grows tax-free. But I could also just invest in index funds myself with more flexibility. What's actually better? The pension product sounds good but locks money until retirement.",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Accountant with good pension planning additional retirement savings, comparing voluntary pension products vs regular investing",
+      "emotionalState": "analytical, methodical, wanting to optimize",
+      "urgency": "low",
+      "specificDetails": {
+        "age": 48,
+        "hasGoodEmployerPension": true,
+        "consideringVoluntaryPension": true,
+        "taxDeductionUpTo": 5000,
+        "alsoConsideringIndexFunds": true,
+        "concernAboutLiquidity": true
+      }
+    },
+    "idealAdvice": [
+      "Great that you're planning ahead - 48 is perfect time to boost retirement savings",
+      "Voluntary pension savings (TyEL-lisä, PS-tili) pros: tax deduction (25% of contribution), tax-free growth, forced discipline",
+      "Cons: Money locked until retirement (usually 68), limited investment options, fees can be high",
+      "Regular index fund investing pros: complete flexibility, lower fees, can access anytime, more investment options",
+      "Cons: No tax deduction on contribution, capital gains tax when selling (30-34%)",
+      "For your situation as accountant:",
+      "You likely already have solid työeläke - supplemental savings is smart but not desperate need",
+      "Hybrid approach often best: Use voluntary pension for tax deduction (maybe 3-5k/year), plus index funds for flexibility",
+      "Tax benefit: If you're in ~30% tax bracket, 5,000€ contribution costs you ~3,500€ after deduction",
+      "BUT: Weigh against losing liquidity for 20 years. Can you afford to lock money away?",
+      "With 32k€ in savings and good income - yes, you can afford to lock some away",
+      "Consider: 3,000€/year to voluntary pension (tax benefit), 3,000€/year to index funds (flexibility)",
+      "Review fees carefully - some voluntary pension products have 1-2% annual fees which erode returns"
+    ],
+    "commonMistakes": [
+      "Pushing voluntary pension without explaining downsides (liquidity lock)",
+      "Dismissing voluntary pension without acknowledging tax benefits",
+      "Not suggesting hybrid approach combining both strategies",
+      "Failing to account for her specific financial situation (already secure)",
+      "Not mentioning fee comparison importance",
+      "Forgetting she's an accountant who appreciates detailed analysis"
+    ]
+  }
+]

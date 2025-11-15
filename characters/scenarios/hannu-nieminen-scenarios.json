@@ -1,0 +1,141 @@
+[
+  {
+    "scenarioId": "scenario_hannu_retirement_investments_001",
+    "characterId": "char_hannu_040",
+    "scenarioType": "senior_investment_rebalancing",
+    "difficulty": 0.6,
+    "topic": "investing",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 4, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I just retired after 40 years in IT. I have 42,000€ in savings plus about 30,000€ in stock index funds (60% stocks, 40% bonds). I lived through dot-com crash in 2000 - lost 40% of my investments. Now I'm retired and nervous about another crash. My wife says I should move everything to safe bank deposits. But I also know I might live another 25 years and need growth. Should I reduce stocks to 20%? Keep current mix? What's right for a 65-year-old retiree?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Newly retired investor with market trauma from dot-com crash uncertain about asset allocation",
+      "emotionalState": "nervous about volatility, past trauma influencing decisions, seeking reassurance",
+      "urgency": "low",
+      "specificDetails": {
+        "age": 65,
+        "justRetired": true,
+        "cashSavings": 42000,
+        "stockInvestments": 30000,
+        "currentAllocation": "60/40 stocks/bonds",
+        "dotComTrauma": true,
+        "wifeConcerned": true,
+        "lifeExpectancy": "20-25 years",
+        "uncertainAboutAllocation": true
+      }
+    },
+    "idealAdvice": [
+      "Your dot-com experience was painful but also taught you valuable lesson - you survived and recovered",
+      "At 65 with good pension, let's think about this strategically:",
+      "Life expectancy: 65-year-old Finnish man typically lives to 85-90 = 20-25 years ahead",
+      "That's LONG-TERM horizon - not short-term like many assume for retirees",
+      "Your portfolio: 42k€ cash + 30k€ invested = 72k€ total investable assets",
+      "Current 60/40 allocation analysis:",
+      "Aggressive side: Market crash could drop 60% stocks by 30% = 9k€ loss (30% of 30k€)",
+      "Conservative side: 20-25 years of inflation will devastate 100% cash",
+      "Common retiree allocation approaches:",
+      "1. Age rule: 100 - age = stock % → 35% stocks at 65",
+      "2. Modern age rule: 120 - age = stock % → 55% stocks at 65",
+      "3. Bucket strategy: 5 years cash, rest invested",
+      "For YOUR situation with trauma history:",
+      "Recommendation: 40% stocks / 60% bonds (more conservative than current)",
+      "Why: Enough growth to fight inflation, less volatility to help you sleep",
+      "That's 12k€ stocks, 18k€ bonds from your 30k€ portfolio",
+      "Critical: Keep 42k€ cash savings - that's 10+ years of pension supplement buffer",
+      "If market crashes 30%: You lose 3.6k€ (30% of 12k€) - painful but not catastrophic",
+      "You have 42k€ cash to avoid selling stocks in crash - huge advantage",
+      "Your wife's concern is valid: Could go 100% safe, but inflation is also a risk",
+      "Compromise: Move to 40/60, reassess every 5 years",
+      "At 75, might go to 30/70, at 85 to 20/80 as spending horizon shortens",
+      "Key: You're financially secure - this is optimizing, not life-or-death",
+      "Past market timing: Don't try to predict crashes - stay invested at right risk level for you"
+    ],
+    "commonMistakes": [
+      "Telling him to stay aggressive because of life expectancy (ignores his trauma)",
+      "Recommending 100% bonds/cash (ignores inflation over 25 years)",
+      "Not acknowledging his dot-com experience shaped his risk tolerance",
+      "Failing to mention bucket strategy with cash buffer",
+      "Not involving wife's perspective in recommendation",
+      "Missing that he's actually quite well-prepared financially"
+    ]
+  },
+  {
+    "scenarioId": "scenario_hannu_crypto_retirement_002",
+    "characterId": "char_hannu_040",
+    "scenarioType": "senior_crypto_curiosity",
+    "difficulty": 0.5,
+    "topic": "investing",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 2, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I worked in IT for 40 years so I understand the technology behind Bitcoin - blockchain is genuinely innovative. I'm retired now and thinking about putting 5,000€ into Bitcoin as small speculative bet. My wife thinks I'm crazy and too old for this. But I have good pension, 42k€ in savings, and this would be just 5% of my investments. Is she right that I'm too old? Or can retirees have small speculative positions too?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Retired IT professional wanting to invest in Bitcoin, spouse thinks too risky for retiree",
+      "emotionalState": "curious, intellectually interested, defensive about age, seeking validation",
+      "urgency": "low",
+      "specificDetails": {
+        "age": 65,
+        "itBackground": true,
+        "understandsBlockchain": true,
+        "wantsToInvest": 5000,
+        "percentOfPortfolio": 5,
+        "wifeOpposed": true,
+        "goodPension": true,
+        "financiallySecure": true
+      }
+    },
+    "idealAdvice": [
+      "Your wife's concern and your interest are both valid - let's analyze objectively",
+      "Tech understanding: You DO understand blockchain better than most - that's advantage",
+      "Risk analysis:",
+      "5,000€ is ~7% of your investable assets (72k€ total) - not catastrophic if lost",
+      "You have good pension covering living expenses - not dependent on this money",
+      "If you lost all 5,000€: Would it change your retirement lifestyle? Probably not significantly",
+      "Age consideration:",
+      "Traditional wisdom: Retirees should avoid speculation",
+      "Counter-argument: At 65 with 20+ years ahead and secure base, you CAN afford some risk",
+      "Critical difference from younger investors: Can you afford the volatility stress?",
+      "Honest questions to consider:",
+      "If Bitcoin drops 50% (very possible), will you panic sell or hold?",
+      "Will crypto volatility cause arguments with wife? (relationship cost?)",
+      "Is this intellectual curiosity or trying to get rich? (one is ok, other is concerning)",
+      "Do you understand tax implications? (30-34% capital gains when sell)",
+      "Your advantage: IT background means less likely to fall for scams",
+      "Your disadvantage: Retirement means losses hurt more psychologically",
+      "Recommendation:",
+      "IF: You can afford to lose it all, wife agrees (or agrees to disagree), and it's pure speculation (not retirement dependent)",
+      "THEN: 3,000-5,000€ in Bitcoin is reasonable 'tech enthusiast' position",
+      "IF: Wife is strongly opposed or you'd be stressed by volatility",
+      "THEN: Skip it - not worth relationship conflict or sleep quality",
+      "Compromise: Start with 1,000€ trial - see how you handle the volatility emotionally",
+      "If you sleep fine for 6 months, can add more",
+      "If it stresses you out, sell and stick to traditional investments",
+      "Your age isn't the issue - your risk tolerance and relationship harmony are"
+    ],
+    "commonMistakes": [
+      "Dismissing crypto solely based on age (ageist)",
+      "Encouraging speculative investment without serious risk analysis",
+      "Not addressing wife's concerns and relationship dynamics",
+      "Failing to acknowledge his technical background is relevant advantage",
+      "Not suggesting trial period to test emotional tolerance",
+      "Missing that stress in retirement is legitimate concern"
+    ]
+  }
+]

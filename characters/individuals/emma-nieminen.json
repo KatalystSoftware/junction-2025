@@ -1,0 +1,83 @@
+{
+  "characterId": "char_emma_022",
+  "name": "Emma Nieminen",
+  "age": 19,
+  "occupation": "Gap Year (Working at Clothing Store)",
+  "background": "Taking a gap year after lukio before deciding on university. Working full-time at H&M in Helsinki saving money for backpacking through Southeast Asia. Has saved diligently but worried about managing money while traveling. Also considering whether to start university studies or continue working. Lives with roommates to save on rent.",
+  "personality": {
+    "impulsiveness": 0.4,
+    "trustingness": 0.6,
+    "financial_literacy": 0.35,
+    "stubbornness": 0.4,
+    "emotionality": 0.6
+  },
+  "financialProfile": {
+    "incomeLevel": "low",
+    "typicalMonthlyIncome": 1800,
+    "hasDebt": false,
+    "hasSavings": "moderate",
+    "bankAccounts": [
+      {
+        "accountId": "acc_emma_001",
+        "bankName": "Danske Bank",
+        "accountType": "checking",
+        "balance": 950.0,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_emma_002",
+        "bankName": "Danske Bank",
+        "accountType": "savings",
+        "balance": 5200.0,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [],
+    "debts": [],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_emma_001",
+        "name": "Spotify Premium",
+        "monthlyCost": 10.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2023-01-01"
+      },
+      {
+        "subscriptionId": "sub_emma_002",
+        "name": "Gym Membership",
+        "monthlyCost": 29.9,
+        "category": "fitness",
+        "currency": "EUR",
+        "startDate": "2024-01-01"
+      },
+      {
+        "subscriptionId": "sub_emma_003",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 19.9,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2023-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "rent": 400,
+      "groceries": 250,
+      "transportation": 54,
+      "utilities": 35,
+      "other": 200
+    }
+  },
+  "communicationStyle": {
+    "formality": "casual",
+    "language": "casual_adult_finnish",
+    "prefersVoice": 0.3,
+    "callsWhenEmotional": false
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}
