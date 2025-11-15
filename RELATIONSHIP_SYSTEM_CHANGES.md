@@ -3,6 +3,8 @@
 ## Overview
 This implementation adds a comprehensive relationship tracking and visualization system to the Financial Advisor Simulator, making character relationships visible and meaningful to players.
 
+**Status**: ✅ Rebased with main and fully integrated with the latest TUI features including quiz feedback and final results modal.
+
 ## Features Implemented
 
 ### 1. Trust Tier System
@@ -45,6 +47,29 @@ This implementation adds a comprehensive relationship tracking and visualization
 - **Tier Change Notifications**: Immediate feedback when relationship tier changes
 - **Recommendation Notifications**: Celebratory message when character refers friend
 - Status bar updates with relationship changes
+
+## Integration with Main Branch Features
+
+The relationship system has been intelligently merged with the main branch's new features:
+
+### Final Results Modal Integration
+- **Relationship changes now appear in the comprehensive final results modal**
+- Tier changes are displayed with icons and detailed descriptions
+- Recommendations (viral unlocks) are highlighted as "NEW CLIENT UNLOCKED"
+- All relationship updates are shown in a dedicated "RELATIONSHIP UPDATE" section
+- Combined with financial impact and earnings display for complete consultation summary
+
+### Quiz System Compatibility
+- Relationship panel coexists with quiz feedback modals
+- No conflicts with the enhanced quiz system featuring:
+  - Per-question feedback
+  - Multiple choice selection
+  - Final results with explanations
+
+### Multiple Choice Advice System
+- Relationship tracking works seamlessly with choice-based consultations
+- Trust changes calculated based on advice quality and outcomes
+- No interference with the 1-9 number input for both thread switching and choice selection
 
 ## Files Modified
 
