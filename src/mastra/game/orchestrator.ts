@@ -79,20 +79,22 @@ export function createNewAdvisor(advisorId: string): AdvisorState {
     achievementsUnlocked: [],
     careerTier: 1, // Start as Junior Advisor
     // NEW: Financial Simulation
-    lastSimulatedDate: getCurrentMonth(),
+    currentGameMonth: "2025-01", // Start at January 2025 (game time, not real-time)
     simulatedMonthsPassed: 0,
     databasePath: process.env.DATABASE_URL || "postgresql://junction_user:junction_dev_password@localhost:5432/junction2025",
   };
 }
 
 /**
- * Get current month in YYYY-MM format
+ * Get current game month from advisor state
+ * NOTE: This is game time (session-based), NOT real-world calendar time
  */
-function getCurrentMonth(): string {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  return `${year}-${month}`;
+function getCurrentMonth(advisorState?: AdvisorState): string {
+  if (advisorState?.currentGameMonth) {
+    return advisorState.currentGameMonth;
+  }
+  // Fallback for initialization
+  return "2025-01";
 }
 
 /**
@@ -133,8 +135,8 @@ export async function startNewConsultation(
     characterPool.applyTrustDecay(advisorState.totalSessions);
   }
 
-  // Run financial simulation for elapsed months
-  await runMonthlySimulation(advisorState);
+  // NOTE: Financial simulation is now run at END of consultation (after advice given)
+  // This allows us to advance time by 1 month per completed session
 
   // Check if we should trigger boss check-in based on performance streak
   const streak = advisorState.currentStreak;
@@ -927,6 +929,9 @@ export async function handleAdvisorResponse(
         (id) => id !== character.characterId,
       );
     }
+
+    // ADVANCE GAME TIME: Consultation complete, simulate 1 month passing
+    await runMonthlySimulation(advisorState);
   } else {
     // Mark thread as awaiting response (character just responded, waiting for advisor)
     threadInfo.status = "awaiting_response";
@@ -1446,7 +1451,7 @@ export function getThread(
 
 /**
  * Run monthly financial simulation for all characters
- * Called at start of each consultation to simulate elapsed time
+ * Called at END of each consultation to advance game time by 1 month
  */
 async function runMonthlySimulation(advisorState: AdvisorState): Promise<void> {
   // Skip if no database path
@@ -1454,17 +1459,9 @@ async function runMonthlySimulation(advisorState: AdvisorState): Promise<void> {
     return;
   }
 
-  // Calculate months elapsed since last simulation
-  const currentMonth = getCurrentMonth();
-  const monthsElapsed = calculateMonthsElapsed(
-    advisorState.lastSimulatedDate,
-    currentMonth,
-  );
-
-  // No simulation needed if less than a month has passed
-  if (monthsElapsed === 0) {
-    return;
-  }
+  // Advance game time by 1 month per consultation (session-based progression)
+  const monthsToAdvance = 1;
+  const currentMonth = getCurrentMonth(advisorState);
 
   try {
     const { SimulationEngine } = await import(
@@ -1476,35 +1473,34 @@ async function runMonthlySimulation(advisorState: AdvisorState): Promise<void> {
     // Get all characters
     const allCharacters = characterPool.getAllCharacters();
 
-    // Simulate each month for all characters
-    for (let i = 0; i < monthsElapsed; i++) {
-      const monthToSimulate = addMonthsToDate(
-        advisorState.lastSimulatedDate,
-        i + 1,
-      );
+    // Simulate the next month for all characters
+    const nextMonth = addMonthsToDate(currentMonth, 1);
 
-      for (const character of allCharacters) {
-        try {
-          // Initialize character if not already in simulation
-          const state = await engine.getCharacterState(character.characterId);
-          if (!state) {
-            await engine.initializeCharacter(character);
-          }
-
-          // Simulate this month
-          await engine.simulateMonth(character, monthToSimulate, true);
-        } catch (error) {
-          console.error(
-            `Error simulating ${monthToSimulate} for ${character.name}:`,
-            error,
-          );
+    for (const character of allCharacters) {
+      try {
+        // Initialize character if not already in simulation
+        const state = await engine.getCharacterState(character.characterId);
+        if (!state) {
+          await engine.initializeCharacter(character);
         }
+
+        // Simulate this month
+        await engine.simulateMonth(character, nextMonth, true);
+      } catch (error) {
+        console.error(
+          `Error simulating ${nextMonth} for ${character.name}:`,
+          error,
+        );
       }
     }
 
-    // Update advisor state
-    advisorState.lastSimulatedDate = currentMonth;
-    advisorState.simulatedMonthsPassed += monthsElapsed;
+    // Update advisor state - advance to next month
+    advisorState.currentGameMonth = nextMonth;
+    advisorState.simulatedMonthsPassed += monthsToAdvance;
+
+    console.log(
+      `⏰ Game time advanced: ${currentMonth} → ${nextMonth} (${advisorState.simulatedMonthsPassed} months total)`,
+    );
 
     await engine.close();
   } catch (error) {

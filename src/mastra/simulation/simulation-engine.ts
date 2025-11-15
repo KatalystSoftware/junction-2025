@@ -400,12 +400,12 @@ export class SimulationEngine {
 
 /**
  * Get current month in YYYY-MM format
+ * NOTE: This fallback is only used during character initialization.
+ * Game time progression is managed by orchestrator via currentGameMonth.
  */
 function getCurrentMonth(): string {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  return `${year}-${month}`;
+  // Default starting month for character backstory generation
+  return "2025-01";
 }
 
 /**

@@ -374,7 +374,7 @@ export interface AdvisorState {
   careerTier: number; // 1-5: Junior → Associate → Senior → Specialist → Expert
 
   // NEW: Financial Simulation
-  lastSimulatedDate: string; // ISO date of last simulation tick
+  currentGameMonth: string; // Current game month in YYYY-MM format (session-based, not real-time)
   simulatedMonthsPassed: number; // Total months simulated since game start
   databasePath?: string; // Path to SQLite database
 }
