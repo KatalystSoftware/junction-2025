@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { Contact } from "./WhatsAppInterface";
+import { getPlayerAvatarUrl } from "../utils/avatarUtils";
 
 interface AdvisorState {
   advisorCoins: number;
@@ -49,8 +50,9 @@ export function PlayerStatsModal({
   advisorState,
 }: PlayerStatsModalProps) {
   const [playerName, setPlayerName] = useState("Player");
+  const [playerAvatarUrl, setPlayerAvatarUrl] = useState("");
 
-  // Load player name from localStorage
+  // Load player profile from localStorage
   useEffect(() => {
     const userProfileStr = localStorage.getItem("userProfile");
     if (userProfileStr) {
@@ -58,6 +60,9 @@ export function PlayerStatsModal({
         const userProfile = JSON.parse(userProfileStr);
         if (userProfile.name) {
           setPlayerName(userProfile.name);
+        }
+        if (userProfile.avatar) {
+          setPlayerAvatarUrl(getPlayerAvatarUrl(userProfile.avatar));
         }
       } catch (e) {
         console.error("Failed to parse userProfile:", e);
@@ -267,7 +272,7 @@ export function PlayerStatsModal({
               <div className="relative">
                 <Avatar className="w-24 h-24">
                   <AvatarImage
-                    src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200"
+                    src={playerAvatarUrl}
                     alt="Player Avatar"
                   />
                   <AvatarFallback
@@ -278,7 +283,7 @@ export function PlayerStatsModal({
                       fontWeight: "var(--font-weight-medium)",
                     }}
                   >
-                    ME
+                    {playerName.substring(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div

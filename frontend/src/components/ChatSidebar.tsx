@@ -6,6 +6,7 @@ import type { Contact } from "./WhatsAppInterface";
 import { useState, useEffect } from "react";
 import logoImage from "figma:asset/28e39d27183eb9dbb848b6be8a7c7b00e841cd40.png";
 import { PlayerStatsModal } from "./PlayerStatsModal";
+import { getPlayerAvatarUrl } from "../utils/avatarUtils";
 
 interface AdvisorState {
   advisorCoins: number;
@@ -43,8 +44,9 @@ export function ChatSidebar({
   const [searchQuery, setSearchQuery] = useState("");
   const [showStatsModal, setShowStatsModal] = useState(false);
   const [playerName, setPlayerName] = useState("Player");
+  const [playerAvatarUrl, setPlayerAvatarUrl] = useState("");
 
-  // Load player name from localStorage
+  // Load player profile from localStorage
   useEffect(() => {
     const userProfileStr = localStorage.getItem("userProfile");
     if (userProfileStr) {
@@ -52,6 +54,9 @@ export function ChatSidebar({
         const userProfile = JSON.parse(userProfileStr);
         if (userProfile.name) {
           setPlayerName(userProfile.name);
+        }
+        if (userProfile.avatar) {
+          setPlayerAvatarUrl(getPlayerAvatarUrl(userProfile.avatar));
         }
       } catch (e) {
         console.error("Failed to parse userProfile:", e);
@@ -113,7 +118,7 @@ export function ChatSidebar({
           <div className="relative">
             <Avatar className="w-14 h-14">
               <AvatarImage
-                src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"
+                src={playerAvatarUrl}
                 alt="Player Avatar"
               />
               <AvatarFallback
@@ -124,7 +129,7 @@ export function ChatSidebar({
                   fontWeight: "var(--font-weight-medium)",
                 }}
               >
-                ME
+                {playerName.substring(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
             <div

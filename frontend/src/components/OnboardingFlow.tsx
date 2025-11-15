@@ -312,24 +312,26 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                     >
                       Your Avatar
                     </Label>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="flex flex-wrap gap-4">
                       {PLAYER_AVATAR_OPTIONS.map((option) => (
                         <motion.button
                           key={option.id}
                           type="button"
                           onClick={() => setUserAvatar(option.id)}
-                          className="flex flex-col items-center gap-2 p-3 rounded-lg transition-all duration-200 cursor-pointer"
-                          style={{
-                            border: `2px solid ${userAvatar === option.id ? "var(--primary)" : "var(--border)"}`,
-                            backgroundColor:
-                              userAvatar === option.id
-                                ? "rgba(127, 86, 217, 0.1)"
-                                : "var(--muted)",
-                          }}
+                          className="transition-all duration-200 cursor-pointer relative"
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                         >
-                          <Avatar className="w-16 h-16">
+                          <Avatar
+                            className="w-24 h-24"
+                            style={{
+                              border: `3px solid ${userAvatar === option.id ? "var(--primary)" : "transparent"}`,
+                              boxShadow:
+                                userAvatar === option.id
+                                  ? "0 0 0 4px rgba(127, 86, 217, 0.2)"
+                                  : "none",
+                            }}
+                          >
                             <AvatarImage src={option.url} alt={option.label} />
                             <AvatarFallback
                               style={{
@@ -339,19 +341,6 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                               {option.label[0]}
                             </AvatarFallback>
                           </Avatar>
-                          <span
-                            style={{
-                              fontFamily: "Inter, sans-serif",
-                              fontSize: "var(--text-xs)",
-                              fontWeight: "var(--font-weight-medium)",
-                              color:
-                                userAvatar === option.id
-                                  ? "var(--primary)"
-                                  : "var(--foreground)",
-                            }}
-                          >
-                            {option.label}
-                          </span>
                         </motion.button>
                       ))}
                     </div>
