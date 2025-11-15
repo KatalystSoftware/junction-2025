@@ -13,11 +13,6 @@ import type {
   CharacterConversationMemory,
 } from "../types/game-types.ts";
 import { cachedGenerate } from "../test-cache.ts";
-import {
-  withRetry,
-  isRetryableError,
-  logError,
-} from "../utils/error-recovery.ts";
 
 export const invokeCharacterTool = {
   id: "invokeCharacterTool",
@@ -63,20 +58,12 @@ export const invokeCharacterTool = {
         prompt = `Conversation so far:\n${historyText}\n\nAdvisor's latest message: "${advisorMessage}"\n\nRespond in character.`;
       }
 
-      // Invoke character agent with retry logic
-      const response = await withRetry(
-        () =>
-          cachedGenerate(
-            "agent",
-            `character_${character.characterId}`,
-            prompt,
-            () => characterAgent.generate(prompt),
-          ),
-        `Character Agent (${character.name})`,
-        {
-          maxAttempts: 3,
-          shouldRetry: isRetryableError,
-        },
+      // Invoke character agent (cachedGenerate already includes retry logic via runAgentOperation)
+      const response = await cachedGenerate(
+        "agent",
+        `character_${character.characterId}`,
+        prompt,
+        () => characterAgent.generate(prompt),
       );
 
       const text = response.text || "";

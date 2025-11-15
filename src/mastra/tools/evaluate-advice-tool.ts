@@ -18,11 +18,6 @@ import type {
   FinancialTopic,
   Character,
 } from "../types/game-types.ts";
-import {
-  withRetry,
-  isRetryableError,
-  logError,
-} from "../utils/error-recovery.ts";
 
 export const evaluateAdviceTool = {
   id: "evaluateAdviceTool",
@@ -96,20 +91,12 @@ ${conversationHistory.map((msg, idx) => `${msg.role === "user" ? "Character" : "
 Please evaluate this advice comprehensively across all dimensions.
 `;
 
-      // Call evaluatorAgent with retry logic (cached in tests)
-      const evaluationResult = await withRetry(
-        () =>
-          cachedGenerate(
-            "agent",
-            "evaluator_advice",
-            evaluationPrompt,
-            () => evaluatorAgent.generate(evaluationPrompt),
-          ),
-        "Advice Evaluator Agent",
-        {
-          maxAttempts: 3,
-          shouldRetry: isRetryableError,
-        },
+      // Call evaluatorAgent (cachedGenerate already includes retry logic via runAgentOperation)
+      const evaluationResult = await cachedGenerate(
+        "agent",
+        "evaluator_advice",
+        evaluationPrompt,
+        () => evaluatorAgent.generate(evaluationPrompt),
       );
 
       // Parse JSON response

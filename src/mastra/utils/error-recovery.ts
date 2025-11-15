@@ -3,6 +3,12 @@
  *
  * Provides retry logic with exponential backoff and error logging
  * to prevent AI failures from crashing the game.
+ *
+ * NOTE: Agent calls through cachedGenerate already use runAgentOperation
+ * from agent-execution.ts, which includes retry logic. This module provides
+ * complementary utilities for error logging and user-friendly error messages.
+ * The withRetry function is kept for potential non-agent operations that need
+ * custom retry behavior.
  */
 
 /**

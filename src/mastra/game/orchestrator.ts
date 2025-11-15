@@ -25,12 +25,6 @@ import type {
   ThreadInfo,
   ConversationMessage,
 } from "../types/game-types.ts";
-import {
-  withRetry,
-  isRetryableError,
-  logError,
-  getUserFriendlyError,
-} from "../utils/error-recovery.ts";
 
 /**
  * Initialize a new advisor with default state
@@ -142,22 +136,14 @@ Should you: send a new character, send a returning character (follow-up), or tri
 Respond with ONLY valid JSON (NO markdown):
 `;
 
-  // Call Game Master with retry logic
+  // Call Game Master (cachedGenerate already includes retry logic via runAgentOperation)
   let decision: GameMasterDecision;
   try {
-    const gmResult = await withRetry(
-      () =>
-        cachedGenerate(
-          "agent",
-          "gameMaster_decision",
-          gmPrompt,
-          () => gmAgent.generate(gmPrompt),
-        ),
-      "Game Master Agent",
-      {
-        maxAttempts: 3,
-        shouldRetry: isRetryableError,
-      },
+    const gmResult = await cachedGenerate(
+      "agent",
+      "gameMaster_decision",
+      gmPrompt,
+      () => gmAgent.generate(gmPrompt),
     );
 
     // Parse Game Master's decision
@@ -170,8 +156,7 @@ Respond with ONLY valid JSON (NO markdown):
 
     decision = JSON.parse(jsonText);
   } catch (error) {
-    console.error("Failed to get GM decision after retries:", error);
-    logError("Game Master Decision", error, 3, 3, false);
+    console.error("Failed to get GM decision:", error);
 
     // Fallback: send a new character
     const newCharResult = characterPool.getNewCharacter(advisorState);
@@ -331,7 +316,7 @@ export async function handleAdvisorResponse(
   // Get character memory (conversation history from previous sessions)
   const characterMemory = character.conversationHistory || [];
 
-  // Invoke character agent with error recovery
+  // Invoke character agent (tool internally uses cachedGenerate with retry logic)
   const characterTool = mastra.getTool("invokeCharacterTool");
   if (!characterTool) {
     throw new Error("Character tool not found");
@@ -339,24 +324,15 @@ export async function handleAdvisorResponse(
 
   let characterResponse: any;
   try {
-    characterResponse = await withRetry(
-      () =>
-        characterTool.execute({
-          character,
-          scenario,
-          advisorMessage,
-          conversationHistory: conversationHistory || [],
-          characterMemory,
-        }),
-      `Character Tool (${character.name})`,
-      {
-        maxAttempts: 3,
-        shouldRetry: isRetryableError,
-      },
-    );
+    characterResponse = await characterTool.execute({
+      character,
+      scenario,
+      advisorMessage,
+      conversationHistory: conversationHistory || [],
+      characterMemory,
+    });
   } catch (error) {
-    console.error("Character tool failed after retries:", error);
-    logError(`Character Tool (${character.name})`, error, 3, 3, false);
+    console.error("Character tool failed:", error);
 
     // Fallback: graceful generic response
     characterResponse = {
@@ -369,7 +345,7 @@ export async function handleAdvisorResponse(
     };
   }
 
-  // Evaluate advice quality using AI-based evaluation with error recovery
+  // Evaluate advice quality using AI-based evaluation (tool internally uses cachedGenerate with retry logic)
   const evaluateTool = mastra.getTool("evaluateAdviceTool");
   let adviceEvaluation: any = {
     qualityScore: 5,
@@ -386,24 +362,15 @@ export async function handleAdvisorResponse(
 
   if (evaluateTool) {
     try {
-      adviceEvaluation = await withRetry(
-        () =>
-          evaluateTool.execute({
-            advice: advisorMessage,
-            scenario,
-            characterPersonality: character.personality,
-            character, // Pass full character for more context
-            conversationHistory, // Pass conversation history for context
-          }),
-        "Advice Evaluation Tool",
-        {
-          maxAttempts: 3,
-          shouldRetry: isRetryableError,
-        },
-      );
+      adviceEvaluation = await evaluateTool.execute({
+        advice: advisorMessage,
+        scenario,
+        characterPersonality: character.personality,
+        character, // Pass full character for more context
+        conversationHistory, // Pass conversation history for context
+      });
     } catch (error) {
-      console.error("Evaluation tool failed after retries:", error);
-      logError("Advice Evaluation Tool", error, 3, 3, false);
+      console.error("Evaluation tool failed:", error);
       // Keep default evaluation values as fallback
       console.log("⚠️ Using default evaluation values");
     }
@@ -775,7 +742,7 @@ export async function handleAdviceChoice(
 
   const adviceText = selectedChoice.fullAdviceText;
 
-  // Evaluate the advice using the evaluate tool with error recovery
+  // Evaluate the advice using the evaluate tool (tool internally uses cachedGenerate with retry logic)
   const evaluateTool = mastra.getTool("evaluateAdviceTool");
   if (!evaluateTool) {
     throw new Error("Evaluate tool not found");
@@ -783,24 +750,15 @@ export async function handleAdviceChoice(
 
   let adviceEvaluation: any;
   try {
-    adviceEvaluation = await withRetry(
-      () =>
-        evaluateTool.execute({
-          advice: adviceText,
-          scenario,
-          characterPersonality: character.personality,
-          character,
-          conversationHistory: conversationHistory || [],
-        }),
-      "Advice Evaluation Tool (Choice)",
-      {
-        maxAttempts: 3,
-        shouldRetry: isRetryableError,
-      },
-    );
+    adviceEvaluation = await evaluateTool.execute({
+      advice: adviceText,
+      scenario,
+      characterPersonality: character.personality,
+      character,
+      conversationHistory: conversationHistory || [],
+    });
   } catch (error) {
-    console.error("Evaluation tool failed after retries:", error);
-    logError("Advice Evaluation Tool (Choice)", error, 3, 3, false);
+    console.error("Evaluation tool failed:", error);
 
     // Fallback: use neutral evaluation
     adviceEvaluation = {
@@ -1012,7 +970,7 @@ async function triggerGodBossReview(
     };
   }
 
-  // Invoke God/Boss tool with error recovery
+  // Invoke God/Boss tool (tool internally uses cachedGenerate with retry logic)
   const godBossTool = mastra.getTool("invokeGodBossTool");
   if (!godBossTool) {
     throw new Error("God/Boss tool not found");
@@ -1020,22 +978,13 @@ async function triggerGodBossReview(
 
   let review: any;
   try {
-    review = await withRetry(
-      () =>
-        godBossTool.execute({
-          sessionsToReview,
-          advisorReputation: advisorState.reputation,
-          advisorSkillLevel: advisorState.skillLevel,
-        }),
-      "God/Boss Review Tool",
-      {
-        maxAttempts: 3,
-        shouldRetry: isRetryableError,
-      },
-    );
+    review = await godBossTool.execute({
+      sessionsToReview,
+      advisorReputation: advisorState.reputation,
+      advisorSkillLevel: advisorState.skillLevel,
+    });
   } catch (error) {
-    console.error("God/Boss review failed after retries:", error);
-    logError("God/Boss Review Tool", error, 3, 3, false);
+    console.error("God/Boss review failed:", error);
 
     // Fallback: use generic positive review
     review = {
