@@ -1,0 +1,32 @@
+{
+  "characterId": "char_jukka_002",
+  "name": "Jukka Laaksonen",
+  "age": 28,
+  "occupation": "Retail Store Clerk",
+  "background": "Works full-time in retail. Has accumulated €8,000 in consumer debt over the past three years. Stressed about the situation. Lives in Tampere, renting an apartment.",
+  "personality": {
+    "impulsiveness": 0.5,
+    "trustingness": 0.7,
+    "financial_literacy": 0.4,
+    "stubbornness": 0.5,
+    "emotionality": 0.8
+  },
+  "financialProfile": {
+    "incomeLevel": "low",
+    "typicalMonthlyIncome": 1900,
+    "hasDebt": true,
+    "hasSavings": "none"
+  },
+  "communicationStyle": {
+    "formality": "casual",
+    "language": "casual_adult",
+    "prefersVoice": 0.5,
+    "callsWhenEmotional": true
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

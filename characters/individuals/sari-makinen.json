@@ -1,0 +1,32 @@
+{
+  "characterId": "char_sari_003",
+  "name": "Sari Mäkinen",
+  "age": 35,
+  "occupation": "Nurse",
+  "background": "Mother of two children. Spouse works in construction. Wants to start saving for the children's future and her own retirement but doesn't know where to start. Lives in Oulu in an owned apartment.",
+  "personality": {
+    "impulsiveness": 0.3,
+    "trustingness": 0.8,
+    "financial_literacy": 0.5,
+    "stubbornness": 0.3,
+    "emotionality": 0.5
+  },
+  "financialProfile": {
+    "incomeLevel": "medium",
+    "typicalMonthlyIncome": 2800,
+    "hasDebt": false,
+    "hasSavings": "moderate"
+  },
+  "communicationStyle": {
+    "formality": "semi-formal",
+    "language": "casual_adult",
+    "prefersVoice": 0.2,
+    "callsWhenEmotional": false
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

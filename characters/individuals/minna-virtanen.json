@@ -1,0 +1,32 @@
+{
+  "characterId": "char_minna_001",
+  "name": "Minna Virtanen",
+  "age": 22,
+  "occupation": "University Student",
+  "background": "First-year student in Helsinki. Just moved out from parents' home and living alone for the first time. Works part-time at a café. Has never made a budget before.",
+  "personality": {
+    "impulsiveness": 0.7,
+    "trustingness": 0.6,
+    "financial_literacy": 0.3,
+    "stubbornness": 0.4,
+    "emotionality": 0.6
+  },
+  "financialProfile": {
+    "incomeLevel": "low",
+    "typicalMonthlyIncome": 800,
+    "hasDebt": false,
+    "hasSavings": "minimal"
+  },
+  "communicationStyle": {
+    "formality": "casual",
+    "language": "casual_young_adult",
+    "prefersVoice": 0.3,
+    "callsWhenEmotional": false
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

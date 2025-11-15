@@ -1,0 +1,99 @@
+[
+  {
+    "scenarioId": "scenario_sari_savings_001",
+    "characterId": "char_sari_003",
+    "scenarioType": "savings_investing_basics",
+    "difficulty": 0.5,
+    "topic": "saving",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 2, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Hello. I'm a 35-year-old nurse and mother of two children. We now have our finances under control, but I'd like to start saving for the children's future and my own retirement. Where should I start? Is a savings account best or should I invest in something?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Financially stable, wants to start saving/investing for kids' future and retirement",
+      "emotionalState": "motivated, curious, slightly overwhelmed by options",
+      "urgency": "low",
+      "specificDetails": {
+        "monthlyIncome": 2800,
+        "currentSavings": 5000,
+        "hasEmergencyFund": true,
+        "childrenAges": [5, 8]
+      }
+    },
+    "idealAdvice": [
+      "Confirm emergency fund is solid first (3-6 months expenses)",
+      "Explain different savings goals (short-term vs long-term)",
+      "For kids: suggest youth savings accounts or investment accounts if they'll buy property someday",
+      "For retirement: explain index funds, ETFs, voluntary pension insurance",
+      "Mention tax benefits (tax deductions for pension savings)",
+      "Start with small amounts to learn (€50-100/month)",
+      "Diversification basics"
+    ],
+    "commonMistakes": [
+      "Recommending complex investment strategies immediately",
+      "Not asking about risk tolerance",
+      "Ignoring short-term vs long-term goal differences",
+      "Not mentioning tax advantages",
+      "Being too cautious (just savings account)"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_sari_investment_choice_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 3
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_sari_investment_choice_002",
+    "characterId": "char_sari_003",
+    "scenarioType": "investment_decision",
+    "difficulty": 0.6,
+    "topic": "investing",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 2, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_sari_savings_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Hi! I've been researching those index funds we talked about. There are many options on Nordnet... Which funds should I invest in? Is there a specific good one or should I diversify across many?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Ready to invest, researched options, needs help choosing specific funds",
+      "emotionalState": "motivated but uncertain",
+      "urgency": "low",
+      "specificDetails": {
+        "monthlyInvestmentAmount": 150,
+        "timeHorizon": "20+ years",
+        "riskTolerance": "moderate"
+      }
+    },
+    "idealAdvice": [
+      "Explain broad market index funds (world index) are good starting point",
+      "Discuss expense ratios (TER) - lower is better",
+      "Suggest diversification (maybe 80% world, 20% bonds for moderate risk)",
+      "Explain euro-cost averaging through monthly investing",
+      "Mention tax-efficient options (dividend funds vs growth funds)",
+      "Recommend starting simple, can adjust later"
+    ],
+    "commonMistakes": [
+      "Recommending specific stocks (too risky for beginner)",
+      "Making it too complicated with many funds",
+      "Not explaining fees and their long-term impact",
+      "Pushing aggressive strategy without understanding risk tolerance"
+    ]
+  }
+]

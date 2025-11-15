@@ -49,9 +49,9 @@ export const mastra = new Mastra({
 async function initializeCharacterPool() {
   const charactersPath = path.join(
     __dirname,
-    "../../characters/characters.json",
+    "../../characters/individuals",
   );
-  const scenariosPath = path.join(__dirname, "../../characters/scenarios.json");
+  const scenariosPath = path.join(__dirname, "../../characters/scenarios");
 
   try {
     await characterPool.loadFromFiles(charactersPath, scenariosPath);

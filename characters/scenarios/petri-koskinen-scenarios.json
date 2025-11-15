@@ -1,0 +1,97 @@
+[
+  {
+    "scenarioId": "scenario_petri_scam_001",
+    "characterId": "char_petri_004",
+    "scenarioType": "scam_awareness",
+    "difficulty": 0.4,
+    "topic": "scam_awareness",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Hey! One of my friends messaged me that he made €5,000 with some crypto thing in a week 😳 Should I be worried it's a scam or can I try it too? I don't want to do something stupid but I also don't want to miss out if it's actually a good thing...",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Friend claims to have made quick money with crypto, uncertain if it's real or scam",
+      "emotionalState": "FOMO, curious, uncertain",
+      "urgency": "medium",
+      "specificDetails": {
+        "friendClaimedProfit": 5000,
+        "timeframe": "one week",
+        "hasInvestmentExperience": false
+      }
+    },
+    "idealAdvice": [
+      "Explain red flags: unrealistic returns, pressure to join quickly, friend recruitment",
+      "If it sounds too good to be true, it probably is",
+      "Friend might be scammed too (Ponzi scheme)",
+      "Legitimate investing takes time and has risks",
+      "How to verify investment opportunities (regulation, financial authorities)",
+      "Suggest learning basics before investing any money",
+      "Protect against FOMO - it's a manipulation tactic"
+    ],
+    "commonMistakes": [
+      "Immediately saying crypto is always a scam (it's not, but this likely is)",
+      "Not explaining WHY it's probably a scam",
+      "Being condescending about not knowing",
+      "Not addressing the FOMO emotion"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_petri_first_paycheck_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 2
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_petri_first_paycheck_002",
+    "characterId": "char_petri_004",
+    "scenarioType": "first_paycheck",
+    "difficulty": 0.3,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_petri_scam_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Hey! Thanks for that warning by the way, my friend had gotten caught up in a pyramid scheme 😬 But now I have good news - I got a summer job! The salary is about €1,200/month. What should I do with my first paycheck? I want to learn to do it right! 💪",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Got first summer job, wants to make smart financial decisions from the start",
+      "emotionalState": "excited, motivated to learn",
+      "urgency": "low",
+      "specificDetails": {
+        "monthlyIncome": 1200,
+        "livingWithParents": true,
+        "lowExpenses": true
+      }
+    },
+    "idealAdvice": [
+      "Celebrate the achievement!",
+      "Set up savings automatically (10-20% since low expenses)",
+      "Create simple budget even with low expenses (builds habit)",
+      "Open separate savings account to avoid temptation",
+      "It's okay to enjoy some of it (balance)",
+      "Avoid lifestyle inflation when money comes in",
+      "Build emergency fund basics"
+    ],
+    "commonMistakes": [
+      "Saying to save everything (unrealistic for a teen)",
+      "Not celebrating the achievement",
+      "Making it too complicated for first job"
+    ]
+  }
+]
