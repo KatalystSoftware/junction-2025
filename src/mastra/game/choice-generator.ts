@@ -167,11 +167,24 @@ function getTrapAdviceByTopic(
       break;
 
     case "scam_awareness":
-      traps.push(
-        "Report to police and wait",
-        "Try to get money back directly from scammer",
-        "Just move on and forget about it",
-      );
+      // Context-aware trap generation: prevention vs. aftermath
+      const isPreventionScenario = detectPreventionScenario(scenario);
+
+      if (isPreventionScenario) {
+        // Prevention traps: encourage risky action (before money is lost)
+        traps.push(
+          "Just invest a small amount to test it out",
+          "Ask your friend for the link and try it",
+          "Don't research too much or you'll miss the opportunity",
+        );
+      } else {
+        // Aftermath traps: ineffective recovery methods (after money is lost)
+        traps.push(
+          "Try to get money back directly from scammer",
+          "Report to police and wait",
+          "Just move on and forget about it",
+        );
+      }
       break;
 
     case "emergency_fund":
@@ -199,6 +212,93 @@ function getTrapAdviceByTopic(
   }
 
   return traps.slice(0, 3); // Return up to 3 traps
+}
+
+/**
+ * Detect if a scam_awareness scenario is prevention (before money lost) vs. aftermath
+ */
+function detectPreventionScenario(scenario: Scenario): boolean {
+  const details = scenario.problemContext.specificDetails as Record<
+    string,
+    any
+  >;
+  const situation = scenario.problemContext.currentSituation.toLowerCase();
+
+  // Check for aftermath indicators in specificDetails
+  if (details) {
+    // Direct indicators that money was already lost
+    if (
+      details.moneyLost ||
+      details.amountScammed ||
+      (details.investmentAmount && details.investmentAmount > 0)
+    ) {
+      return false; // Aftermath scenario
+    }
+  }
+
+  // Check currentSituation text for prevention keywords
+  const preventionKeywords = [
+    "should i",
+    "can i try",
+    "thinking about",
+    "considering",
+    "uncertain",
+    "is it a scam",
+    "worried it's a scam",
+  ];
+
+  const aftermathKeywords = [
+    "lost money",
+    "lost €",
+    "scammed",
+    "invested",
+    "paid",
+    "gave them",
+  ];
+
+  const hasPreventionKeywords = preventionKeywords.some((keyword) =>
+    situation.includes(keyword),
+  );
+  const hasAftermathKeywords = aftermathKeywords.some((keyword) =>
+    situation.includes(keyword),
+  );
+
+  // If both or neither, check idealAdvice for prevention-focused content
+  if (hasPreventionKeywords && !hasAftermathKeywords) {
+    return true; // Prevention
+  }
+  if (hasAftermathKeywords) {
+    return false; // Aftermath
+  }
+
+  // Fallback: check idealAdvice for prevention vs recovery focus
+  const adviceText = scenario.idealAdvice.join(" ").toLowerCase();
+  const preventionAdviceKeywords = [
+    "red flags",
+    "before investing",
+    "how to verify",
+    "protect against fomo",
+  ];
+  const recoveryAdviceKeywords = [
+    "report to",
+    "get money back",
+    "police",
+    "recovery",
+  ];
+
+  const hasPreventionAdvice = preventionAdviceKeywords.some((keyword) =>
+    adviceText.includes(keyword),
+  );
+  const hasRecoveryAdvice = recoveryAdviceKeywords.some((keyword) =>
+    adviceText.includes(keyword),
+  );
+
+  if (hasPreventionAdvice && !hasRecoveryAdvice) {
+    return true; // Prevention
+  }
+
+  // Default: assume aftermath (conservative, shows recovery traps)
+  return false;
 }
 
 /**
