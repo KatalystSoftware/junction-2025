@@ -10,9 +10,15 @@ variable "region" {
 }
 
 variable "container_image" {
-  description = "Container image to deploy (e.g. nginx:stable-alpine)"
+  description = "Container image to deploy (e.g. ghcr.io/katalystsoftware/financial-advisor-sim:latest)"
   type        = string
-  default     = "nginx:stable-alpine"
+  default     = "ghcr.io/katalystsoftware/financial-advisor-sim:latest"
+}
+
+variable "google_generative_ai_api_key" {
+  description = "API key for Google Generative AI (Gemini)"
+  type        = string
+  sensitive   = true
 }
 
 variable "bastion_zone" {

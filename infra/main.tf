@@ -56,6 +56,11 @@ resource "google_cloud_run_v2_service" "app" {
         name  = "NODE_ENV"
         value = "production"
       }
+
+      env {
+        name  = "GOOGLE_GENERATIVE_AI_API_KEY"
+        value = var.google_generative_ai_api_key
+      }
     }
   }
 
