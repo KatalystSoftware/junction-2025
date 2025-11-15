@@ -5,7 +5,7 @@
  * knowledge base for research-backed standards and best practices.
  */
 
-import { openai } from "@ai-sdk/openai";
+import { google } from "@ai-sdk/google";
 import { LibSQLVector } from "@mastra/libsql";
 import { embed } from "ai";
 import { z } from "zod";
@@ -83,7 +83,7 @@ export const queryFinnishKnowledgeTool = createTool({
       // Generate embedding for the query
       const { embedding } = await embed({
         value: query,
-        model: openai.embedding("text-embedding-3-small"),
+        model: google.textEmbeddingModel("text-embedding-004"),
       });
 
       // Query vector store

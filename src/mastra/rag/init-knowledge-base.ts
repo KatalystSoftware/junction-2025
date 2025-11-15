@@ -7,7 +7,7 @@
  * Based on Mastra vector store patterns.
  */
 
-import { openai } from "@ai-sdk/openai";
+import { google } from "@ai-sdk/google";
 import { LibSQLVector } from "@mastra/libsql";
 import { embedMany } from "ai";
 import { readFileSync } from "fs";
@@ -23,8 +23,8 @@ const KNOWLEDGE_BASE_PATH = path.join(
   "../../../knowledge-base/finnish-financial-literacy.md",
 );
 const VECTOR_INDEX_NAME = "finnish_financial_literacy";
-const EMBEDDING_MODEL = "text-embedding-3-small"; // 1536 dimensions
-const EMBEDDING_DIMENSION = 1536;
+const EMBEDDING_MODEL = "text-embedding-004"; // Google's embedding model
+const EMBEDDING_DIMENSION = 768; // Google text-embedding-004 uses 768 dimensions
 const CHUNK_SIZE = 800; // characters per chunk
 const CHUNK_OVERLAP = 150; // overlap between chunks
 
@@ -247,7 +247,7 @@ export async function initializeKnowledgeBase() {
 
   const { embeddings } = await embedMany({
     values: chunks.map((chunk) => chunk.text),
-    model: openai.embedding(EMBEDDING_MODEL),
+    model: google.textEmbeddingModel(EMBEDDING_MODEL),
   });
 
   console.log(`   ✓ Generated ${embeddings.length} embeddings\n`);
