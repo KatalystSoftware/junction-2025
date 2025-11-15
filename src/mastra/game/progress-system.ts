@@ -169,20 +169,46 @@ export const ACHIEVEMENTS: Achievement[] = [
 
   // Special achievements
   {
-    id: "empathy_streak",
-    name: "Heart of Gold",
-    description: "Show empathy in 5 consecutive sessions",
-    icon: "❤️",
-    category: "special",
-    coinReward: 150,
-  },
-  {
     id: "quick_learner",
     name: "Quick Learner",
     description: "Pass a boss quiz with 100% score",
     icon: "🧠",
     category: "special",
     coinReward: 200,
+  },
+
+  // PHASE G: Financial impact achievements
+  {
+    id: "coffee_connoisseur",
+    name: "Coffee Connoisseur",
+    description: "Help a client reduce coffee spending by €50+/month",
+    icon: "☕",
+    category: "finance",
+    coinReward: 150,
+  },
+  {
+    id: "temu_terminator",
+    name: "Temu Terminator",
+    description: "Stop a client's impulse online shopping habit",
+    icon: "🛒",
+    category: "finance",
+    coinReward: 150,
+  },
+  {
+    id: "savings_champion",
+    name: "Savings Champion",
+    description: "Help a client save 20%+ of their income",
+    icon: "💰",
+    category: "finance",
+    coinReward: 200,
+  },
+  {
+    id: "big_win",
+    name: "Big Win",
+    description: "Help a client save €200+ in a single consultation",
+    icon: "🎯",
+    category: "finance",
+    coinReward: 250,
   },
 ];
 
@@ -221,6 +247,65 @@ export function checkForNewAchievements(
     !unlocked.has("fifty_clients")
   ) {
     newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "fifty_clients")!);
+  }
+
+  // PHASE G: Financial impact achievements
+  if (lastSession) {
+    // Check financial projection from the session
+    const projection = (lastSession as any).evaluation?.financialProjection;
+    const baseline = (lastSession as any).financialBaseline;
+
+    if (projection && baseline) {
+      // Coffee Connoisseur: reduced coffee by €50+/month
+      if (
+        baseline.baselineSpending?.coffee &&
+        projection.categorySavings?.coffee
+      ) {
+        const coffeeSavings = projection.categorySavings.coffee;
+        if (coffeeSavings >= 50 && !unlocked.has("coffee_connoisseur")) {
+          newAchievements.push(
+            ACHIEVEMENTS.find((a) => a.id === "coffee_connoisseur")!,
+          );
+        }
+      }
+
+      // Temu Terminator: stopped online shopping
+      if (
+        baseline.baselineSpending?.onlineShopping &&
+        projection.categorySavings?.onlineShopping
+      ) {
+        const shoppingSavings = projection.categorySavings.onlineShopping;
+        if (shoppingSavings >= 80 && !unlocked.has("temu_terminator")) {
+          newAchievements.push(
+            ACHIEVEMENTS.find((a) => a.id === "temu_terminator")!,
+          );
+        }
+      }
+
+      // Savings Champion: client saved 20%+ of income
+      if (
+        projection.monthlySavings &&
+        baseline.baselineIncome &&
+        baseline.baselineIncome > 0
+      ) {
+        const savingsRate =
+          (projection.monthlySavings / baseline.baselineIncome) * 100;
+        if (savingsRate >= 20 && !unlocked.has("savings_champion")) {
+          newAchievements.push(
+            ACHIEVEMENTS.find((a) => a.id === "savings_champion")!,
+          );
+        }
+      }
+
+      // Big Win: saved €200+ total
+      if (
+        projection.totalSaved &&
+        projection.totalSaved >= 200 &&
+        !unlocked.has("big_win")
+      ) {
+        newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "big_win")!);
+      }
+    }
   }
 
   // Skill level achievements
@@ -291,19 +376,6 @@ export function checkForNewAchievements(
     !unlocked.has("investment_guru")
   ) {
     newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "investment_guru")!);
-  }
-
-  // Special: Empathy streak
-  if (!unlocked.has("empathy_streak")) {
-    const last5 = advisorState.sessionHistory.slice(-5);
-    if (
-      last5.length === 5 &&
-      last5.every((s) => s.evaluation?.wasEmpathetic === true)
-    ) {
-      newAchievements.push(
-        ACHIEVEMENTS.find((a) => a.id === "empathy_streak")!,
-      );
-    }
   }
 
   return newAchievements;
@@ -434,9 +506,6 @@ export function generateMiniFeedback(session: ConsultationSession): string {
 
   // Good score - give specific feedback
   if (score >= 6) {
-    if (evaluation?.wasEmpathetic === false) {
-      return "💡 Tip: Show more empathy - acknowledge their feelings first.";
-    }
     if (evaluation?.wasActionable === false) {
       return "💡 Tip: Give specific, actionable steps they can follow.";
     }

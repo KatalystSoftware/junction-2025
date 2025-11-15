@@ -17,7 +17,8 @@
     "check": "tsc --noEmit",
     "init:knowledge-base": "node --env-file=.env src/mastra/rag/init-knowledge-base.ts",
     "init:knowledge-base:enhanced": "node --env-file=.env src/mastra/rag/init-knowledge-base-enhanced.ts",
-    "update:news": "node --env-file=.env src/mastra/rag/update-news-index.ts"
+    "update:news": "node --env-file=.env src/mastra/rag/update-news-index.ts",
+    "view-transactions": "node --env-file=.env src/view-transactions.ts"
   },
   "keywords": [],
   "author": "",
@@ -35,11 +36,13 @@
     "@mastra/loggers": "1.0.0-beta.0",
     "@mastra/memory": "1.0.0-beta.0",
     "ai": "^5.0.93",
+    "better-sqlite3": "^12.4.1",
     "ink": "^6.5.0",
     "react": "^19.2.0",
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",

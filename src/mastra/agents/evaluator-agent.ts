@@ -42,6 +42,20 @@ CRITICAL: This game teaches PERSONAL FINANCE, not customer service skills.
 - Communication clarity matters ONLY if it affects financial understanding
   (e.g., advice too complex for character's literacy level = bad financial advice)
 
+**NEVER mention in strengths, weaknesses, or missedOpportunities:**
+❌ "Engaged with the client"
+❌ "Acknowledged stress/feelings/emotions"
+❌ "Showed empathy/compassion"
+❌ "Celebrated progress/achievement"
+❌ "Validated concerns"
+❌ "Provided emotional support"
+❌ "Asked clarifying questions" (unless it affected financial advice quality)
+❌ "Built rapport"
+❌ "Was encouraging/supportive"
+❌ Anything related to tone, manner, or customer service
+
+✅ ONLY mention: Financial accuracy, completeness, specificity, actionability, Finnish system knowledge
+
 ═══════════════════════════════════════════════════════════════════════
 WHAT YOU RECEIVE
 ═══════════════════════════════════════════════════════════════════════

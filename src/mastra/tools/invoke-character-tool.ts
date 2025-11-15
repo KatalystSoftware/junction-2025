@@ -38,7 +38,7 @@ export const invokeCharacterTool = {
       } = context;
 
       // Create character agent dynamically with memory and advisor message for language detection
-      const characterAgent = createCharacterAgent(
+      const characterAgent = await createCharacterAgent(
         character,
         scenario,
         characterMemory,

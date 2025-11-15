@@ -105,6 +105,69 @@ function getPersonalityDescription(character: Character): string {
 /**
  * Build memory context for returning characters
  */
+/**
+ * Build transaction context from simulation data
+ */
+async function buildTransactionContext(character: Character): Promise<string> {
+  try {
+    // Try to load transaction data from simulation
+    const { SimulationEngine } = await import(
+      "../simulation/simulation-engine.ts"
+    );
+
+    // Get database path from a hypothetical advisor state
+    // In practice, this should be passed down from the orchestrator
+    const dbPath = `saves/advisor_default.db`;
+
+    const engine = new SimulationEngine(dbPath);
+    const state = engine.getCharacterState(character.characterId);
+
+    if (!state) {
+      engine.close();
+      return "";
+    }
+
+    // Get recent transactions
+    const recentTxns = engine.getRecentTransactions(character.characterId, 10);
+
+    // Get monthly summary
+    const summaries = engine.getMonthlySummaries(character.characterId, 1);
+    const currentMonth = summaries[0];
+
+    engine.close();
+
+    if (!recentTxns.length && !currentMonth) {
+      return "";
+    }
+
+    let context = "\nYOUR RECENT FINANCIAL ACTIVITY:\n";
+
+    if (currentMonth) {
+      context += `This month (${currentMonth.month}):\n`;
+      context += `- Income: €${currentMonth.totalIncome.toFixed(2)}\n`;
+      context += `- Expenses: €${currentMonth.totalExpenses.toFixed(2)}\n`;
+      context += `- Current balance: €${state.currentBalance.toFixed(2)}\n`;
+      context += `- Number of transactions: ${currentMonth.transactionCount}\n`;
+    }
+
+    if (recentTxns.length > 0) {
+      context += `\nRecent transactions:\n`;
+      recentTxns.slice(0, 5).forEach((txn) => {
+        const amount =
+          txn.amount > 0 ? `+${txn.amount.toFixed(2)}` : txn.amount.toFixed(2);
+        context += `- ${txn.date}: ${txn.description} (${txn.merchantName || "N/A"}) ${amount}€\n`;
+      });
+    }
+
+    context += "\n(You know these details from checking your bank account)\n";
+
+    return context;
+  } catch (error) {
+    // Silently fail if simulation not available
+    return "";
+  }
+}
+
 function buildMemoryContext(
   character: Character,
   conversationHistory: CharacterConversationMemory[],
@@ -356,12 +419,12 @@ BEHAVIORAL RULES:
 /**
  * Create a dynamic character agent with dynamic language matching
  */
-export function createCharacterAgent(
+export async function createCharacterAgent(
   character: Character,
   scenario: Scenario,
   conversationHistory?: CharacterConversationMemory[],
   advisorMessage?: string,
-): Agent {
+): Promise<Agent> {
   // Detect advisor's language and match it
   const advisorLanguage = detectLanguage(advisorMessage);
   const languageStyle = getLanguageStyleForAdvisor(
@@ -376,6 +439,7 @@ export function createCharacterAgent(
     conversationHistory || [],
   );
   const conversationExamples = getConversationExamples(advisorLanguage);
+  const transactionContext = await buildTransactionContext(character);
 
   const instructions = `
 You are ${character.name}, a ${character.age}-year-old ${character.occupation}.
@@ -394,6 +458,8 @@ YOUR CURRENT FINANCIAL SITUATION:
 ${Object.entries(scenario.problemContext.specificDetails)
   .map(([key, value]) => `- ${key}: ${value}`)
   .join("\n")}
+
+${transactionContext}
 
 YOUR PROBLEM:
 ${scenario.problemContext.currentSituation}

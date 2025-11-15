@@ -20,6 +20,7 @@ import {
   saveSession,
   generateSessionId,
   formatSessionId,
+  type ThreadMetadata,
 } from "./mastra/persistence/session-store.ts";
 import {
   getSkillTrend,
@@ -48,13 +49,136 @@ interface Message {
   timestamp: Date;
 }
 
+interface FinancialOverview {
+  balance: number;
+  monthlyIncome: number;
+  monthlyExpenses: number;
+  netIncome: number;
+  topCategories: Array<{
+    category: string;
+    amount: number;
+    percentage: number;
+  }>;
+  recentTransactions: Array<{
+    date: string;
+    description: string;
+    amount: number;
+  }>;
+  anomalies: string[];
+}
+
 interface ThreadData {
   threadId: string;
+  characterId?: string;
   characterName: string;
   messages: Message[];
   unreadCount: number;
   status: "active" | "completed";
   adviceChoices?: AdviceChoice[];
+  financialOverview?: FinancialOverview;
+}
+
+// ============================================================================
+// Helper Functions
+// ============================================================================
+
+/**
+ * Load financial overview for a character from the simulation database
+ * Returns structured data for display in FinancialOverviewBox component
+ */
+async function getFinancialOverview(
+  characterId: string,
+  databasePath: string = "saves/advisor_default.db",
+): Promise<FinancialOverview | null> {
+  try {
+    const { SimulationEngine } = await import(
+      "./mastra/simulation/simulation-engine.ts"
+    );
+    const engine = new SimulationEngine(databasePath);
+
+    const state = engine.getCharacterState(characterId);
+    if (!state) {
+      engine.close();
+      return null;
+    }
+
+    const recentTxns = engine.getRecentTransactions(characterId, 10);
+    const summaries = engine.getMonthlySummaries(characterId, 1);
+    const currentMonth = summaries[0];
+
+    if (!currentMonth) {
+      engine.close();
+      return null;
+    }
+
+    // Get spending by category
+    const db = engine.getDatabase();
+    const spending = db.getSpendingByCategory(
+      characterId,
+      currentMonth.month + "-01",
+      currentMonth.month + "-31",
+    );
+    engine.close();
+
+    // Calculate net income
+    const netIncome = currentMonth.totalIncome - currentMonth.totalExpenses;
+
+    // Top categories with percentages
+    const totalExpenses = currentMonth.totalExpenses;
+    const topCategories = Object.entries(spending)
+      .map(([cat, amount]) => ({
+        category: cat,
+        amount: Math.abs(amount),
+        percentage:
+          totalExpenses > 0 ? (Math.abs(amount) / totalExpenses) * 100 : 0,
+      }))
+      .filter((c) => c.amount > 0)
+      .sort((a, b) => b.amount - a.amount)
+      .slice(0, 5);
+
+    // Recent transactions (last 5)
+    const recentTransactions = recentTxns.slice(0, 5).map((txn) => ({
+      date: txn.date,
+      description: txn.description.substring(0, 30),
+      amount: txn.amount,
+    }));
+
+    // Detect anomalies
+    const anomalies: string[] = [];
+    if (spending.coffee && Math.abs(spending.coffee) > 60) {
+      anomalies.push(
+        `High coffee spending: €${Math.abs(spending.coffee).toFixed(2)}/month`,
+      );
+    }
+    if (spending.onlineShopping && Math.abs(spending.onlineShopping) > 100) {
+      anomalies.push(
+        `Frequent online shopping: €${Math.abs(spending.onlineShopping).toFixed(2)}/month`,
+      );
+    }
+    if (spending.dining && Math.abs(spending.dining) > 150) {
+      anomalies.push(
+        `High dining/delivery costs: €${Math.abs(spending.dining).toFixed(2)}/month`,
+      );
+    }
+    if (currentMonth.totalExpenses > currentMonth.totalIncome) {
+      anomalies.push(
+        `SPENDING EXCEEDS INCOME by €${(currentMonth.totalExpenses - currentMonth.totalIncome).toFixed(2)}`,
+      );
+    }
+
+    return {
+      balance: state.currentBalance,
+      monthlyIncome: currentMonth.totalIncome,
+      monthlyExpenses: currentMonth.totalExpenses,
+      netIncome,
+      topCategories,
+      recentTransactions,
+      anomalies,
+    };
+  } catch (error) {
+    console.error("Error loading financial overview:", error);
+    return null;
+  }
 }
 
 // ============================================================================
@@ -90,16 +214,24 @@ function App() {
   const [newAchievements, setNewAchievements] = useState<Achievement[]>([]);
   const [miniFeedback, setMiniFeedback] = useState<string | null>(null);
 
-  // Helper: Convert threads to format for saving (filter system messages, remove timestamps)
-  const getThreadHistoriesForSave = (
+  // Helper: Convert threads to format for saving (extract histories and metadata)
+  const getThreadDataForSave = (
     threadMap: Map<string, ThreadData>,
-  ): Map<string, Array<{ role: "user" | "assistant"; content: string }>> => {
+  ): {
+    histories: Map<
+      string,
+      Array<{ role: "user" | "assistant"; content: string }>
+    >;
+    metadata: Map<string, ThreadMetadata>;
+  } => {
     const histories = new Map<
       string,
       Array<{ role: "user" | "assistant"; content: string }>
     >();
+    const metadata = new Map<string, ThreadMetadata>();
 
     threadMap.forEach((thread, threadId) => {
+      // Extract message history (filter system messages, remove timestamps)
       const history = thread.messages
         .filter((m) => m.role !== "system")
         .map((m) => ({
@@ -107,9 +239,18 @@ function App() {
           content: m.content,
         }));
       histories.set(threadId, history);
+
+      // Extract thread metadata
+      metadata.set(threadId, {
+        characterId: thread.characterId,
+        characterName: thread.characterName,
+        status: thread.status,
+        financialOverview: thread.financialOverview,
+        adviceChoices: thread.adviceChoices,
+      });
     });
 
-    return histories;
+    return { histories, metadata };
   };
 
   // Initialize game
@@ -153,28 +294,65 @@ function App() {
         ? savedState.advisorState
         : createNewAdvisor(currentSessionId);
 
-      // Restore thread histories if available
+      // Restore thread histories and metadata if available
       if (savedState?.threadHistories) {
         const restoredThreads = new Map<string, ThreadData>();
-        savedState.threadHistories.forEach((history, threadId) => {
+
+        for (const [
+          threadId,
+          history,
+        ] of savedState.threadHistories.entries()) {
           // Find thread info from advisor state
           const threadInfo = advisor.activeThreads[threadId];
           if (threadInfo) {
+            // Get saved metadata (including financialOverview, characterId, etc.)
+            const metadata = savedState.threadMetadata?.get(threadId);
+
+            // Convert message history to Message objects
             const messages: Message[] = history.map((msg) => ({
               role: msg.role,
               content: msg.content,
               timestamp: new Date(),
             }));
 
+            // Try to restore financial overview
+            let financialOverview: FinancialOverview | undefined;
+
+            // Option 1: Use saved financial overview if available
+            if (metadata?.financialOverview) {
+              financialOverview = metadata.financialOverview;
+            }
+            // Option 2: Re-fetch if we have characterId
+            else if (metadata?.characterId) {
+              try {
+                const fetched = await getFinancialOverview(
+                  metadata.characterId,
+                  "saves/advisor_default.db", // Use shared database
+                );
+                financialOverview = fetched || undefined;
+              } catch (error) {
+                console.error(
+                  `Failed to fetch financial overview for ${metadata.characterId}:`,
+                  error,
+                );
+              }
+            }
+
             restoredThreads.set(threadId, {
               threadId,
-              characterName: threadInfo.characterId, // We'll update this when we have character data
+              characterId: metadata?.characterId || threadInfo.characterId,
+              characterName: metadata?.characterName || threadInfo.characterId, // We'll update this when we have character data
               messages,
               unreadCount: 0,
-              status: threadInfo.status === "resolved" ? "completed" : "active",
+              status:
+                metadata?.status ||
+                (threadInfo.status === "resolved" ? "completed" : "active"),
+              adviceChoices: metadata?.adviceChoices,
+              financialOverview,
             });
           }
-        });
+        }
+
         setThreads(restoredThreads);
       }
 
@@ -311,11 +489,8 @@ function App() {
         // Boss review completed without quiz - auto-save
         setBossReview(null);
         if (advisorState && sessionId) {
-          saveSession(
-            sessionId,
-            advisorState,
-            getThreadHistoriesForSave(threads),
-          );
+          const { histories, metadata } = getThreadDataForSave(threads);
+          saveSession(sessionId, advisorState, histories, metadata);
         }
       }
       return;
@@ -395,11 +570,8 @@ function App() {
 
           // Auto-save after quiz completion
           if (sessionId) {
-            saveSession(
-              sessionId,
-              updatedState,
-              getThreadHistoriesForSave(threads),
-            );
+            const { histories, metadata } = getThreadDataForSave(threads);
+            saveSession(sessionId, updatedState, histories, metadata);
           }
         }
 
@@ -524,10 +696,12 @@ function App() {
 
         // Auto-save after onboarding
         if (sessionId) {
+          const { histories, metadata } = getThreadDataForSave(threads);
           await saveSession(
             sessionId,
             consultation.stateUpdate,
-            getThreadHistoriesForSave(threads),
+            histories,
+            metadata,
           );
         }
         return;
@@ -542,10 +716,12 @@ function App() {
 
         // Auto-save after check-in
         if (sessionId) {
+          const { histories, metadata } = getThreadDataForSave(threads);
           await saveSession(
             sessionId,
             consultation.stateUpdate,
-            getThreadHistoriesForSave(threads),
+            histories,
+            metadata,
           );
         }
         return;
@@ -560,10 +736,12 @@ function App() {
 
         // Auto-save after boss review state update
         if (sessionId) {
+          const { histories, metadata } = getThreadDataForSave(threads);
           await saveSession(
             sessionId,
             consultation.stateUpdate,
-            getThreadHistoriesForSave(threads),
+            histories,
+            metadata,
           );
         }
         return;
@@ -578,25 +756,103 @@ function App() {
         const newThreadId = consultation.threadId;
         const characterName = consultation.characterInfo.name;
 
+        // Get characterId from the thread in activeThreads
+        const threadInfo = consultation.stateUpdate.activeThreads[newThreadId];
+        const characterId = threadInfo?.characterId || "";
+
+        // Load financial overview (structured data)
+        // NOTE: Always use shared database (advisor_default.db) since financial simulation
+        // is shared across all sessions, not session-specific
+        const financialOverview =
+          characterId && characterId.length > 0
+            ? await getFinancialOverview(
+                characterId,
+                "saves/advisor_default.db", // Use shared database, not session-specific
+              )
+            : null;
+
         // Create new thread
+        const messages: Array<{
+          role: "user" | "assistant" | "system";
+          content: string;
+          timestamp: Date;
+        }> = [
+          {
+            role: "system",
+            content: `New client: ${characterName}, ${consultation.characterInfo.age}, ${consultation.characterInfo.occupation}`,
+            timestamp: new Date(),
+          },
+        ];
+
+        // Add actual outcome banner for returning characters
+        if (consultation.actualOutcome) {
+          const outcome = consultation.actualOutcome;
+          const savedAmount = outcome.totalSaved ?? 0;
+          let outcomeMessage =
+            "\n\n📈 ACTUAL FINANCIAL OUTCOME (Since Last Visit):\n\n";
+
+          if (savedAmount > 0) {
+            outcomeMessage += `✅ SUCCESS: Client saved €${savedAmount.toFixed(2)} total\n`;
+            outcomeMessage += `Previous expenses: €${outcome.baselineExpenses.toFixed(2)}/month (${outcome.baselineMonth})\n`;
+            if (outcome.followUpExpenses !== undefined) {
+              outcomeMessage += `Current expenses: €${outcome.followUpExpenses.toFixed(2)}/month (${outcome.followUpMonth || "now"})\n`;
+            }
+          } else if (savedAmount < 0) {
+            outcomeMessage += `⚠️ CONCERN: Spending increased by €${Math.abs(savedAmount).toFixed(2)}\n`;
+            outcomeMessage += `Previous expenses: €${outcome.baselineExpenses.toFixed(2)}/month\n`;
+            if (outcome.followUpExpenses !== undefined) {
+              outcomeMessage += `Current expenses: €${outcome.followUpExpenses.toFixed(2)}/month\n`;
+            }
+          } else {
+            outcomeMessage += `➡️ NEUTRAL: No significant change in spending\n`;
+          }
+
+          // Add category breakdown if available
+          if (
+            outcome.categorySavings &&
+            Object.keys(outcome.categorySavings).length > 0
+          ) {
+            outcomeMessage += "\n📊 Category Changes:\n";
+            Object.entries(outcome.categorySavings)
+              .filter(([_, amount]) => Math.abs(amount) > 1)
+              .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
+              .forEach(([category, amount]) => {
+                const emoji =
+                  category === "coffee"
+                    ? "☕"
+                    : category === "dining"
+                      ? "🍔"
+                      : category === "shopping"
+                        ? "🛒"
+                        : "💰";
+                const sign = amount > 0 ? "-" : "+";
+                outcomeMessage += `  ${emoji} ${category}: ${sign}€${Math.abs(amount).toFixed(2)}\n`;
+              });
+          }
+
+          messages.push({
+            role: "system",
+            content: outcomeMessage,
+            timestamp: new Date(),
+          });
+        }
+
+        // Add character's opening message
+        messages.push({
+          role: "assistant",
+          content: consultation.messages?.[0] || "Hello...",
+          timestamp: new Date(),
+        });
+
         const newThread: ThreadData = {
           threadId: newThreadId,
+          characterId: characterId || undefined,
           characterName,
-          messages: [
-            {
-              role: "system",
-              content: `New client: ${characterName}, ${consultation.characterInfo.age}, ${consultation.characterInfo.occupation}`,
-              timestamp: new Date(),
-            },
-            {
-              role: "assistant",
-              content: consultation.messages?.[0] || "Hello...",
-              timestamp: new Date(),
-            },
-          ],
+          messages,
           unreadCount: 0,
           status: "active",
           adviceChoices: consultation.adviceChoices,
+          financialOverview: financialOverview || undefined,
         };
 
         const updated = new Map(threads);
@@ -608,10 +864,12 @@ function App() {
 
         // Auto-save after new consultation
         if (sessionId) {
+          const { histories, metadata } = getThreadDataForSave(updated);
           await saveSession(
             sessionId,
             consultation.stateUpdate,
-            getThreadHistoriesForSave(updated),
+            histories,
+            metadata,
           );
         }
       } else {
@@ -758,11 +1016,8 @@ function App() {
 
       // Auto-save after message exchange
       if (sessionId) {
-        await saveSession(
-          sessionId,
-          response.stateUpdate,
-          getThreadHistoriesForSave(updated),
-        );
+        const { histories, metadata } = getThreadDataForSave(updated);
+        await saveSession(sessionId, response.stateUpdate, histories, metadata);
       }
 
       // Check if conversation ended
@@ -1041,6 +1296,71 @@ function App() {
 }
 
 // ============================================================================
+// Financial Overview Box Component
+// ============================================================================
+
+function FinancialOverviewBox({ overview }: { overview: FinancialOverview }) {
+  return (
+    <Box flexDirection="column" marginBottom={1}>
+      <Box borderStyle="single" borderColor="green" paddingX={1}>
+        <Text bold color="green">
+          💰 FINANCIAL OVERVIEW
+        </Text>
+      </Box>
+
+      <Box flexDirection="column" paddingLeft={2} paddingY={0}>
+        <Text>Balance: €{overview.balance.toFixed(2)}</Text>
+        <Text>Monthly Income: €{overview.monthlyIncome.toFixed(2)}</Text>
+        <Text>Monthly Expenses: €{overview.monthlyExpenses.toFixed(2)}</Text>
+        <Text color={overview.netIncome >= 0 ? "green" : "red"}>
+          Net: {overview.netIncome >= 0 ? "+" : ""}€
+          {overview.netIncome.toFixed(2)}
+        </Text>
+      </Box>
+
+      {overview.topCategories.length > 0 && (
+        <Box flexDirection="column" paddingLeft={2} paddingTop={1}>
+          <Text bold>📊 Top Spending:</Text>
+          {overview.topCategories.slice(0, 5).map((cat, index) => (
+            <Text key={index}>
+              {" "}
+              • {cat.category}: €{Math.abs(cat.amount).toFixed(2)} (
+              {cat.percentage.toFixed(1)}%)
+            </Text>
+          ))}
+        </Box>
+      )}
+
+      {overview.recentTransactions.length > 0 && (
+        <Box flexDirection="column" paddingLeft={2} paddingTop={1}>
+          <Text bold>📋 Recent Transactions:</Text>
+          {overview.recentTransactions.slice(0, 5).map((txn, index) => (
+            <Text key={index} dimColor>
+              {" "}
+              {txn.date}: {txn.description} €{txn.amount.toFixed(2)}
+            </Text>
+          ))}
+        </Box>
+      )}
+
+      {overview.anomalies.length > 0 && (
+        <Box flexDirection="column" paddingLeft={2} paddingTop={1}>
+          <Text bold color="yellow">
+            ⚠️ Spending Alerts:
+          </Text>
+          {overview.anomalies.map((anomaly, index) => (
+            <Text key={index} color="yellow">
+              {" "}
+              {anomaly}
+            </Text>
+          ))}
+        </Box>
+      )}
+    </Box>
+  );
+}
+
+// ============================================================================
 // Conversation Panel Component
 // ============================================================================
 
@@ -1055,6 +1375,11 @@ function ConversationPanel({ thread }: { thread: ThreadData }) {
           💬 {thread.characterName}
         </Text>
       </Box>
+
+      {/* Show financial overview if available */}
+      {thread.financialOverview && (
+        <FinancialOverviewBox overview={thread.financialOverview} />
+      )}
 
       {recentMessages.map((msg, index) => (
         <Box key={index} paddingY={0} flexDirection="column">
@@ -1603,6 +1928,53 @@ function FinalResultsModal({
         </>
       )}
 
+      {/* PHASE C: Extracted Actions Display */}
+      {financialResults?.extractedActions &&
+        financialResults.extractedActions.length > 0 && (
+          <>
+            <Box
+              borderStyle="single"
+              borderColor="green"
+              paddingX={1}
+              flexDirection="column"
+            >
+              <Text color="green" bold>
+                ✅ ACTIONABLE ITEMS EXTRACTED:
+              </Text>
+              <Text color="yellow">
+                {financialResults.extractedActions.length} action
+                {financialResults.extractedActions.length > 1 ? "s" : ""}{" "}
+                identified from your advice:
+              </Text>
+              {financialResults.extractedActions.map((action, idx) => {
+                let actionDesc = "";
+                if (action.actionType === "cancel_subscription") {
+                  actionDesc = `🚫 Cancel ${action.specificSubscription || "subscription"}`;
+                } else if (action.actionType === "reduce_expense_category") {
+                  const percent = action.reductionPercent
+                    ? Math.round(action.reductionPercent * 100)
+                    : 20;
+                  actionDesc = `📉 Reduce ${action.targetCategory || "expenses"} by ${percent}%`;
+                } else if (action.actionType === "start_tracking") {
+                  actionDesc = `📊 Start tracking expenses`;
+                } else if (action.actionType === "reduce_impulse_purchases") {
+                  actionDesc = `🛑 Reduce impulse purchases`;
+                } else if (action.actionType === "increase_debt_payment") {
+                  actionDesc = `💳 Increase debt payments`;
+                } else {
+                  actionDesc = `• ${action.actionType}`;
+                }
+                return (
+                  <Text key={idx} color="green">
+                    {actionDesc}
+                  </Text>
+                );
+              })}
+            </Box>
+            <Text> </Text>
+          </>
+        )}
+
       {/* Character's final response */}
       {response.messages && response.messages.length > 0 && (
         <>
@@ -1780,6 +2152,64 @@ function FinalResultsModal({
           <Text> </Text>
         </>
       )}
+
+      {/* PHASE F: Savings Summary */}
+      {projection &&
+        projection.totalSaved !== undefined &&
+        projection.totalSaved > 0 && (
+          <>
+            <Text dimColor>─────────────────────────</Text>
+            <Text bold color="green">
+              🎯 YOU HELPED SAVE: €{Math.round(projection.totalSaved)} over{" "}
+              {projection.projectionPeriodMonths} months
+            </Text>
+            {projection.monthlySavings > 0 && (
+              <Text color="cyan">
+                That's €{Math.round(projection.monthlySavings)}/month in their
+                pocket!
+              </Text>
+            )}
+
+            {/* PHASE F: Category Breakdown */}
+            {projection.categorySavings &&
+              Object.keys(projection.categorySavings).length > 0 && (
+                <>
+                  <Text> </Text>
+                  <Text color="yellow" bold>
+                    📊 Savings Breakdown:
+                  </Text>
+                  {Object.entries(projection.categorySavings)
+                    .filter(([_, amount]) => amount > 0)
+                    .sort((a, b) => b[1] - a[1])
+                    .map(([category, amount]) => {
+                      const emoji =
+                        category === "coffee"
+                          ? "☕"
+                          : category === "dining"
+                            ? "🍔"
+                            : category === "onlineShopping"
+                              ? "🛒"
+                              : category === "groceries"
+                                ? "🛒"
+                                : category === "subscriptions"
+                                  ? "📺"
+                                  : "💰";
+                      return (
+                        <Text key={category} color="green">
+                          {emoji} {category}: €{Math.round(amount)} (€
+                          {Math.round(
+                            amount / projection.projectionPeriodMonths,
+                          )}
+                          /month)
+                        </Text>
+                      );
+                    })}
+                </>
+              )}
+
+            <Text> </Text>
+          </>
+        )}
 
       {/* Earnings */}
       <Text dimColor>─────────────────────────</Text>
