@@ -7,6 +7,10 @@
 
 import { evaluatorAgent } from "../agents/evaluator-agent.ts";
 import { cachedGenerate } from "../test-cache.ts";
+import {
+  calculateProjectedOutcome,
+  type FinancialProjection,
+} from "../game/financial-calculator.ts";
 import type {
   AdviceEvaluation,
   Scenario,
@@ -125,6 +129,17 @@ Please evaluate this advice comprehensively across all dimensions.
         }
       }
 
+      // Calculate financial projection
+      const willFollowConfidence =
+        evaluation.characterProgression?.confidence ?? 0.5;
+
+      const financialProjection = calculateProjectedOutcome(
+        scenario,
+        qualityScore,
+        willFollowAdvice,
+        willFollowConfidence,
+      );
+
       // Return comprehensive evaluation
       return {
         qualityScore: parseFloat(qualityScore.toFixed(1)),
@@ -143,6 +158,8 @@ Please evaluate this advice comprehensively across all dimensions.
         dimensions: evaluation.dimensions,
         characterProgression: evaluation.characterProgression,
         consultationStatus: evaluation.consultationStatus,
+        // NEW: Financial projection
+        financialProjection,
       };
     } catch (error) {
       console.error("❌ Error evaluating advice with AI:", error);
@@ -207,6 +224,15 @@ Please evaluate this advice comprehensively across all dimensions.
         weaknesses.push("Could be more detailed and specific");
       }
 
+      // Calculate financial projection for fallback
+      const willFollowConfidence = willFollowAdvice ? 0.6 : 0.3;
+      const financialProjection = calculateProjectedOutcome(
+        scenario,
+        score,
+        willFollowAdvice,
+        willFollowConfidence,
+      );
+
       return {
         qualityScore: parseFloat(score.toFixed(1)),
         willFollowAdvice,
@@ -218,6 +244,8 @@ Please evaluate this advice comprehensively across all dimensions.
         wasActionable,
         wasEmpathetic: false,
         wasAccurate: true,
+        // NEW: Financial projection
+        financialProjection,
       };
     }
   },

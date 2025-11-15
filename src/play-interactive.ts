@@ -9,6 +9,7 @@ import { characterPool } from "./mastra/index.ts";
 import {
   startNewConsultation,
   handleAdvisorResponse,
+  handleAdviceChoice,
   createNewAdvisor,
   getAdvisorSummary,
   getActiveThreads,
@@ -17,6 +18,7 @@ import {
 import type {
   AdvisorState,
   ConversationThread,
+  AdviceChoice,
 } from "./mastra/types/game-types.ts";
 
 const rl = readline.createInterface({
@@ -28,6 +30,7 @@ const rl = readline.createInterface({
 const colors = {
   reset: "\x1b[0m",
   bright: "\x1b[1m",
+  dim: "\x1b[2m",
   cyan: "\x1b[36m",
   yellow: "\x1b[33m",
   green: "\x1b[32m",
@@ -70,13 +73,46 @@ function printCharacterMessage(
 
 function printStats(advisorState: AdvisorState) {
   const summary = getAdvisorSummary(advisorState);
-  print("\n📊 Your Stats:", colors.yellow);
-  print(`   Reputation: ${summary.performance.reputation}`, colors.yellow);
-  print(`   Skill Level: ${summary.performance.skillLevel}`, colors.yellow);
-  print(`   Sessions: ${summary.progress.totalSessions}`, colors.yellow);
+
+  print("\n" + "═".repeat(70), colors.bright + colors.cyan);
+  print("📊 ADVISOR DASHBOARD", colors.bright + colors.cyan);
+  print("═".repeat(70), colors.bright + colors.cyan);
+
+  // Career & Performance
+  const tierNames = [
+    "",
+    "Junior Advisor",
+    "Associate Advisor",
+    "Senior Advisor",
+    "Specialist",
+    "Expert",
+  ];
+  const tierName = tierNames[advisorState.careerTier] || "Advisor";
+  print(
+    `\n🎖️  Career: ${tierName} (Tier ${advisorState.careerTier}/5)`,
+    colors.bright + colors.yellow,
+  );
+  print(`📊 Reputation: ${summary.performance.reputation}/100`, colors.yellow);
+  print(`🎓 Skill Level: ${summary.performance.skillLevel}/10`, colors.yellow);
+
+  // Earnings & Impact
+  print(`\n💰 EARNINGS & IMPACT`, colors.bright + colors.green);
+  print(`   Coins: ${advisorState.advisorCoins} 💎`, colors.cyan);
+  print(
+    `   Lifetime Savings Generated: ${advisorState.lifetimeSavingsGenerated}€`,
+    colors.green,
+  );
+  print(
+    `   Lifetime Debt Cleared: ${advisorState.lifetimeDebtCleared}€`,
+    colors.green,
+  );
+
+  // Progress
+  print(`\n📈 PROGRESS`, colors.bright + colors.green);
+  print(`   Sessions: ${summary.progress.totalSessions}`, colors.cyan);
   print(
     `   Clients Helped: ${summary.progress.totalClientsHelped}`,
-    colors.yellow,
+    colors.cyan,
   );
 
   // Show relationships summary
@@ -86,6 +122,31 @@ function printStats(advisorState: AdvisorState) {
   if (relationships.length > 0) {
     print(`   Characters Met: ${relationships.length}`, colors.yellow);
   }
+
+  // Current Goal
+  if (advisorState.currentGoal) {
+    const goal = advisorState.currentGoal;
+    print(
+      `\n🎯 CURRENT GOAL (${goal.sessionsRemaining} sessions left)`,
+      colors.bright + colors.yellow,
+    );
+    print(`   ${goal.description}`, colors.cyan);
+    const progress = Math.min(
+      100,
+      Math.round((goal.progress / goal.target) * 100),
+    );
+    const progressBar =
+      "█".repeat(Math.floor(progress / 5)) +
+      "░".repeat(20 - Math.floor(progress / 5));
+    print(`   Progress: ${progressBar} ${progress}%`, colors.yellow);
+    print(`   ${goal.progress}/${goal.target}`, colors.cyan);
+    print(
+      `   Reward: +${goal.coinReward} coins, +${goal.skillBonus} skill`,
+      colors.green,
+    );
+  }
+
+  print("═".repeat(70) + "\n", colors.bright + colors.cyan);
 }
 
 function getTrustHearts(trustLevel: number): string {
@@ -359,6 +420,207 @@ async function askQuestion(prompt: string): Promise<string> {
   });
 }
 
+async function waitForEnter(): Promise<void> {
+  return new Promise((resolve) => {
+    rl.question("", () => {
+      resolve();
+    });
+  });
+}
+
+/**
+ * Interactive choice selector with arrow key navigation
+ */
+async function selectChoiceWithArrows(
+  choices: AdviceChoice[],
+): Promise<number> {
+  return new Promise((resolve) => {
+    let selectedIndex = 0;
+
+    // Set up raw mode for keypress detection
+    const stdin = process.stdin;
+    stdin.setRawMode(true);
+    stdin.resume();
+    stdin.setEncoding("utf8");
+
+    // Save cursor position before drawing
+    process.stdout.write("\u001b7"); // Save cursor position
+    displayAdviceChoices(choices, selectedIndex);
+
+    const redrawChoices = () => {
+      process.stdout.write("\u001b8"); // Restore cursor position
+      process.stdout.write("\u001b[J"); // Clear from cursor to end of screen
+      displayAdviceChoices(choices, selectedIndex);
+    };
+
+    const onKeyPress = (key: string) => {
+      if (key === "\u001b[A") {
+        // Up arrow
+        selectedIndex = Math.max(0, selectedIndex - 1);
+        redrawChoices();
+      } else if (key === "\u001b[B") {
+        // Down arrow
+        selectedIndex = Math.min(choices.length - 1, selectedIndex + 1);
+        redrawChoices();
+      } else if (key === "\r" || key === "\n") {
+        // Enter key
+        cleanup();
+        resolve(selectedIndex);
+      } else if (key === "q" || key === "Q") {
+        // Quit
+        cleanup();
+        print("\n👋 Thanks for playing!\n", colors.cyan);
+        process.exit(0);
+      } else if (key === "\u0003") {
+        // Ctrl+C
+        cleanup();
+        process.exit(0);
+      }
+    };
+
+    const cleanup = () => {
+      stdin.removeListener("data", onKeyPress);
+      stdin.setRawMode(false);
+      stdin.pause();
+    };
+
+    stdin.on("data", onKeyPress);
+  });
+}
+
+/**
+ * Display advice choices to player
+ */
+function displayAdviceChoices(
+  choices: AdviceChoice[],
+  selectedIndex?: number,
+): void {
+  print(
+    "\n┌─ YOUR MOVE " + "─".repeat(57) + "┐",
+    colors.bright + colors.yellow,
+  );
+  print(
+    "│ What's your advice?                                             │",
+    colors.yellow,
+  );
+  print(
+    "│                                                                 │",
+    colors.yellow,
+  );
+
+  choices.forEach((choice, index) => {
+    const isSelected = selectedIndex !== undefined && selectedIndex === index;
+    const arrow = isSelected ? "→" : " ";
+    const number = `[${index + 1}]`;
+    const icon = choice.icon;
+    const action = choice.actionText;
+    const outcome = choice.projectedOutcome;
+
+    // First line: Arrow, Number, icon, action
+    const actionLine = `${arrow} ${number} ${icon} ${action}`;
+    const actionPadded =
+      actionLine + " ".repeat(Math.max(0, 65 - actionLine.length));
+    const actionColor = isSelected ? colors.bright + colors.green : colors.cyan;
+    print(`│ ${actionPadded}│`, actionColor);
+
+    // Second line: Outcome
+    const outcomeLine = `     ${outcome}`;
+    const outcomePadded =
+      outcomeLine + " ".repeat(Math.max(0, 65 - outcomeLine.length));
+    print(`│ ${outcomePadded}│`, colors.dim);
+
+    // Blank line between choices
+    if (index < choices.length - 1) {
+      print(
+        "│                                                                 │",
+        colors.yellow,
+      );
+    }
+  });
+
+  print("└" + "─".repeat(67) + "┘", colors.bright + colors.yellow);
+
+  // Show instructions if in arrow key mode
+  if (selectedIndex !== undefined) {
+    print("  ↑↓ Navigate  │  Enter Select  │  Q Quit", colors.dim);
+  }
+  print("", colors.reset);
+}
+
+/**
+ * Display financial results after consultation
+ */
+function displayFinancialResults(
+  financialResults: { projection?: any; coinsEarned?: number },
+  characterName: string,
+): void {
+  print("\n" + "━".repeat(70), colors.bright + colors.green);
+  print("✨ CONSULTATION COMPLETE ✨", colors.bright + colors.green);
+  print("━".repeat(70), colors.bright + colors.green);
+
+  if (financialResults.projection) {
+    const proj = financialResults.projection;
+
+    print("\n💰 FINANCIAL IMPACT", colors.bright + colors.yellow);
+    print("─".repeat(70), colors.dim);
+
+    // Show primary outcomes
+    if (proj.totalSaved > 0) {
+      print(
+        `📈 Client will save: ${Math.round(proj.totalSaved)}€ over ${proj.projectionPeriodMonths} months`,
+        colors.green,
+      );
+      if (proj.monthlySavings > 0) {
+        print(
+          `   (${Math.round(proj.monthlySavings)}€/month average)`,
+          colors.cyan,
+        );
+      }
+    }
+
+    if (proj.totalDebtReduced > 0) {
+      print(
+        `💳 Debt reduced by: ${Math.round(proj.totalDebtReduced)}€`,
+        colors.green,
+      );
+      if (proj.totalInterestSaved > 0) {
+        print(
+          `   Interest saved: ${Math.round(proj.totalInterestSaved)}€`,
+          colors.green,
+        );
+      }
+      if (proj.monthsToGoal > 0 && proj.monthsToGoal < 999) {
+        print(
+          `   Debt-free in: ${Math.round(proj.monthsToGoal)} months`,
+          colors.cyan,
+        );
+      }
+    }
+
+    // Emergency fund progress
+    if (proj.emergencyFundProgress > 0 && proj.emergencyFundProgress < 1) {
+      const progressPercent = Math.round(proj.emergencyFundProgress * 100);
+      print(
+        `🛡️  Emergency Fund: ${progressPercent}% toward 3-month goal`,
+        colors.cyan,
+      );
+    } else if (proj.emergencyFundProgress >= 1) {
+      print(`🛡️  Emergency Fund: GOAL REACHED! ✅`, colors.green);
+    }
+  }
+
+  // Show earnings
+  if (financialResults.coinsEarned !== undefined) {
+    print("\n" + "─".repeat(70), colors.dim);
+    print(
+      `💎 YOU EARNED: +${financialResults.coinsEarned} coins`,
+      colors.bright + colors.yellow,
+    );
+  }
+
+  print("━".repeat(70) + "\n", colors.bright + colors.green);
+}
+
 async function playGame() {
   printBanner();
 
@@ -372,22 +634,200 @@ async function playGame() {
   printStats(advisorState);
 
   print("\n\nPress ENTER to start your first consultation...", colors.yellow);
-  await askQuestion("");
+  await waitForEnter();
+
+  // Automatically start first consultation
+  print("\n🔄 Finding your first client...", colors.cyan);
+  const firstConsultation = await startNewConsultation(advisorId, advisorState);
+
+  if (
+    firstConsultation.type !== "character_message" ||
+    !firstConsultation.characterInfo
+  ) {
+    print("❌ Failed to start consultation.", colors.red);
+    rl.close();
+    return;
+  }
+
+  advisorState = firstConsultation.stateUpdate;
+  const firstThreadId = firstConsultation.threadId || `thread_${Date.now()}`;
 
   let continueGame = true;
-  let currentThreadId: string | null = null;
+  let currentThreadId: string | null = firstThreadId;
 
   // Store conversation history per thread
   const threadHistories = new Map<
     string,
     Array<{ role: "user" | "assistant"; content: string }>
   >();
+  threadHistories.set(firstThreadId, []);
 
   // Store character info per thread
   const threadCharacterInfo = new Map<
     string,
     { name: string; age: number; occupation: string }
   >();
+  threadCharacterInfo.set(firstThreadId, firstConsultation.characterInfo);
+
+  // Display first client
+  print("\n\n" + "═".repeat(70), colors.bright);
+  print(`   🆕 NEW CLIENT`, colors.bright + colors.green);
+  print("═".repeat(70), colors.bright);
+  print(`Name: ${firstConsultation.characterInfo.name}`, colors.cyan);
+  print(`Age: ${firstConsultation.characterInfo.age}`, colors.cyan);
+  print(
+    `Occupation: ${firstConsultation.characterInfo.occupation}`,
+    colors.cyan,
+  );
+
+  // Display financial snapshot if available
+  if (firstConsultation.scenarioFinancialContext) {
+    const ctx = firstConsultation.scenarioFinancialContext;
+    print("\n📊 FINANCIAL SNAPSHOT", colors.bright + colors.yellow);
+    print("━".repeat(70), colors.dim);
+
+    // Difficulty & Topic
+    const difficultyStars =
+      "⭐".repeat(Math.ceil(ctx.difficulty * 5)) +
+      "☆".repeat(5 - Math.ceil(ctx.difficulty * 5));
+    print(`Difficulty: ${difficultyStars}`, colors.yellow);
+    print(
+      `Topic: ${ctx.topic.replace(/_/g, " ").toUpperCase()}`,
+      colors.yellow,
+    );
+
+    // Income & Expenses
+    print("\n💰 INCOME & EXPENSES", colors.green);
+    if (ctx.monthlyIncome) {
+      print(`  Income:     ${ctx.monthlyIncome}€/month`, colors.cyan);
+      if (ctx.rent) {
+        const rentPercent = Math.round((ctx.rent / ctx.monthlyIncome) * 100);
+        const rentWarning = rentPercent > 50 ? " 🔴" : "";
+        print(
+          `  Rent:       ${ctx.rent}€ (${rentPercent}% of income)${rentWarning}`,
+          colors.cyan,
+        );
+      } else {
+        print(`  Rent:       Unknown`, colors.cyan);
+      }
+    } else {
+      print(`  Income:     Unknown`, colors.cyan);
+      print(`  Rent:       Unknown`, colors.cyan);
+    }
+
+    // Debt & Savings
+    print("\n💳 DEBT & SAVINGS", colors.green);
+    if (ctx.totalDebt) {
+      print(`  Debt:       ${ctx.totalDebt}€ 🔴`, colors.cyan);
+    } else {
+      print(`  Debt:       None ✅`, colors.cyan);
+    }
+    if (ctx.currentSavings !== undefined) {
+      print(`  Savings:    ${ctx.currentSavings}€`, colors.cyan);
+    } else {
+      print(`  Savings:    Unknown`, colors.cyan);
+    }
+
+    // Situation
+    print("\n📈 SITUATION", colors.green);
+    print(`  ${ctx.situation}`, colors.cyan);
+    const urgencyEmoji =
+      ctx.urgency === "high" ? "🔴" : ctx.urgency === "medium" ? "⚠️" : "✅";
+    print(
+      `  Urgency:    ${ctx.urgency.toUpperCase()} ${urgencyEmoji}`,
+      colors.yellow,
+    );
+
+    print("━".repeat(70) + "\n", colors.dim);
+  }
+
+  const firstMessage = firstConsultation.messages?.[0] || "Hello...";
+  printCharacterMessage(
+    firstConsultation.characterInfo.name,
+    firstMessage,
+    firstConsultation.voiceNeeded || false,
+  );
+
+  // Show advice choices for first consultation
+  if (
+    firstConsultation.adviceChoices &&
+    firstConsultation.adviceChoices.length > 0 &&
+    firstConsultation.characterInfo
+  ) {
+    // Use arrow key selector
+    const selectedIndex = await selectChoiceWithArrows(
+      firstConsultation.adviceChoices,
+    );
+    const selectedChoice = firstConsultation.adviceChoices[selectedIndex];
+
+    // For compatibility, also set choiceNumber
+    const choiceNumber = selectedIndex + 1;
+
+    if (selectedChoice) {
+      // Check if custom advice option
+      if (selectedChoice.actionText.toLowerCase().includes("custom")) {
+        // Allow free-text input
+        const customAdvice = await askQuestion("Enter your custom advice: ");
+        // Handle as normal free-text response
+        const response = await handleAdvisorResponse(
+          firstThreadId,
+          customAdvice,
+          advisorState,
+          [],
+        );
+        advisorState = response.stateUpdate;
+
+        if (response.messages && response.messages.length > 0) {
+          response.messages.forEach((msg) => {
+            printCharacterMessage(
+              firstConsultation.characterInfo!.name,
+              msg,
+              false,
+            );
+          });
+        }
+
+        // Show financial results if consultation ended
+        if (response.type === "conversation_end" && response.financialResults) {
+          displayFinancialResults(
+            response.financialResults,
+            firstConsultation.characterInfo!.name,
+          );
+          currentThreadId = null;
+        }
+      } else {
+        // Handle choice-based advice
+        print("\n⏳ Processing your advice...", colors.cyan);
+        const response = await handleAdviceChoice(
+          firstThreadId,
+          choiceNumber - 1, // Pass zero-based array index
+          advisorState,
+          [],
+        );
+        advisorState = response.stateUpdate;
+
+        // Show character's acceptance
+        if (response.messages && response.messages.length > 0) {
+          printCharacterMessage(
+            firstConsultation.characterInfo!.name,
+            response.messages[0],
+            false,
+          );
+        }
+
+        // Show financial results
+        if (response.financialResults) {
+          displayFinancialResults(
+            response.financialResults,
+            firstConsultation.characterInfo!.name,
+          );
+        }
+
+        // Consultation is complete, clear current thread
+        currentThreadId = null;
+      }
+    }
+  }
 
   while (continueGame) {
     try {
@@ -487,7 +927,7 @@ async function playGame() {
 
           printStats(advisorState);
           print("\nPress ENTER to continue...", colors.yellow);
-          await askQuestion("");
+          await waitForEnter();
           continue;
         }
 
@@ -521,12 +961,164 @@ async function playGame() {
           colors.cyan,
         );
 
+        // NEW: Display financial snapshot if available
+        if (consultation.scenarioFinancialContext) {
+          const ctx = consultation.scenarioFinancialContext;
+          print("\n📊 FINANCIAL SNAPSHOT", colors.bright + colors.yellow);
+          print("━".repeat(70), colors.dim);
+
+          // Difficulty & Topic
+          const difficultyStars =
+            "⭐".repeat(Math.ceil(ctx.difficulty * 5)) +
+            "☆".repeat(5 - Math.ceil(ctx.difficulty * 5));
+          print(`Difficulty: ${difficultyStars}`, colors.yellow);
+          print(
+            `Topic: ${ctx.topic.replace(/_/g, " ").toUpperCase()}`,
+            colors.yellow,
+          );
+
+          // Income & Expenses
+          print("\n💰 INCOME & EXPENSES", colors.green);
+          if (ctx.monthlyIncome) {
+            print(`  Income:     ${ctx.monthlyIncome}€/month`, colors.cyan);
+            if (ctx.rent) {
+              const rentPercent = Math.round(
+                (ctx.rent / ctx.monthlyIncome) * 100,
+              );
+              const rentWarning = rentPercent > 50 ? " 🔴" : "";
+              print(
+                `  Rent:       ${ctx.rent}€ (${rentPercent}% of income)${rentWarning}`,
+                colors.cyan,
+              );
+            } else {
+              print(`  Rent:       Unknown`, colors.cyan);
+            }
+          } else {
+            print(`  Income:     Unknown`, colors.cyan);
+            print(`  Rent:       Unknown`, colors.cyan);
+          }
+
+          // Debt & Savings
+          print("\n💳 DEBT & SAVINGS", colors.green);
+          if (ctx.totalDebt) {
+            print(`  Debt:       ${ctx.totalDebt}€ 🔴`, colors.cyan);
+          } else {
+            print(`  Debt:       None ✅`, colors.cyan);
+          }
+          if (ctx.currentSavings !== undefined) {
+            print(`  Savings:    ${ctx.currentSavings}€`, colors.cyan);
+          } else {
+            print(`  Savings:    Unknown`, colors.cyan);
+          }
+
+          // Situation
+          print("\n📈 SITUATION", colors.green);
+          print(`  ${ctx.situation}`, colors.cyan);
+          const urgencyEmoji =
+            ctx.urgency === "high"
+              ? "🔴"
+              : ctx.urgency === "medium"
+                ? "⚠️"
+                : "✅";
+          print(
+            `  Urgency:    ${ctx.urgency.toUpperCase()} ${urgencyEmoji}`,
+            colors.yellow,
+          );
+
+          print("━".repeat(70) + "\n", colors.dim);
+        }
+
         const initialMessage = consultation.messages?.[0] || "Hello...";
         printCharacterMessage(
           consultation.characterInfo.name,
           initialMessage,
           consultation.voiceNeeded || false,
         );
+
+        // Show advice choices if available
+        if (
+          consultation.adviceChoices &&
+          consultation.adviceChoices.length > 0
+        ) {
+          // Use arrow key selector
+          const selectedIndex = await selectChoiceWithArrows(
+            consultation.adviceChoices,
+          );
+          const selectedChoice = consultation.adviceChoices[selectedIndex];
+
+          // For compatibility, also set choiceNumber
+          const choiceNumber = selectedIndex + 1;
+
+          if (selectedChoice) {
+            // Check if custom advice option
+            if (selectedChoice.actionText.toLowerCase().includes("custom")) {
+              // Allow free-text input
+              const customAdvice = await askQuestion(
+                "Enter your custom advice: ",
+              );
+              // Handle as normal free-text response
+              const response = await handleAdvisorResponse(
+                newThreadId,
+                customAdvice,
+                advisorState,
+                [],
+              );
+              advisorState = response.stateUpdate;
+
+              if (response.messages && response.messages.length > 0) {
+                response.messages.forEach((msg) => {
+                  printCharacterMessage(
+                    consultation.characterInfo!.name,
+                    msg,
+                    false,
+                  );
+                });
+              }
+
+              // Show financial results if consultation ended
+              if (
+                response.type === "conversation_end" &&
+                response.financialResults
+              ) {
+                displayFinancialResults(
+                  response.financialResults,
+                  consultation.characterInfo!.name,
+                );
+                currentThreadId = null;
+              }
+            } else {
+              // Handle choice-based advice
+              print("\n⏳ Processing your advice...", colors.cyan);
+              const response = await handleAdviceChoice(
+                newThreadId,
+                choiceNumber - 1, // Pass zero-based array index
+                advisorState,
+                [],
+              );
+              advisorState = response.stateUpdate;
+
+              // Show character's acceptance
+              if (response.messages && response.messages.length > 0) {
+                printCharacterMessage(
+                  consultation.characterInfo!.name,
+                  response.messages[0],
+                  false,
+                );
+              }
+
+              // Show financial results
+              if (response.financialResults) {
+                displayFinancialResults(
+                  response.financialResults,
+                  consultation.characterInfo!.name,
+                );
+              }
+
+              // Consultation is complete, clear current thread
+              currentThreadId = null;
+            }
+          }
+        }
 
         continue;
       }
@@ -641,6 +1233,110 @@ async function playGame() {
       // Check if conversation ended
       if (response.type === "conversation_end") {
         print("\n✅ Client has left the consultation.", colors.green);
+
+        // NEW: Display financial projection results
+        if (response.financialResults?.projection) {
+          const proj = response.financialResults.projection;
+          const coins = response.financialResults.coinsEarned || 0;
+
+          print("\n" + "━".repeat(70), colors.bright + colors.yellow);
+          print(
+            "💰 FINANCIAL OUTCOME PROJECTION",
+            colors.bright + colors.yellow,
+          );
+          print("━".repeat(70), colors.bright + colors.yellow);
+
+          // Show primary outcome based on topic
+          if (proj.totalSaved > 0) {
+            print(
+              `\n📈 Projected Savings: ${Math.round(proj.totalSaved)}€ over ${proj.projectionPeriodMonths} months`,
+              colors.green,
+            );
+            if (proj.monthlySavings > 0) {
+              print(
+                `   (${Math.round(proj.monthlySavings)}€/month average)`,
+                colors.cyan,
+              );
+            }
+          }
+
+          if (proj.totalDebtReduced !== 0) {
+            const isPositive = proj.totalDebtReduced > 0;
+            const color = isPositive ? colors.green : colors.red;
+            const label = isPositive
+              ? "Projected Debt Reduction"
+              : "⚠️  WARNING: Debt Increase";
+            const amount = Math.abs(Math.round(proj.totalDebtReduced));
+
+            print(`\n💳 ${label}: ${amount}€`, color);
+
+            if (isPositive) {
+              if (proj.totalInterestSaved > 0) {
+                print(
+                  `   Interest saved: ${Math.round(proj.totalInterestSaved)}€`,
+                  colors.green,
+                );
+              }
+              if (proj.monthsToGoal > 0 && proj.monthsToGoal < 999) {
+                print(
+                  `   Debt-free in: ${Math.round(proj.monthsToGoal)} months`,
+                  colors.cyan,
+                );
+              }
+            } else {
+              print(
+                `   This advice will make the problem WORSE!`,
+                colors.red + colors.bright,
+              );
+            }
+          }
+
+          // Emergency fund progress
+          if (
+            proj.emergencyFundProgress > 0 &&
+            proj.emergencyFundProgress < 1
+          ) {
+            const progressPercent = Math.round(
+              proj.emergencyFundProgress * 100,
+            );
+            print(
+              `\n🛡️  Emergency Fund: ${progressPercent}% toward 3-month goal`,
+              colors.cyan,
+            );
+          } else if (proj.emergencyFundProgress >= 1) {
+            print(`\n🛡️  Emergency Fund: GOAL REACHED! ✅`, colors.green);
+          }
+
+          // Quality feedback
+          print("\n" + "─".repeat(70), colors.dim);
+          if (coins > 10) {
+            print(
+              `✅ Quality Bonus! Great advice!`,
+              colors.green + colors.bright,
+            );
+          } else if (coins === 10) {
+            print(`✓ Decent advice`, colors.yellow);
+          } else if (coins > 0) {
+            print(`⚠️  Advice had some issues`, colors.yellow);
+          } else {
+            print(
+              `❌ Poor advice - caused harm to client`,
+              colors.red + colors.bright,
+            );
+          }
+
+          // Earnings display
+          print("\n" + "─".repeat(70), colors.dim);
+          const earnColor =
+            coins > 0 ? colors.bright + colors.yellow : colors.red;
+          print(`💎 YOU EARNED: +${coins} coins`, earnColor);
+          print(
+            `   Total coins: ${advisorState.advisorCoins} coins`,
+            colors.cyan,
+          );
+          print("━".repeat(70) + "\n", colors.bright + colors.yellow);
+        }
+
         print(
           `📊 Your reputation: ${advisorState.reputation}/100`,
           colors.yellow,
@@ -689,7 +1385,7 @@ async function playGame() {
     } catch (error) {
       print(`\n❌ Error: ${error}`, colors.red);
       print("Press ENTER to try again...", colors.yellow);
-      await askQuestion("");
+      await waitForEnter();
     }
   }
 

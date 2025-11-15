@@ -207,6 +207,35 @@ export interface TopicExpertise {
   scam_awareness: number;
 }
 
+export interface FinancialProjection {
+  monthlySavings: number;
+  monthlyExpenseReduction: number;
+  monthlyDebtPayment: number;
+  totalSaved: number;
+  totalDebtReduced: number;
+  totalInterestSaved: number;
+  monthsToGoal: number;
+  projectionPeriodMonths: number;
+  savingsRate: number;
+  debtReductionRate: number;
+  emergencyFundProgress: number;
+  debtFreeProgress: number;
+}
+
+export interface ActualFinancialResult {
+  moneySaved: number;
+  expenseReduction: number;
+  debtReduced: number;
+  budgetAdherence: number;
+  goalProgress: number;
+  projectedVsActual: {
+    projected: number;
+    actual: number;
+    difference: number;
+    accuracy: number;
+  };
+}
+
 export interface ConsultationSession {
   sessionId: string;
   characterId: string;
@@ -242,6 +271,10 @@ export interface ConsultationSession {
       expectedOutcome: string;
     };
   };
+  // NEW: Financial outcomes
+  financialProjection?: FinancialProjection;
+  actualResult?: ActualFinancialResult;
+  coinsEarned?: number;
 }
 
 export interface CompletedMaterial {
@@ -263,6 +296,19 @@ export interface ThreadInfo {
 
 export type ThreadStatus = "active" | "awaiting_response" | "resolved";
 
+export interface SessionGoal {
+  goalId: string;
+  type: "save_target" | "debt_reduction" | "clients_helped" | "accuracy_target";
+  description: string;
+  target: number; // Target value to reach
+  progress: number; // Current progress
+  sessionsRemaining: number; // Sessions left to achieve goal
+  coinReward: number; // Coins earned if goal met
+  coinPenalty: number; // Coins lost if goal missed
+  skillBonus: number; // Skill points if goal met
+  createdAt: string;
+}
+
 export interface AdvisorState {
   advisorId: string;
   reputation: number; // 0-100
@@ -277,6 +323,14 @@ export interface AdvisorState {
   learningMaterials: CompletedMaterial[];
   totalSessions: number;
   lastReviewSession: number; // Session count when last reviewed
+
+  // NEW: Gamification & Earnings
+  advisorCoins: number; // Currency earned from successful consultations
+  lifetimeSavingsGenerated: number; // Total € clients have saved
+  lifetimeDebtCleared: number; // Total € debt eliminated
+  currentGoal: SessionGoal | null; // Active goal to achieve
+  achievementsUnlocked: string[]; // Achievement IDs
+  careerTier: number; // 1-5: Junior → Associate → Senior → Specialist → Expert
 }
 
 // ============================================================================
@@ -383,6 +437,22 @@ export interface QuizQuestion {
 // GAME RESPONSES
 // ============================================================================
 
+export interface AdviceChoice {
+  choiceId: string;
+  actionText: string;
+  icon: string;
+  projectedOutcome: string;
+  financialImpact?: {
+    monthlySavings?: number;
+    debtReduction?: number;
+    timeToGoal?: number;
+    interestSaved?: number;
+  };
+  qualityScore: number;
+  difficulty: "beginner" | "intermediate" | "advanced";
+  fullAdviceText: string;
+}
+
 export interface GameResponse {
   type: "character_message" | "god_boss_review" | "conversation_end";
 
@@ -396,6 +466,20 @@ export interface GameResponse {
     age: number;
     occupation: string;
   };
+  // NEW: Scenario financial context for pre-consultation dashboard
+  scenarioFinancialContext?: {
+    topic: FinancialTopic;
+    difficulty: number;
+    monthlyIncome?: number;
+    currentSavings?: number;
+    totalDebt?: number;
+    rent?: number;
+    urgency: "low" | "medium" | "high";
+    situation: string;
+  };
+
+  // NEW: Advice choices for choice-based gameplay
+  adviceChoices?: AdviceChoice[];
 
   // For god boss reviews
   review?: GodBossReview;
@@ -408,6 +492,13 @@ export interface GameResponse {
 
   // Character recommendation notification
   recommendationMessage?: string;
+
+  // NEW: Post-consultation results
+  financialResults?: {
+    projection?: FinancialProjection;
+    actualResult?: ActualFinancialResult;
+    coinsEarned?: number;
+  };
 }
 
 // ============================================================================

@@ -9,6 +9,10 @@ import { mastra } from "../index.ts";
 import { characterPool } from "./character-pool-manager.ts";
 import { getCharacterInitialMessage } from "../agents/character-agent-factory.ts";
 import { cachedGenerate } from "../test-cache.ts";
+import {
+  generateAdviceChoices,
+  type AdviceChoice,
+} from "./choice-generator.ts";
 import type {
   AdvisorState,
   GameMasterDecision,
@@ -51,6 +55,13 @@ export function createNewAdvisor(advisorId: string): AdvisorState {
     learningMaterials: [],
     totalSessions: 0,
     lastReviewSession: 0,
+    // NEW: Gamification fields
+    advisorCoins: 0,
+    lifetimeSavingsGenerated: 0,
+    lifetimeDebtCleared: 0,
+    currentGoal: null,
+    achievementsUnlocked: [],
+    careerTier: 1, // Start as Junior Advisor
   };
 }
 
@@ -226,7 +237,27 @@ Respond with ONLY valid JSON (NO markdown):
     // Get all active threads for UI
     const activeThreads = getActiveThreads(advisorState);
 
-    // Return initial character message
+    // Extract financial context from scenario
+    const details = scenario.problemContext.specificDetails;
+    const scenarioFinancialContext = {
+      topic: scenario.topic,
+      difficulty: scenario.difficulty,
+      monthlyIncome: details.monthlyIncome,
+      currentSavings: details.currentSavings,
+      totalDebt: details.totalDebt,
+      rent: details.rent,
+      urgency: scenario.problemContext.urgency,
+      situation: scenario.problemContext.currentSituation,
+    };
+
+    // Generate advice choices for the player
+    const adviceChoices = generateAdviceChoices(
+      scenario,
+      character.personality,
+      [], // No conversation history yet (first turn)
+    );
+
+    // Return initial character message with advice choices
     return {
       type: "character_message",
       threadId,
@@ -238,6 +269,8 @@ Respond with ONLY valid JSON (NO markdown):
         age: character.age,
         occupation: character.occupation,
       },
+      scenarioFinancialContext,
+      adviceChoices, // NEW: Provide choices to player
       stateUpdate: advisorState,
       activeThreads,
     };
@@ -525,6 +558,67 @@ export async function handleAdvisorResponse(
       );
     }
 
+    // NEW: Calculate earnings based on financial projection
+    let coinsEarned = 0;
+    if (adviceEvaluation.financialProjection) {
+      const projection = adviceEvaluation.financialProjection;
+
+      // Base consultation fee
+      coinsEarned = 10;
+
+      // Bonus for client financial results (projected)
+      // For every 100€ client saves: +5 coins
+      const savingsBonus = Math.floor(projection.totalSaved / 100) * 5;
+      coinsEarned += savingsBonus;
+
+      // For every 500€ debt reduced: +10 coins
+      const debtBonus = Math.floor(projection.totalDebtReduced / 500) * 10;
+      coinsEarned += debtBonus;
+
+      // Bonus for high quality advice
+      if (adviceEvaluation.qualityScore >= 8) {
+        coinsEarned += 5;
+      }
+
+      // Bonus for empathy
+      if (adviceEvaluation.wasEmpathetic) {
+        coinsEarned += 3;
+      }
+
+      // Penalty for poor outcomes
+      if (adviceEvaluation.outcome === "negative") {
+        coinsEarned = Math.max(0, coinsEarned - 20);
+      }
+
+      // Apply earnings
+      advisorState.advisorCoins += coinsEarned;
+
+      // Track lifetime stats
+      advisorState.lifetimeSavingsGenerated += Math.round(
+        projection.totalSaved,
+      );
+      advisorState.lifetimeDebtCleared += Math.round(
+        projection.totalDebtReduced,
+      );
+
+      // Store in session
+      session.financialProjection = projection;
+      session.coinsEarned = coinsEarned;
+
+      // Update current goal progress if exists
+      if (advisorState.currentGoal) {
+        const goal = advisorState.currentGoal;
+        if (goal.type === "save_target") {
+          goal.progress += Math.round(projection.totalSaved);
+        } else if (goal.type === "debt_reduction") {
+          goal.progress += Math.round(projection.totalDebtReduced);
+        } else if (goal.type === "clients_helped") {
+          goal.progress += 1;
+        }
+        goal.sessionsRemaining -= 1;
+      }
+    }
+
     // Mark thread as resolved
     threadInfo.status = "resolved";
 
@@ -550,6 +644,25 @@ export async function handleAdvisorResponse(
   // Get all active threads for UI
   const activeThreads = getActiveThreads(advisorState);
 
+  // If conversation is ending, include financial results from the last session
+  let financialResults;
+  if (
+    characterResponse.conversationEnding &&
+    advisorState.sessionHistory.length > 0
+  ) {
+    const lastSession =
+      advisorState.sessionHistory[advisorState.sessionHistory.length - 1];
+    if (
+      lastSession.financialProjection &&
+      lastSession.coinsEarned !== undefined
+    ) {
+      financialResults = {
+        projection: lastSession.financialProjection,
+        coinsEarned: lastSession.coinsEarned,
+      };
+    }
+  }
+
   return {
     type: characterResponse.conversationEnding
       ? "conversation_end"
@@ -560,7 +673,235 @@ export async function handleAdvisorResponse(
     stateUpdate: advisorState,
     activeThreads,
     recommendationMessage,
+    financialResults,
   };
+}
+
+/**
+ * Handle choice-based advice (fast gameplay, no back-and-forth)
+ * Character accepts advice and we immediately show financial outcome
+ */
+export async function handleAdviceChoice(
+  threadId: string,
+  choiceIndex: number,
+  currentState: AdvisorState,
+  conversationHistory?: Array<{ role: "user" | "assistant"; content: string }>,
+): Promise<GameResponse> {
+  let advisorState = { ...currentState };
+
+  // Get thread info
+  const threadInfo = advisorState.activeThreads[threadId];
+  if (!threadInfo) {
+    throw new Error(`Thread ${threadId} not found`);
+  }
+
+  // Get character and scenario
+  const character = characterPool.getCharacter(threadInfo.characterId);
+  const scenario = characterPool.getScenario(threadInfo.scenarioId);
+
+  if (!character || !scenario) {
+    throw new Error("Character or scenario not found");
+  }
+
+  // Generate choices to find the selected one
+  const choices = generateAdviceChoices(
+    scenario,
+    character.personality,
+    conversationHistory || [],
+  );
+
+  const selectedChoice = choices[choiceIndex];
+  if (!selectedChoice) {
+    throw new Error(`Choice at index ${choiceIndex} not found`);
+  }
+
+  const adviceText = selectedChoice.fullAdviceText;
+
+  // Evaluate the advice using the evaluate tool
+  const evaluateTool = mastra.getTool("evaluateAdviceTool");
+  if (!evaluateTool) {
+    throw new Error("Evaluate tool not found");
+  }
+
+  const adviceEvaluation = await evaluateTool.execute({
+    advice: adviceText,
+    scenario,
+    characterPersonality: character.personality,
+    character,
+    conversationHistory: conversationHistory || [],
+  });
+
+  // Character accepts the advice (almost always)
+  const characterAccepts = Math.random() > 0.1; // 90% acceptance rate
+
+  let characterReaction: string;
+  if (characterAccepts) {
+    // Generate positive acceptance response
+    characterReaction = generateAcceptanceResponse(
+      character,
+      adviceText,
+      scenario.topic,
+    );
+  } else {
+    // Rare case: character is hesitant
+    characterReaction = generateHesitantResponse(character, adviceText);
+  }
+
+  // Create consultation session
+  const sessionId = `session_${Date.now()}`;
+  const now = new Date().toISOString();
+
+  // NEW: Calculate earnings based on financial projection
+  let coinsEarned = 0;
+  if (adviceEvaluation.financialProjection) {
+    const projection = adviceEvaluation.financialProjection;
+
+    coinsEarned = 10; // Base consultation fee
+
+    // Bonus for client financial results
+    const savingsBonus = Math.floor(projection.totalSaved / 100) * 5;
+    coinsEarned += savingsBonus;
+
+    const debtBonus = Math.floor(projection.totalDebtReduced / 500) * 10;
+    coinsEarned += debtBonus;
+
+    // Quality bonus
+    if (adviceEvaluation.qualityScore >= 8) {
+      coinsEarned += 5; // High quality bonus
+    }
+
+    // Empathy bonus
+    if (adviceEvaluation.wasEmpathetic) {
+      coinsEarned += 3;
+    }
+
+    // Penalty for negative outcomes
+    if (adviceEvaluation.outcome === "negative") {
+      coinsEarned = Math.max(0, coinsEarned - 20);
+    }
+
+    // Update advisor coins and lifetime stats
+    advisorState.advisorCoins += coinsEarned;
+    advisorState.lifetimeSavingsGenerated += Math.round(projection.totalSaved);
+    advisorState.lifetimeDebtCleared += Math.round(projection.totalDebtReduced);
+  }
+
+  const session: ConsultationSession = {
+    sessionId,
+    characterId: character.characterId,
+    characterName: character.name,
+    scenarioId: scenario.scenarioId,
+    timestamp: now,
+    playerAdvice: [adviceText],
+    characterReactions: [characterReaction],
+    adviceQualityScore: adviceEvaluation.qualityScore,
+    topicsCovered: adviceEvaluation.topicsCovered,
+    followUpScheduled: false,
+    outcomeRevealed: false,
+    duration: 1, // Single exchange
+    evaluation: {
+      strengths: adviceEvaluation.strengths,
+      weaknesses: adviceEvaluation.weaknesses,
+      missedOpportunities: adviceEvaluation.missedOpportunities,
+      wasActionable: adviceEvaluation.wasActionable,
+      wasEmpathetic: adviceEvaluation.wasEmpathetic,
+      wasAccurate: adviceEvaluation.wasAccurate,
+      dimensions: adviceEvaluation.dimensions,
+      characterProgression: adviceEvaluation.characterProgression,
+    },
+    financialProjection: adviceEvaluation.financialProjection,
+    coinsEarned,
+  };
+
+  // Add session to history
+  advisorState.sessionHistory.push(session);
+  advisorState.totalSessions += 1;
+
+  // Update topic expertise
+  const topicExpertiseIncrease = Math.min(
+    0.2,
+    adviceEvaluation.qualityScore / 50,
+  );
+  advisorState.topicsExpertise[scenario.topic] = Math.min(
+    10,
+    advisorState.topicsExpertise[scenario.topic] + topicExpertiseIncrease,
+  );
+
+  // Update reputation based on quality
+  const reputationChange = Math.round((adviceEvaluation.qualityScore - 5) * 2);
+  advisorState.reputation = Math.max(
+    0,
+    Math.min(100, advisorState.reputation + reputationChange),
+  );
+
+  // Update skill level gradually
+  if (adviceEvaluation.qualityScore >= 8) {
+    advisorState.skillLevel = Math.min(10, advisorState.skillLevel + 0.1);
+  }
+
+  // Mark character as helped
+  if (!advisorState.totalClientsHelped) {
+    advisorState.totalClientsHelped = 0;
+  }
+  advisorState.totalClientsHelped += 1;
+
+  // Close the thread (consultation is done)
+  threadInfo.status = "resolved";
+  advisorState.activeClients = advisorState.activeClients.filter(
+    (id) => id !== character.characterId,
+  );
+
+  // Get active threads for UI
+  const activeThreads = getActiveThreads(advisorState);
+
+  // Return immediate financial results
+  return {
+    type: "conversation_end",
+    threadId,
+    messages: [characterReaction],
+    stateUpdate: advisorState,
+    activeThreads,
+    financialResults: {
+      projection: adviceEvaluation.financialProjection,
+      coinsEarned,
+    },
+  };
+}
+
+/**
+ * Generate acceptance response from character
+ */
+function generateAcceptanceResponse(
+  character: Character,
+  advice: string,
+  topic: FinancialTopic,
+): string {
+  const responses = [
+    `Kiitos! Tämä kuulostaa hyvältä suunnitelmalta. Aloitan heti!`,
+    `Joo, ymmärrän. Kokeilen tätä!`,
+    `Okei, kuulostaa järkevältä. Kiitos avusta!`,
+    `Selvä! Tämä auttaa varmasti.`,
+    `Hyvä idea! En olisi itse tullut ajatelleeksi.`,
+  ];
+
+  // Select random response
+  return responses[Math.floor(Math.random() * responses.length)];
+}
+
+/**
+ * Generate hesitant response (rare)
+ */
+function generateHesitantResponse(
+  character: Character,
+  advice: string,
+): string {
+  const responses = [
+    `Hmm, en ole ihan varma... Mutta ehkä kokeilen.`,
+    `Kuulostaa vähän haastavalta, mutta yritän.`,
+    `Okei... Täytyy miettiä vielä.`,
+  ];
+
+  return responses[Math.floor(Math.random() * responses.length)];
 }
 
 /**
