@@ -48,16 +48,16 @@ export async function recordBaseline(
   sessionId: string,
 ): Promise<FinancialOutcome | null> {
   try {
-    const state = engine.getCharacterState(character.characterId);
+    const state = await engine.getCharacterState(character.characterId);
     if (!state) return null;
 
-    const summaries = engine.getMonthlySummaries(character.characterId, 1);
+    const summaries = await engine.getMonthlySummaries(character.characterId, 1);
     const currentMonth = summaries[0];
     if (!currentMonth) return null;
 
     // Get category spending breakdown
     const db = engine.getDatabase();
-    const spending = db.getSpendingByCategory(
+    const spending = await db.getSpendingByCategory(
       character.characterId,
       currentMonth.month + "-01",
       currentMonth.month + "-31",
@@ -89,16 +89,16 @@ export async function updateOutcomeWithFollowUp(
   outcome: FinancialOutcome,
 ): Promise<FinancialOutcome> {
   try {
-    const state = engine.getCharacterState(outcome.characterId);
+    const state = await engine.getCharacterState(outcome.characterId);
     if (!state) return outcome;
 
-    const summaries = engine.getMonthlySummaries(outcome.characterId, 1);
+    const summaries = await engine.getMonthlySummaries(outcome.characterId, 1);
     const currentMonth = summaries[0];
     if (!currentMonth) return outcome;
 
     // Get follow-up category spending
     const db = engine.getDatabase();
-    const followUpSpending = db.getSpendingByCategory(
+    const followUpSpending = await db.getSpendingByCategory(
       outcome.characterId,
       currentMonth.month + "-01",
       currentMonth.month + "-31",

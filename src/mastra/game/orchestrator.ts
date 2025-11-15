@@ -81,7 +81,7 @@ export function createNewAdvisor(advisorId: string): AdvisorState {
     // NEW: Financial Simulation
     lastSimulatedDate: getCurrentMonth(),
     simulatedMonthsPassed: 0,
-    databasePath: `saves/advisor_${advisorId}.db`,
+    databasePath: process.env.DATABASE_URL || "postgresql://junction_user:junction_dev_password@localhost:5432/junction2025",
   };
 }
 
@@ -355,7 +355,7 @@ Respond with ONLY valid JSON (NO markdown):
             engine,
             baseline,
           );
-          engine.close();
+          await engine.close();
 
           actualOutcome = updatedOutcome;
         }
@@ -657,7 +657,7 @@ export async function handleAdvisorResponse(
         if (effects.length > 0) {
           const db = engine.getDatabase();
           for (const effect of effects) {
-            db.insertAdviceEffect(effect);
+            await db.insertAdviceEffect(effect);
           }
         }
 
@@ -680,7 +680,7 @@ export async function handleAdvisorResponse(
           );
         }
 
-        engine.close();
+        await engine.close();
       } catch (error) {
         console.error("Failed to extract/store advice effects:", error);
       }
@@ -1486,13 +1486,13 @@ async function runMonthlySimulation(advisorState: AdvisorState): Promise<void> {
       for (const character of allCharacters) {
         try {
           // Initialize character if not already in simulation
-          const state = engine.getCharacterState(character.characterId);
+          const state = await engine.getCharacterState(character.characterId);
           if (!state) {
-            engine.initializeCharacter(character);
+            await engine.initializeCharacter(character);
           }
 
           // Simulate this month
-          engine.simulateMonth(character, monthToSimulate, true);
+          await engine.simulateMonth(character, monthToSimulate, true);
         } catch (error) {
           console.error(
             `Error simulating ${monthToSimulate} for ${character.name}:`,
@@ -1506,7 +1506,7 @@ async function runMonthlySimulation(advisorState: AdvisorState): Promise<void> {
     advisorState.lastSimulatedDate = currentMonth;
     advisorState.simulatedMonthsPassed += monthsElapsed;
 
-    engine.close();
+    await engine.close();
   } catch (error) {
     console.error("Error running monthly simulation:", error);
   }

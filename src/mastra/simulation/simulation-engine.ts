@@ -36,8 +36,8 @@ export class SimulationEngine {
   private db: SimulationDatabaseManager;
   private transactionGenerator: TransactionGenerator;
 
-  constructor(databasePath: string) {
-    this.db = new SimulationDatabaseManager(databasePath);
+  constructor(connectionString: string) {
+    this.db = new SimulationDatabaseManager(connectionString);
     this.transactionGenerator = new TransactionGenerator();
   }
 
@@ -45,9 +45,9 @@ export class SimulationEngine {
    * Initialize character in simulation system
    * Called when character first appears in game
    */
-  initializeCharacter(character: Character): void {
+  async initializeCharacter(character: Character): Promise<void> {
     // Check if already initialized
-    const existing = this.db.getCharacterState(character.characterId);
+    const existing = await this.db.getCharacterState(character.characterId);
     if (existing) return;
 
     // Generate spending model from personality
@@ -71,22 +71,22 @@ export class SimulationEngine {
       updatedAt: new Date().toISOString(),
     };
 
-    this.db.createCharacterState(state);
+    await this.db.createCharacterState(state);
   }
 
   /**
    * Simulate one month for a character
    */
-  simulateMonth(
+  async simulateMonth(
     character: Character,
     month: string,
     applyAdviceEffects: boolean = true,
-  ): SimulatedMonth {
+  ): Promise<SimulatedMonth> {
     // Get character's financial state
-    let state = this.db.getCharacterState(character.characterId);
+    let state = await this.db.getCharacterState(character.characterId);
     if (!state) {
-      this.initializeCharacter(character);
-      state = this.db.getCharacterState(character.characterId)!;
+      await this.initializeCharacter(character);
+      state = (await this.db.getCharacterState(character.characterId))!;
     }
 
     const startBalance = state.currentBalance;
@@ -94,7 +94,7 @@ export class SimulationEngine {
 
     // Apply active advice effects to spending model
     if (applyAdviceEffects) {
-      spendingModel = this.applyAdviceEffectsToSpending(
+      spendingModel = await this.applyAdviceEffectsToSpending(
         character.characterId,
         spendingModel,
       );
@@ -138,13 +138,13 @@ export class SimulationEngine {
       .reduce((sum, t) => sum + Math.abs(t.amount), 0);
 
     // Save transactions to database
-    this.db.insertTransactionsBatch(transactions);
+    await this.db.insertTransactionsBatch(transactions);
 
     // Update character state
     state.currentBalance = endBalance;
     state.lastSimulatedDate = month;
     state.updatedAt = new Date().toISOString();
-    this.db.updateCharacterState(state);
+    await this.db.updateCharacterState(state);
 
     // Save monthly summary
     const summary: MonthSummary = {
@@ -157,7 +157,7 @@ export class SimulationEngine {
       debtReduction: debtReduction,
       createdAt: new Date().toISOString(),
     };
-    this.db.insertMonthlySummary(summary);
+    await this.db.insertMonthlySummary(summary);
 
     return {
       month,
@@ -174,10 +174,10 @@ export class SimulationEngine {
   /**
    * Simulate multiple months for a character
    */
-  simulateMonths(
+  async simulateMonths(
     character: Character,
     config: SimulationConfig,
-  ): SimulationResult {
+  ): Promise<SimulationResult> {
     const results: SimulatedMonth[] = [];
     const errors: string[] = [];
 
@@ -185,7 +185,7 @@ export class SimulationEngine {
 
     for (let i = 0; i < config.monthsToSimulate; i++) {
       try {
-        const monthResult = this.simulateMonth(
+        const monthResult = await this.simulateMonth(
           character,
           currentMonth,
           config.applyAdviceEffects,
@@ -207,7 +207,7 @@ export class SimulationEngine {
       0,
     );
 
-    const summaries = this.db.getMonthlySummaries(
+    const summaries = await this.db.getMonthlySummaries(
       character.characterId,
       config.monthsToSimulate,
     );
@@ -225,11 +225,11 @@ export class SimulationEngine {
   /**
    * Simulate all characters for multiple months (catch-up simulation)
    */
-  simulateAllCharacters(
+  async simulateAllCharacters(
     characters: Character[],
     monthsToSimulate: number,
     startMonth: string,
-  ): Record<string, SimulationResult> {
+  ): Promise<Record<string, SimulationResult>> {
     const results: Record<string, SimulationResult> = {};
 
     for (const character of characters) {
@@ -240,7 +240,7 @@ export class SimulationEngine {
         applyAdviceEffects: true,
       };
 
-      results[character.characterId] = this.simulateMonths(character, config);
+      results[character.characterId] = await this.simulateMonths(character, config);
     }
 
     return results;
@@ -249,35 +249,35 @@ export class SimulationEngine {
   /**
    * Get character's current financial state
    */
-  getCharacterState(characterId: string): CharacterFinancialState | null {
-    return this.db.getCharacterState(characterId);
+  async getCharacterState(characterId: string): Promise<CharacterFinancialState | null> {
+    return await this.db.getCharacterState(characterId);
   }
 
   /**
    * Get recent transactions for character
    */
-  getRecentTransactions(
+  async getRecentTransactions(
     characterId: string,
     limit: number = 100,
-  ): Transaction[] {
-    return this.db.getRecentTransactions(characterId, limit);
+  ): Promise<Transaction[]> {
+    return await this.db.getRecentTransactions(characterId, limit);
   }
 
   /**
    * Get monthly summaries for character
    */
-  getMonthlySummaries(characterId: string, limit?: number): MonthSummary[] {
-    return this.db.getMonthlySummaries(characterId, limit);
+  async getMonthlySummaries(characterId: string, limit?: number): Promise<MonthSummary[]> {
+    return await this.db.getMonthlySummaries(characterId, limit);
   }
 
   /**
    * Apply advice effects to spending model
    */
-  private applyAdviceEffectsToSpending(
+  private async applyAdviceEffectsToSpending(
     characterId: string,
     baseSpending: SpendingModel,
-  ): SpendingModel {
-    const activeEffects = this.db.getActiveAdviceEffects(characterId);
+  ): Promise<SpendingModel> {
+    const activeEffects = await this.db.getActiveAdviceEffects(characterId);
     let modified = { ...baseSpending };
 
     for (const effect of activeEffects) {
@@ -375,8 +375,8 @@ export class SimulationEngine {
   /**
    * Deactivate expired advice effects
    */
-  deactivateExpiredEffects(currentDate: string): void {
-    this.db.deactivateExpiredEffects(currentDate);
+  async deactivateExpiredEffects(currentDate: string): Promise<void> {
+    await this.db.deactivateExpiredEffects(currentDate);
   }
 
   /**
@@ -389,8 +389,8 @@ export class SimulationEngine {
   /**
    * Close database connection
    */
-  close(): void {
-    this.db.close();
+  async close(): Promise<void> {
+    await this.db.close();
   }
 }
 
