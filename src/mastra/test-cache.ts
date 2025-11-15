@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
+import { runAgentOperation } from "./agent-execution.ts";
 
 type CacheMode = "off" | "record" | "replay";
 
@@ -58,7 +59,7 @@ export async function cachedGenerate<T>(
 ): Promise<{ text: string } & T> {
   const mode = getMode();
   if (mode === "off") {
-    return generate();
+    return runAgentOperation(generate);
   }
 
   const cacheFile = await loadCache();
@@ -75,7 +76,7 @@ export async function cachedGenerate<T>(
     return { text: existing.text } as { text: string } & T;
   }
 
-  const result = await generate();
+  const result = await runAgentOperation(generate);
   const text = result.text ?? "";
 
   if (existing) {
