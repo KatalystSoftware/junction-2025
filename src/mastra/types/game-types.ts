@@ -143,6 +143,12 @@ export interface Character {
   relationshipState: CharacterRelationshipState;
   conversationHistory: CharacterConversationMemory[];
   advisorNotes: string; // Summary of past interactions
+
+  // NEW: Financial Simulation link
+  financialSimulation?: {
+    monthlyIncomeDay: number; // Day of month salary arrives (15-25)
+    hasSimulationHistory: boolean; // Whether initial 6-month history has been generated
+  };
 }
 
 // ============================================================================
@@ -241,6 +247,8 @@ export interface FinancialProjection {
   debtReductionRate: number;
   emergencyFundProgress: number;
   debtFreeProgress: number;
+  // NEW: Category-level savings breakdown (Phase F)
+  categorySavings?: Record<string, number>;
 }
 
 export interface ActualFinancialResult {
@@ -276,7 +284,6 @@ export interface ConsultationSession {
     weaknesses: string[];
     missedOpportunities: string[];
     wasActionable: boolean;
-    wasEmpathetic: boolean;
     wasAccurate: boolean;
     dimensions?: {
       adviceQuality: number;
@@ -296,6 +303,14 @@ export interface ConsultationSession {
   financialProjection?: FinancialProjection;
   actualResult?: ActualFinancialResult;
   coinsEarned?: number;
+  // NEW: Extracted advice actions (Phase C)
+  extractedActions?: Array<{
+    actionType: string;
+    specificSubscription?: string;
+    targetCategory?: string;
+    reductionPercent?: number;
+    confidence?: number;
+  }>;
 }
 
 export interface CompletedMaterial {
@@ -357,6 +372,11 @@ export interface AdvisorState {
   currentGoal: SessionGoal | null; // Active goal to achieve
   achievementsUnlocked: string[]; // Achievement IDs
   careerTier: number; // 1-5: Junior → Associate → Senior → Specialist → Expert
+
+  // NEW: Financial Simulation
+  lastSimulatedDate: string; // ISO date of last simulation tick
+  simulatedMonthsPassed: number; // Total months simulated since game start
+  databasePath?: string; // Path to SQLite database
 }
 
 // ============================================================================
@@ -553,8 +573,18 @@ export interface GameResponse {
     situation: string;
   };
 
-  // NEW: Advice choices for choice-based gameplay
+  // Advice choices for choice-based gameplay
   adviceChoices?: AdviceChoice[];
+
+  // Actual financial outcome for returning characters
+  actualOutcome?: {
+    baselineMonth: string;
+    baselineExpenses: number;
+    followUpMonth?: string;
+    followUpExpenses?: number;
+    totalSaved?: number;
+    categorySavings?: Record<string, number>;
+  };
 
   // For god boss reviews
   review?: GodBossReview;
@@ -594,9 +624,16 @@ export interface GameResponse {
       weaknesses: string[];
       missedOpportunities: string[];
       wasActionable: boolean;
-      wasEmpathetic: boolean;
       wasAccurate: boolean;
     };
+    // NEW: Extracted actions from advice (Phase C)
+    extractedActions?: Array<{
+      actionType: string;
+      specificSubscription?: string;
+      targetCategory?: string;
+      reductionPercent?: number;
+      confidence?: number;
+    }>;
   };
 
   // NEW: Progress visualization
@@ -619,7 +656,6 @@ export interface AdviceEvaluation {
   missedOpportunities: string[];
   topicsCovered: FinancialTopic[];
   wasActionable: boolean;
-  wasEmpathetic: boolean;
   wasAccurate: boolean;
 }
 

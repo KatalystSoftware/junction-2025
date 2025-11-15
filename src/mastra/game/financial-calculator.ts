@@ -6,6 +6,7 @@
  */
 
 import type { Scenario } from "../types/game-types.ts";
+import type { ExtractedAdviceAction } from "../simulation/simulation-types.ts";
 
 export interface FinancialProjection {
   // Monthly changes
@@ -29,6 +30,9 @@ export interface FinancialProjection {
   // Goal achievement
   emergencyFundProgress: number; // % toward 3-month emergency fund
   debtFreeProgress: number; // % toward debt-free status
+
+  // Category breakdown (NEW: Phase F enhancement)
+  categorySavings?: Record<string, number>; // Savings per category
 }
 
 export interface ActualFinancialResult {
@@ -52,12 +56,14 @@ export interface ActualFinancialResult {
 
 /**
  * Calculate projected financial outcome based on advice quality
+ * Uses actual extracted actions for accurate projections instead of generic formulas
  */
 export function calculateProjectedOutcome(
   scenario: Scenario,
   adviceQuality: number, // 0-10
   willFollow: boolean,
   willFollowConfidence: number, // 0-1
+  extractedActions?: ExtractedAdviceAction[], // Actual extracted advice actions for accurate calculation
 ): FinancialProjection {
   const details = scenario.problemContext.specificDetails;
 
@@ -76,7 +82,27 @@ export function calculateProjectedOutcome(
   const followMultiplier = willFollow ? willFollowConfidence : 0.1; // Low if won't follow
   const effectivenessMultiplier = qualityMultiplier * followMultiplier;
 
-  // Calculate outcomes based on topic
+  // Try action-based calculation first if actions were extracted
+  if (extractedActions && extractedActions.length > 0) {
+    const actionProjection = calculateActionBasedProjection(
+      extractedActions,
+      monthlyIncome,
+      totalDebt,
+      interestRate,
+      effectivenessMultiplier,
+      projectionPeriodMonths,
+    );
+
+    // If action-based calculation produced meaningful results, use it
+    if (
+      actionProjection.totalSaved > 0 ||
+      actionProjection.totalDebtReduced > 0
+    ) {
+      return actionProjection;
+    }
+  }
+
+  // Fallback to generic formula-based calculation
   let projection: FinancialProjection;
 
   switch (scenario.topic) {
@@ -136,6 +162,150 @@ export function calculateProjectedOutcome(
   }
 
   return projection;
+}
+
+/**
+ * Calculate projection based on actual extracted actions
+ * Instead of generic formulas, sum up savings from concrete actions
+ */
+function calculateActionBasedProjection(
+  actions: ExtractedAdviceAction[],
+  monthlyIncome: number,
+  totalDebt: number,
+  interestRate: number,
+  effectivenessMultiplier: number,
+  projectionPeriodMonths: number,
+): FinancialProjection {
+  let monthlySavings = 0;
+  let monthlyExpenseReduction = 0;
+  let monthlyDebtPayment = 0;
+  const categorySavings: Record<string, number> = {};
+
+  // Process each action to calculate concrete savings
+  for (const action of actions) {
+    const actionConfidence = action.confidence * effectivenessMultiplier;
+
+    switch (action.actionType) {
+      case "cancel_subscription": {
+        // Estimate average subscription cost: Netflix €12, Spotify €10, etc.
+        const estimatedSubscriptionCost = 12; // €/month
+        const savings = estimatedSubscriptionCost * actionConfidence;
+        monthlySavings += savings;
+        monthlyExpenseReduction += savings;
+
+        // Track by category
+        const category = action.specificSubscription || "subscriptions";
+        categorySavings[category] = (categorySavings[category] || 0) + savings;
+        break;
+      }
+
+      case "reduce_expense_category": {
+        const category = action.targetCategory || "expenses";
+        const reductionPercent = action.reductionPercent || 0.2;
+
+        // Estimate category spending from typical budgets
+        let estimatedCategorySpending = 0;
+        const categoryStr = String(category); // Convert to string for comparison
+
+        if (categoryStr === "coffee") {
+          estimatedCategorySpending = monthlyIncome * 0.02; // 2% of income (~€16 for €800)
+        } else if (categoryStr === "dining") {
+          estimatedCategorySpending = monthlyIncome * 0.08; // 8% of income
+        } else if (categoryStr === "groceries") {
+          estimatedCategorySpending = monthlyIncome * 0.15; // 15% of income
+        } else if (
+          categoryStr === "shopping" ||
+          categoryStr === "onlineShopping"
+        ) {
+          estimatedCategorySpending = monthlyIncome * 0.05; // 5% of income
+        } else if (categoryStr === "entertainment") {
+          estimatedCategorySpending = monthlyIncome * 0.05; // 5% of income
+        } else {
+          estimatedCategorySpending = monthlyIncome * 0.1; // 10% generic
+        }
+
+        const savings =
+          estimatedCategorySpending * reductionPercent * actionConfidence;
+        monthlySavings += savings;
+        monthlyExpenseReduction += savings;
+        categorySavings[category] = (categorySavings[category] || 0) + savings;
+        break;
+      }
+
+      case "increase_debt_payment": {
+        const extraPayment = action.extraDebtPayment || 0;
+        monthlyDebtPayment += extraPayment * actionConfidence;
+        break;
+      }
+
+      case "start_tracking":
+      case "create_budget": {
+        // Budget tracking typically reduces waste by 5-10%
+        const wasteSavings = monthlyIncome * 0.075 * actionConfidence;
+        monthlySavings += wasteSavings;
+        monthlyExpenseReduction += wasteSavings;
+        categorySavings["budgeting"] =
+          (categorySavings["budgeting"] || 0) + wasteSavings;
+        break;
+      }
+
+      case "avoid_impulse": {
+        // Avoiding impulse purchases saves ~3% of income
+        const impulseSavings = monthlyIncome * 0.03 * actionConfidence;
+        monthlySavings += impulseSavings;
+        monthlyExpenseReduction += impulseSavings;
+        categorySavings["impulsePurchases"] =
+          (categorySavings["impulsePurchases"] || 0) + impulseSavings;
+        break;
+      }
+    }
+  }
+
+  // Calculate total impact over projection period
+  const totalSaved = monthlySavings * projectionPeriodMonths;
+  const totalDebtReduced = monthlyDebtPayment * projectionPeriodMonths;
+
+  // Calculate interest saved if paying down debt
+  let totalInterestSaved = 0;
+  if (totalDebt > 0 && monthlyDebtPayment > 0) {
+    const monthlyInterest = (totalDebt * interestRate) / 12;
+    const baselineInterest = monthlyInterest * projectionPeriodMonths;
+    totalInterestSaved = baselineInterest * 0.3 * effectivenessMultiplier; // ~30% interest reduction
+  }
+
+  // Calculate metrics
+  const savingsRate = monthlyIncome > 0 ? monthlySavings / monthlyIncome : 0;
+  const debtReductionRate = totalDebt > 0 ? totalDebtReduced / totalDebt : 0;
+
+  // Emergency fund progress
+  const emergencyFundTarget = monthlyIncome * 3;
+  const emergencyFundProgress = Math.min(totalSaved / emergencyFundTarget, 1);
+
+  // Debt-free progress
+  const debtFreeProgress =
+    totalDebt > 0
+      ? Math.min(1, 1 - (totalDebt - totalDebtReduced) / totalDebt)
+      : 1;
+
+  // Time to goal
+  const monthsToGoal =
+    monthlySavings > 0 ? emergencyFundTarget / monthlySavings : 999;
+
+  return {
+    monthlySavings,
+    monthlyExpenseReduction,
+    monthlyDebtPayment,
+    totalSaved,
+    totalDebtReduced,
+    totalInterestSaved,
+    monthsToGoal,
+    projectionPeriodMonths,
+    savingsRate,
+    debtReductionRate,
+    emergencyFundProgress,
+    debtFreeProgress,
+    categorySavings, // Breakdown by category
+  };
 }
 
 /**

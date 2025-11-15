@@ -9,7 +9,6 @@ export interface EarningsCalculationResult {
 // (these come from the tool execution but aren't in the base AdviceEvaluation type)
 interface EvaluationWithFinancials {
   qualityScore: number;
-  wasEmpathetic: boolean;
   outcome?: "positive" | "neutral" | "negative";
   financialProjection?: FinancialProjection;
 }
@@ -48,11 +47,6 @@ export function calculateCoinsEarned(
     // Bonus for high quality advice
     if (adviceEvaluation.qualityScore >= 8) {
       coinsEarned += 5;
-    }
-
-    // Bonus for empathy
-    if (adviceEvaluation.wasEmpathetic) {
-      coinsEarned += 3;
     }
 
     // Penalty for poor outcomes

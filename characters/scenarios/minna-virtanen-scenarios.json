@@ -40,8 +40,7 @@
       "Just saying 'spend less' without actionable steps",
       "Recommending overly complex budgeting systems",
       "Setting unrealistic savings goals (>30% for low income)",
-      "Not asking about her actual expenses first",
-      "Being judgmental about past spending"
+      "Not asking about her actual expenses first"
     ],
     "followUpScenarios": [
       {
@@ -86,7 +85,6 @@
       }
     },
     "idealAdvice": [
-      "Praise progress made (positive reinforcement)",
       "Suggest meal prepping and bringing lunch to campus",
       "Recommend rotating between eating out and home-cooked group meals with friends",
       "Set a monthly eating-out budget and stick to it",
@@ -95,7 +93,6 @@
     ],
     "commonMistakes": [
       "Saying to completely stop socializing (unrealistic)",
-      "Not acknowledging the progress made",
       "Being too restrictive"
     ]
   },
@@ -128,17 +125,12 @@
       }
     },
     "idealAdvice": [
-      "Reassure that budgeting takes practice (empathy)",
       "Start even simpler: just track for one week without changing anything",
       "Focus on one category at a time",
       "Suggest automatic budgeting tools that do tracking for you",
       "Set a smaller, more achievable first goal",
       "Offer to break it down into smaller steps"
     ],
-    "commonMistakes": [
-      "Being judgmental or implying they're lazy",
-      "Giving the same complex advice again",
-      "Not addressing the emotional aspect"
-    ]
+    "commonMistakes": ["Giving the same complex advice again"]
   }
 ]

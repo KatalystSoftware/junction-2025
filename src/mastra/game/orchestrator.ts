@@ -78,7 +78,21 @@ export function createNewAdvisor(advisorId: string): AdvisorState {
     currentGoal: null,
     achievementsUnlocked: [],
     careerTier: 1, // Start as Junior Advisor
+    // NEW: Financial Simulation
+    lastSimulatedDate: getCurrentMonth(),
+    simulatedMonthsPassed: 0,
+    databasePath: `saves/advisor_${advisorId}.db`,
   };
+}
+
+/**
+ * Get current month in YYYY-MM format
+ */
+function getCurrentMonth(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  return `${year}-${month}`;
 }
 
 /**
@@ -118,6 +132,9 @@ export async function startNewConsultation(
   if (advisorState.totalSessions > 0) {
     characterPool.applyTrustDecay(advisorState.totalSessions);
   }
+
+  // Run financial simulation for elapsed months
+  await runMonthlySimulation(advisorState);
 
   // Check if we should trigger boss check-in based on performance streak
   const streak = advisorState.currentStreak;
@@ -309,6 +326,44 @@ Respond with ONLY valid JSON (NO markdown):
       }
     }
 
+    // For returning characters, retrieve baseline and calculate actual outcome
+    let actualOutcome: any = undefined;
+    if (!decision.isNewCharacter && advisorState.databasePath) {
+      try {
+        // Find the most recent session for this character that has a baseline
+        const previousSessions = advisorState.sessionHistory.filter(
+          (s) =>
+            s.characterId === character.characterId &&
+            (s as any).financialBaseline,
+        );
+
+        if (previousSessions.length > 0) {
+          // Get the most recent session with baseline
+          const baselineSession = previousSessions[previousSessions.length - 1];
+          const baseline = (baselineSession as any).financialBaseline;
+
+          // Load simulation engine and calculate current state
+          const { SimulationEngine } = await import(
+            "../simulation/simulation-engine.ts"
+          );
+          const { updateOutcomeWithFollowUp } = await import(
+            "./outcome-tracker.ts"
+          );
+
+          const engine = new SimulationEngine(advisorState.databasePath);
+          const updatedOutcome = await updateOutcomeWithFollowUp(
+            engine,
+            baseline,
+          );
+          engine.close();
+
+          actualOutcome = updatedOutcome;
+        }
+      } catch (error) {
+        console.error("Failed to retrieve baseline outcome:", error);
+      }
+    }
+
     // Mark scenario as used
     characterPool.markScenarioUsed(scenario.scenarioId);
 
@@ -401,7 +456,8 @@ Respond with ONLY valid JSON (NO markdown):
         occupation: character.occupation,
       },
       scenarioFinancialContext,
-      adviceChoices, // NEW: Provide choices to player (only first session)
+      adviceChoices,
+      actualOutcome,
       stateUpdate: advisorState,
       activeThreads,
     };
@@ -494,10 +550,15 @@ export async function handleAdvisorResponse(
     missedOpportunities: ["Evaluation system temporarily unavailable"],
     topicsCovered: [scenario.topic],
     wasActionable: false,
-    wasEmpathetic: false,
     wasAccurate: true,
     // Include default financial projection so evaluation section always renders
-    financialProjection: calculateProjectedOutcome(scenario, 5, false, 0.3),
+    financialProjection: calculateProjectedOutcome(
+      scenario,
+      5,
+      false,
+      0.3,
+      undefined, // No actions in default fallback
+    ),
   };
 
   if (evaluateTool) {
@@ -508,11 +569,11 @@ export async function handleAdvisorResponse(
         characterPersonality: character.personality,
         character, // Pass full character for more context
         conversationHistory, // Pass conversation history for context
+        databasePath: advisorState.databasePath, // Pass database path for transaction context
       });
     } catch (error) {
       console.error("Evaluation tool failed:", error);
       // Keep default evaluation values as fallback
-      console.log("⚠️ Using default evaluation values");
     }
   }
 
@@ -561,12 +622,69 @@ export async function handleAdvisorResponse(
         weaknesses: adviceEvaluation.weaknesses,
         missedOpportunities: adviceEvaluation.missedOpportunities,
         wasActionable: adviceEvaluation.wasActionable,
-        wasEmpathetic: adviceEvaluation.wasEmpathetic,
         wasAccurate: adviceEvaluation.wasAccurate,
         dimensions: adviceEvaluation.dimensions,
         characterProgression: adviceEvaluation.characterProgression,
       },
     };
+
+    // PHASE C & D: Extract advice actions, create effects, and record outcome baseline
+    if (advisorState.databasePath && character.characterId) {
+      try {
+        const { extractAdviceActions, createAdviceEffects } = await import(
+          "../simulation/advice-action-extractor.ts"
+        );
+        const { SimulationEngine } = await import(
+          "../simulation/simulation-engine.ts"
+        );
+        const { recordBaseline } = await import("./outcome-tracker.ts");
+
+        const engine = new SimulationEngine(advisorState.databasePath);
+
+        // Extract concrete actions from advice text
+        const actions = extractAdviceActions(allAdvisorAdvice);
+
+        // Create advice effects based on character's likelihood to follow
+        const followProbability = adviceEvaluation.willFollowAdvice ? 0.8 : 0.3;
+        const effects = createAdviceEffects(
+          character.characterId,
+          session.sessionId,
+          actions,
+          followProbability,
+        );
+
+        // Store effects in database
+        if (effects.length > 0) {
+          const db = engine.getDatabase();
+          for (const effect of effects) {
+            db.insertAdviceEffect(effect);
+          }
+        }
+
+        // Store extracted actions in session for UI display (Phase C visibility)
+        if (actions.length > 0) {
+          (session as any).extractedActions = actions;
+        }
+
+        // PHASE D: Record baseline financial state for outcome tracking
+        const baseline = await recordBaseline(
+          engine,
+          character,
+          session.sessionId,
+        );
+        if (baseline) {
+          // Store baseline in session for later comparison
+          (session as any).financialBaseline = baseline;
+          console.log(
+            `📊 Recorded financial baseline for ${character.name}: €${baseline.baselineExpenses.toFixed(2)}/month expenses`,
+          );
+        }
+
+        engine.close();
+      } catch (error) {
+        console.error("Failed to extract/store advice effects:", error);
+      }
+    }
 
     // Add to session history
     advisorState.sessionHistory.push(session);
@@ -692,13 +810,6 @@ export async function handleAdvisorResponse(
     }
 
     // Bonus/penalty for specific evaluation criteria (scaled for beginners)
-    if (adviceEvaluation.wasEmpathetic) {
-      const empathyBonus = isBeginner ? 3 : 2; // Extra reward for beginners
-      advisorState.reputation = Math.min(
-        100,
-        advisorState.reputation + empathyBonus,
-      );
-    }
     if (adviceEvaluation.wasActionable) {
       const actionableBonus = isBeginner ? 0.02 : 0.01; // Double skill gain for beginners
       advisorState.skillLevel = Math.min(
@@ -848,10 +959,11 @@ export async function handleAdvisorResponse(
               weaknesses: lastSession.evaluation.weaknesses,
               missedOpportunities: lastSession.evaluation.missedOpportunities,
               wasActionable: lastSession.evaluation.wasActionable,
-              wasEmpathetic: lastSession.evaluation.wasEmpathetic,
               wasAccurate: lastSession.evaluation.wasAccurate,
             }
           : undefined,
+        // NEW: Include extracted actions for UI display (Phase C)
+        extractedActions: (lastSession as any).extractedActions,
       };
     }
 
@@ -938,6 +1050,7 @@ export async function handleAdviceChoice(
       characterPersonality: character.personality,
       character,
       conversationHistory: conversationHistory || [],
+      databasePath: advisorState.databasePath, // Pass database path for transaction context
     });
   } catch (error) {
     console.error("Evaluation tool failed:", error);
@@ -952,7 +1065,6 @@ export async function handleAdviceChoice(
       missedOpportunities: [],
       topicsCovered: [scenario.topic],
       wasActionable: true,
-      wasEmpathetic: true,
       wasAccurate: true,
       financialProjection: {
         totalSaved: 0,
@@ -1007,7 +1119,6 @@ export async function handleAdviceChoice(
       weaknesses: adviceEvaluation.weaknesses,
       missedOpportunities: adviceEvaluation.missedOpportunities,
       wasActionable: adviceEvaluation.wasActionable,
-      wasEmpathetic: adviceEvaluation.wasEmpathetic,
       wasAccurate: adviceEvaluation.wasAccurate,
       dimensions: adviceEvaluation.dimensions,
       characterProgression: adviceEvaluation.characterProgression,
@@ -1073,7 +1184,6 @@ export async function handleAdviceChoice(
         weaknesses: adviceEvaluation.weaknesses,
         missedOpportunities: adviceEvaluation.missedOpportunities,
         wasActionable: adviceEvaluation.wasActionable,
-        wasEmpathetic: adviceEvaluation.wasEmpathetic,
         wasAccurate: adviceEvaluation.wasAccurate,
       },
     },
@@ -1328,4 +1438,99 @@ export function getThread(
   advisorState: AdvisorState,
 ): ConversationThread | null {
   return switchThread(threadId, advisorState);
+}
+
+// ============================================================================
+// FINANCIAL SIMULATION INTEGRATION
+// ============================================================================
+
+/**
+ * Run monthly financial simulation for all characters
+ * Called at start of each consultation to simulate elapsed time
+ */
+async function runMonthlySimulation(advisorState: AdvisorState): Promise<void> {
+  // Skip if no database path
+  if (!advisorState.databasePath) {
+    return;
+  }
+
+  // Calculate months elapsed since last simulation
+  const currentMonth = getCurrentMonth();
+  const monthsElapsed = calculateMonthsElapsed(
+    advisorState.lastSimulatedDate,
+    currentMonth,
+  );
+
+  // No simulation needed if less than a month has passed
+  if (monthsElapsed === 0) {
+    return;
+  }
+
+  try {
+    const { SimulationEngine } = await import(
+      "../simulation/simulation-engine.ts"
+    );
+
+    const engine = new SimulationEngine(advisorState.databasePath);
+
+    // Get all characters
+    const allCharacters = characterPool.getAllCharacters();
+
+    // Simulate each month for all characters
+    for (let i = 0; i < monthsElapsed; i++) {
+      const monthToSimulate = addMonthsToDate(
+        advisorState.lastSimulatedDate,
+        i + 1,
+      );
+
+      for (const character of allCharacters) {
+        try {
+          // Initialize character if not already in simulation
+          const state = engine.getCharacterState(character.characterId);
+          if (!state) {
+            engine.initializeCharacter(character);
+          }
+
+          // Simulate this month
+          engine.simulateMonth(character, monthToSimulate, true);
+        } catch (error) {
+          console.error(
+            `Error simulating ${monthToSimulate} for ${character.name}:`,
+            error,
+          );
+        }
+      }
+    }
+
+    // Update advisor state
+    advisorState.lastSimulatedDate = currentMonth;
+    advisorState.simulatedMonthsPassed += monthsElapsed;
+
+    engine.close();
+  } catch (error) {
+    console.error("Error running monthly simulation:", error);
+  }
+}
+
+/**
+ * Calculate number of months between two YYYY-MM dates
+ */
+function calculateMonthsElapsed(startMonth: string, endMonth: string): number {
+  const [startYear, startMo] = startMonth.split("-").map(Number);
+  const [endYear, endMo] = endMonth.split("-").map(Number);
+
+  return (endYear - startYear) * 12 + (endMo - startMo);
+}
+
+/**
+ * Add months to YYYY-MM date string
+ */
+function addMonthsToDate(monthString: string, months: number): string {
+  const [year, month] = monthString.split("-").map(Number);
+  const date = new Date(year, month - 1, 1);
+  date.setMonth(date.getMonth() + months);
+
+  const newYear = date.getFullYear();
+  const newMonth = String(date.getMonth() + 1).padStart(2, "0");
+  return `${newYear}-${newMonth}`;
 }

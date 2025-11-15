@@ -31,7 +31,6 @@
       }
     },
     "idealAdvice": [
-      "Acknowledge how stressful this situation is",
       "Immediate: apply for student loan payment pause/reduction (available in Finland)",
       "Review all unemployment benefits eligibility (housing allowance, etc.)",
       "Create bare minimum survival budget for job search period",
@@ -43,9 +42,7 @@
     "commonMistakes": [
       "Suggesting to just \"get any job\" without specific advice on how",
       "Not addressing the student loan payment issue immediately",
-      "Being judgmental about savings running out",
       "Recommending expensive solutions (courses, certifications)",
-      "Not validating the emotional stress",
       "Ignoring available social support systems in Finland"
     ],
     "followUpScenarios": [
@@ -92,7 +89,6 @@
       }
     },
     "idealAdvice": [
-      "Celebrate the achievement!",
       "Start emergency fund immediately - even €50/month matters",
       "Aim for 3-6 months of expenses (€2,500-5,000 as initial goal)",
       "Resume student loan payments but at comfortable level",
@@ -103,7 +99,6 @@
     ],
     "commonMistakes": [
       "Suggesting to pay off all debt before building emergency fund",
-      "Not celebrating the successful job search",
       "Recommending overly aggressive savings that leaves no room for life",
       "Ignoring student loan completely"
     ]
@@ -152,8 +147,7 @@
       "Not strongly warning against payday loans",
       "Suggesting bankruptcy prematurely",
       "Not providing concrete immediate actions",
-      "Ignoring the eviction threat urgency",
-      "Being judgmental instead of supportive"
+      "Ignoring the eviction threat urgency"
     ]
   }
 ]
