@@ -46,6 +46,8 @@ interface Message {
   role: "user" | "assistant" | "system";
   content: string;
   timestamp: Date;
+  isVoice?: boolean;
+  voiceUrgency?: "calm" | "concerned" | "urgent" | "excited";
 }
 
 interface ThreadData {
@@ -592,6 +594,8 @@ function App() {
               role: "assistant",
               content: consultation.messages?.[0] || "Hello...",
               timestamp: new Date(),
+              isVoice: consultation.voiceNeeded,
+              voiceUrgency: consultation.voiceConfig?.urgency,
             },
           ],
           unreadCount: 0,
@@ -746,6 +750,8 @@ function App() {
           role: "assistant",
           content: response.messages.join("\n\n"),
           timestamp: new Date(),
+          isVoice: response.voiceNeeded,
+          voiceUrgency: response.voiceConfig?.urgency,
         });
       }
 
@@ -1056,19 +1062,31 @@ function ConversationPanel({ thread }: { thread: ThreadData }) {
         </Text>
       </Box>
 
-      {recentMessages.map((msg, index) => (
-        <Box key={index} paddingY={0} flexDirection="column">
-          {msg.role === "system" ? (
-            <Text color="yellow">ℹ️ {msg.content}</Text>
-          ) : msg.role === "user" ? (
-            <Text color="green">💼 You: {msg.content}</Text>
-          ) : (
-            <Text color="blue">
-              💬 {thread.characterName}: "{msg.content}"
-            </Text>
-          )}
-        </Box>
-      ))}
+      {recentMessages.map((msg, index) => {
+        // Get voice icon based on urgency
+        const getVoiceIcon = (urgency?: string) => {
+          switch (urgency) {
+            case "urgent": return "🎤❗";
+            case "concerned": return "🎤⚠️";
+            case "excited": return "🎤✨";
+            default: return "🎤";
+          }
+        };
+
+        return (
+          <Box key={index} paddingY={0} flexDirection="column">
+            {msg.role === "system" ? (
+              <Text color="yellow">ℹ️ {msg.content}</Text>
+            ) : msg.role === "user" ? (
+              <Text color="green">💼 You: {msg.content}</Text>
+            ) : (
+              <Text color="blue">
+                {msg.isVoice ? getVoiceIcon(msg.voiceUrgency) : "💬"} {thread.characterName}: "{msg.content}"
+              </Text>
+            )}
+          </Box>
+        );
+      })}
 
       {/* Show advice choices if available */}
       {thread.adviceChoices && thread.adviceChoices.length > 0 && (
