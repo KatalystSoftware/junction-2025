@@ -13,6 +13,17 @@ import {
   generateAdviceChoices,
   type AdviceChoice,
 } from "./choice-generator.ts";
+import {
+  checkForNewAchievements,
+  checkForMilestones,
+  generateMiniFeedback,
+  type Achievement,
+  type Milestone,
+} from "./progress-system.ts";
+import {
+  calculateCoinsEarned,
+  updateGoalProgress,
+} from "./earnings-calculator.ts";
 import type {
   AdvisorState,
   GameMasterDecision,
@@ -407,6 +418,9 @@ export async function handleAdvisorResponse(
 
   // If conversation is ending, save session
   if (characterResponse.conversationEnding) {
+    // Save previous state for milestone detection
+    const previousState = { ...currentState };
+
     // Collect all advisor advice from the conversation
     const allAdvisorAdvice = conversationHistory
       ? conversationHistory
@@ -619,65 +633,41 @@ export async function handleAdvisorResponse(
     }
 
     // NEW: Calculate earnings based on financial projection
-    let coinsEarned = 0;
+    // Calculate coins earned and update state
+    const { coinsEarned, updatedState } = calculateCoinsEarned(
+      adviceEvaluation,
+      advisorState,
+    );
+    advisorState = updatedState;
+
+    // Store in session
     if (adviceEvaluation.financialProjection) {
       const projection = adviceEvaluation.financialProjection;
-
-      // Base consultation fee
-      coinsEarned = 10;
-
-      // Bonus for client financial results (projected)
-      // For every 100€ client saves: +5 coins
-      const savingsBonus = Math.floor(projection.totalSaved / 100) * 5;
-      coinsEarned += savingsBonus;
-
-      // For every 500€ debt reduced: +10 coins
-      const debtBonus = Math.floor(projection.totalDebtReduced / 500) * 10;
-      coinsEarned += debtBonus;
-
-      // Bonus for high quality advice
-      if (adviceEvaluation.qualityScore >= 8) {
-        coinsEarned += 5;
-      }
-
-      // Bonus for empathy
-      if (adviceEvaluation.wasEmpathetic) {
-        coinsEarned += 3;
-      }
-
-      // Penalty for poor outcomes
-      if (adviceEvaluation.outcome === "negative") {
-        coinsEarned = Math.max(0, coinsEarned - 20);
-      }
-
-      // Apply earnings
-      advisorState.advisorCoins += coinsEarned;
-
-      // Track lifetime stats
-      advisorState.lifetimeSavingsGenerated += Math.round(
-        projection.totalSaved,
-      );
-      advisorState.lifetimeDebtCleared += Math.round(
-        projection.totalDebtReduced,
-      );
-
-      // Store in session
       session.financialProjection = projection;
       session.coinsEarned = coinsEarned;
 
       // Update current goal progress if exists
-      if (advisorState.currentGoal) {
-        const goal = advisorState.currentGoal;
-        if (goal.type === "save_target") {
-          goal.progress += Math.round(projection.totalSaved);
-        } else if (goal.type === "debt_reduction") {
-          goal.progress += Math.round(projection.totalDebtReduced);
-        } else if (goal.type === "clients_helped") {
-          goal.progress += 1;
-        }
-        goal.sessionsRemaining -= 1;
-      }
+      updateGoalProgress(advisorState, projection);
     }
+
+    // Check for milestones and achievements
+    const milestonesAchieved = checkForMilestones(previousState, advisorState, session);
+    const newAchievements = checkForNewAchievements(advisorState, session);
+
+    // Add achievements to unlocked list and award coins
+    for (const achievement of newAchievements) {
+      advisorState.achievementsUnlocked.push(achievement.id);
+      advisorState.advisorCoins += achievement.coinReward;
+      achievement.unlockedAt = new Date().toISOString();
+    }
+
+    // Generate mini-feedback for this session
+    const miniFeedback = generateMiniFeedback(session);
+
+    // Store progress data in session for later display
+    (session as any).miniFeedback = miniFeedback;
+    (session as any).milestonesAchieved = milestonesAchieved;
+    (session as any).achievementsUnlocked = newAchievements;
 
     // Mark thread as resolved
     threadInfo.status = "resolved";
@@ -704,8 +694,12 @@ export async function handleAdvisorResponse(
   // Get all active threads for UI
   const activeThreads = getActiveThreads(advisorState);
 
-  // If conversation is ending, include financial results from the last session
+  // If conversation is ending, include financial results and progress data from the last session
   let financialResults;
+  let miniFeedback;
+  let milestonesAchieved;
+  let achievementsUnlocked;
+
   if (
     characterResponse.conversationEnding &&
     advisorState.sessionHistory.length > 0
@@ -721,6 +715,11 @@ export async function handleAdvisorResponse(
         coinsEarned: lastSession.coinsEarned,
       };
     }
+
+    // Get progress data from session
+    miniFeedback = (lastSession as any).miniFeedback;
+    milestonesAchieved = (lastSession as any).milestonesAchieved;
+    achievementsUnlocked = (lastSession as any).achievementsUnlocked;
   }
 
   return {
@@ -735,6 +734,9 @@ export async function handleAdvisorResponse(
     recommendationMessage,
     tierChangeNotification,
     financialResults,
+    miniFeedback,
+    milestonesAchieved,
+    achievementsUnlocked,
   };
 }
 
@@ -836,40 +838,12 @@ export async function handleAdviceChoice(
   const sessionId = `session_${Date.now()}`;
   const now = new Date().toISOString();
 
-  // NEW: Calculate earnings based on financial projection
-  let coinsEarned = 0;
-  if (adviceEvaluation.financialProjection) {
-    const projection = adviceEvaluation.financialProjection;
-
-    coinsEarned = 10; // Base consultation fee
-
-    // Bonus for client financial results
-    const savingsBonus = Math.floor(projection.totalSaved / 100) * 5;
-    coinsEarned += savingsBonus;
-
-    const debtBonus = Math.floor(projection.totalDebtReduced / 500) * 10;
-    coinsEarned += debtBonus;
-
-    // Quality bonus
-    if (adviceEvaluation.qualityScore >= 8) {
-      coinsEarned += 5; // High quality bonus
-    }
-
-    // Empathy bonus
-    if (adviceEvaluation.wasEmpathetic) {
-      coinsEarned += 3;
-    }
-
-    // Penalty for negative outcomes
-    if (adviceEvaluation.outcome === "negative") {
-      coinsEarned = Math.max(0, coinsEarned - 20);
-    }
-
-    // Update advisor coins and lifetime stats
-    advisorState.advisorCoins += coinsEarned;
-    advisorState.lifetimeSavingsGenerated += Math.round(projection.totalSaved);
-    advisorState.lifetimeDebtCleared += Math.round(projection.totalDebtReduced);
-  }
+  // Calculate earnings based on financial projection
+  const { coinsEarned, updatedState } = calculateCoinsEarned(
+    adviceEvaluation,
+    advisorState,
+  );
+  advisorState = updatedState;
 
   const session: ConsultationSession = {
     sessionId,

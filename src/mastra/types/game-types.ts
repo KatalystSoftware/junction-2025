@@ -471,6 +471,24 @@ export interface AdviceChoice {
   fullAdviceText: string;
 }
 
+export interface Milestone {
+  id: string;
+  title: string;
+  message: string;
+  icon: string;
+  type: "skill" | "reputation" | "clients" | "finance" | "achievement";
+}
+
+export interface Achievement {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: "progress" | "skill" | "finance" | "relationship" | "special";
+  coinReward: number;
+  unlockedAt?: string;
+}
+
 export interface GameResponse {
   type: "character_message" | "god_boss_review" | "conversation_end";
 
@@ -532,6 +550,11 @@ export interface GameResponse {
     actualResult?: ActualFinancialResult;
     coinsEarned?: number;
   };
+
+  // NEW: Progress visualization
+  miniFeedback?: string;
+  milestonesAchieved?: Milestone[];
+  achievementsUnlocked?: Achievement[];
 }
 
 // ============================================================================

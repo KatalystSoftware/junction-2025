@@ -24,6 +24,14 @@ import {
   generateSessionId,
   formatSessionId,
 } from "./mastra/persistence/session-store.ts";
+import {
+  getSkillTrend,
+  createSkillTrendGraph,
+  getBossReviewStatus,
+  ACHIEVEMENTS,
+  type Milestone,
+  type Achievement,
+} from "./mastra/game/progress-system.ts";
 import type {
   AdvisorState,
   ConversationThread,
@@ -31,6 +39,7 @@ import type {
   AdviceChoice,
   TrustTier,
 } from "./mastra/types/game-types.ts";
+import { Modal } from "./components/Modal.tsx";
 
 // ============================================================================
 // Types
@@ -63,9 +72,8 @@ function App() {
   const [currentThreadId, setCurrentThreadId] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState("");
   const [statusMessage, setStatusMessage] = useState("Initializing...");
-  const [showStats, setShowStats] = useState(false);
+  const [activePanel, setActivePanel] = useState<'stats' | 'relationships' | 'progress' | 'achievements' | null>(null);
   const [showAllThreads, setShowAllThreads] = useState(false); // Toggle active/all threads
-  const [showRelationships, setShowRelationships] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [bossReview, setBossReview] = useState<any>(null);
   const [quiz, setQuiz] = useState<any>(null);
@@ -77,6 +85,9 @@ function App() {
     characterName: string;
     response: GameResponse;
   } | null>(null);
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const [newAchievements, setNewAchievements] = useState<Achievement[]>([]);
+  const [miniFeedback, setMiniFeedback] = useState<string | null>(null);
 
   // Helper: Convert threads to format for saving (filter system messages, remove timestamps)
   const getThreadHistoriesForSave = (
@@ -189,17 +200,16 @@ function App() {
       return;
     }
 
-    // Toggle stats
-    if (input === "s" && !inputValue) {
-      setShowStats(!showStats);
-      setShowRelationships(false);
-      return;
-    }
+    // Toggle panels (s=stats, r=relationships, p=progress, a=achievements)
+    const panelKeys: Record<string, 'stats' | 'relationships' | 'progress' | 'achievements'> = {
+      s: 'stats',
+      r: 'relationships',
+      p: 'progress',
+      a: 'achievements'
+    };
 
-    // Toggle relationships
-    if (input === "r" && !inputValue) {
-      setShowRelationships(!showRelationships);
-      setShowStats(false);
+    if (panelKeys[input] && !inputValue) {
+      setActivePanel(activePanel === panelKeys[input] ? null : panelKeys[input]);
       return;
     }
 
@@ -385,6 +395,23 @@ function App() {
       setQuizAnswers([]);
       setShowQuizFeedback(false);
       setLastQuizAnswer(null);
+      setStatusMessage("Ready! Press 'n' for new consultation");
+      return;
+    }
+
+    // Close milestones modal
+    if (milestones.length > 0 && input === " ") {
+      setMilestones([]);
+      // Check if there are achievements to show next
+      if (newAchievements.length === 0) {
+        setStatusMessage("Ready! Press 'n' for new consultation");
+      }
+      return;
+    }
+
+    // Close achievements modal
+    if (newAchievements.length > 0 && input === " ") {
+      setNewAchievements([]);
       setStatusMessage("Ready! Press 'n' for new consultation");
       return;
     }
@@ -661,7 +688,26 @@ function App() {
 
       // Check if conversation ended
       if (response.type === "conversation_end") {
-        // Show final results modal with relationship changes
+        // Capture progress data
+        if (response.miniFeedback) {
+          setMiniFeedback(response.miniFeedback);
+        }
+
+        // Check for milestones first (highest priority modal)
+        if (response.milestonesAchieved && response.milestonesAchieved.length > 0) {
+          setMilestones(response.milestonesAchieved);
+          setStatusMessage("Milestone achieved! Press SPACE to continue");
+          return;
+        }
+
+        // Then check for achievements
+        if (response.achievementsUnlocked && response.achievementsUnlocked.length > 0) {
+          setNewAchievements(response.achievementsUnlocked);
+          setStatusMessage("New achievement unlocked! Press SPACE to continue");
+          return;
+        }
+
+        // Finally show final results modal with relationship changes and financial impact
         let statusMsg = "Consultation complete!";
 
         // Add tier change to status message
@@ -710,7 +756,17 @@ function App() {
     );
   }
 
-  // Final results modal
+  // Milestone modal (highest priority)
+  if (milestones.length > 0) {
+    return <MilestoneModal milestones={milestones} />;
+  }
+
+  // Achievement modal (second priority)
+  if (newAchievements.length > 0) {
+    return <AchievementModal achievements={newAchievements} />;
+  }
+
+  // Final results modal (third priority)
   if (finalResults) {
     return (
       <FinalResultsModal
@@ -815,10 +871,14 @@ function App() {
             )}
           <Text dimColor> </Text>
           <Text dimColor>───────────────</Text>
-          {showStats ? (
+          {activePanel === 'stats' ? (
             <StatsPanel advisorState={advisorState} />
-          ) : showRelationships ? (
+          ) : activePanel === 'relationships' ? (
             <RelationshipsPanel advisorState={advisorState} />
+          ) : activePanel === 'progress' ? (
+            <ProgressPanel advisorState={advisorState} />
+          ) : activePanel === 'achievements' ? (
+            <AchievementsPanel advisorState={advisorState} />
           ) : (
             <>
               <Text dimColor>Commands:</Text>
@@ -827,6 +887,8 @@ function App() {
               <Text dimColor>h History</Text>
               <Text dimColor>s Stats</Text>
               <Text dimColor>r Relationships</Text>
+              <Text dimColor>p Progress</Text>
+              <Text dimColor>a Achievements</Text>
               <Text dimColor>q Quit</Text>
             </>
           )}
@@ -853,10 +915,13 @@ function App() {
         justifyContent="space-between"
       >
         <Text color={isLoading ? "yellow" : "cyan"}>{statusMessage}</Text>
-        <Text dimColor>
-          Rep: {advisorState.reputation} | Skill:{" "}
-          {advisorState.skillLevel.toFixed(1)}
-        </Text>
+        <Box>
+          <Text dimColor>
+            Rep: {advisorState.reputation} | Skill:{" "}
+            {advisorState.skillLevel.toFixed(1)} |{" "}
+          </Text>
+          <Text dimColor>{getBossReviewStatus(advisorState)}</Text>
+        </Box>
       </Box>
 
       {/* Input box */}
@@ -1079,6 +1144,130 @@ function RelationshipsPanel({ advisorState }: { advisorState: AdvisorState }) {
 }
 
 // ============================================================================
+// Progress Panel Component
+// ============================================================================
+
+function ProgressPanel({ advisorState }: { advisorState: AdvisorState }) {
+  const trend = getSkillTrend(advisorState.sessionHistory);
+  const graph = createSkillTrendGraph(trend);
+
+  return (
+    <Box flexDirection="column">
+      <Text bold color="yellow">
+        📈 Progress
+      </Text>
+      <Text dimColor> </Text>
+      <Text dimColor>Skill Trend:</Text>
+      {graph.map((line, i) => (
+        <Text key={i} dimColor>
+          {line}
+        </Text>
+      ))}
+      <Text dimColor> </Text>
+      <Text dimColor>Sessions: {advisorState.totalSessions}</Text>
+      <Text dimColor>Clients: {advisorState.totalClientsHelped}</Text>
+      <Text dimColor>Coins: {advisorState.advisorCoins}</Text>
+    </Box>
+  );
+}
+
+// ============================================================================
+// Achievements Panel Component
+// ============================================================================
+
+function AchievementsPanel({ advisorState }: { advisorState: AdvisorState }) {
+  const unlockedIds = new Set(advisorState.achievementsUnlocked);
+  const unlocked = ACHIEVEMENTS.filter((a) => unlockedIds.has(a.id));
+  const locked = ACHIEVEMENTS.filter((a) => !unlockedIds.has(a.id));
+
+  return (
+    <Box flexDirection="column">
+      <Text bold color="yellow">
+        🏆 Achievements
+      </Text>
+      <Text dimColor> </Text>
+      <Text color="green">
+        Unlocked: {unlocked.length}/{ACHIEVEMENTS.length}
+      </Text>
+      <Text dimColor> </Text>
+      {unlocked.slice(0, 3).map((achievement, index) => (
+        <Box key={index} flexDirection="column">
+          <Text color="green">
+            {achievement.icon} {achievement.name}
+          </Text>
+          <Text dimColor>{achievement.description}</Text>
+        </Box>
+      ))}
+      {unlocked.length === 0 && (
+        <Text dimColor>No achievements yet</Text>
+      )}
+      {unlocked.length > 3 && (
+        <Text dimColor>...and {unlocked.length - 3} more</Text>
+      )}
+      <Text dimColor> </Text>
+      <Text dimColor>Next to unlock:</Text>
+      {locked.slice(0, 2).map((achievement, index) => (
+        <Box key={index} flexDirection="column">
+          <Text dimColor>
+            🔒 {achievement.name}
+          </Text>
+          <Text dimColor>{achievement.description}</Text>
+        </Box>
+      ))}
+    </Box>
+  );
+}
+
+// ============================================================================
+// Milestone Modal Component
+// ============================================================================
+
+function MilestoneModal({ milestones }: { milestones: Milestone[] }) {
+  return (
+    <Modal title="🎯 MILESTONE ACHIEVED!" color="yellow">
+      {milestones.map((milestone, index) => (
+        <Box key={index} flexDirection="column" paddingY={1}>
+          <Text bold color="green">
+            {milestone.icon} {milestone.title}
+          </Text>
+          <Text color="cyan">{milestone.message}</Text>
+          <Text> </Text>
+        </Box>
+      ))}
+    </Modal>
+  );
+}
+
+// ============================================================================
+// Achievement Modal Component
+// ============================================================================
+
+function AchievementModal({ achievements }: { achievements: Achievement[] }) {
+  const totalCoins = achievements.reduce((sum, a) => sum + a.coinReward, 0);
+
+  return (
+    <Modal title="🏆 ACHIEVEMENT UNLOCKED!" color="magenta">
+      {achievements.map((achievement, index) => (
+        <Box key={index} flexDirection="column" paddingY={1}>
+          <Text bold color="green">
+            {achievement.icon} {achievement.name}
+          </Text>
+          <Text color="cyan">{achievement.description}</Text>
+          <Text color="yellow">
+            Reward: +{achievement.coinReward} coins
+          </Text>
+          <Text> </Text>
+        </Box>
+      ))}
+
+      <Text bold color="green">
+        Total coins earned: {totalCoins}
+      </Text>
+    </Modal>
+  );
+}
+
+// ============================================================================
 // Quiz Question Modal Component
 // ============================================================================
 
@@ -1094,15 +1283,11 @@ function QuizQuestionModal({
   const question = quiz.questions[currentQuestionIndex];
 
   return (
-    <Box
-      flexDirection="column"
-      padding={2}
-      borderStyle="double"
-      borderColor="cyan"
+    <Modal
+      title="📝 INTERACTIVE QUIZ"
+      color="cyan"
+      showContinue={false}
     >
-      <Text bold color="cyan">
-        📝 INTERACTIVE QUIZ
-      </Text>
       <Text dimColor>
         Question {currentQuestionIndex + 1} of {totalQuestions}
       </Text>
@@ -1131,7 +1316,7 @@ function QuizQuestionModal({
       <Text> </Text>
 
       <Text dimColor>Press 1-4 to answer</Text>
-    </Box>
+    </Modal>
   );
 }
 
@@ -1152,17 +1337,10 @@ function QuizFeedbackModal({
   const isCorrect = userAnswer === question.correctAnswer;
 
   return (
-    <Box
-      flexDirection="column"
-      padding={2}
-      borderStyle="double"
-      borderColor={isCorrect ? "green" : "red"}
+    <Modal
+      title={isCorrect ? "✅ CORRECT!" : "❌ INCORRECT"}
+      color={isCorrect ? "green" : "red"}
     >
-      <Text bold color={isCorrect ? "green" : "red"}>
-        {isCorrect ? "✅ CORRECT!" : "❌ INCORRECT"}
-      </Text>
-      <Text> </Text>
-
       <Box
         borderStyle="single"
         borderColor="blue"
@@ -1198,10 +1376,7 @@ function QuizFeedbackModal({
         </Text>
         <Text color="cyan">{question.explanation}</Text>
       </Box>
-      <Text> </Text>
-
-      <Text dimColor>Press SPACE to continue</Text>
-    </Box>
+    </Modal>
   );
 }
 
@@ -1244,17 +1419,7 @@ function QuizResultsModal({
   }
 
   return (
-    <Box
-      flexDirection="column"
-      padding={2}
-      borderStyle="double"
-      borderColor="magenta"
-    >
-      <Text bold color="magenta">
-        📊 QUIZ RESULTS
-      </Text>
-      <Text> </Text>
-
+    <Modal title="📊 QUIZ RESULTS" color="magenta">
       <Text color="green" bold>
         Score: {correctCount}/{quiz.questions.length} (
         {scorePercentage.toFixed(0)}%)
@@ -1301,10 +1466,7 @@ function QuizResultsModal({
           </Box>
         );
       })}
-      <Text> </Text>
-
-      <Text dimColor>Press SPACE to continue</Text>
-    </Box>
+    </Modal>
   );
 }
 
@@ -1324,15 +1486,7 @@ function FinalResultsModal({
   const coinsEarned = financialResults?.coinsEarned || 0;
 
   return (
-    <Box
-      flexDirection="column"
-      padding={2}
-      borderStyle="double"
-      borderColor="green"
-    >
-      <Text bold color="green">
-        ✨ CONSULTATION COMPLETE ✨
-      </Text>
+    <Modal title="✨ CONSULTATION COMPLETE ✨" color="green">
       <Text color="cyan">Client: {characterName}</Text>
       <Text> </Text>
 
@@ -1516,10 +1670,7 @@ function FinalResultsModal({
           </Box>
         </>
       )}
-
-      <Text> </Text>
-      <Text dimColor>Press SPACE to continue</Text>
-    </Box>
+    </Modal>
   );
 }
 
@@ -1529,16 +1680,11 @@ function FinalResultsModal({
 
 function BossReviewModal({ review }: { review: any }) {
   return (
-    <Box
-      flexDirection="column"
-      padding={2}
-      borderStyle="double"
-      borderColor="magenta"
+    <Modal
+      title="👔 BOSS REVIEW"
+      color="magenta"
+      continueText={`Press SPACE to ${review.quiz ? "start quiz" : "continue"}`}
     >
-      <Text bold color="magenta">
-        👔 BOSS REVIEW
-      </Text>
-      <Text> </Text>
       <Text color="green">📈 Overall Score: {review.overallScore}/10</Text>
       <Text> </Text>
 
@@ -1589,14 +1735,9 @@ function BossReviewModal({ review }: { review: any }) {
             Your boss has prepared {review.quiz.questions.length} questions to
             test your knowledge.
           </Text>
-          <Text> </Text>
         </>
       )}
-
-      <Text dimColor>
-        Press SPACE to {review.quiz ? "start quiz" : "continue"}
-      </Text>
-    </Box>
+    </Modal>
   );
 }
 
