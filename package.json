@@ -9,7 +9,9 @@
     "test-ci": "TEST_CACHE_MODE=replay node src/test-game.ts",
     "test:game": "node --env-file=.env src/test-game.ts",
     "test:unit": "jest",
+    "test:analytics": "tsx --env-file=.env src/test-analytics.ts",
     "play": "tsx --env-file=.env src/play-tui.tsx",
+    "analytics": "tsx --env-file=.env src/view-analytics.tsx",
     "dev": "mastra dev",
     "build": "mastra build",
     "start": "mastra start",
@@ -38,7 +40,9 @@
     "@mastra/voice-elevenlabs": "^0.11.12",
     "ai": "^5.0.93",
     "ink": "^6.5.0",
+    "lucide-react": "^0.553.0",
     "react": "^19.2.0",
+    "recharts": "^3.4.1",
     "zod": "^4.1.12"
   },
   "devDependencies": {

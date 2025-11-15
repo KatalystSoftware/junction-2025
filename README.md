@@ -224,6 +224,21 @@ See [docs/features/relationship-system.md](docs/features/relationship-system.md)
 - €X saved/debt cleared = Y coins
 - Future: Unlock features with coins
 
+### Analytics Dashboard
+Track your performance across multiple dimensions:
+- **Performance Stats**: Quality scores, success rates, trends, and streaks
+- **Topic Expertise**: Visual breakdown of all 10 financial topics
+- **Character Success**: Per-client success rates and relationship metrics
+- **Financial Impact**: Lifetime savings, debt cleared, and ROI tracking
+
+**View Analytics:**
+```bash
+pnpm analytics [sessionId]        # View dashboard in terminal
+pnpm test:analytics                # Test analytics system
+```
+
+See [docs/ANALYTICS.md](docs/ANALYTICS.md) for detailed documentation.
+
 ---
 
 ## 🧠 Key Features
