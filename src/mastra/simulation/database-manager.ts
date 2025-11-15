@@ -1,6 +1,6 @@
 /**
  * Elämäpeli 2025 - Financial Simulation Database Manager
- * SQLite database operations for transaction persistence
+ * PostgreSQL database operations for transaction persistence
  *
  * Handles:
  * - Schema creation and migrations
@@ -11,7 +11,7 @@
  * - Query operations
  */
 
-import Database from "better-sqlite3";
+import { Pool, PoolClient } from "pg";
 import type {
   Transaction,
   CharacterFinancialState,
@@ -23,11 +23,15 @@ import type {
 } from "./simulation-types.ts";
 
 export class SimulationDatabaseManager {
-  private db: Database.Database;
+  private pool: Pool;
 
-  constructor(dbPath: string) {
-    this.db = new Database(dbPath);
-    this.db.pragma("journal_mode = WAL"); // Better concurrency
+  constructor(connectionString: string) {
+    this.pool = new Pool({
+      connectionString,
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 2000,
+    });
     this.initializeSchema();
   }
 
@@ -35,125 +39,139 @@ export class SimulationDatabaseManager {
   // SCHEMA INITIALIZATION
   // ============================================================================
 
-  private initializeSchema(): void {
-    // Character financial state table
-    this.db.exec(`
-      CREATE TABLE IF NOT EXISTS character_states (
-        character_id TEXT PRIMARY KEY,
-        current_balance REAL NOT NULL,
-        monthly_income_day INTEGER NOT NULL,
-        last_simulated_date TEXT NOT NULL,
-        spending_model TEXT NOT NULL,
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL
-      );
-    `);
+  private async initializeSchema(): Promise<void> {
+    const client = await this.pool.connect();
+    try {
+      // Character financial state table
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS character_states (
+          character_id TEXT PRIMARY KEY,
+          current_balance REAL NOT NULL,
+          monthly_income_day INTEGER NOT NULL,
+          last_simulated_date TEXT NOT NULL,
+          spending_model TEXT NOT NULL,
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL
+        );
+      `);
 
-    // Transactions table
-    this.db.exec(`
-      CREATE TABLE IF NOT EXISTS transactions (
-        id TEXT PRIMARY KEY,
-        character_id TEXT NOT NULL,
-        date TEXT NOT NULL,
-        type TEXT NOT NULL,
-        category TEXT NOT NULL,
-        amount REAL NOT NULL,
-        balance_after REAL NOT NULL,
-        description TEXT NOT NULL,
-        merchant_name TEXT,
-        advice_influenced INTEGER DEFAULT 0,
-        metadata TEXT,
-        created_at TEXT NOT NULL,
-        FOREIGN KEY (character_id) REFERENCES character_states(character_id)
-      );
-    `);
+      // Transactions table
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS transactions (
+          id TEXT PRIMARY KEY,
+          character_id TEXT NOT NULL,
+          date TEXT NOT NULL,
+          type TEXT NOT NULL,
+          category TEXT NOT NULL,
+          amount REAL NOT NULL,
+          balance_after REAL NOT NULL,
+          description TEXT NOT NULL,
+          merchant_name TEXT,
+          advice_influenced INTEGER DEFAULT 0,
+          metadata TEXT,
+          created_at TEXT NOT NULL,
+          FOREIGN KEY (character_id) REFERENCES character_states(character_id)
+        );
+      `);
 
-    // Advice effects table
-    this.db.exec(`
-      CREATE TABLE IF NOT EXISTS advice_effects (
-        id TEXT PRIMARY KEY,
-        character_id TEXT NOT NULL,
-        advice_session_id TEXT NOT NULL,
-        effect_type TEXT NOT NULL,
-        strength REAL NOT NULL,
-        applied_date TEXT NOT NULL,
-        expires_date TEXT,
-        metadata TEXT,
-        is_active INTEGER DEFAULT 1,
-        created_at TEXT NOT NULL,
-        FOREIGN KEY (character_id) REFERENCES character_states(character_id)
-      );
-    `);
+      // Advice effects table
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS advice_effects (
+          id TEXT PRIMARY KEY,
+          character_id TEXT NOT NULL,
+          advice_session_id TEXT NOT NULL,
+          effect_type TEXT NOT NULL,
+          strength REAL NOT NULL,
+          applied_date TEXT NOT NULL,
+          expires_date TEXT,
+          metadata TEXT,
+          is_active INTEGER DEFAULT 1,
+          created_at TEXT NOT NULL,
+          FOREIGN KEY (character_id) REFERENCES character_states(character_id)
+        );
+      `);
 
-    // Monthly summaries table
-    this.db.exec(`
-      CREATE TABLE IF NOT EXISTS monthly_summaries (
-        character_id TEXT NOT NULL,
-        month TEXT NOT NULL,
-        total_income REAL NOT NULL,
-        total_expenses REAL NOT NULL,
-        end_balance REAL NOT NULL,
-        transaction_count INTEGER NOT NULL,
-        debt_reduction REAL DEFAULT 0,
-        created_at TEXT NOT NULL,
-        PRIMARY KEY (character_id, month),
-        FOREIGN KEY (character_id) REFERENCES character_states(character_id)
-      );
-    `);
+      // Monthly summaries table
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS monthly_summaries (
+          character_id TEXT NOT NULL,
+          month TEXT NOT NULL,
+          total_income REAL NOT NULL,
+          total_expenses REAL NOT NULL,
+          end_balance REAL NOT NULL,
+          transaction_count INTEGER NOT NULL,
+          debt_reduction REAL DEFAULT 0,
+          created_at TEXT NOT NULL,
+          PRIMARY KEY (character_id, month),
+          FOREIGN KEY (character_id) REFERENCES character_states(character_id)
+        );
+      `);
 
-    // Create indexes
-    this.db.exec(`
-      CREATE INDEX IF NOT EXISTS idx_transactions_character_date
-        ON transactions(character_id, date DESC);
-
-      CREATE INDEX IF NOT EXISTS idx_transactions_type
-        ON transactions(type);
-
-      CREATE INDEX IF NOT EXISTS idx_transactions_advice
-        ON transactions(advice_influenced);
-
-      CREATE INDEX IF NOT EXISTS idx_advice_effects_character
-        ON advice_effects(character_id, is_active);
-
-      CREATE INDEX IF NOT EXISTS idx_advice_effects_session
-        ON advice_effects(advice_session_id);
-
-      CREATE INDEX IF NOT EXISTS idx_monthly_summaries_month
-        ON monthly_summaries(month);
-    `);
+      // Create indexes
+      await client.query(`
+        CREATE INDEX IF NOT EXISTS idx_transactions_character_date
+          ON transactions(character_id, date DESC);
+      `);
+      await client.query(`
+        CREATE INDEX IF NOT EXISTS idx_transactions_type
+          ON transactions(type);
+      `);
+      await client.query(`
+        CREATE INDEX IF NOT EXISTS idx_transactions_advice
+          ON transactions(advice_influenced);
+      `);
+      await client.query(`
+        CREATE INDEX IF NOT EXISTS idx_advice_effects_character
+          ON advice_effects(character_id, is_active);
+      `);
+      await client.query(`
+        CREATE INDEX IF NOT EXISTS idx_advice_effects_session
+          ON advice_effects(advice_session_id);
+      `);
+      await client.query(`
+        CREATE INDEX IF NOT EXISTS idx_monthly_summaries_month
+          ON monthly_summaries(month);
+      `);
+    } finally {
+      client.release();
+    }
   }
 
   // ============================================================================
   // CHARACTER STATE OPERATIONS
   // ============================================================================
 
-  createCharacterState(state: CharacterFinancialState): void {
-    const stmt = this.db.prepare(`
+  async createCharacterState(state: CharacterFinancialState): Promise<void> {
+    await this.pool.query(
+      `
       INSERT INTO character_states (
         character_id, current_balance, monthly_income_day,
         last_simulated_date, spending_model, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?)
-    `);
-
-    stmt.run(
-      state.characterId,
-      state.currentBalance,
-      state.monthlyIncomeDay,
-      state.lastSimulatedDate,
-      JSON.stringify(state.spendingModel),
-      state.createdAt,
-      state.updatedAt,
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `,
+      [
+        state.characterId,
+        state.currentBalance,
+        state.monthlyIncomeDay,
+        state.lastSimulatedDate,
+        JSON.stringify(state.spendingModel),
+        state.createdAt,
+        state.updatedAt,
+      ]
     );
   }
 
-  getCharacterState(characterId: string): CharacterFinancialState | null {
-    const stmt = this.db.prepare(`
-      SELECT * FROM character_states WHERE character_id = ?
-    `);
+  async getCharacterState(
+    characterId: string
+  ): Promise<CharacterFinancialState | null> {
+    const result = await this.pool.query(
+      `SELECT * FROM character_states WHERE character_id = $1`,
+      [characterId]
+    );
 
-    const row = stmt.get(characterId) as any;
+    if (result.rows.length === 0) return null;
 
-    if (!row) return null;
+    const row = result.rows[0];
 
     return {
       characterId: row.character_id,
@@ -166,42 +184,46 @@ export class SimulationDatabaseManager {
     };
   }
 
-  updateCharacterBalance(characterId: string, newBalance: number): void {
-    const stmt = this.db.prepare(`
+  async updateCharacterBalance(
+    characterId: string,
+    newBalance: number
+  ): Promise<void> {
+    await this.pool.query(
+      `
       UPDATE character_states
-      SET current_balance = ?, updated_at = ?
-      WHERE character_id = ?
-    `);
-
-    stmt.run(newBalance, new Date().toISOString(), characterId);
-  }
-
-  updateCharacterState(state: CharacterFinancialState): void {
-    const stmt = this.db.prepare(`
-      UPDATE character_states
-      SET current_balance = ?,
-          monthly_income_day = ?,
-          last_simulated_date = ?,
-          spending_model = ?,
-          updated_at = ?
-      WHERE character_id = ?
-    `);
-
-    stmt.run(
-      state.currentBalance,
-      state.monthlyIncomeDay,
-      state.lastSimulatedDate,
-      JSON.stringify(state.spendingModel),
-      new Date().toISOString(),
-      state.characterId,
+      SET current_balance = $1, updated_at = $2
+      WHERE character_id = $3
+    `,
+      [newBalance, new Date().toISOString(), characterId]
     );
   }
 
-  getAllCharacterStates(): CharacterFinancialState[] {
-    const stmt = this.db.prepare(`SELECT * FROM character_states`);
-    const rows = stmt.all() as any[];
+  async updateCharacterState(state: CharacterFinancialState): Promise<void> {
+    await this.pool.query(
+      `
+      UPDATE character_states
+      SET current_balance = $1,
+          monthly_income_day = $2,
+          last_simulated_date = $3,
+          spending_model = $4,
+          updated_at = $5
+      WHERE character_id = $6
+    `,
+      [
+        state.currentBalance,
+        state.monthlyIncomeDay,
+        state.lastSimulatedDate,
+        JSON.stringify(state.spendingModel),
+        new Date().toISOString(),
+        state.characterId,
+      ]
+    );
+  }
 
-    return rows.map((row) => ({
+  async getAllCharacterStates(): Promise<CharacterFinancialState[]> {
+    const result = await this.pool.query(`SELECT * FROM character_states`);
+
+    return result.rows.map((row) => ({
       characterId: row.character_id,
       currentBalance: row.current_balance,
       monthlyIncomeDay: row.monthly_income_day,
@@ -216,105 +238,115 @@ export class SimulationDatabaseManager {
   // TRANSACTION OPERATIONS
   // ============================================================================
 
-  insertTransaction(transaction: Transaction): void {
-    const stmt = this.db.prepare(`
+  async insertTransaction(transaction: Transaction): Promise<void> {
+    await this.pool.query(
+      `
       INSERT INTO transactions (
         id, character_id, date, type, category, amount,
         balance_after, description, merchant_name,
         advice_influenced, metadata, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-
-    stmt.run(
-      transaction.id,
-      transaction.characterId,
-      transaction.date,
-      transaction.type,
-      transaction.category,
-      transaction.amount,
-      transaction.balanceAfter,
-      transaction.description,
-      transaction.merchantName || null,
-      transaction.adviceInfluenced ? 1 : 0,
-      transaction.metadata ? JSON.stringify(transaction.metadata) : null,
-      transaction.createdAt,
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+    `,
+      [
+        transaction.id,
+        transaction.characterId,
+        transaction.date,
+        transaction.type,
+        transaction.category,
+        transaction.amount,
+        transaction.balanceAfter,
+        transaction.description,
+        transaction.merchantName || null,
+        transaction.adviceInfluenced ? 1 : 0,
+        transaction.metadata ? JSON.stringify(transaction.metadata) : null,
+        transaction.createdAt,
+      ]
     );
   }
 
   /**
    * Batch insert transactions (much faster than individual inserts)
    */
-  insertTransactionsBatch(transactions: Transaction[]): void {
-    const stmt = this.db.prepare(`
-      INSERT INTO transactions (
-        id, character_id, date, type, category, amount,
-        balance_after, description, merchant_name,
-        advice_influenced, metadata, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
+  async insertTransactionsBatch(transactions: Transaction[]): Promise<void> {
+    const client = await this.pool.connect();
+    try {
+      await client.query("BEGIN");
 
-    const insertMany = this.db.transaction((txns: Transaction[]) => {
-      for (const txn of txns) {
-        stmt.run(
-          txn.id,
-          txn.characterId,
-          txn.date,
-          txn.type,
-          txn.category,
-          txn.amount,
-          txn.balanceAfter,
-          txn.description,
-          txn.merchantName || null,
-          txn.adviceInfluenced ? 1 : 0,
-          txn.metadata ? JSON.stringify(txn.metadata) : null,
-          txn.createdAt,
+      for (const txn of transactions) {
+        await client.query(
+          `
+          INSERT INTO transactions (
+            id, character_id, date, type, category, amount,
+            balance_after, description, merchant_name,
+            advice_influenced, metadata, created_at
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+        `,
+          [
+            txn.id,
+            txn.characterId,
+            txn.date,
+            txn.type,
+            txn.category,
+            txn.amount,
+            txn.balanceAfter,
+            txn.description,
+            txn.merchantName || null,
+            txn.adviceInfluenced ? 1 : 0,
+            txn.metadata ? JSON.stringify(txn.metadata) : null,
+            txn.createdAt,
+          ]
         );
       }
-    });
 
-    insertMany(transactions);
+      await client.query("COMMIT");
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 
-  getTransactions(query: TransactionQuery): Transaction[] {
-    let sql = `SELECT * FROM transactions WHERE character_id = ?`;
+  async getTransactions(query: TransactionQuery): Promise<Transaction[]> {
+    let sql = `SELECT * FROM transactions WHERE character_id = $1`;
     const params: any[] = [query.characterId];
+    let paramIndex = 2;
 
     if (query.startDate) {
-      sql += ` AND date >= ?`;
+      sql += ` AND date >= $${paramIndex++}`;
       params.push(query.startDate);
     }
 
     if (query.endDate) {
-      sql += ` AND date <= ?`;
+      sql += ` AND date <= $${paramIndex++}`;
       params.push(query.endDate);
     }
 
     if (query.type) {
-      sql += ` AND type = ?`;
+      sql += ` AND type = $${paramIndex++}`;
       params.push(query.type);
     }
 
     if (query.category) {
-      sql += ` AND category = ?`;
+      sql += ` AND category = $${paramIndex++}`;
       params.push(query.category);
     }
 
     sql += ` ORDER BY date DESC`;
 
     if (query.limit) {
-      sql += ` LIMIT ?`;
+      sql += ` LIMIT $${paramIndex++}`;
       params.push(query.limit);
     }
 
     if (query.offset) {
-      sql += ` OFFSET ?`;
+      sql += ` OFFSET $${paramIndex++}`;
       params.push(query.offset);
     }
 
-    const stmt = this.db.prepare(sql);
-    const rows = stmt.all(...params) as any[];
+    const result = await this.pool.query(sql, params);
 
-    return rows.map((row) => ({
+    return result.rows.map((row) => ({
       id: row.id,
       characterId: row.character_id,
       date: row.date,
@@ -330,74 +362,78 @@ export class SimulationDatabaseManager {
     }));
   }
 
-  getRecentTransactions(
+  async getRecentTransactions(
     characterId: string,
-    limit: number = 100,
-  ): Transaction[] {
+    limit: number = 100
+  ): Promise<Transaction[]> {
     return this.getTransactions({ characterId, limit });
   }
 
-  getTransactionsByMonth(characterId: string, month: string): Transaction[] {
+  async getTransactionsByMonth(
+    characterId: string,
+    month: string
+  ): Promise<Transaction[]> {
     const startDate = `${month}-01`;
     const endDate = `${month}-31`; // Simple approximation
 
     return this.getTransactions({ characterId, startDate, endDate });
   }
 
-  getTransactionCount(characterId: string): number {
-    const stmt = this.db.prepare(`
-      SELECT COUNT(*) as count FROM transactions WHERE character_id = ?
-    `);
+  async getTransactionCount(characterId: string): Promise<number> {
+    const result = await this.pool.query(
+      `SELECT COUNT(*) as count FROM transactions WHERE character_id = $1`,
+      [characterId]
+    );
 
-    const result = stmt.get(characterId) as any;
-    return result.count;
+    return parseInt(result.rows[0].count);
   }
 
   // ============================================================================
   // ADVICE EFFECTS OPERATIONS
   // ============================================================================
 
-  insertAdviceEffect(effect: AdviceEffect): void {
-    const stmt = this.db.prepare(`
+  async insertAdviceEffect(effect: AdviceEffect): Promise<void> {
+    await this.pool.query(
+      `
       INSERT INTO advice_effects (
         id, character_id, advice_session_id, effect_type,
         strength, applied_date, expires_date, metadata,
         is_active, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-
-    stmt.run(
-      effect.id,
-      effect.characterId,
-      effect.adviceSessionId,
-      effect.effectType,
-      effect.strength,
-      effect.appliedDate,
-      effect.expiresDate || null,
-      effect.metadata ? JSON.stringify(effect.metadata) : null,
-      effect.isActive ? 1 : 0,
-      effect.createdAt,
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    `,
+      [
+        effect.id,
+        effect.characterId,
+        effect.adviceSessionId,
+        effect.effectType,
+        effect.strength,
+        effect.appliedDate,
+        effect.expiresDate || null,
+        effect.metadata ? JSON.stringify(effect.metadata) : null,
+        effect.isActive ? 1 : 0,
+        effect.createdAt,
+      ]
     );
   }
 
-  getAdviceEffects(query: AdviceEffectQuery): AdviceEffect[] {
-    let sql = `SELECT * FROM advice_effects WHERE character_id = ?`;
+  async getAdviceEffects(query: AdviceEffectQuery): Promise<AdviceEffect[]> {
+    let sql = `SELECT * FROM advice_effects WHERE character_id = $1`;
     const params: any[] = [query.characterId];
+    let paramIndex = 2;
 
     if (query.isActive !== undefined) {
-      sql += ` AND is_active = ?`;
+      sql += ` AND is_active = $${paramIndex++}`;
       params.push(query.isActive ? 1 : 0);
     }
 
     if (query.effectType) {
-      sql += ` AND effect_type = ?`;
+      sql += ` AND effect_type = $${paramIndex++}`;
       params.push(query.effectType);
     }
 
-    const stmt = this.db.prepare(sql);
-    const rows = stmt.all(...params) as any[];
+    const result = await this.pool.query(sql, params);
 
-    return rows.map((row) => ({
+    return result.rows.map((row) => ({
       id: row.id,
       characterId: row.character_id,
       adviceSessionId: row.advice_session_id,
@@ -411,61 +447,76 @@ export class SimulationDatabaseManager {
     }));
   }
 
-  getActiveAdviceEffects(characterId: string): AdviceEffect[] {
+  async getActiveAdviceEffects(characterId: string): Promise<AdviceEffect[]> {
     return this.getAdviceEffects({ characterId, isActive: true });
   }
 
-  deactivateAdviceEffect(effectId: string): void {
-    const stmt = this.db.prepare(`
-      UPDATE advice_effects SET is_active = 0 WHERE id = ?
-    `);
-
-    stmt.run(effectId);
+  async deactivateAdviceEffect(effectId: string): Promise<void> {
+    await this.pool.query(
+      `UPDATE advice_effects SET is_active = 0 WHERE id = $1`,
+      [effectId]
+    );
   }
 
-  deactivateExpiredEffects(currentDate: string): void {
-    const stmt = this.db.prepare(`
+  async deactivateExpiredEffects(currentDate: string): Promise<void> {
+    await this.pool.query(
+      `
       UPDATE advice_effects
       SET is_active = 0
-      WHERE expires_date IS NOT NULL AND expires_date <= ? AND is_active = 1
-    `);
-
-    stmt.run(currentDate);
+      WHERE expires_date IS NOT NULL AND expires_date <= $1 AND is_active = 1
+    `,
+      [currentDate]
+    );
   }
 
   // ============================================================================
   // MONTHLY SUMMARY OPERATIONS
   // ============================================================================
 
-  insertMonthlySummary(summary: MonthSummary): void {
-    const stmt = this.db.prepare(`
-      INSERT OR REPLACE INTO monthly_summaries (
+  async insertMonthlySummary(summary: MonthSummary): Promise<void> {
+    await this.pool.query(
+      `
+      INSERT INTO monthly_summaries (
         character_id, month, total_income, total_expenses,
         end_balance, transaction_count, debt_reduction, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-
-    stmt.run(
-      summary.characterId,
-      summary.month,
-      summary.totalIncome,
-      summary.totalExpenses,
-      summary.endBalance,
-      summary.transactionCount,
-      summary.debtReduction,
-      summary.createdAt,
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      ON CONFLICT (character_id, month)
+      DO UPDATE SET
+        total_income = EXCLUDED.total_income,
+        total_expenses = EXCLUDED.total_expenses,
+        end_balance = EXCLUDED.end_balance,
+        transaction_count = EXCLUDED.transaction_count,
+        debt_reduction = EXCLUDED.debt_reduction,
+        created_at = EXCLUDED.created_at
+    `,
+      [
+        summary.characterId,
+        summary.month,
+        summary.totalIncome,
+        summary.totalExpenses,
+        summary.endBalance,
+        summary.transactionCount,
+        summary.debtReduction,
+        summary.createdAt,
+      ]
     );
   }
 
-  getMonthlySummary(characterId: string, month: string): MonthSummary | null {
-    const stmt = this.db.prepare(`
+  async getMonthlySummary(
+    characterId: string,
+    month: string
+  ): Promise<MonthSummary | null> {
+    const result = await this.pool.query(
+      `
       SELECT * FROM monthly_summaries
-      WHERE character_id = ? AND month = ?
-    `);
+      WHERE character_id = $1 AND month = $2
+    `,
+      [characterId, month]
+    );
 
-    const row = stmt.get(characterId, month) as any;
+    if (result.rows.length === 0) return null;
 
-    if (!row) return null;
+    const row = result.rows[0];
 
     return {
       characterId: row.character_id,
@@ -479,23 +530,26 @@ export class SimulationDatabaseManager {
     };
   }
 
-  getMonthlySummaries(characterId: string, limit?: number): MonthSummary[] {
+  async getMonthlySummaries(
+    characterId: string,
+    limit?: number
+  ): Promise<MonthSummary[]> {
     let sql = `
       SELECT * FROM monthly_summaries
-      WHERE character_id = ?
+      WHERE character_id = $1
       ORDER BY month DESC
     `;
 
+    const params: any[] = [characterId];
+
     if (limit) {
-      sql += ` LIMIT ?`;
+      sql += ` LIMIT $2`;
+      params.push(limit);
     }
 
-    const stmt = this.db.prepare(sql);
-    const rows = limit
-      ? (stmt.all(characterId, limit) as any[])
-      : (stmt.all(characterId) as any[]);
+    const result = await this.pool.query(sql, params);
 
-    return rows.map((row) => ({
+    return result.rows.map((row) => ({
       characterId: row.character_id,
       month: row.month,
       totalIncome: row.total_income,
@@ -514,80 +568,86 @@ export class SimulationDatabaseManager {
   /**
    * Get spending by category for a character over a date range
    */
-  getSpendingByCategory(
+  async getSpendingByCategory(
     characterId: string,
     startDate: string,
-    endDate: string,
-  ): Record<string, number> {
-    const stmt = this.db.prepare(`
+    endDate: string
+  ): Promise<Record<string, number>> {
+    const result = await this.pool.query(
+      `
       SELECT category, SUM(ABS(amount)) as total
       FROM transactions
-      WHERE character_id = ?
-        AND date >= ?
-        AND date <= ?
+      WHERE character_id = $1
+        AND date >= $2
+        AND date <= $3
         AND amount < 0
       GROUP BY category
-    `);
+    `,
+      [characterId, startDate, endDate]
+    );
 
-    const rows = stmt.all(characterId, startDate, endDate) as any[];
-
-    const result: Record<string, number> = {};
-    for (const row of rows) {
-      result[row.category] = row.total;
+    const spending: Record<string, number> = {};
+    for (const row of result.rows) {
+      spending[row.category] = parseFloat(row.total);
     }
 
-    return result;
+    return spending;
   }
 
   /**
    * Get total income for a character over a date range
    */
-  getTotalIncome(
+  async getTotalIncome(
     characterId: string,
     startDate: string,
-    endDate: string,
-  ): number {
-    const stmt = this.db.prepare(`
+    endDate: string
+  ): Promise<number> {
+    const result = await this.pool.query(
+      `
       SELECT SUM(amount) as total
       FROM transactions
-      WHERE character_id = ?
-        AND date >= ?
-        AND date <= ?
+      WHERE character_id = $1
+        AND date >= $2
+        AND date <= $3
         AND amount > 0
-    `);
+    `,
+      [characterId, startDate, endDate]
+    );
 
-    const result = stmt.get(characterId, startDate, endDate) as any;
-    return result.total || 0;
+    return parseFloat(result.rows[0].total) || 0;
   }
 
   /**
    * Get total expenses for a character over a date range
    */
-  getTotalExpenses(
+  async getTotalExpenses(
     characterId: string,
     startDate: string,
-    endDate: string,
-  ): number {
-    const stmt = this.db.prepare(`
+    endDate: string
+  ): Promise<number> {
+    const result = await this.pool.query(
+      `
       SELECT SUM(ABS(amount)) as total
       FROM transactions
-      WHERE character_id = ?
-        AND date >= ?
-        AND date <= ?
+      WHERE character_id = $1
+        AND date >= $2
+        AND date <= $3
         AND amount < 0
-    `);
+    `,
+      [characterId, startDate, endDate]
+    );
 
-    const result = stmt.get(characterId, startDate, endDate) as any;
-    return result.total || 0;
+    return parseFloat(result.rows[0].total) || 0;
   }
 
   /**
    * Get transactions influenced by advisor's advice
    */
-  getAdviceInfluencedTransactions(characterId: string): Transaction[] {
-    return this.getTransactions({ characterId }).filter(
-      (t) => t.adviceInfluenced,
-    );
+  async getAdviceInfluencedTransactions(
+    characterId: string
+  ): Promise<Transaction[]> {
+    const transactions = await this.getTransactions({ characterId });
+    return transactions.filter((t) => t.adviceInfluenced);
   }
 
   // ============================================================================
@@ -595,75 +655,65 @@ export class SimulationDatabaseManager {
   // ============================================================================
 
   /**
-   * Close database connection
+   * Close database connection pool
    */
-  close(): void {
-    this.db.close();
-  }
-
-  /**
-   * Vacuum database to reclaim space
-   */
-  vacuum(): void {
-    this.db.exec("VACUUM");
+  async close(): Promise<void> {
+    await this.pool.end();
   }
 
   /**
    * Get database statistics
    */
-  getStats(): {
+  async getStats(): Promise<{
     totalTransactions: number;
     totalCharacters: number;
     totalAdviceEffects: number;
-    databaseSizeKB: number;
-  } {
-    const txnCount = this.db
-      .prepare("SELECT COUNT(*) as count FROM transactions")
-      .get() as any;
-    const charCount = this.db
-      .prepare("SELECT COUNT(*) as count FROM character_states")
-      .get() as any;
-    const effectCount = this.db
-      .prepare("SELECT COUNT(*) as count FROM advice_effects")
-      .get() as any;
-    const pageCount = this.db.pragma("page_count") as any[];
-    const pageSize = this.db.pragma("page_size") as any[];
-
-    const sizeKB =
-      (pageCount[0]["page_count"] * pageSize[0]["page_size"]) / 1024;
+  }> {
+    const txnResult = await this.pool.query(
+      "SELECT COUNT(*) as count FROM transactions"
+    );
+    const charResult = await this.pool.query(
+      "SELECT COUNT(*) as count FROM character_states"
+    );
+    const effectResult = await this.pool.query(
+      "SELECT COUNT(*) as count FROM advice_effects"
+    );
 
     return {
-      totalTransactions: txnCount.count,
-      totalCharacters: charCount.count,
-      totalAdviceEffects: effectCount.count,
-      databaseSizeKB: Math.round(sizeKB),
+      totalTransactions: parseInt(txnResult.rows[0].count),
+      totalCharacters: parseInt(charResult.rows[0].count),
+      totalAdviceEffects: parseInt(effectResult.rows[0].count),
     };
   }
 
   /**
    * Delete all data for a character (for testing/reset)
    */
-  deleteCharacterData(characterId: string): void {
-    const deleteTransactions = this.db.prepare(
-      "DELETE FROM transactions WHERE character_id = ?",
-    );
-    const deleteEffects = this.db.prepare(
-      "DELETE FROM advice_effects WHERE character_id = ?",
-    );
-    const deleteSummaries = this.db.prepare(
-      "DELETE FROM monthly_summaries WHERE character_id = ?",
-    );
-    const deleteState = this.db.prepare(
-      "DELETE FROM character_states WHERE character_id = ?",
-    );
+  async deleteCharacterData(characterId: string): Promise<void> {
+    const client = await this.pool.connect();
+    try {
+      await client.query("BEGIN");
 
-    const deleteAll = this.db.transaction((charId: string) => {
-      deleteTransactions.run(charId);
-      deleteEffects.run(charId);
-      deleteSummaries.run(charId);
-      deleteState.run(charId);
-    });
+      await client.query("DELETE FROM transactions WHERE character_id = $1", [
+        characterId,
+      ]);
+      await client.query("DELETE FROM advice_effects WHERE character_id = $1", [
+        characterId,
+      ]);
+      await client.query(
+        "DELETE FROM monthly_summaries WHERE character_id = $1",
+        [characterId]
+      );
+      await client.query("DELETE FROM character_states WHERE character_id = $1", [
+        characterId,
+      ]);
 
-    deleteAll(characterId);
+      await client.query("COMMIT");
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 }
