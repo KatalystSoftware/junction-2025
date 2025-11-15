@@ -8,6 +8,7 @@
 import { mastra } from "../index.ts";
 import { characterPool } from "./character-pool-manager.ts";
 import { getCharacterInitialMessage } from "../agents/character-agent-factory.ts";
+import { cachedGenerate } from "../test-cache.ts";
 import type {
   AdvisorState,
   GameMasterDecision,
@@ -119,7 +120,12 @@ Should you: send a new character, send a returning character (follow-up), or tri
 Respond with ONLY valid JSON (NO markdown):
 `;
 
-  const gmResult = await gmAgent.generate(gmPrompt);
+  const gmResult = await cachedGenerate(
+    "agent",
+    "gameMaster_decision",
+    gmPrompt,
+    () => gmAgent.generate(gmPrompt),
+  );
 
   // Parse Game Master's decision
   let decision: GameMasterDecision;

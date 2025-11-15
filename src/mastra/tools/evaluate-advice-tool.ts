@@ -6,6 +6,7 @@
  */
 
 import { evaluatorAgent } from "../agents/evaluator-agent.ts";
+import { cachedGenerate } from "../test-cache.ts";
 import type {
   AdviceEvaluation,
   Scenario,
@@ -86,8 +87,13 @@ ${conversationHistory.map((msg, idx) => `${msg.role === "user" ? "Character" : "
 Please evaluate this advice comprehensively across all dimensions.
 `;
 
-      // Call evaluatorAgent
-      const evaluationResult = await evaluatorAgent.generate(evaluationPrompt);
+      // Call evaluatorAgent (cached in tests)
+      const evaluationResult = await cachedGenerate(
+        "agent",
+        "evaluator_advice",
+        evaluationPrompt,
+        () => evaluatorAgent.generate(evaluationPrompt),
+      );
 
       // Parse JSON response
       let jsonText = evaluationResult.text.trim();

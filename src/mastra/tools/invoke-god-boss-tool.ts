@@ -10,6 +10,7 @@ import type {
   GodBossReview,
   ConsultationSession,
 } from "../types/game-types.ts";
+import { cachedGenerate } from "../test-cache.ts";
 
 export const invokeGodBossTool = {
   id: "invokeGodBossTool",
@@ -54,7 +55,12 @@ Provide comprehensive feedback following your review format.
 `;
 
       // Invoke God/Boss agent
-      const response = await godBossAgent.generate(prompt);
+      const response = await cachedGenerate(
+        "agent",
+        "godBoss_review",
+        prompt,
+        () => godBossAgent.generate(prompt),
+      );
 
       const text = response.text || "";
 

@@ -347,34 +347,54 @@ export class CharacterPoolManager {
       return null;
     }
 
-    // Pick a random new character
-    const randomCharIndex = Math.floor(Math.random() * newCharacters.length);
-    const selectedCharacter = newCharacters[randomCharIndex];
+    const deterministic =
+      process.env.TEST_CACHE_MODE === "record" ||
+      process.env.TEST_CACHE_MODE === "replay";
 
-    // Find initial scenario for this character
-    const initialScenarios = Array.from(this.scenarios.values()).filter(
-      (s) =>
-        s.characterId === selectedCharacter.characterId &&
-        !s.triggerConditions.isFollowUp &&
-        !this.usedScenarios.has(s.scenarioId) &&
-        advisorState.skillLevel >= s.triggerConditions.advisorSkillLevel.min &&
-        advisorState.skillLevel <= s.triggerConditions.advisorSkillLevel.max,
-    );
+    const candidatePairs: { character: Character; scenario: Scenario }[] = [];
 
-    if (initialScenarios.length === 0) {
-      console.log(
-        `⚠️ No initial scenarios for character ${selectedCharacter.characterId}`,
+    for (const character of newCharacters) {
+      const initialScenarios = Array.from(this.scenarios.values()).filter(
+        (s) =>
+          s.characterId === character.characterId &&
+          !s.triggerConditions.isFollowUp &&
+          !this.usedScenarios.has(s.scenarioId) &&
+          advisorState.skillLevel >=
+            s.triggerConditions.advisorSkillLevel.min &&
+          advisorState.skillLevel <=
+            s.triggerConditions.advisorSkillLevel.max,
       );
+
+      if (initialScenarios.length === 0) {
+        continue;
+      }
+
+      for (const scenario of initialScenarios) {
+        candidatePairs.push({ character, scenario });
+      }
+    }
+
+    if (candidatePairs.length === 0) {
+      console.log("⚠️ No initial scenarios for any new characters");
       return null;
     }
 
-    // Pick first available initial scenario
-    const selectedScenario = initialScenarios[0];
+    let selectedPair: { character: Character; scenario: Scenario };
 
-    return {
-      character: selectedCharacter,
-      scenario: selectedScenario,
-    };
+    if (deterministic) {
+      selectedPair = [...candidatePairs].sort((a, b) => {
+        const byChar = a.character.characterId.localeCompare(
+          b.character.characterId,
+        );
+        if (byChar !== 0) return byChar;
+        return a.scenario.scenarioId.localeCompare(b.scenario.scenarioId);
+      })[0];
+    } else {
+      selectedPair =
+        candidatePairs[Math.floor(Math.random() * candidatePairs.length)];
+    }
+
+    return selectedPair;
   }
 
   /**

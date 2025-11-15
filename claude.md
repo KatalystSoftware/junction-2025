@@ -35,8 +35,11 @@ Instead of managing your own money (which can create pressure), you act as a **p
 # Play the game (interactive CLI)
 pnpm play
 
-# Run tests/demo
-pnpm test:game
+# Run tests/demo (real AI, updates cache)
+pnpm test
+
+# Run cached CI-style test flow (no env / credits)
+pnpm test-ci
 
 # Start Mastra dev server
 pnpm dev
@@ -44,6 +47,7 @@ pnpm dev
 # BEFORE EVERY COMMIT - MANDATORY
 pnpm format      # Format code with Prettier
 pnpm check       # TypeScript type checking
+pnpm test-ci     # Validate cached game flow still makes sense
 ```
 
 ### Important Technical Notes
@@ -66,8 +70,10 @@ import { characterPool } from "./mastra/index";
 
 1. Run `pnpm format` (auto-formats all files)
 2. Run `pnpm check` (verify TypeScript compiles)
-3. Fix any errors before committing
-4. Commit with descriptive message
+3. Run `pnpm test-ci` and confirm the output story makes sense
+   - Agents adding new features SHOULD extend the test flow (e.g. more turns, boss review, follow-ups) so `pnpm test-ci` exercises new behavior over time
+4. Fix any errors before committing
+5. Commit with descriptive message
 
 ### Running Files Directly
 

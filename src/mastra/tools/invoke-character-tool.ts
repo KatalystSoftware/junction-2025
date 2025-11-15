@@ -12,6 +12,7 @@ import type {
   CharacterResponse,
   CharacterConversationMemory,
 } from "../types/game-types.ts";
+import { cachedGenerate } from "../test-cache.ts";
 
 export const invokeCharacterTool = {
   id: "invokeCharacterTool",
@@ -58,7 +59,12 @@ export const invokeCharacterTool = {
       }
 
       // Invoke character agent
-      const response = await characterAgent.generate(prompt);
+      const response = await cachedGenerate(
+        "agent",
+        `character_${character.characterId}`,
+        prompt,
+        () => characterAgent.generate(prompt),
+      );
 
       const text = response.text || "";
 
