@@ -216,7 +216,10 @@ export function checkForNewAchievements(
   if (advisorState.totalClientsHelped === 10 && !unlocked.has("ten_clients")) {
     newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "ten_clients")!);
   }
-  if (advisorState.totalClientsHelped === 50 && !unlocked.has("fifty_clients")) {
+  if (
+    advisorState.totalClientsHelped === 50 &&
+    !unlocked.has("fifty_clients")
+  ) {
     newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "fifty_clients")!);
   }
 
@@ -257,7 +260,9 @@ export function checkForNewAchievements(
     advisorState.lifetimeSavingsGenerated >= 100000 &&
     !unlocked.has("millionaire_maker")
   ) {
-    newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "millionaire_maker")!);
+    newAchievements.push(
+      ACHIEVEMENTS.find((a) => a.id === "millionaire_maker")!,
+    );
   }
 
   // Reputation achievements
@@ -295,7 +300,9 @@ export function checkForNewAchievements(
       last5.length === 5 &&
       last5.every((s) => s.evaluation?.wasEmpathetic === true)
     ) {
-      newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "empathy_streak")!);
+      newAchievements.push(
+        ACHIEVEMENTS.find((a) => a.id === "empathy_streak")!,
+      );
     }
   }
 
@@ -329,7 +336,10 @@ export function checkForMilestones(
   // Reputation milestones
   const repMilestones = [25, 50, 75, 100];
   for (const milestone of repMilestones) {
-    if (previousState.reputation < milestone && currentState.reputation >= milestone) {
+    if (
+      previousState.reputation < milestone &&
+      currentState.reputation >= milestone
+    ) {
       milestones.push({
         id: `reputation_${milestone}`,
         title: "Reputation Milestone!",
@@ -430,7 +440,10 @@ export function generateMiniFeedback(session: ConsultationSession): string {
     if (evaluation?.wasActionable === false) {
       return "💡 Tip: Give specific, actionable steps they can follow.";
     }
-    if (evaluation?.missedOpportunities && evaluation.missedOpportunities.length > 0) {
+    if (
+      evaluation?.missedOpportunities &&
+      evaluation.missedOpportunities.length > 0
+    ) {
       return `💡 Tip: ${evaluation.missedOpportunities[0]}`;
     }
     return "💡 Good effort! Focus on being more specific and actionable.";
@@ -491,7 +504,10 @@ export function getSkillTrend(
     // Estimate changes (simplified)
     const scoreChange = (session.adviceQualityScore - 5) * 0.02;
     currentSkill = Math.max(0, Math.min(10, currentSkill + scoreChange));
-    currentRep = Math.max(0, Math.min(100, currentRep + (session.adviceQualityScore - 5) * 2));
+    currentRep = Math.max(
+      0,
+      Math.min(100, currentRep + (session.adviceQualityScore - 5) * 2),
+    );
   });
 
   return trend;
@@ -522,7 +538,10 @@ export function createSkillTrendGraph(trend: SkillTrendPoint[]): string[] {
       const point = normalizedPoints[col];
       if (point.y === row) {
         line += "●";
-      } else if (col > 0 && isBetween(row, normalizedPoints[col - 1].y, point.y)) {
+      } else if (
+        col > 0 &&
+        isBetween(row, normalizedPoints[col - 1].y, point.y)
+      ) {
         line += "│";
       } else {
         line += " ";
@@ -550,7 +569,8 @@ function isBetween(value: number, a: number, b: number): boolean {
 // ============================================================================
 
 export function getSessionsUntilBossReview(advisorState: AdvisorState): number {
-  const sessionsSinceReview = advisorState.totalSessions - advisorState.lastReviewSession;
+  const sessionsSinceReview =
+    advisorState.totalSessions - advisorState.lastReviewSession;
 
   // Boss review happens between 3-5 sessions
   // Show countdown starting from session 3

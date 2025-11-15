@@ -7,10 +7,7 @@
 
 import React, { useState, useEffect } from "react";
 import { render, Box, Text, useInput, useApp } from "ink";
-import {
-  characterPool,
-  getTrustTierInfo,
-} from "./mastra/index.ts";
+import { characterPool, getTrustTierInfo } from "./mastra/index.ts";
 import {
   startNewConsultation,
   handleAdvisorResponse,
@@ -72,7 +69,9 @@ function App() {
   const [currentThreadId, setCurrentThreadId] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState("");
   const [statusMessage, setStatusMessage] = useState("Initializing...");
-  const [activePanel, setActivePanel] = useState<'stats' | 'relationships' | 'progress' | 'achievements' | null>(null);
+  const [activePanel, setActivePanel] = useState<
+    "stats" | "relationships" | "progress" | "achievements" | null
+  >(null);
   const [showAllThreads, setShowAllThreads] = useState(false); // Toggle active/all threads
   const [isLoading, setIsLoading] = useState(false);
   const [onboardingMessage, setOnboardingMessage] = useState<any>(null);
@@ -172,8 +171,7 @@ function App() {
               characterName: threadInfo.characterId, // We'll update this when we have character data
               messages,
               unreadCount: 0,
-              status:
-                threadInfo.status === "resolved" ? "completed" : "active",
+              status: threadInfo.status === "resolved" ? "completed" : "active",
             });
           }
         });
@@ -203,15 +201,20 @@ function App() {
     }
 
     // Toggle panels (s=stats, r=relationships, p=progress, a=achievements)
-    const panelKeys: Record<string, 'stats' | 'relationships' | 'progress' | 'achievements'> = {
-      s: 'stats',
-      r: 'relationships',
-      p: 'progress',
-      a: 'achievements'
+    const panelKeys: Record<
+      string,
+      "stats" | "relationships" | "progress" | "achievements"
+    > = {
+      s: "stats",
+      r: "relationships",
+      p: "progress",
+      a: "achievements",
     };
 
     if (panelKeys[input] && !inputValue) {
-      setActivePanel(activePanel === panelKeys[input] ? null : panelKeys[input]);
+      setActivePanel(
+        activePanel === panelKeys[input] ? null : panelKeys[input],
+      );
       return;
     }
 
@@ -235,7 +238,9 @@ function App() {
     // Handle number input (1-9)
     if (/^[1-9]$/.test(input) && !inputValue) {
       // Check if current thread has advice choices - if so, this is a choice selection
-      const currentThread = currentThreadId ? threads.get(currentThreadId) : null;
+      const currentThread = currentThreadId
+        ? threads.get(currentThreadId)
+        : null;
       if (
         currentThread?.adviceChoices &&
         currentThread.adviceChoices.length > 0
@@ -306,7 +311,11 @@ function App() {
         // Boss review completed without quiz - auto-save
         setBossReview(null);
         if (advisorState && sessionId) {
-          saveSession(sessionId, advisorState, getThreadHistoriesForSave(threads));
+          saveSession(
+            sessionId,
+            advisorState,
+            getThreadHistoriesForSave(threads),
+          );
         }
       }
       return;
@@ -378,8 +387,7 @@ function App() {
               quiz.topic as keyof typeof updatedState.topicsExpertise;
             updatedState.topicsExpertise = {
               ...updatedState.topicsExpertise,
-              [topic]:
-                (updatedState.topicsExpertise[topic] || 0) + skillBonus,
+              [topic]: (updatedState.topicsExpertise[topic] || 0) + skillBonus,
             };
           }
 
@@ -387,7 +395,11 @@ function App() {
 
           // Auto-save after quiz completion
           if (sessionId) {
-            saveSession(sessionId, updatedState, getThreadHistoriesForSave(threads));
+            saveSession(
+              sessionId,
+              updatedState,
+              getThreadHistoriesForSave(threads),
+            );
           }
         }
 
@@ -501,7 +513,10 @@ function App() {
       );
 
       // Onboarding
-      if (consultation.type === "onboarding" && consultation.onboardingMessage) {
+      if (
+        consultation.type === "onboarding" &&
+        consultation.onboardingMessage
+      ) {
         setOnboardingMessage(consultation.onboardingMessage);
         setAdvisorState(consultation.stateUpdate);
         setStatusMessage("Welcome! Press SPACE to continue");
@@ -509,7 +524,11 @@ function App() {
 
         // Auto-save after onboarding
         if (sessionId) {
-          await saveSession(sessionId, consultation.stateUpdate, getThreadHistoriesForSave(threads));
+          await saveSession(
+            sessionId,
+            consultation.stateUpdate,
+            getThreadHistoriesForSave(threads),
+          );
         }
         return;
       }
@@ -523,7 +542,11 @@ function App() {
 
         // Auto-save after check-in
         if (sessionId) {
-          await saveSession(sessionId, consultation.stateUpdate, getThreadHistoriesForSave(threads));
+          await saveSession(
+            sessionId,
+            consultation.stateUpdate,
+            getThreadHistoriesForSave(threads),
+          );
         }
         return;
       }
@@ -537,7 +560,11 @@ function App() {
 
         // Auto-save after boss review state update
         if (sessionId) {
-          await saveSession(sessionId, consultation.stateUpdate, getThreadHistoriesForSave(threads));
+          await saveSession(
+            sessionId,
+            consultation.stateUpdate,
+            getThreadHistoriesForSave(threads),
+          );
         }
         return;
       }
@@ -581,7 +608,11 @@ function App() {
 
         // Auto-save after new consultation
         if (sessionId) {
-          await saveSession(sessionId, consultation.stateUpdate, getThreadHistoriesForSave(updated));
+          await saveSession(
+            sessionId,
+            consultation.stateUpdate,
+            getThreadHistoriesForSave(updated),
+          );
         }
       } else {
         setStatusMessage("No characters available");
@@ -727,7 +758,11 @@ function App() {
 
       // Auto-save after message exchange
       if (sessionId) {
-        await saveSession(sessionId, response.stateUpdate, getThreadHistoriesForSave(updated));
+        await saveSession(
+          sessionId,
+          response.stateUpdate,
+          getThreadHistoriesForSave(updated),
+        );
       }
 
       // Check if conversation ended
@@ -738,14 +773,20 @@ function App() {
         }
 
         // Check for milestones first (highest priority modal)
-        if (response.milestonesAchieved && response.milestonesAchieved.length > 0) {
+        if (
+          response.milestonesAchieved &&
+          response.milestonesAchieved.length > 0
+        ) {
           setMilestones(response.milestonesAchieved);
           setStatusMessage("Milestone achieved! Press SPACE to continue");
           return;
         }
 
         // Then check for achievements
-        if (response.achievementsUnlocked && response.achievementsUnlocked.length > 0) {
+        if (
+          response.achievementsUnlocked &&
+          response.achievementsUnlocked.length > 0
+        ) {
           setNewAchievements(response.achievementsUnlocked);
           setStatusMessage("New achievement unlocked! Press SPACE to continue");
           return;
@@ -925,13 +966,13 @@ function App() {
             )}
           <Text dimColor> </Text>
           <Text dimColor>───────────────</Text>
-          {activePanel === 'stats' ? (
+          {activePanel === "stats" ? (
             <StatsPanel advisorState={advisorState} />
-          ) : activePanel === 'relationships' ? (
+          ) : activePanel === "relationships" ? (
             <RelationshipsPanel advisorState={advisorState} />
-          ) : activePanel === 'progress' ? (
+          ) : activePanel === "progress" ? (
             <ProgressPanel advisorState={advisorState} />
-          ) : activePanel === 'achievements' ? (
+          ) : activePanel === "achievements" ? (
             <AchievementsPanel advisorState={advisorState} />
           ) : (
             <>
@@ -983,7 +1024,10 @@ function App() {
         {currentThreadId &&
         threads.get(currentThreadId)?.adviceChoices &&
         threads.get(currentThreadId)!.adviceChoices!.length > 0 ? (
-          <Text dimColor>Select an option above (1-{threads.get(currentThreadId)!.adviceChoices!.length})</Text>
+          <Text dimColor>
+            Select an option above (1-
+            {threads.get(currentThreadId)!.adviceChoices!.length})
+          </Text>
         ) : (
           <>
             <Text color="green">💼 You: </Text>
@@ -1039,7 +1083,7 @@ function ConversationPanel({ thread }: { thread: ThreadData }) {
               <Text color="cyan">
                 [{index + 1}] {choice.icon} {choice.actionText}
               </Text>
-              <Text dimColor>    {choice.projectedOutcome}</Text>
+              <Text dimColor> {choice.projectedOutcome}</Text>
             </Box>
           ))}
           <Text dimColor> </Text>
@@ -1252,9 +1296,7 @@ function AchievementsPanel({ advisorState }: { advisorState: AdvisorState }) {
           <Text dimColor>{achievement.description}</Text>
         </Box>
       ))}
-      {unlocked.length === 0 && (
-        <Text dimColor>No achievements yet</Text>
-      )}
+      {unlocked.length === 0 && <Text dimColor>No achievements yet</Text>}
       {unlocked.length > 3 && (
         <Text dimColor>...and {unlocked.length - 3} more</Text>
       )}
@@ -1262,9 +1304,7 @@ function AchievementsPanel({ advisorState }: { advisorState: AdvisorState }) {
       <Text dimColor>Next to unlock:</Text>
       {locked.slice(0, 2).map((achievement, index) => (
         <Box key={index} flexDirection="column">
-          <Text dimColor>
-            🔒 {achievement.name}
-          </Text>
+          <Text dimColor>🔒 {achievement.name}</Text>
           <Text dimColor>{achievement.description}</Text>
         </Box>
       ))}
@@ -1307,9 +1347,7 @@ function AchievementModal({ achievements }: { achievements: Achievement[] }) {
             {achievement.icon} {achievement.name}
           </Text>
           <Text color="cyan">{achievement.description}</Text>
-          <Text color="yellow">
-            Reward: +{achievement.coinReward} coins
-          </Text>
+          <Text color="yellow">Reward: +{achievement.coinReward} coins</Text>
           <Text> </Text>
         </Box>
       ))}
@@ -1337,11 +1375,7 @@ function QuizQuestionModal({
   const question = quiz.questions[currentQuestionIndex];
 
   return (
-    <Modal
-      title="📝 INTERACTIVE QUIZ"
-      color="cyan"
-      showContinue={false}
-    >
+    <Modal title="📝 INTERACTIVE QUIZ" color="cyan" showContinue={false}>
       <Text dimColor>
         Question {currentQuestionIndex + 1} of {totalQuestions}
       </Text>
@@ -1414,7 +1448,9 @@ function QuizFeedbackModal({
       {!isCorrect && (
         <>
           <Text color="yellow">Correct answer:</Text>
-          <Text color="green">• {question.options[question.correctAnswer]}</Text>
+          <Text color="green">
+            • {question.options[question.correctAnswer]}
+          </Text>
           <Text> </Text>
         </>
       )}
@@ -1538,11 +1574,34 @@ function FinalResultsModal({
   const financialResults = response.financialResults;
   const projection = financialResults?.projection;
   const coinsEarned = financialResults?.coinsEarned || 0;
+  const evaluation = financialResults?.evaluation;
 
   return (
     <Modal title="✨ CONSULTATION COMPLETE ✨" color="green">
       <Text color="cyan">Client: {characterName}</Text>
       <Text> </Text>
+
+      {/* Advisor's advice (what the player said) */}
+      {response.advisorAdvice && response.advisorAdvice.length > 0 && (
+        <>
+          <Box
+            borderStyle="single"
+            borderColor="cyan"
+            paddingX={1}
+            flexDirection="column"
+          >
+            <Text color="cyan" bold>
+              💼 YOUR ADVICE:
+            </Text>
+            {response.advisorAdvice.map((advice, idx) => (
+              <Text key={idx} color="cyan">
+                "{advice}"
+              </Text>
+            ))}
+          </Box>
+          <Text> </Text>
+        </>
+      )}
 
       {/* Character's final response */}
       {response.messages && response.messages.length > 0 && (
@@ -1568,7 +1627,7 @@ function FinalResultsModal({
           </Text>
           <Text dimColor>─────────────────────────</Text>
 
-          {projection.totalSaved !== undefined && projection.totalSaved !== 0 && (
+          {projection.totalSaved !== undefined && (
             <>
               {projection.totalSaved > 0 ? (
                 <>
@@ -1582,7 +1641,7 @@ function FinalResultsModal({
                     </Text>
                   )}
                 </>
-              ) : (
+              ) : projection.totalSaved < 0 ? (
                 <>
                   <Text color="red" bold>
                     ⚠️ WARNING: Client will lose{" "}
@@ -1595,46 +1654,53 @@ function FinalResultsModal({
                     </Text>
                   )}
                 </>
+              ) : (
+                <Text color="yellow" dimColor>
+                  📈 Savings: 0€ (no meaningful financial progress)
+                </Text>
               )}
             </>
           )}
 
-          {projection.totalDebtReduced !== undefined &&
-            projection.totalDebtReduced !== 0 && (
-              <>
-                {projection.totalDebtReduced > 0 ? (
-                  <>
+          {projection.totalDebtReduced !== undefined && (
+            <>
+              {projection.totalDebtReduced > 0 ? (
+                <>
+                  <Text color="green">
+                    💳 Debt reduced by:{" "}
+                    {Math.round(projection.totalDebtReduced)}€
+                  </Text>
+                  {projection.totalInterestSaved > 0 && (
                     <Text color="green">
-                      💳 Debt reduced by:{" "}
-                      {Math.round(projection.totalDebtReduced)}€
+                      Interest saved:{" "}
+                      {Math.round(projection.totalInterestSaved)}€
                     </Text>
-                    {projection.totalInterestSaved > 0 && (
-                      <Text color="green">
-                        Interest saved:{" "}
-                        {Math.round(projection.totalInterestSaved)}€
+                  )}
+                  {projection.monthsToGoal > 0 &&
+                    projection.monthsToGoal < 999 && (
+                      <Text color="cyan">
+                        Debt-free in: {Math.round(projection.monthsToGoal)}{" "}
+                        months
                       </Text>
                     )}
-                    {projection.monthsToGoal > 0 &&
-                      projection.monthsToGoal < 999 && (
-                        <Text color="cyan">
-                          Debt-free in: {Math.round(projection.monthsToGoal)}{" "}
-                          months
-                        </Text>
-                      )}
-                  </>
-                ) : (
-                  <>
-                    <Text color="red" bold>
-                      ⚠️ Debt will INCREASE by{" "}
-                      {Math.abs(Math.round(projection.totalDebtReduced))}€
-                    </Text>
-                    <Text color="red" bold>
-                      This advice made the problem WORSE!
-                    </Text>
-                  </>
-                )}
-              </>
-            )}
+                </>
+              ) : projection.totalDebtReduced < 0 ? (
+                <>
+                  <Text color="red" bold>
+                    ⚠️ Debt will INCREASE by{" "}
+                    {Math.abs(Math.round(projection.totalDebtReduced))}€
+                  </Text>
+                  <Text color="red" bold>
+                    This advice made the problem WORSE!
+                  </Text>
+                </>
+              ) : (
+                <Text color="yellow" dimColor>
+                  💳 Debt reduction: 0€ (no debt progress)
+                </Text>
+              )}
+            </>
+          )}
 
           {projection.emergencyFundProgress > 0 &&
             projection.emergencyFundProgress < 1 && (
@@ -1647,25 +1713,110 @@ function FinalResultsModal({
           {projection.emergencyFundProgress >= 1 && (
             <Text color="green">🛡️ Emergency Fund: GOAL REACHED! ✅</Text>
           )}
+
+          <Text> </Text>
+        </>
+      )}
+
+      {/* Advice Feedback */}
+      {evaluation && (
+        <>
+          <Text bold color="cyan">
+            📊 ADVICE QUALITY
+          </Text>
+          <Text dimColor>─────────────────────────</Text>
+          <Text
+            bold
+            color={
+              evaluation.qualityScore >= 8
+                ? "green"
+                : evaluation.qualityScore >= 5
+                  ? "yellow"
+                  : "red"
+            }
+          >
+            Quality Score: {evaluation.qualityScore.toFixed(1)}/10
+          </Text>
+
+          {evaluation.strengths.length > 0 && (
+            <>
+              <Text color="green" bold>
+                ✅ Strengths:
+              </Text>
+              {evaluation.strengths.map((strength, idx) => (
+                <Text key={idx} color="green">
+                  • {strength}
+                </Text>
+              ))}
+            </>
+          )}
+
+          {evaluation.weaknesses.length > 0 && (
+            <>
+              <Text color="red" bold>
+                ⚠️ Weaknesses:
+              </Text>
+              {evaluation.weaknesses.map((weakness, idx) => (
+                <Text key={idx} color="red">
+                  • {weakness}
+                </Text>
+              ))}
+            </>
+          )}
+
+          {evaluation.missedOpportunities.length > 0 && (
+            <>
+              <Text color="yellow" bold>
+                💡 Missed Opportunities:
+              </Text>
+              {evaluation.missedOpportunities.map((opportunity, idx) => (
+                <Text key={idx} color="yellow">
+                  • {opportunity}
+                </Text>
+              ))}
+            </>
+          )}
+
           <Text> </Text>
         </>
       )}
 
       {/* Earnings */}
       <Text dimColor>─────────────────────────</Text>
-      <Text bold color={coinsEarned > 10 ? "green" : coinsEarned > 0 ? "yellow" : "red"}>
-        💎 YOU EARNED: +{coinsEarned} coins
+      <Text
+        bold
+        color={coinsEarned >= 8 ? "green" : coinsEarned > 0 ? "yellow" : "red"}
+      >
+        💎 YOU {coinsEarned >= 0 ? "EARNED" : "LOST"}:{" "}
+        {coinsEarned >= 0 ? "+" : ""}
+        {coinsEarned} coins
       </Text>
 
-      {coinsEarned > 10 && (
-        <Text color="green">✅ Quality Bonus! Great advice!</Text>
+      {coinsEarned >= 15 && (
+        <Text color="green">
+          ✅ Excellent! Great advice + strong financial impact!
+        </Text>
       )}
-      {coinsEarned === 10 && <Text color="yellow">✓ Decent advice</Text>}
-      {coinsEarned > 0 && coinsEarned < 10 && (
-        <Text color="yellow">⚠️ Advice had some issues</Text>
+      {coinsEarned >= 8 && coinsEarned < 15 && (
+        <Text color="green">✓ Good advice with positive results</Text>
+      )}
+      {coinsEarned >= 5 && coinsEarned < 8 && (
+        <Text color="yellow">~ Acceptable advice, room for improvement</Text>
+      )}
+      {coinsEarned > 0 && coinsEarned < 5 && (
+        <Text color="yellow">
+          ⚠️ Marginal quality - advice barely met minimum standards
+        </Text>
       )}
       {coinsEarned === 0 && (
-        <Text color="red">❌ Poor advice - caused harm to client</Text>
+        <Text color="red">
+          ❌ Poor advice (quality &lt; 5/10) - no payment earned
+        </Text>
+      )}
+      {coinsEarned < 0 && (
+        <Text color="red">
+          ❌ Harmful advice - caused damage to client (penalty applied)
+        </Text>
       )}
 
       {/* Relationship Changes */}
@@ -1691,17 +1842,22 @@ function FinalResultsModal({
           >
             <Text color="magenta">
               {getTrustTierInfo(response.tierChangeNotification.newTier).icon}{" "}
-              {response.tierChangeNotification.characterName} now considers you a{" "}
+              {response.tierChangeNotification.characterName} now considers you
+              a{" "}
               <Text bold>
                 {getTrustTierInfo(response.tierChangeNotification.newTier).name}
               </Text>
               !
             </Text>
             <Text dimColor>
-              Trust Level: {Math.round(response.tierChangeNotification.trustLevel * 100)}%
+              Trust Level:{" "}
+              {Math.round(response.tierChangeNotification.trustLevel * 100)}%
             </Text>
             <Text dimColor>
-              {getTrustTierInfo(response.tierChangeNotification.newTier).description}
+              {
+                getTrustTierInfo(response.tierChangeNotification.newTier)
+                  .description
+              }
             </Text>
           </Box>
         </>

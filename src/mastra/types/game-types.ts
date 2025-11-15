@@ -513,7 +513,12 @@ export interface Achievement {
 }
 
 export interface GameResponse {
-  type: "character_message" | "god_boss_review" | "conversation_end" | "onboarding" | "boss_checkin";
+  type:
+    | "character_message"
+    | "god_boss_review"
+    | "conversation_end"
+    | "onboarding"
+    | "boss_checkin";
 
   // For onboarding
   onboardingMessage?: BossOnboardingMessage;
@@ -578,12 +583,24 @@ export interface GameResponse {
     projection?: FinancialProjection;
     actualResult?: ActualFinancialResult;
     coinsEarned?: number;
+    evaluation?: {
+      qualityScore: number;
+      strengths: string[];
+      weaknesses: string[];
+      missedOpportunities: string[];
+      wasActionable: boolean;
+      wasEmpathetic: boolean;
+      wasAccurate: boolean;
+    };
   };
 
   // NEW: Progress visualization
   miniFeedback?: string;
   milestonesAchieved?: Milestone[];
   achievementsUnlocked?: Achievement[];
+
+  // Advisor's advice (what the player said)
+  advisorAdvice?: string[];
 }
 
 // ============================================================================

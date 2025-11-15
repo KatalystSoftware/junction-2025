@@ -118,8 +118,7 @@ export class CharacterPoolManager {
             ...char.relationshipState,
             trustLevel,
             trustTier: calculateTrustTier(trustLevel),
-            progressionHistory:
-              char.relationshipState.progressionHistory || [],
+            progressionHistory: char.relationshipState.progressionHistory || [],
             decayApplied: char.relationshipState.decayApplied || 0,
             wasRecommended: char.relationshipState.wasRecommended || false,
           },
@@ -231,7 +230,11 @@ export class CharacterPoolManager {
         outcome: "positive" | "negative" | "neutral";
       };
       progressionEvent?: {
-        event: "advice_positive" | "advice_negative" | "decay" | "recommendation";
+        event:
+          | "advice_positive"
+          | "advice_negative"
+          | "decay"
+          | "recommendation";
         trustChange: number;
       };
     },
@@ -688,7 +691,13 @@ export class CharacterPoolManager {
       followed: boolean;
       outcome: "positive" | "negative" | "neutral";
     },
-  ): { willRecommend: boolean; newTrustLevel: number; tierChanged: boolean; oldTier: TrustTier; newTier: TrustTier } {
+  ): {
+    willRecommend: boolean;
+    newTrustLevel: number;
+    tierChanged: boolean;
+    oldTier: TrustTier;
+    newTier: TrustTier;
+  } {
     const char = this.characters.get(characterId);
     if (!char) {
       return {

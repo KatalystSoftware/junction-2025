@@ -18,14 +18,28 @@ function detectLanguage(messages: string[]): "finnish" | "english" {
 
   if (/[äö]/i.test(allText)) finnishScore += 2;
 
-  const finnishWords = ['hei', 'moi', 'kiitos', 'että', 'voin', 'pitää', 'kannattaa'];
-  const wordMatches = finnishWords.filter(word => new RegExp(`\\b${word}\\b`, 'i').test(allText));
+  const finnishWords = [
+    "hei",
+    "moi",
+    "kiitos",
+    "että",
+    "voin",
+    "pitää",
+    "kannattaa",
+  ];
+  const wordMatches = finnishWords.filter((word) =>
+    new RegExp(`\\b${word}\\b`, "i").test(allText),
+  );
   finnishScore += wordMatches.length;
 
-  const englishWords = ['the', 'you', 'your', 'need', 'help', 'advice'];
-  const englishMatches = englishWords.filter(word => new RegExp(`\\b${word}\\b`, 'i').test(allText));
+  const englishWords = ["the", "you", "your", "need", "help", "advice"];
+  const englishMatches = englishWords.filter((word) =>
+    new RegExp(`\\b${word}\\b`, "i").test(allText),
+  );
 
-  return (finnishScore >= 3 && finnishScore > englishMatches.length) ? "finnish" : "english";
+  return finnishScore >= 3 && finnishScore > englishMatches.length
+    ? "finnish"
+    : "english";
 }
 
 /**
@@ -37,22 +51,28 @@ function getLanguageInstructions(language: "finnish" | "english"): {
 } {
   if (language === "finnish") {
     return {
-      languageRule: "- **CRITICAL**: You MUST respond ONLY in Finnish. ALL text must be in Finnish. DO NOT use English.",
+      languageRule:
+        "- **CRITICAL**: You MUST respond ONLY in Finnish. ALL text must be in Finnish. DO NOT use English.",
       exampleOutput: {
         greeting: "Hei! Hetki aikaa?",
-        positiveEncouragement: "Olet tehnyt todella hyvää työtä viime aikoina! Huomaan selkeää edistystä.",
-        negativeSupport: "Huomaan että viimeiset asiakkaat ovat olleet haasteellisia. Haluatko jutella?",
+        positiveEncouragement:
+          "Olet tehnyt todella hyvää työtä viime aikoina! Huomaan selkeää edistystä.",
+        negativeSupport:
+          "Huomaan että viimeiset asiakkaat ovat olleet haasteellisia. Haluatko jutella?",
         advice: "Muista kysyä tarkentavia kysymyksiä ennen neuvojen antamista.",
         closing: "Jatka samaan malliin! Olen ylpeä sinusta.",
       },
     };
   } else {
     return {
-      languageRule: "- **CRITICAL**: You MUST respond ONLY in English. ALL text must be in English. DO NOT use Finnish.",
+      languageRule:
+        "- **CRITICAL**: You MUST respond ONLY in English. ALL text must be in English. DO NOT use Finnish.",
       exampleOutput: {
         greeting: "Hey! Got a minute?",
-        positiveEncouragement: "You've been doing really great work lately! I can see clear progress.",
-        negativeSupport: "I've noticed the last few clients have been challenging. Want to talk about it?",
+        positiveEncouragement:
+          "You've been doing really great work lately! I can see clear progress.",
+        negativeSupport:
+          "I've noticed the last few clients have been challenging. Want to talk about it?",
         advice: "Remember to ask clarifying questions before giving advice.",
         closing: "Keep up the good work! I'm proud of you.",
       },

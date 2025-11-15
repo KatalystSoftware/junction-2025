@@ -140,14 +140,72 @@ Please evaluate this advice comprehensively across all dimensions.
         willFollowConfidence,
       );
 
+      // Ensure arrays are never empty - add generic feedback if missing
+      let strengths = evaluation.strengths || [];
+      let weaknesses = evaluation.weaknesses || [];
+      let missedOpportunities = evaluation.missedOpportunities || [];
+
+      if (strengths.length === 0) {
+        if (qualityScore >= 7) {
+          strengths.push("Provided helpful and relevant advice");
+        } else if (qualityScore >= 5) {
+          strengths.push("Attempted to address the client's concern");
+        } else {
+          strengths.push("Engaged with the client");
+        }
+      }
+
+      if (weaknesses.length === 0 && qualityScore < 8) {
+        if (qualityScore < 4) {
+          weaknesses.push(
+            "Advice did not adequately address the specific problem",
+          );
+          weaknesses.push(
+            "Lacked concrete, actionable steps appropriate for the situation",
+          );
+        } else if (qualityScore < 6) {
+          weaknesses.push(
+            "Advice could be more specific to the client's situation",
+          );
+        } else {
+          weaknesses.push(
+            "Minor improvements could make the advice more actionable",
+          );
+        }
+      }
+
+      if (missedOpportunities.length === 0) {
+        const topicGuidance: { [key: string]: string } = {
+          budgeting:
+            "Could have suggested specific budgeting tools or the 50/30/20 rule",
+          debt_management:
+            "Could have discussed debt prioritization strategies (avalanche vs snowball)",
+          saving:
+            "Could have recommended specific savings vehicles (ASP-tili, etc.)",
+          investing:
+            "Could have explained risk tolerance and diversification principles",
+          scam_awareness:
+            "Could have provided red flags to watch for and verification steps",
+          credit_building:
+            "Could have explained how credit scores work in Finland",
+          insurance:
+            "Could have discussed appropriate coverage levels for their situation",
+        };
+
+        const guidance =
+          topicGuidance[scenario.topic] ||
+          "Could have provided more specific, actionable guidance";
+        missedOpportunities.push(guidance);
+      }
+
       // Return comprehensive evaluation
       return {
         qualityScore: parseFloat(qualityScore.toFixed(1)),
         willFollowAdvice,
         outcome,
-        strengths: evaluation.strengths || [],
-        weaknesses: evaluation.weaknesses || [],
-        missedOpportunities: evaluation.missedOpportunities || [],
+        strengths,
+        weaknesses,
+        missedOpportunities,
         topicsCovered: (evaluation.topicsCovered || [
           scenario.topic,
         ]) as FinancialTopic[],

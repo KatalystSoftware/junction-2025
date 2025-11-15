@@ -65,9 +65,7 @@ export function calculateCoinsEarned(
 
     // Track lifetime stats
     updatedState.lifetimeSavingsGenerated += Math.round(projection.totalSaved);
-    updatedState.lifetimeDebtCleared += Math.round(
-      projection.totalDebtReduced,
-    );
+    updatedState.lifetimeDebtCleared += Math.round(projection.totalDebtReduced);
   }
 
   return { coinsEarned, updatedState };

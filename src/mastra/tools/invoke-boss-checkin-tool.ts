@@ -6,7 +6,10 @@
 
 import { createBossCheckinAgent } from "../agents/boss-checkin-agent.ts";
 import { cachedGenerate } from "../test-cache.ts";
-import type { BossCheckinMessage, ConsultationSession } from "../types/game-types.ts";
+import type {
+  BossCheckinMessage,
+  ConsultationSession,
+} from "../types/game-types.ts";
 
 export const invokeBossCheckinTool = {
   id: "invokeBossCheckinTool",
@@ -19,7 +22,8 @@ export const invokeBossCheckinTool = {
     advisorSkillLevel: number;
   }): Promise<BossCheckinMessage> => {
     try {
-      const { streak, recentSessions, advisorReputation, advisorSkillLevel } = context;
+      const { streak, recentSessions, advisorReputation, advisorSkillLevel } =
+        context;
 
       // Collect advisor messages for language detection
       const advisorMessages = recentSessions.flatMap(
@@ -59,9 +63,11 @@ ADVISOR CONTEXT:
 - Current Skill Level: ${advisorSkillLevel}/10
 - Performance Streak: ${streak} (${isPositiveStreak ? "doing great!" : "struggling"})
 
-${isPositiveStreak
-  ? "This advisor has been doing excellent work! Acknowledge their progress, celebrate their wins, and encourage them to keep it up."
-  : "This advisor is having a tough time. Show empathy, normalize the struggle, offer support, and remind them that learning takes time."}
+${
+  isPositiveStreak
+    ? "This advisor has been doing excellent work! Acknowledge their progress, celebrate their wins, and encourage them to keep it up."
+    : "This advisor is having a tough time. Show empathy, normalize the struggle, offer support, and remind them that learning takes time."
+}
 
 Generate a warm, authentic check-in message following your instructions.
 `;
@@ -96,17 +102,22 @@ Generate a warm, authentic check-in message following your instructions.
           parsed = {
             greeting: "Hey! Got a minute?",
             observation: "I've noticed you've been doing great work lately!",
-            mainMessage: "Your last few consultations have been really strong. Clients are responding well to your advice.",
+            mainMessage:
+              "Your last few consultations have been really strong. Clients are responding well to your advice.",
             advice: "Keep up that empathetic approach - it's working!",
             closing: "Proud of your progress. Keep it up!",
           };
         } else {
           parsed = {
             greeting: "Hey, how are you doing?",
-            observation: "I noticed the last few clients have been challenging.",
-            mainMessage: "Don't be too hard on yourself - these are tough situations. Every advisor goes through this.",
-            advice: "Try asking more clarifying questions before giving advice. It helps you understand their situation better.",
-            closing: "You're doing fine. Keep learning, and don't hesitate to ask for help!",
+            observation:
+              "I noticed the last few clients have been challenging.",
+            mainMessage:
+              "Don't be too hard on yourself - these are tough situations. Every advisor goes through this.",
+            advice:
+              "Try asking more clarifying questions before giving advice. It helps you understand their situation better.",
+            closing:
+              "You're doing fine. Keep learning, and don't hesitate to ask for help!",
           };
         }
       }

@@ -11,7 +11,10 @@ import type { AdvisorState } from "../types/game-types.ts";
 export interface SavedSession {
   sessionId: string;
   advisorState: AdvisorState;
-  threadHistories: Map<string, Array<{ role: "user" | "assistant"; content: string }>>;
+  threadHistories: Map<
+    string,
+    Array<{ role: "user" | "assistant"; content: string }>
+  >;
   savedAt: string;
 }
 
@@ -28,7 +31,10 @@ export interface SessionMetadata {
 export async function saveSession(
   sessionId: string,
   advisorState: AdvisorState,
-  threadHistories?: Map<string, Array<{ role: "user" | "assistant"; content: string }>>,
+  threadHistories?: Map<
+    string,
+    Array<{ role: "user" | "assistant"; content: string }>
+  >,
 ): Promise<void> {
   // Prepare metadata for quick lookups
   const metadata: Record<string, unknown> = {
@@ -41,9 +47,7 @@ export async function saveSession(
   // Prepare session data
   const sessionData = {
     advisorState,
-    threadHistories: threadHistories
-      ? Object.fromEntries(threadHistories)
-      : {},
+    threadHistories: threadHistories ? Object.fromEntries(threadHistories) : {},
     savedAt: metadata.lastActive,
   };
 

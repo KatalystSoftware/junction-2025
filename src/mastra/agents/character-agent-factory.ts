@@ -185,16 +185,52 @@ function detectLanguage(message?: string): "finnish" | "english" {
   if (/[äö]/i.test(message)) finnishScore += 2;
 
   // Common Finnish words (must match multiple)
-  const finnishWords = ['hei', 'moi', 'kiitos', 'että', 'voin', 'pitää', 'kannattaa', 'pitäisi', 'sinun', 'budjetointi', 'säästö', 'velka', 'sijoittaminen', 'tarvitsen', 'auttaa', 'neuvoa'];
-  const wordMatches = finnishWords.filter(word => new RegExp(`\\b${word}\\b`, 'i').test(lowerText));
+  const finnishWords = [
+    "hei",
+    "moi",
+    "kiitos",
+    "että",
+    "voin",
+    "pitää",
+    "kannattaa",
+    "pitäisi",
+    "sinun",
+    "budjetointi",
+    "säästö",
+    "velka",
+    "sijoittaminen",
+    "tarvitsen",
+    "auttaa",
+    "neuvoa",
+  ];
+  const wordMatches = finnishWords.filter((word) =>
+    new RegExp(`\\b${word}\\b`, "i").test(lowerText),
+  );
   finnishScore += wordMatches.length;
 
   // English indicators (counter-evidence)
-  const englishWords = ['the', 'you', 'your', 'need', 'help', 'advice', 'should', 'would', 'could', 'budget', 'saving', 'debt'];
-  const englishMatches = englishWords.filter(word => new RegExp(`\\b${word}\\b`, 'i').test(lowerText));
+  const englishWords = [
+    "the",
+    "you",
+    "your",
+    "need",
+    "help",
+    "advice",
+    "should",
+    "would",
+    "could",
+    "budget",
+    "saving",
+    "debt",
+  ];
+  const englishMatches = englishWords.filter((word) =>
+    new RegExp(`\\b${word}\\b`, "i").test(lowerText),
+  );
 
   // Decide: Need at least 3 Finnish points and more Finnish than English indicators
-  return (finnishScore >= 3 && finnishScore > englishMatches.length) ? "finnish" : "english";
+  return finnishScore >= 3 && finnishScore > englishMatches.length
+    ? "finnish"
+    : "english";
 }
 
 /**
@@ -486,7 +522,7 @@ async function translateToEnglish(finnishText: string): Promise<string> {
  */
 export async function getCharacterInitialMessage(
   scenario: Scenario,
-  advisorLanguage?: "finnish" | "english"
+  advisorLanguage?: "finnish" | "english",
 ): Promise<{
   message: string;
   isVoice: boolean;

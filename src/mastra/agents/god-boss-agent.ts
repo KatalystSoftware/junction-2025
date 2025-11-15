@@ -26,16 +26,52 @@ function detectLanguage(messages: string[]): "finnish" | "english" {
   if (/[äö]/i.test(allText)) finnishScore += 2;
 
   // Common Finnish words (must match multiple to avoid false positives like "on")
-  const finnishWords = ['hei', 'moi', 'kiitos', 'että', 'voin', 'pitää', 'kannattaa', 'pitäisi', 'sinun', 'budjetointi', 'säästö', 'velka', 'sijoittaminen', 'tarvitsen', 'auttaa', 'neuvoa'];
-  const wordMatches = finnishWords.filter(word => new RegExp(`\\b${word}\\b`, 'i').test(allText));
+  const finnishWords = [
+    "hei",
+    "moi",
+    "kiitos",
+    "että",
+    "voin",
+    "pitää",
+    "kannattaa",
+    "pitäisi",
+    "sinun",
+    "budjetointi",
+    "säästö",
+    "velka",
+    "sijoittaminen",
+    "tarvitsen",
+    "auttaa",
+    "neuvoa",
+  ];
+  const wordMatches = finnishWords.filter((word) =>
+    new RegExp(`\\b${word}\\b`, "i").test(allText),
+  );
   finnishScore += wordMatches.length;
 
   // English indicators (counter-evidence)
-  const englishWords = ['the', 'you', 'your', 'need', 'help', 'advice', 'should', 'would', 'could', 'budget', 'saving', 'debt'];
-  const englishMatches = englishWords.filter(word => new RegExp(`\\b${word}\\b`, 'i').test(allText));
+  const englishWords = [
+    "the",
+    "you",
+    "your",
+    "need",
+    "help",
+    "advice",
+    "should",
+    "would",
+    "could",
+    "budget",
+    "saving",
+    "debt",
+  ];
+  const englishMatches = englishWords.filter((word) =>
+    new RegExp(`\\b${word}\\b`, "i").test(allText),
+  );
 
   // Decide: Need at least 3 Finnish points and more Finnish than English indicators
-  return (finnishScore >= 3 && finnishScore > englishMatches.length) ? "finnish" : "english";
+  return finnishScore >= 3 && finnishScore > englishMatches.length
+    ? "finnish"
+    : "english";
 }
 
 /**
@@ -47,7 +83,8 @@ function getLanguageInstructions(language: "finnish" | "english"): {
 } {
   if (language === "finnish") {
     return {
-      languageRule: "- **CRITICAL**: You MUST respond ONLY in Finnish. ALL text must be in Finnish - feedback, messages, everything. DO NOT use English under any circumstances.",
+      languageRule:
+        "- **CRITICAL**: You MUST respond ONLY in Finnish. ALL text must be in Finnish - feedback, messages, everything. DO NOT use English under any circumstances.",
       exampleOutput: {
         strengthsIdentified: [
           "Selitit budjetoinnin 50/30/20 säännön todella selkeästi",
@@ -62,7 +99,8 @@ function getLanguageInstructions(language: "finnish" | "english"): {
     };
   } else {
     return {
-      languageRule: "- **CRITICAL**: You MUST respond ONLY in English. ALL text must be in English - feedback, messages, everything. DO NOT use Finnish under any circumstances.",
+      languageRule:
+        "- **CRITICAL**: You MUST respond ONLY in English. ALL text must be in English - feedback, messages, everything. DO NOT use Finnish under any circumstances.",
       exampleOutput: {
         strengthsIdentified: [
           "You explained the 50/30/20 budgeting rule very clearly",

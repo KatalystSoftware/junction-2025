@@ -10,7 +10,9 @@ import { Agent } from "@mastra/core/agent";
 /**
  * Detect language preference (defaults to English, supports Finnish)
  */
-function detectLanguage(preferredLanguage?: "finnish" | "english"): "finnish" | "english" {
+function detectLanguage(
+  preferredLanguage?: "finnish" | "english",
+): "finnish" | "english" {
   return preferredLanguage || "english";
 }
 
@@ -23,27 +25,39 @@ function getLanguageInstructions(language: "finnish" | "english"): {
 } {
   if (language === "finnish") {
     return {
-      languageRule: "- **CRITICAL**: You MUST respond ONLY in Finnish. ALL text must be in Finnish. DO NOT use English under any circumstances.",
+      languageRule:
+        "- **CRITICAL**: You MUST respond ONLY in Finnish. ALL text must be in Finnish. DO NOT use English under any circumstances.",
       exampleOutput: {
         welcomeTitle: "Tervetuloa tiimiin!",
-        introduction: "Hei! Olen Mika, seniorineuvoja tässä toimistossa. Tervetuloa mukaan tiimimme!",
-        roleExplanation: "Olet nyt osa talouskonsulttitiimiämme. Tehtäväsi on auttaa asiakkaita heidän talousasioissaan - budjetoinnissa, säästämisessä, velanhallinnassa ja sijoittamisessa.",
-        howItWorks: "Tapaat erilaisia asiakkaita, joilla kullakin on omat haasteensa. Kuuntele heitä huolellisesti ja anna neuvoja, jotka sopivat juuri heidän tilanteeseensa.",
-        expectations: "Tarkistan työsi laatua säännöllisesti 3-5 asiakkaan välein. Annan palautetta ja opin, missä olet hyvä ja missä voit kehittyä.",
-        encouragement: "Älä huoli, jos et tiedä kaikkea heti - opimme kaikki tekemällä. Olen täällä tukemassa sinua. Olet valmis aloittamaan!",
+        introduction:
+          "Hei! Olen Mika, seniorineuvoja tässä toimistossa. Tervetuloa mukaan tiimimme!",
+        roleExplanation:
+          "Olet nyt osa talouskonsulttitiimiämme. Tehtäväsi on auttaa asiakkaita heidän talousasioissaan - budjetoinnissa, säästämisessä, velanhallinnassa ja sijoittamisessa.",
+        howItWorks:
+          "Tapaat erilaisia asiakkaita, joilla kullakin on omat haasteensa. Kuuntele heitä huolellisesti ja anna neuvoja, jotka sopivat juuri heidän tilanteeseensa.",
+        expectations:
+          "Tarkistan työsi laatua säännöllisesti 3-5 asiakkaan välein. Annan palautetta ja opin, missä olet hyvä ja missä voit kehittyä.",
+        encouragement:
+          "Älä huoli, jos et tiedä kaikkea heti - opimme kaikki tekemällä. Olen täällä tukemassa sinua. Olet valmis aloittamaan!",
         readyMessage: "Ensimmäinen asiakas odottaa jo. Onnea! 🚀",
       },
     };
   } else {
     return {
-      languageRule: "- **CRITICAL**: You MUST respond ONLY in English. ALL text must be in English. DO NOT use Finnish under any circumstances.",
+      languageRule:
+        "- **CRITICAL**: You MUST respond ONLY in English. ALL text must be in English. DO NOT use Finnish under any circumstances.",
       exampleOutput: {
         welcomeTitle: "Welcome to the Team!",
-        introduction: "Hey there! I'm your senior advisor here at the office. Welcome aboard!",
-        roleExplanation: "You're now part of our financial consulting team. Your job is to help clients with their financial matters - budgeting, saving, debt management, and investing.",
-        howItWorks: "You'll meet different clients, each with their own challenges. Listen to them carefully and give advice that fits their specific situation.",
-        expectations: "I'll be checking in on your work regularly, every 3-5 clients. I'll give you feedback on what you're doing well and where you can improve.",
-        encouragement: "Don't worry if you don't know everything right away - we all learn by doing. I'm here to support you. You've got this!",
+        introduction:
+          "Hey there! I'm your senior advisor here at the office. Welcome aboard!",
+        roleExplanation:
+          "You're now part of our financial consulting team. Your job is to help clients with their financial matters - budgeting, saving, debt management, and investing.",
+        howItWorks:
+          "You'll meet different clients, each with their own challenges. Listen to them carefully and give advice that fits their specific situation.",
+        expectations:
+          "I'll be checking in on your work regularly, every 3-5 clients. I'll give you feedback on what you're doing well and where you can improve.",
+        encouragement:
+          "Don't worry if you don't know everything right away - we all learn by doing. I'm here to support you. You've got this!",
         readyMessage: "Your first client is already waiting. Good luck! 🚀",
       },
     };
@@ -53,7 +67,9 @@ function getLanguageInstructions(language: "finnish" | "english"): {
 /**
  * Create Boss Onboarding agent with dynamic language support
  */
-export function createBossOnboardingAgent(language: "finnish" | "english" = "english"): Agent {
+export function createBossOnboardingAgent(
+  language: "finnish" | "english" = "english",
+): Agent {
   const { languageRule, exampleOutput } = getLanguageInstructions(language);
 
   return new Agent({

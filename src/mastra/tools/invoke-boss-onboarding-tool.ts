@@ -78,8 +78,7 @@ Create a comprehensive onboarding message following your instructions.
         } else {
           parsed = {
             welcomeTitle: "Welcome to the Team!",
-            introduction:
-              "Hey! I'm your senior advisor. Welcome aboard!",
+            introduction: "Hey! I'm your senior advisor. Welcome aboard!",
             roleExplanation:
               "You're now part of our financial consulting team. Your job is to help clients with their finances.",
             howItWorks:

@@ -24,6 +24,7 @@ import {
   calculateCoinsEarned,
   updateGoalProgress,
 } from "./earnings-calculator.ts";
+import { calculateProjectedOutcome } from "./financial-calculator.ts";
 import type {
   AdvisorState,
   GameMasterDecision,
@@ -300,22 +301,31 @@ Respond with ONLY valid JSON (NO markdown):
     // Detect advisor's preferred language from previous conversations
     let advisorLanguage: "finnish" | "english" = "english"; // Default to English
     const allPreviousAdvice = advisorState.sessionHistory.flatMap(
-      session => session.playerAdvice
+      (session) => session.playerAdvice,
     );
     if (allPreviousAdvice.length > 0) {
       // Simple detection from previous messages
       const allText = allPreviousAdvice.join(" ").toLowerCase();
       const hasFinnish = /[äö]/.test(allText);
-      const finnishWords = ['hei', 'moi', 'kiitos', 'että', 'voin', 'pitää', 'kannattaa'].filter(
-        word => new RegExp(`\\b${word}\\b`).test(allText)
-      ).length;
+      const finnishWords = [
+        "hei",
+        "moi",
+        "kiitos",
+        "että",
+        "voin",
+        "pitää",
+        "kannattaa",
+      ].filter((word) => new RegExp(`\\b${word}\\b`).test(allText)).length;
       if (hasFinnish || finnishWords >= 2) {
         advisorLanguage = "finnish";
       }
     }
 
     // Get character's initial message (translated if needed)
-    const initialContact = await getCharacterInitialMessage(scenario, advisorLanguage);
+    const initialContact = await getCharacterInitialMessage(
+      scenario,
+      advisorLanguage,
+    );
 
     // Get all active threads for UI
     const activeThreads = getActiveThreads(advisorState);
@@ -441,13 +451,18 @@ export async function handleAdvisorResponse(
     qualityScore: 5,
     willFollowAdvice: false,
     outcome: "neutral",
-    strengths: [],
-    weaknesses: [],
-    missedOpportunities: [],
+    strengths: ["Attempted to address the client's concern"],
+    weaknesses: [
+      "Advice quality could not be fully evaluated",
+      "Consider being more specific to the client's exact situation",
+    ],
+    missedOpportunities: ["Evaluation system temporarily unavailable"],
     topicsCovered: [scenario.topic],
     wasActionable: false,
     wasEmpathetic: false,
     wasAccurate: true,
+    // Include default financial projection so evaluation section always renders
+    financialProjection: calculateProjectedOutcome(scenario, 5, false, 0.3),
   };
 
   if (evaluateTool) {
@@ -727,7 +742,11 @@ export async function handleAdvisorResponse(
     }
 
     // Check for milestones and achievements
-    const milestonesAchieved = checkForMilestones(previousState, advisorState, session);
+    const milestonesAchieved = checkForMilestones(
+      previousState,
+      advisorState,
+      session,
+    );
     const newAchievements = checkForNewAchievements(advisorState, session);
 
     // Add achievements to unlocked list and award coins
@@ -782,13 +801,22 @@ export async function handleAdvisorResponse(
   ) {
     const lastSession =
       advisorState.sessionHistory[advisorState.sessionHistory.length - 1];
-    if (
-      lastSession.financialProjection &&
-      lastSession.coinsEarned !== undefined
-    ) {
+    // Create financialResults if we have EITHER financial projection OR evaluation data
+    if (lastSession.financialProjection || lastSession.evaluation) {
       financialResults = {
         projection: lastSession.financialProjection,
-        coinsEarned: lastSession.coinsEarned,
+        coinsEarned: lastSession.coinsEarned ?? 0, // Safe fallback if coins weren't calculated
+        evaluation: lastSession.evaluation
+          ? {
+              qualityScore: lastSession.adviceQualityScore, // Quality score is stored at session level
+              strengths: lastSession.evaluation.strengths,
+              weaknesses: lastSession.evaluation.weaknesses,
+              missedOpportunities: lastSession.evaluation.missedOpportunities,
+              wasActionable: lastSession.evaluation.wasActionable,
+              wasEmpathetic: lastSession.evaluation.wasEmpathetic,
+              wasAccurate: lastSession.evaluation.wasAccurate,
+            }
+          : undefined,
       };
     }
 
@@ -813,6 +841,10 @@ export async function handleAdvisorResponse(
     miniFeedback,
     milestonesAchieved,
     achievementsUnlocked,
+    advisorAdvice: characterResponse.conversationEnding
+      ? advisorState.sessionHistory[advisorState.sessionHistory.length - 1]
+          ?.playerAdvice
+      : undefined,
   };
 }
 
@@ -989,7 +1021,7 @@ export async function handleAdviceChoice(
   // Get active threads for UI
   const activeThreads = getActiveThreads(advisorState);
 
-  // Return immediate financial results
+  // Return immediate financial results with evaluation
   return {
     type: "conversation_end",
     threadId,
@@ -999,7 +1031,17 @@ export async function handleAdviceChoice(
     financialResults: {
       projection: adviceEvaluation.financialProjection,
       coinsEarned,
+      evaluation: {
+        qualityScore: adviceEvaluation.qualityScore,
+        strengths: adviceEvaluation.strengths,
+        weaknesses: adviceEvaluation.weaknesses,
+        missedOpportunities: adviceEvaluation.missedOpportunities,
+        wasActionable: adviceEvaluation.wasActionable,
+        wasEmpathetic: adviceEvaluation.wasEmpathetic,
+        wasAccurate: adviceEvaluation.wasAccurate,
+      },
     },
+    advisorAdvice: session.playerAdvice,
   };
 }
 

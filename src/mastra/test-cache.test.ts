@@ -65,8 +65,8 @@ async function testAgentTimingLog() {
   );
 
   const content = await fs.readFile(logPath, "utf8");
-  assert.ok(content.includes("\"scope\":\"agent\""));
-  assert.ok(content.includes("\"name\":\"timing-test\""));
+  assert.ok(content.includes('"scope":"agent"'));
+  assert.ok(content.includes('"name":"timing-test"'));
 
   await fs.rm(logPath, { force: true });
 }
