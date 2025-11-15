@@ -412,6 +412,7 @@ export interface GameMasterDecision {
 export interface CharacterResponse {
   messages: string[];
   voiceNeeded?: boolean;
+  voiceConfig?: VoiceMessageConfig;
   emotionalState?: string;
   willFollowAdvice?: boolean; // AI's assessment
   conversationEnding?: boolean; // Character ready to leave
@@ -530,6 +531,7 @@ export interface GameResponse {
   threadId?: string;
   messages?: string[];
   voiceNeeded?: boolean;
+  voiceConfig?: VoiceMessageConfig;
   isNewThread?: boolean;
   characterInfo?: {
     name: string;

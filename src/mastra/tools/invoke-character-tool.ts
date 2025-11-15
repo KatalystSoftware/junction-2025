@@ -11,8 +11,14 @@ import type {
   Scenario,
   CharacterResponse,
   CharacterConversationMemory,
+  VoiceMessageConfig,
 } from "../types/game-types.ts";
 import { cachedGenerate } from "../test-cache.ts";
+import {
+  shouldGenerateVoiceMessage,
+  generateVoiceMessage,
+  inferEmotionalStateFromContext,
+} from "../services/voice-service.ts";
 
 export const invokeCharacterTool = {
   id: "invokeCharacterTool",
@@ -92,11 +98,36 @@ export const invokeCharacterTool = {
         };
       }
 
+      // Determine emotional state (from parsed response or scenario)
+      const emotionalState = parsed.emotionalState ||
+        inferEmotionalStateFromContext(character, scenario.problemContext.emotionalState);
+
+      // Check if we should generate a voice message
+      const scenarioNumber = character.relationshipState.visitCount || 1;
+      const shouldGenerateVoice = shouldGenerateVoiceMessage(
+        character,
+        emotionalState,
+        scenarioNumber,
+      );
+
+      // Generate voice message if needed
+      let voiceConfig: VoiceMessageConfig | undefined;
+      if (shouldGenerateVoice && parsed.messages && parsed.messages.length > 0) {
+        // Generate voice for the first message (usually the most emotional one)
+        const messageForVoice = parsed.messages[0];
+        voiceConfig = await generateVoiceMessage(
+          character,
+          messageForVoice,
+          emotionalState,
+        );
+      }
+
       return {
         messages: parsed.messages || [text],
-        emotionalState: parsed.emotionalState,
+        emotionalState,
         conversationEnding: parsed.conversationEnding || false,
-        voiceNeeded: false,
+        voiceNeeded: shouldGenerateVoice && voiceConfig?.enabled,
+        voiceConfig: voiceConfig,
         adviceQualityFeedback: parsed.adviceQualityFeedback,
       };
     } catch (error) {

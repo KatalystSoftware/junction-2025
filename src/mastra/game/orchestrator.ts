@@ -321,10 +321,11 @@ Respond with ONLY valid JSON (NO markdown):
       }
     }
 
-    // Get character's initial message (translated if needed)
+    // Get character's initial message (translated if needed, with potential voice generation)
     const initialContact = await getCharacterInitialMessage(
       scenario,
       advisorLanguage,
+      character,
     );
 
     // Get all active threads for UI
@@ -353,12 +354,13 @@ Respond with ONLY valid JSON (NO markdown):
           )
         : undefined;
 
-    // Return initial character message with advice choices
+    // Return initial character message with advice choices and voice config
     return {
       type: "character_message",
       threadId,
       messages: [initialContact.message],
       voiceNeeded: initialContact.isVoice,
+      voiceConfig: initialContact.voiceConfig,
       isNewThread: true,
       characterInfo: {
         name: character.name,
@@ -833,6 +835,7 @@ export async function handleAdvisorResponse(
     threadId,
     messages: characterResponse.messages,
     voiceNeeded: characterResponse.voiceNeeded,
+    voiceConfig: characterResponse.voiceConfig,
     stateUpdate: advisorState,
     activeThreads,
     recommendationMessage,
