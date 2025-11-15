@@ -14,3 +14,21 @@ variable "container_image" {
   type        = string
   default     = "nginx:stable-alpine"
 }
+
+variable "bastion_zone" {
+  description = "GCE zone for bastion host"
+  type        = string
+  default     = "europe-north1-b"
+}
+
+variable "db_name" {
+  description = "PostgreSQL database name"
+  type        = string
+  default     = "appdb"
+}
+
+variable "db_user" {
+  description = "PostgreSQL database user"
+  type        = string
+  default     = "appuser"
+}
