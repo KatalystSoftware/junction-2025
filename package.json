@@ -9,6 +9,7 @@
     "test-ci": "TEST_CACHE_MODE=replay node src/test-game.ts",
     "test:game": "node --env-file=.env src/test-game.ts",
     "test:unit": "jest",
+    "test:infra": "bash scripts/terraform-validate.sh",
     "play": "tsx --env-file=.env src/play-tui.tsx",
     "dev": "mastra dev",
     "build": "mastra build",
