@@ -11,8 +11,10 @@ import {
   handleAdvisorResponse,
   createNewAdvisor,
   getAdvisorSummary,
+  getActiveThreads,
+  switchThread,
 } from "./mastra/game/orchestrator.ts";
-import type { AdvisorState } from "./mastra/types/game-types.ts";
+import type { AdvisorState, ConversationThread } from "./mastra/types/game-types.ts";
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -75,6 +77,38 @@ function printStats(advisorState: AdvisorState) {
   );
 }
 
+function printActiveThreads(threads: ConversationThread[], currentThreadId: string | null) {
+  if (threads.length === 0) {
+    return;
+  }
+
+  const totalUnread = threads.reduce((sum, t) => sum + t.unreadCount, 0);
+
+  print("\n" + "┌" + "─".repeat(68) + "┐", colors.cyan);
+  print(`│ ACTIVE THREADS${totalUnread > 0 ? ` (${totalUnread} unread)` : ""}${" ".repeat(68 - 15 - (totalUnread > 0 ? ` (${totalUnread} unread)`.length : 0))}│`, colors.cyan);
+
+  threads.forEach((thread, index) => {
+    const isCurrent = thread.threadId === currentThreadId;
+    const unreadText = thread.unreadCount > 0 ? ` - ${thread.unreadCount} unread` : " - 0 unread";
+    const currentIndicator = isCurrent ? " (CURRENT)" : "";
+    const line = `│ [${index + 1}] 💬 ${thread.characterName}${unreadText}${currentIndicator}`;
+    const padding = " ".repeat(Math.max(0, 70 - line.length));
+    print(line + padding + "│", isCurrent ? colors.green + colors.bright : colors.cyan);
+  });
+
+  print("└" + "─".repeat(68) + "┘", colors.cyan);
+}
+
+function printThreadCommands() {
+  print("\nCommands:", colors.yellow);
+  print("  • Type your response to current client", colors.yellow);
+  print("  • 's1', 's2', etc. - Switch to thread 1, 2, etc.", colors.yellow);
+  print("  • 'threads' or 't' - List all active threads", colors.yellow);
+  print("  • 'new' or 'n' - Start new consultation", colors.yellow);
+  print("  • 'stats' - View your stats", colors.yellow);
+  print("  • 'quit' or 'exit' - Exit game", colors.yellow);
+}
+
 function printBossReview(review: any) {
   print("\n" + "═".repeat(70), colors.magenta);
   print("   👔 BOSS REVIEW", colors.magenta + colors.bright);
@@ -126,150 +160,219 @@ async function playGame() {
 
   let continueGame = true;
   let currentThreadId: string | null = null;
-  let conversationHistory: Array<{
-    role: "user" | "assistant";
-    content: string;
-  }> = [];
+
+  // Store conversation history per thread
+  const threadHistories = new Map<string, Array<{ role: "user" | "assistant"; content: string }>>();
+
+  // Store character info per thread
+  const threadCharacterInfo = new Map<string, { name: string; age: number; occupation: string }>();
 
   while (continueGame) {
     try {
-      // Start new consultation
-      print("\n🔄 Finding your next client...", colors.cyan);
-      const consultation = await startNewConsultation(advisorId, advisorState);
+      const activeThreads = getActiveThreads(advisorState);
 
-      if (consultation.type === "god_boss_review" && consultation.review) {
-        // Boss review!
-        printBossReview(consultation.review);
-        advisorState = consultation.stateUpdate;
-        printStats(advisorState);
-
-        print("\nPress ENTER to continue...", colors.yellow);
-        await askQuestion("");
-        continue;
+      // Show active threads if any
+      if (activeThreads.length > 0) {
+        printActiveThreads(activeThreads, currentThreadId);
       }
 
-      if (
-        consultation.type !== "character_message" ||
-        !consultation.characterInfo
-      ) {
-        print("No more characters available right now.", colors.red);
+      // If we have a current thread, show it
+      if (currentThreadId && advisorState.activeThreads[currentThreadId]) {
+        const currentThread = activeThreads.find(t => t.threadId === currentThreadId);
+        if (currentThread) {
+          print(`\n💬 Current client: ${currentThread.characterName}`, colors.green + colors.bright);
+        }
+      }
+
+      // Show commands if there are active threads
+      if (activeThreads.length > 0 || currentThreadId) {
+        printThreadCommands();
+      }
+
+      const userInput = await askQuestion("");
+
+      // Handle quit
+      if (userInput.toLowerCase() === "quit" || userInput.toLowerCase() === "exit") {
+        print("\n👋 Thanks for playing! Goodbye!", colors.yellow);
+        continueGame = false;
         break;
       }
 
-      // New character appeared
-      advisorState = consultation.stateUpdate;
-      currentThreadId = consultation.threadId || null;
-      conversationHistory = [];
+      // Handle stats
+      if (userInput.toLowerCase() === "stats") {
+        printStats(advisorState);
+        continue;
+      }
 
-      print("\n\n" + "═".repeat(70), colors.bright);
-      print(
-        `   ${consultation.isNewThread ? "🆕 NEW CLIENT" : "🔄 RETURNING CLIENT"}`,
-        colors.bright + colors.green
-      );
-      print("═".repeat(70), colors.bright);
-      print(`Name: ${consultation.characterInfo.name}`, colors.cyan);
-      print(`Age: ${consultation.characterInfo.age}`, colors.cyan);
-      print(
-        `Occupation: ${consultation.characterInfo.occupation}`,
-        colors.cyan
-      );
-
-      const initialMessage = consultation.messages?.[0] || "Hello...";
-      printCharacterMessage(
-        consultation.characterInfo.name,
-        initialMessage,
-        consultation.voiceNeeded || false
-      );
-
-      // Conversation loop
-      let conversationActive = true;
-
-      while (conversationActive) {
-        const yourAdvice = await askQuestion("");
-
-        if (
-          yourAdvice.toLowerCase() === "quit" ||
-          yourAdvice.toLowerCase() === "exit"
-        ) {
-          print("\n👋 Thanks for playing! Goodbye!", colors.yellow);
-          continueGame = false;
-          conversationActive = false;
-          break;
+      // Handle thread list
+      if (userInput.toLowerCase() === "threads" || userInput.toLowerCase() === "t") {
+        if (activeThreads.length === 0) {
+          print("\nNo active threads. Type 'new' or 'n' to start a consultation.", colors.yellow);
         }
+        continue;
+      }
 
-        if (yourAdvice.toLowerCase() === "stats") {
+      // Handle new consultation
+      if (userInput.toLowerCase() === "new" || userInput.toLowerCase() === "n") {
+        print("\n🔄 Finding your next client...", colors.cyan);
+        const consultation = await startNewConsultation(advisorId, advisorState);
+
+        if (consultation.type === "god_boss_review" && consultation.review) {
+          // Boss review!
+          printBossReview(consultation.review);
+          advisorState = consultation.stateUpdate;
           printStats(advisorState);
+          print("\nPress ENTER to continue...", colors.yellow);
+          await askQuestion("");
           continue;
         }
 
-        if (!yourAdvice.trim()) {
-          print("Please type your advice for the client.", colors.yellow);
+        if (consultation.type !== "character_message" || !consultation.characterInfo) {
+          print("No more characters available right now.", colors.red);
           continue;
         }
 
-        print("\n⏳ Character is thinking...", colors.cyan);
+        // New character appeared
+        advisorState = consultation.stateUpdate;
+        const newThreadId = consultation.threadId || `thread_${Date.now()}`;
+        currentThreadId = newThreadId;
 
-        // Send advice to character
-        const response = await handleAdvisorResponse(
-          currentThreadId || "thread_1",
-          yourAdvice,
-          advisorState,
-          conversationHistory
+        // Initialize conversation history for this thread
+        threadHistories.set(newThreadId, []);
+        threadCharacterInfo.set(newThreadId, consultation.characterInfo);
+
+        print("\n\n" + "═".repeat(70), colors.bright);
+        print(`   ${consultation.isNewThread ? "🆕 NEW CLIENT" : "🔄 RETURNING CLIENT"}`, colors.bright + colors.green);
+        print("═".repeat(70), colors.bright);
+        print(`Name: ${consultation.characterInfo.name}`, colors.cyan);
+        print(`Age: ${consultation.characterInfo.age}`, colors.cyan);
+        print(`Occupation: ${consultation.characterInfo.occupation}`, colors.cyan);
+
+        const initialMessage = consultation.messages?.[0] || "Hello...";
+        printCharacterMessage(
+          consultation.characterInfo.name,
+          initialMessage,
+          consultation.voiceNeeded || false
         );
 
-        advisorState = response.stateUpdate;
+        continue;
+      }
 
-        // Add to history
-        conversationHistory.push({ role: "user", content: yourAdvice });
-        if (response.messages && response.messages.length > 0) {
-          conversationHistory.push({
-            role: "assistant",
-            content: response.messages[0],
-          });
-        }
+      // Handle thread switching (s1, s2, etc.)
+      const switchMatch = userInput.match(/^s(\d+)$/i);
+      if (switchMatch) {
+        const threadIndex = parseInt(switchMatch[1]) - 1;
+        if (threadIndex >= 0 && threadIndex < activeThreads.length) {
+          const targetThread = activeThreads[threadIndex];
+          currentThreadId = targetThread.threadId;
 
-        // Show character response
-        if (response.messages && response.messages.length > 0) {
-          printCharacterMessage(
-            consultation.characterInfo?.name || "Client",
-            response.messages.join("\n\n"),
-            response.voiceNeeded || false
-          );
-        }
+          print(`\n🔄 Switched to thread with ${targetThread.characterName}`, colors.green);
 
-        // Check if conversation ended
-        if (response.type === "conversation_end") {
-          print("\n✅ Client has left the consultation.", colors.green);
-          print(
-            `📊 Your reputation: ${advisorState.reputation}/100`,
-            colors.yellow
-          );
-          print(
-            `🎓 Skill level: ${advisorState.skillLevel.toFixed(1)}/10`,
-            colors.yellow
-          );
-
-          const poolStats = characterPool.getPoolStats();
-          if (poolStats.pendingFollowUps > 0) {
-            print(
-              `\n📅 ${poolStats.pendingFollowUps} follow-up(s) scheduled for later!`,
-              colors.cyan
-            );
+          // Show thread info
+          const charInfo = threadCharacterInfo.get(currentThreadId);
+          if (charInfo) {
+            print("\n" + "═".repeat(70), colors.bright);
+            print(`Name: ${charInfo.name}`, colors.cyan);
+            print(`Age: ${charInfo.age}`, colors.cyan);
+            print(`Occupation: ${charInfo.occupation}`, colors.cyan);
+            print("═".repeat(70), colors.bright);
           }
 
-          print(
-            '\n\nPress ENTER for next client (or type "quit" to exit)...',
-            colors.yellow
-          );
-          const next = await askQuestion("");
-
-          if (next.toLowerCase() === "quit" || next.toLowerCase() === "exit") {
-            continueGame = false;
+          // Show recent messages from history
+          const history = threadHistories.get(currentThreadId) || [];
+          if (history.length > 0) {
+            const lastExchange = history.slice(-2);
+            lastExchange.forEach(msg => {
+              if (msg.role === "assistant") {
+                printCharacterMessage(targetThread.characterName, msg.content, false);
+              }
+            });
           }
 
-          conversationActive = false;
+          continue;
+        } else {
+          print(`\n❌ Invalid thread number. Use s1-s${activeThreads.length}`, colors.red);
+          continue;
         }
       }
+
+      // Handle advisor response to current thread
+      if (!currentThreadId) {
+        print("\nNo active thread. Type 'new' or 'n' to start a consultation.", colors.yellow);
+        continue;
+      }
+
+      if (!userInput.trim()) {
+        print("Please type your advice for the client.", colors.yellow);
+        continue;
+      }
+
+      const currentThread = activeThreads.find(t => t.threadId === currentThreadId);
+      if (!currentThread) {
+        print("\n❌ Current thread not found. Please switch to another thread or start a new one.", colors.red);
+        currentThreadId = null;
+        continue;
+      }
+
+      print("\n⏳ Character is thinking...", colors.cyan);
+
+      // Send advice to character
+      const history = threadHistories.get(currentThreadId) || [];
+      const response = await handleAdvisorResponse(
+        currentThreadId,
+        userInput,
+        advisorState,
+        history
+      );
+
+      advisorState = response.stateUpdate;
+
+      // Add to thread history
+      history.push({ role: "user", content: userInput });
+      if (response.messages && response.messages.length > 0) {
+        history.push({
+          role: "assistant",
+          content: response.messages[0],
+        });
+      }
+      threadHistories.set(currentThreadId, history);
+
+      // Show character response
+      if (response.messages && response.messages.length > 0) {
+        const charInfo = threadCharacterInfo.get(currentThreadId);
+        printCharacterMessage(
+          charInfo?.name || currentThread.characterName,
+          response.messages.join("\n\n"),
+          response.voiceNeeded || false
+        );
+      }
+
+      // Check if conversation ended
+      if (response.type === "conversation_end") {
+        print("\n✅ Client has left the consultation.", colors.green);
+        print(`📊 Your reputation: ${advisorState.reputation}/100`, colors.yellow);
+        print(`🎓 Skill level: ${advisorState.skillLevel.toFixed(1)}/10`, colors.yellow);
+
+        const poolStats = characterPool.getPoolStats();
+        if (poolStats.pendingFollowUps > 0) {
+          print(`\n📅 ${poolStats.pendingFollowUps} follow-up(s) scheduled for later!`, colors.cyan);
+        }
+
+        // Clear current thread
+        threadHistories.delete(currentThreadId);
+        threadCharacterInfo.delete(currentThreadId);
+
+        // Switch to another active thread if available
+        const remainingThreads = getActiveThreads(advisorState);
+        if (remainingThreads.length > 0) {
+          currentThreadId = remainingThreads[0].threadId;
+          print(`\n🔄 Switched to thread with ${remainingThreads[0].characterName}`, colors.green);
+        } else {
+          currentThreadId = null;
+          print("\n\nNo more active threads. Type 'new' or 'n' to start a new consultation.", colors.yellow);
+        }
+      }
+
     } catch (error) {
       print(`\n❌ Error: ${error}`, colors.red);
       print("Press ENTER to try again...", colors.yellow);
