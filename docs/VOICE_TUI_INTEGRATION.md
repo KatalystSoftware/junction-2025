@@ -12,8 +12,8 @@ The ElevenLabs voice integration **generates** audio for emotional character mom
 3. ✅ **Transcription is included** in `voiceConfig.transcription`
 4. ✅ **Urgency level is set** based on emotional state
 
-### TUI (Visual Indication)
-Since terminals can't play audio, the TUI shows **visual indicators**:
+### TUI (Visual Indication + Audio Files)
+Since terminals can't play audio directly, the TUI provides:
 
 1. **Voice Icon**: Messages with voice show 🎤 instead of 💬
 2. **Urgency Indicators**: Different icons based on emotional urgency:
@@ -21,14 +21,26 @@ Since terminals can't play audio, the TUI shows **visual indicators**:
    - `🎤⚠️` - Concerned voice message
    - `🎤❗` - Urgent voice message (scared, crying)
    - `🎤✨` - Excited voice message (happy, thrilled)
+3. **Audio File Path**: Voice messages are saved to temp files with playback instructions
+4. **Status Bar Instructions**: Shows how to play the audio file
 
 ### Example in TUI
 
 ```
 💬 Matti: "I need some advice about my savings."
+
 🎤❗ Matti: "I'm so scared! The debt collectors called!"
+🎧 Audio saved: /tmp/junction-voice-messages/voice_Matti_1731676543210.mp3
+
 💬 Matti: "Thanks, that helps a bit."
+
 🎤✨ Matti: "You're amazing! Thank you so much!"
+🎧 Audio saved: /tmp/junction-voice-messages/voice_Matti_1731676890123.mp3
+```
+
+**Status bar shows:**
+```
+🎧 Voice message received! Play: open "/tmp/junction-voice-messages/voice_Matti_1731676543210.mp3"
 ```
 
 ## Voice Message Triggering
@@ -113,53 +125,104 @@ For audio playback, you need a web frontend. Here's how it would work:
 )}
 ```
 
-## TUI Limitations
+## TUI Capabilities & Limitations
 
-The TUI has fundamental limitations:
+**What the TUI CAN do:**
+1. ✅ **Generate voice audio** - Creates MP3 files via ElevenLabs API
+2. ✅ **Save audio files** - Automatically saves to `/tmp/junction-voice-messages/`
+3. ✅ **Show file paths** - Displays playback instructions and file locations
+4. ✅ **Visual indicators** - Shows voice icons (🎤) with urgency levels
 
-1. ❌ **Cannot play audio** - terminals are text-only
-2. ❌ **Cannot save audio files** - no built-in file system access in terminal
-3. ❌ **Cannot open external players** - would break the TUI flow
+**What the TUI CANNOT do:**
+1. ❌ **Auto-play audio** - Terminals cannot play audio directly
+2. ❌ **Inline audio player** - No built-in media player in terminal UI
+3. ❌ **Background playback** - Would require external process management
 
-## Alternative Solutions for Terminal
+**Workaround:** Copy the file path shown in the TUI and play it with your system's media player (see "Playing Audio Files" section above).
 
-If you really want audio in terminal, you could:
+## Playing Audio Files (Implemented!)
 
-### Option 1: Save Audio to File
-```typescript
-// Add to TUI when voice message received
-if (response.voiceConfig?.audioUrl) {
-  const base64Data = response.voiceConfig.audioUrl.split(',')[1];
-  const audioBuffer = Buffer.from(base64Data, 'base64');
-  const filename = `/tmp/voice_${Date.now()}.mp3`;
-  fs.writeFileSync(filename, audioBuffer);
-  setStatusMessage(`🎤 Voice message saved to ${filename} (play with: mpg123 ${filename})`);
-}
+The TUI now **automatically saves voice audio files** and shows you how to play them!
+
+### Audio File Location
+
+Voice messages are saved to:
+```
+/tmp/junction-voice-messages/voice_<CharacterName>_<timestamp>.mp3
 ```
 
-### Option 2: Auto-play with System Command
-```typescript
-// Automatically play audio using system player
-if (response.voiceConfig?.audioUrl && process.platform !== 'win32') {
-  const base64Data = response.voiceConfig.audioUrl.split(',')[1];
-  const audioBuffer = Buffer.from(base64Data, 'base64');
-  const filename = `/tmp/voice_${Date.now()}.mp3`;
-  fs.writeFileSync(filename, audioBuffer);
-
-  // Play on macOS
-  exec(`afplay ${filename}`);
-  // Or on Linux
-  // exec(`mpg123 ${filename}`);
-}
+Example:
+```
+/tmp/junction-voice-messages/voice_Matti_1731676543210.mp3
 ```
 
-### Option 3: Web UI Recommendation
-The TUI could show a message:
+### How to Play
+
+**Method 1: Use the `open` command (shown in status bar)**
+```bash
+# Copy the command from status bar and run it
+open "/tmp/junction-voice-messages/voice_Matti_1731676543210.mp3"
 ```
-🎤❗ Voice message available!
-   To hear emotional voice messages, use the web UI:
-   npm run start:web
-   http://localhost:3000
+
+**Method 2: macOS - Default player**
+```bash
+open "/tmp/junction-voice-messages/voice_Matti_1731676543210.mp3"
+# Or use afplay (no GUI)
+afplay "/tmp/junction-voice-messages/voice_Matti_1731676543210.mp3"
+```
+
+**Method 3: Linux - Media players**
+```bash
+# VLC
+vlc "/tmp/junction-voice-messages/voice_Matti_1731676543210.mp3"
+
+# mpg123 (terminal)
+mpg123 "/tmp/junction-voice-messages/voice_Matti_1731676543210.mp3"
+
+# xdg-open (default player)
+xdg-open "/tmp/junction-voice-messages/voice_Matti_1731676543210.mp3"
+```
+
+**Method 4: Windows - Media players**
+```bash
+# Windows Media Player
+start "" "/tmp/junction-voice-messages/voice_Matti_1731676543210.mp3"
+
+# Or drag and drop the file into a media player
+```
+
+**Method 5: Browser**
+```
+1. Copy the file path
+2. Open browser
+3. Paste in address bar: file:///tmp/junction-voice-messages/voice_Matti_1731676543210.mp3
+```
+
+### Quick Playback Tips
+
+**1. Keep the path handy**: The TUI shows it under each voice message
+```
+🎤❗ Matti: "I'm so scared!"
+🎧 Audio saved: /tmp/junction-voice-messages/voice_Matti_1731676543210.mp3
+         ↑ Copy this path
+```
+
+**2. Use terminal history**: The status bar command can be copied from terminal scrollback
+```
+🎧 Voice message received! Play: open "/tmp/junction-voice-messages/voice_Matti_1731676543210.mp3"
+                                  ↑ Copy everything from "open" to end
+```
+
+**3. Play all voice messages**:
+```bash
+# List all saved voice files
+ls -lt /tmp/junction-voice-messages/
+
+# Play the most recent one
+open "$(ls -t /tmp/junction-voice-messages/voice_*.mp3 | head -1)"
+
+# Play all voice messages
+for f in /tmp/junction-voice-messages/voice_*.mp3; do afplay "$f"; done
 ```
 
 ## Testing Voice Integration
@@ -190,11 +253,15 @@ Monitor usage at: https://elevenlabs.io/app/usage
 
 | Feature | TUI Support | Notes |
 |---------|-------------|-------|
-| Voice Generation | ✅ Yes | Audio is generated via API |
+| Voice Generation | ✅ Yes | Audio is generated via ElevenLabs API |
 | Visual Indicator | ✅ Yes | Shows 🎤 with urgency icons |
-| Audio Playback | ❌ No | Terminals can't play audio |
+| Audio File Saving | ✅ Yes | Auto-saves to `/tmp/junction-voice-messages/` |
+| File Path Display | ✅ Yes | Shows path under each voice message |
+| Playback Instructions | ✅ Yes | Status bar shows `open` command |
+| Inline Audio Playback | ❌ No | Terminals can't play audio (use external player) |
 | Transcription | ✅ Yes | Text is displayed normally |
-| Urgency Display | ✅ Yes | Different icons per urgency |
-| Audio Export | 🟡 Possible | Could save to file manually |
+| Urgency Display | ✅ Yes | Different icons per urgency level |
 
-For full voice experience with audio playback, use a **web frontend** that can play the base64 audio data URLs.
+**How to listen:**
+1. **TUI users**: Copy the file path and play with `open`, `vlc`, `mpg123`, etc.
+2. **Web frontend users**: Full inline audio player with base64 data URLs
