@@ -39,8 +39,8 @@ docker-compose up -d  # Podman supports docker-compose command
 This will:
 - Start PostgreSQL 16 on port 5432
 - Create the database and user
-- Initialize the schema using scripts in `init-db/`
 - Set up persistent volumes for data
+- Schema is auto-created by the application on first connection
 
 ### 3. Verify It's Running
 
@@ -160,17 +160,20 @@ docker compose exec -T postgres psql -U junction_user -d junction2025 < backup.s
 
 ## Database Initialization
 
-SQL scripts in the `init-db/` directory are automatically executed when the PostgreSQL container is first created, in alphabetical order:
+The database schema is **automatically created by the application** on first connection using `CREATE TABLE IF NOT EXISTS` statements. No manual setup or SQL scripts are required.
 
-- `01-init-schema.sql` - Creates tables, indexes, and grants permissions
+The application creates:
+- 4 tables: `character_states`, `transactions`, `advice_effects`, `monthly_summaries`
+- 6 indexes for query optimization
+- Foreign key constraints
 
-To re-initialize the database:
+To reset the database:
 
 ```bash
 # Stop and remove containers and volumes
 docker compose down -v
 
-# Start fresh
+# Start fresh (schema will be auto-created by app)
 docker compose up -d
 ```
 
