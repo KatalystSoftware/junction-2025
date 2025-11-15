@@ -91,7 +91,7 @@ ${conversationHistory.map((msg, idx) => `${msg.role === "user" ? "Character" : "
 Please evaluate this advice comprehensively across all dimensions.
 `;
 
-      // Call evaluatorAgent (cached in tests)
+      // Call evaluatorAgent (cachedGenerate already includes retry logic via runAgentOperation)
       const evaluationResult = await cachedGenerate(
         "agent",
         "evaluator_advice",

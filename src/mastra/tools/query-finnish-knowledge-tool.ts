@@ -10,6 +10,11 @@ import { LibSQLVector } from "@mastra/libsql";
 import { embed } from "ai";
 import { z } from "zod";
 import { createTool } from "@mastra/core/tools";
+import {
+  withRetry,
+  isRetryableError,
+  logError,
+} from "../utils/error-recovery.ts";
 
 // Shared vector store instance
 let vectorStore: LibSQLVector | null = null;
@@ -80,13 +85,21 @@ export const queryFinnishKnowledgeTool = createTool({
     const { query, topic, topK = 3 } = input;
 
     try {
-      // Generate embedding for the query
-      const { embedding } = await embed({
-        value: query,
-        model: google.textEmbeddingModel("text-embedding-004"),
-      });
+      // Generate embedding for the query with retry logic
+      const { embedding } = await withRetry(
+        () =>
+          embed({
+            value: query,
+            model: google.textEmbeddingModel("text-embedding-004"),
+          }),
+        "Embedding Generation",
+        {
+          maxAttempts: 3,
+          shouldRetry: isRetryableError,
+        },
+      );
 
-      // Query vector store
+      // Query vector store with retry logic
       const store = getVectorStore();
 
       const queryParams: any = {
@@ -101,7 +114,14 @@ export const queryFinnishKnowledgeTool = createTool({
         queryParams.filter = { topic: { $eq: topic } };
       }
 
-      const searchResults = await store.query(queryParams);
+      const searchResults = await withRetry(
+        () => store.query(queryParams),
+        "Vector Store Query",
+        {
+          maxAttempts: 3,
+          shouldRetry: isRetryableError,
+        },
+      );
 
       // Format results
       const results = searchResults.map((result) => ({

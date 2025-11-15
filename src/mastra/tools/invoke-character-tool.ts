@@ -58,7 +58,7 @@ export const invokeCharacterTool = {
         prompt = `Conversation so far:\n${historyText}\n\nAdvisor's latest message: "${advisorMessage}"\n\nRespond in character.`;
       }
 
-      // Invoke character agent
+      // Invoke character agent (cachedGenerate already includes retry logic via runAgentOperation)
       const response = await cachedGenerate(
         "agent",
         `character_${character.characterId}`,
