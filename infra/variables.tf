@@ -12,7 +12,7 @@ variable "region" {
 variable "container_image" {
   description = "Container image to deploy (e.g. ghcr.io/katalystsoftware/financial-advisor-sim:latest)"
   type        = string
-  default     = "ghcr.io/katalystsoftware/financial-advisor-sim:latest"
+  default     = "europe-north1-docker.pkg.dev/junkkari2025/financial-advisor-sim/app:latest"
 }
 
 variable "github_repository" {

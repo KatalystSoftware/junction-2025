@@ -39,6 +39,9 @@ jobs:
     runs-on: ubuntu-latest
     # needs: test-ci
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
       - name: Checkout repository
@@ -52,7 +55,7 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           token_format: "access_token"
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          workload_identity_provider: projects/516458799404/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions
           service_account: github-actions-sa@junkkari2025.iam.gserviceaccount.com
 
       - name: Log in to Artifact Registry
