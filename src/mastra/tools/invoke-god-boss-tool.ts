@@ -5,7 +5,7 @@
  * Reviews recent consultation sessions and provides feedback.
  */
 
-import { godBossAgent } from "../agents/god-boss-agent.ts";
+import { createGodBossAgent } from "../agents/god-boss-agent.ts";
 import type {
   GodBossReview,
   ConsultationSession,
@@ -24,6 +24,14 @@ export const invokeGodBossTool = {
     try {
       const { sessionsToReview, advisorReputation, advisorSkillLevel } =
         context;
+
+      // Collect all advisor messages for language detection
+      const advisorMessages = sessionsToReview.flatMap(
+        (session) => session.playerAdvice,
+      );
+
+      // Create boss agent with detected language
+      const godBossAgent = createGodBossAgent(advisorMessages);
 
       // Build review prompt with session transcripts
       const sessionSummaries = sessionsToReview
@@ -80,28 +88,28 @@ Provide comprehensive feedback following your review format.
           parseError,
         );
 
-        // Fallback review
+        // Fallback review (English)
         parsed = {
           overallScore: 6,
           strengthsIdentified: [
-            "Yritit auttaa asiakkaita parhaasi mukaan",
-            "Keskustelut pysyivät asiallisina",
+            "You tried your best to help clients",
+            "Conversations remained professional",
           ],
           areasForImprovement: [
-            "Voisit antaa tarkempia ja konkreettisempia neuvoja",
-            "Muista kysyä tarkentavia kysymyksiä ennen neuvon antamista",
+            "You could provide more specific and concrete advice",
+            "Remember to ask clarifying questions before giving advice",
           ],
           learningMaterials: [
             {
               materialId: "mat_general_001",
-              title: "Talousneuvonnan perusteet",
-              description: "Yleisopas talousneuvontaan",
+              title: "Financial Counseling Basics",
+              description: "General guide to financial counseling",
               topic: "budgeting",
               type: "article" as const,
             },
           ],
           encouragingMessage:
-            "Hyvä alku! Jatka harjoittelua ja muista kysyä asiakkailta tarkentavia kysymyksiä. 💪",
+            "Good start! Keep practicing and remember to ask clients clarifying questions. 💪",
           reputationChange: 5,
           skillLevelChange: 0.2,
           topicsExpertiseUpdates: {},
@@ -114,7 +122,7 @@ Provide comprehensive feedback following your review format.
         areasForImprovement: parsed.areasForImprovement || [],
         learningMaterials: parsed.learningMaterials || [],
         encouragingMessage:
-          parsed.encouragingMessage || "Hyvä työ! Jatka samaan malliin. 💪",
+          parsed.encouragingMessage || "Great work! Keep it up. 💪",
         reputationChange: parsed.reputationChange || 5,
         skillLevelChange: parsed.skillLevelChange || 0.1,
         topicsExpertiseUpdates: parsed.topicsExpertiseUpdates || {},
@@ -122,13 +130,13 @@ Provide comprehensive feedback following your review format.
     } catch (error) {
       console.error("❌ Error invoking God/Boss agent:", error);
 
-      // Return fallback review
+      // Return fallback review (English)
       return {
         overallScore: 6,
-        strengthsIdentified: ["Yritit parhaasi"],
-        areasForImprovement: ["Jatka harjoittelua"],
+        strengthsIdentified: ["You tried your best"],
+        areasForImprovement: ["Keep practicing"],
         learningMaterials: [],
-        encouragingMessage: "Virhe tapahtui, mutta jatka yrittämistä! 💪",
+        encouragingMessage: "An error occurred, but keep trying! 💪",
         reputationChange: 0,
         skillLevelChange: 0,
         topicsExpertiseUpdates: {},

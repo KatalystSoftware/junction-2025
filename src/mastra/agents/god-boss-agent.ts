@@ -10,10 +10,76 @@
 
 import { Agent } from "@mastra/core/agent";
 
-export const godBossAgent = new Agent({
-  name: "godBossAgent",
-  model: "google/gemini-2.5-flash",
-  instructions: `
+/**
+ * Detect language from advisor messages
+ */
+function detectLanguage(messages: string[]): "finnish" | "english" {
+  if (!messages || messages.length === 0) return "english";
+
+  const allText = messages.join(" ");
+  const finnishPatterns = [
+    /\b(hei|moi|kiitos|ole|on|ja|mutta|että|voin|pitää|kannattaa|pitäisi|sinun|kannattaa|budjetointi|säästö|velka|sijoittaminen)\b/i,
+    /ä|ö/i,
+  ];
+
+  const hasFinnishPatterns = finnishPatterns.some((pattern) =>
+    pattern.test(allText),
+  );
+  return hasFinnishPatterns ? "finnish" : "english";
+}
+
+/**
+ * Get language-specific instructions and examples
+ */
+function getLanguageInstructions(
+  language: "finnish" | "english",
+): { languageRule: string; exampleOutput: any } {
+  if (language === "finnish") {
+    return {
+      languageRule: "- Always respond in Finnish",
+      exampleOutput: {
+        strengthsIdentified: [
+          "Selitit budjetoinnin 50/30/20 säännön todella selkeästi",
+          "Annoit konkreettisia työkaluja, kuten app-suositukset",
+        ],
+        areasForImprovement: [
+          "Muista kysyä tarkemmin asiakkaan menoista ennen neuvon antamista",
+        ],
+        encouragingMessage:
+          "Hyvää työtä! Olet selvästi edistynyt budjettiasioiden neuvonnassa.",
+      },
+    };
+  } else {
+    return {
+      languageRule: "- Always respond in English",
+      exampleOutput: {
+        strengthsIdentified: [
+          "You explained the 50/30/20 budgeting rule very clearly",
+          "You provided concrete tools, such as app recommendations",
+        ],
+        areasForImprovement: [
+          "Remember to ask more specifically about the client's expenses before giving advice",
+        ],
+        encouragingMessage:
+          "Great work! You have clearly progressed in budgeting advice.",
+      },
+    };
+  }
+}
+
+/**
+ * Create God/Boss agent with dynamic language support
+ */
+export function createGodBossAgent(
+  advisorMessages: string[] = [],
+): Agent {
+  const language = detectLanguage(advisorMessages);
+  const { languageRule, exampleOutput } = getLanguageInstructions(language);
+
+  return new Agent({
+    name: "godBossAgent",
+    model: "google/gemini-2.5-flash",
+    instructions: `
 ═══════════════════════════════════════════════════════════════════════
 YOU ARE THE BOSS - SENIOR MENTOR
 ═══════════════════════════════════════════════════════════════════════
@@ -61,12 +127,12 @@ You will receive transcripts of the last 3-5 consultation sessions the advisor c
 
    b) STRENGTHS (2-3 specific things they did well):
       - Use specific examples from the sessions
-      - E.g., "Sinä selitit budjetoinnin 50/30/20 säännön selkeästi Minnalle ja annoit konkreettisia työkaluja (app-suositukset)"
+      - Example: "${exampleOutput.strengthsIdentified[0]}"
 
    c) AREAS FOR IMPROVEMENT (2-3 specific things to work on):
       - Be constructive, not critical
       - Give actionable suggestions
-      - E.g., "Muista kysyä tarkemmin asiakkaan nykyisistä menoista ennen neuvon antamista. Tämä auttaa antamaan realistisempia neuvoja."
+      - Example: "${exampleOutput.areasForImprovement[0]}"
 
    d) LEARNING MATERIALS (2-4 resources):
       - Provide Finnish financial literacy resources relevant to their weak areas
@@ -112,10 +178,11 @@ You will receive transcripts of the last 3-5 consultation sessions the advisor c
         * Include specific page URLs in learning materials, not just homepages
 
    h) ENCOURAGING MESSAGE:
-      - End with motivating message in Finnish
+      - End with motivating message
       - Acknowledge progress
       - Set expectation for continued growth
       - Make them feel capable and supported
+      - Example: "${exampleOutput.encouragingMessage}"
 
 ═══════════════════════════════════════════════════════════════════════
 CRITICAL SECRECY & IMMERSION RULES
@@ -215,7 +282,7 @@ You must respond with a valid JSON object in this exact format (NO markdown, NO 
 }
 
 IMPORTANT RULES:
-- Always respond in Finnish
+${languageRule}
 - Be honest but kind
 - Focus on growth and learning
 - Use specific examples from the sessions
@@ -224,4 +291,8 @@ IMPORTANT RULES:
 - Remember you're a mentor, not a judge
 - Output ONLY valid JSON, no markdown formatting
 `,
-});
+  });
+}
+
+// Legacy export for backward compatibility
+export const godBossAgent = createGodBossAgent();
