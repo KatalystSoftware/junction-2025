@@ -1,9 +1,10 @@
-# Elämäpeli 2025 - Financial Advisor Simulator
+# Broke No More! 2025 - Financial Advisor Simulator
 
 > **Learn financial literacy by teaching it.** An AI-powered game where you play as a financial advisor helping realistic characters with their money problems.
 
 [![Junction 2025](https://img.shields.io/badge/Junction_2025-Helsinki-blue)](https://junction2025.com)
-[![Node Version](https://img.shields.io/badge/node-%3E%3D22.13.0-brightgreen)](https://nodejs.org/)
+
+![Broke No More! intro](https://github.com/user-attachments/assets/a63c596a-32f3-45ad-9d6e-e0e6c41468db)
 
 ---
 
