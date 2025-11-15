@@ -256,7 +256,7 @@ export async function handleAdvisorResponse(
     conversationHistory: conversationHistory || [],
   });
 
-  // Evaluate advice quality
+  // Evaluate advice quality using AI-based evaluation
   const evaluateTool = mastra.getTool("evaluateAdviceTool");
   let adviceEvaluation: any = {
     qualityScore: 5,
@@ -264,6 +264,11 @@ export async function handleAdvisorResponse(
     outcome: "neutral",
     strengths: [],
     weaknesses: [],
+    missedOpportunities: [],
+    topicsCovered: [scenario.topic],
+    wasActionable: false,
+    wasEmpathetic: false,
+    wasAccurate: true,
   };
 
   if (evaluateTool) {
@@ -271,12 +276,14 @@ export async function handleAdvisorResponse(
       advice: advisorMessage,
       scenario,
       characterPersonality: character.personality,
+      character, // Pass full character for more context
+      conversationHistory, // Pass conversation history for context
     });
   }
 
   // If conversation is ending, save session
   if (characterResponse.conversationEnding) {
-    // Create consultation session record
+    // Create consultation session record with detailed evaluation
     const session: ConsultationSession = {
       sessionId: `session_${Date.now()}`,
       characterId: character.characterId,
@@ -286,10 +293,21 @@ export async function handleAdvisorResponse(
       playerAdvice: [advisorMessage], // Would accumulate all advice in full implementation
       characterReactions: characterResponse.messages,
       adviceQualityScore: adviceEvaluation.qualityScore,
-      topicsCovered: [scenario.topic],
+      topicsCovered: adviceEvaluation.topicsCovered || [scenario.topic],
       followUpScheduled: false,
       outcomeRevealed: false,
       duration: (conversationHistory?.length || 0) + 1,
+      // Store detailed evaluation for later review
+      evaluation: {
+        strengths: adviceEvaluation.strengths,
+        weaknesses: adviceEvaluation.weaknesses,
+        missedOpportunities: adviceEvaluation.missedOpportunities,
+        wasActionable: adviceEvaluation.wasActionable,
+        wasEmpathetic: adviceEvaluation.wasEmpathetic,
+        wasAccurate: adviceEvaluation.wasAccurate,
+        dimensions: adviceEvaluation.dimensions,
+        characterProgression: adviceEvaluation.characterProgression,
+      },
     };
 
     // Add to session history
@@ -335,9 +353,43 @@ export async function handleAdvisorResponse(
       }
     }
 
-    // Update skill and reputation based on performance
-    const skillChange = (adviceEvaluation.qualityScore - 5) * 0.02; // -0.1 to +0.1
-    const repChange = Math.round((adviceEvaluation.qualityScore - 5) * 2); // -10 to +10
+    // Update skill and reputation based on comprehensive evaluation
+    // Use dimension scores if available for more nuanced updates
+    const dimensionScores = adviceEvaluation.dimensions;
+    let avgDimensionScore = adviceEvaluation.qualityScore;
+
+    if (dimensionScores) {
+      avgDimensionScore = (
+        dimensionScores.adviceQuality +
+        dimensionScores.communicationEffectiveness +
+        dimensionScores.learningObjectives +
+        dimensionScores.characterProgression
+      ) / 4;
+    }
+
+    // Calculate changes based on comprehensive evaluation
+    const skillChange = (avgDimensionScore - 5) * 0.02; // -0.1 to +0.1
+    const repChange = Math.round((avgDimensionScore - 5) * 2); // -10 to +10
+
+    // Bonus/penalty for specific evaluation criteria
+    if (adviceEvaluation.wasEmpathetic) {
+      advisorState.reputation = Math.min(
+        100,
+        advisorState.reputation + 2,
+      );
+    }
+    if (adviceEvaluation.wasActionable) {
+      advisorState.skillLevel = Math.min(
+        10,
+        advisorState.skillLevel + 0.01,
+      );
+    }
+    if (!adviceEvaluation.wasAccurate) {
+      advisorState.reputation = Math.max(
+        0,
+        advisorState.reputation - 5,
+      );
+    }
 
     advisorState.skillLevel = Math.max(
       0,
@@ -348,12 +400,15 @@ export async function handleAdvisorResponse(
       Math.min(100, advisorState.reputation + repChange),
     );
 
-    // Update topic expertise
-    const topicChange = (adviceEvaluation.qualityScore - 5) * 0.05;
-    advisorState.topicsExpertise[scenario.topic] = Math.max(
-      0,
-      Math.min(10, advisorState.topicsExpertise[scenario.topic] + topicChange),
-    );
+    // Update topic expertise for all topics covered in the evaluation
+    const topicsToUpdate = adviceEvaluation.topicsCovered || [scenario.topic];
+    for (const topic of topicsToUpdate) {
+      const topicChange = (adviceEvaluation.qualityScore - 5) * 0.05;
+      advisorState.topicsExpertise[topic as FinancialTopic] = Math.max(
+        0,
+        Math.min(10, advisorState.topicsExpertise[topic as FinancialTopic] + topicChange),
+      );
+    }
 
     // Clear current client
     advisorState.currentClient = null;
