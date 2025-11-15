@@ -11,7 +11,8 @@
  * - Query operations
  */
 
-import { Pool, PoolClient } from "pg";
+import pkg from "pg";
+const { Pool } = pkg;
 import type {
   Transaction,
   CharacterFinancialState,

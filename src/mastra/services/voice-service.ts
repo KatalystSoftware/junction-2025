@@ -356,7 +356,7 @@ export function enhanceTextWithVoiceTags(
  * - Random chance (1/10 or ~10%)
  * - Character preference for voice messages
  * - Emotional intensity
- * - Scenario count: 50% on scenario 2, guaranteed on scenario 3 if not received on 2
+ * - Scenario count: ALWAYS on scenario 2 (for demo impact), random chance after
  */
 export function shouldGenerateVoiceMessage(
   character: Character,
@@ -374,16 +374,13 @@ export function shouldGenerateVoiceMessage(
     callsWhenEmotional: character.communicationStyle.callsWhenEmotional,
   });
 
-  // Scenario 2: 50% chance
+  // Scenario 2: Always generate voice message for demo impact
   if (scenarioNumber === 2) {
-    const shouldGenerate = Math.random() < 0.5;
-    console.log(
-      `🎲 Scenario 2 voice chance (50%): ${shouldGenerate ? "YES" : "no"}`,
-    );
-    return shouldGenerate;
+    console.log(`✅ Guaranteed voice message (scenario 2 - demo enhancement)`);
+    return true;
   }
 
-  // Scenario 3: Guaranteed if they didn't get it on scenario 2
+  // Scenario 3+: Use random chance (scenario 2 now always has voice, so this won't trigger)
   if (scenarioNumber === 3 && !hasReceivedVoice) {
     console.log(
       `✅ Guaranteed voice message (scenario 3, no voice on scenario 2)`,

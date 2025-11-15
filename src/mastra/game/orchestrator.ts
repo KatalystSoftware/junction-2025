@@ -433,9 +433,9 @@ Respond with ONLY valid JSON (NO markdown):
       situation: scenario.problemContext.currentSituation,
     };
 
-    // Generate advice choices for the player (only for first session)
+    // Generate advice choices for the player (first two sessions to ease into the game)
     const adviceChoices =
-      advisorState.totalSessions === 0
+      advisorState.totalSessions <= 1
         ? generateAdviceChoices(
             scenario,
             character.personality,

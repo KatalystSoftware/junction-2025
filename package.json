@@ -12,7 +12,7 @@
     "test:infra": "bash scripts/terraform-validate.sh",
     "play": "tsx --env-file=.env src/play-tui.tsx",
     "dev": "concurrently -n \"api,frontend\" -c \"blue,green\" \"pnpm run dev:api\" \"pnpm run dev:frontend\"",
-    "dev:api": "tsx --env-file=.env --watch src/index.ts",
+    "dev:api": "node --env-file=.env --watch src/index.ts",
     "dev:frontend": "pnpm --filter frontend dev",
     "build": "mastra build",
     "build:frontend": "pnpm --filter frontend build",

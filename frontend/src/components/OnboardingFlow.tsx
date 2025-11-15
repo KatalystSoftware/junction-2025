@@ -5,21 +5,14 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
-  ArrowRight,
   ChevronRight,
   MessageSquare,
-  Target,
-  TrendingUp,
-  Heart,
   Sparkles,
-  Award,
-  Users,
-  Lightbulb,
   CheckCircle2,
   User,
 } from "lucide-react";
-import { Progress } from "./ui/progress";
 import bossImage from "figma:asset/98a682f9e6eea0635304bf1ceada7ac6a7758d54.png";
+import { PLAYER_AVATAR_OPTIONS } from "../utils/avatarUtils";
 
 interface OnboardingFlowProps {
   onComplete: () => void;
@@ -31,11 +24,9 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
   // User profile data
   const [userName, setUserName] = useState("");
-  const [userGender, setUserGender] = useState<
-    "male" | "female" | "other" | ""
-  >("");
+  const [userAvatar, setUserAvatar] = useState("");
 
-  const totalScreens = 7;
+  const totalScreens = 3;
   const progressPercentage = ((currentScreen + 1) / totalScreens) * 100;
 
   // Add keyboard navigation (but not for the profile screen)
@@ -59,7 +50,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const handleNext = () => {
     // Validate profile screen
     if (currentScreen === 0) {
-      if (!userName.trim() || !userGender) {
+      if (!userName.trim() || !userAvatar) {
         return; // Don't proceed if fields are empty
       }
       // Save profile to localStorage
@@ -67,7 +58,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         "userProfile",
         JSON.stringify({
           name: userName,
-          gender: userGender,
+          avatar: userAvatar,
         }),
       );
     }
@@ -83,10 +74,10 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     {
       id: "profile",
       icon: User,
-      title: "Let's Create Your Profile",
-      subtitle: "Tell Us About Yourself",
+      title: "Choose Your Identity",
+      subtitle: "How do you want to be seen?",
       description:
-        "Before you start your journey as a financial advisor, we'd love to know a bit about you.",
+        "Pick an avatar that represents you as a financial advisor.",
       illustration: "👤",
       color: "var(--primary)",
       gradient:
@@ -95,82 +86,29 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     },
     {
       id: "welcome",
-      icon: Sparkles,
+      icon: MessageSquare,
       title: "Welcome to Gansos Finances!",
-      subtitle: "Your Journey to Financial Advisory Excellence Begins",
+      subtitle: "Your Financial Advisory Career Starts Here",
       description:
-        "You're about to step into a role that matters. As a financial advisor, you'll guide real people through their money challenges, build trust, and help them transform their financial lives.",
+        "You'll chat with clients via messaging, understand their situations, and provide thoughtful advice. Each interaction builds trust. Good advice transforms lives.",
       illustration: "💼",
       color: "var(--primary)",
       gradient:
         "linear-gradient(135deg, rgba(127, 86, 217, 0.1) 0%, rgba(105, 65, 198, 0.05) 100%)",
-    },
-    {
-      id: "role",
-      icon: Target,
-      title: "Your Role as an Advisor",
-      subtitle: "Empathy Meets Expertise",
-      description:
-        "You'll chat with clients via WhatsApp-style messaging. Each person has unique financial situations, dreams, and struggles. Your job? Listen carefully, ask the right questions, and provide advice that's practical, encouraging, and tailored to them.",
-      illustration: "🎯",
-      color: "var(--accent)",
-      gradient:
-        "linear-gradient(135deg, rgba(105, 65, 198, 0.1) 0%, rgba(83, 56, 158, 0.05) 100%)",
-    },
-    {
-      id: "how-it-works",
-      icon: MessageSquare,
-      title: "How It Works",
-      subtitle: "Simple, Yet Impactful",
-      description:
-        "Read your client's messages, understand their situation, and respond with thoughtful financial advice. Each interaction affects their trust in you. Good advice builds relationships. Great advice transforms lives.",
-      illustration: "💬",
-      color: "var(--chart-1)",
-      gradient:
-        "linear-gradient(135deg, rgba(127, 86, 217, 0.12) 0%, rgba(182, 146, 246, 0.06) 100%)",
       features: [
-        "Chat naturally with clients",
-        "Build trust through quality advice",
-        "Track client progress and savings",
+        "Chat naturally with clients about their finances",
+        "Build trust through quality, personalized advice",
+        "Help clients achieve real financial progress",
       ],
-    },
-    {
-      id: "expectations",
-      icon: Award,
-      title: "What I Expect From You",
-      subtitle: "Excellence in Every Interaction",
-      description:
-        "Think critically. Be empathetic. Don't just give generic advice—take the time to understand each client's situation. The trust score reflects how well you're doing. Aim for excellence, not perfection.",
-      illustration: "⭐",
-      color: "var(--chart-3)",
-      gradient:
-        "linear-gradient(135deg, rgba(217, 45, 32, 0.08) 0%, rgba(217, 45, 32, 0.02) 100%)",
-      expectations: [
-        { icon: Heart, text: "Be empathetic and supportive" },
-        { icon: Lightbulb, text: "Provide thoughtful, tailored advice" },
-        { icon: TrendingUp, text: "Help clients achieve real progress" },
-      ],
-    },
-    {
-      id: "encouragement",
-      icon: Sparkles,
-      title: "You've Got This!",
-      subtitle: "Every Expert Was Once a Beginner",
-      description:
-        "This isn't just a game—it's practice for real-world impact. Every client you help, every trust point you earn, every dollar you save them... it all adds up. You're building skills that matter.",
-      illustration: "🚀",
-      color: "var(--chart-2)",
-      gradient:
-        "linear-gradient(135deg, rgba(182, 146, 246, 0.15) 0%, rgba(214, 187, 251, 0.08) 100%)",
     },
     {
       id: "ready",
-      icon: Users,
-      title: "Ready to Meet Your First Client?",
-      subtitle: "Your Advisory Career Starts Now",
+      icon: Sparkles,
+      title: "Ready to Start?",
+      subtitle: "Your First Client Awaits",
       description:
-        "Michael Scott is waiting in your inbox. He's your boss, and he has high hopes for you. This is your chance to prove yourself. Read his message, understand his needs, and give him advice he can trust.",
-      illustration: "👔",
+        "Michael Scott is waiting in your inbox. He's your boss and has high hopes. Be empathetic, think critically, and provide advice that truly helps.",
+      illustration: "🚀",
       color: "var(--primary)",
       gradient:
         "linear-gradient(135deg, rgba(127, 86, 217, 0.15) 0%, rgba(105, 65, 198, 0.08) 100%)",
@@ -331,23 +269,23 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 }}
-                  className="space-y-3 mb-6"
+                  className="space-y-5 mb-6"
                 >
-                  <div className="space-y-2 mb-6">
+                  <div className="space-y-2">
                     <Label
                       htmlFor="name"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      className="text-sm font-medium leading-none"
                       style={{
                         color: "var(--foreground)",
                       }}
                     >
-                      Name
+                      Your Name
                     </Label>
                     <Input
                       id="name"
                       value={userName}
                       onChange={(e) => setUserName(e.target.value)}
-                      placeholder="Enter your name or nickname"
+                      placeholder="Enter your name"
                       style={{
                         backgroundColor: "var(--input-background)",
                         borderColor: "var(--border)",
@@ -365,68 +303,56 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                       }}
                     />
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <Label
-                      htmlFor="gender"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      className="text-sm font-medium leading-none"
                       style={{
                         color: "var(--foreground)",
                       }}
                     >
-                      Gender
+                      Your Avatar
                     </Label>
-                    <div className="flex items-center gap-6">
-                      {[
-                        { id: "male", value: "male", label: "Male" },
-                        { id: "female", value: "female", label: "Female" },
-                        { id: "other", value: "other", label: "Other" },
-                      ].map((option) => (
-                        <div
+                    <div className="grid grid-cols-3 gap-3">
+                      {PLAYER_AVATAR_OPTIONS.map((option) => (
+                        <motion.button
                           key={option.id}
-                          className="flex items-center gap-2"
+                          type="button"
+                          onClick={() => setUserAvatar(option.id)}
+                          className="flex flex-col items-center gap-2 p-3 rounded-lg transition-all duration-200 cursor-pointer"
+                          style={{
+                            border: `2px solid ${userAvatar === option.id ? "var(--primary)" : "var(--border)"}`,
+                            backgroundColor:
+                              userAvatar === option.id
+                                ? "rgba(127, 86, 217, 0.1)"
+                                : "var(--muted)",
+                          }}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                         >
-                          <button
-                            type="button"
-                            id={option.id}
-                            role="radio"
-                            aria-checked={userGender === option.value}
-                            onClick={() =>
-                              setUserGender(option.value as typeof userGender)
-                            }
-                            className="relative w-5 h-5 rounded-full transition-all duration-200 cursor-pointer"
+                          <Avatar className="w-16 h-16">
+                            <AvatarImage src={option.url} alt={option.label} />
+                            <AvatarFallback
+                              style={{
+                                backgroundColor: "var(--muted)",
+                              }}
+                            >
+                              {option.label[0]}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span
                             style={{
-                              border: `2px solid ${userGender === option.value ? "var(--primary)" : "var(--border)"}`,
-                              backgroundColor:
-                                userGender === option.value
-                                  ? "var(--primary)"
-                                  : "var(--input-background)",
-                            }}
-                          >
-                            {userGender === option.value && (
-                              <span
-                                className="absolute inset-0 m-auto w-2 h-2 rounded-full"
-                                style={{
-                                  backgroundColor: "var(--primary-foreground)",
-                                }}
-                              />
-                            )}
-                          </button>
-                          <Label
-                            htmlFor={option.id}
-                            className="cursor-pointer"
-                            style={{
-                              color: "var(--foreground)",
                               fontFamily: "Inter, sans-serif",
-                              fontSize: "var(--text-sm)",
+                              fontSize: "var(--text-xs)",
                               fontWeight: "var(--font-weight-medium)",
+                              color:
+                                userAvatar === option.id
+                                  ? "var(--primary)"
+                                  : "var(--foreground)",
                             }}
-                            onClick={() =>
-                              setUserGender(option.value as typeof userGender)
-                            }
                           >
                             {option.label}
-                          </Label>
-                        </div>
+                          </span>
+                        </motion.button>
                       ))}
                     </div>
                   </div>
@@ -472,51 +398,6 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 </motion.div>
               )}
 
-              {/* Expectations list (for "expectations" screen) */}
-              {currentScreenData.expectations && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 }}
-                  className="space-y-2 mb-5"
-                >
-                  {currentScreenData.expectations.map((expectation, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.7 + index * 0.1 }}
-                      className="flex items-start gap-3 p-3 rounded-lg"
-                      style={{
-                        backgroundColor: "var(--muted)",
-                        border: `1px solid var(--border)`,
-                      }}
-                    >
-                      <div
-                        className="flex items-center justify-center rounded-lg flex-shrink-0"
-                        style={{
-                          backgroundColor: currentScreenData.color,
-                          width: "40px",
-                          height: "40px",
-                        }}
-                      >
-                        <span style={{ fontSize: "1.25rem" }}>😊</span>
-                      </div>
-                      <span
-                        style={{
-                          fontFamily: "Inter, sans-serif",
-                          fontSize: "var(--text-base)",
-                          fontWeight: "var(--font-weight-medium)",
-                          color: "var(--foreground)",
-                          lineHeight: "1.5",
-                        }}
-                      >
-                        {expectation.text}
-                      </span>
-                    </motion.div>
-                  ))}
-                </motion.div>
-              )}
 
               {/* CTA Button */}
               <motion.div
@@ -527,6 +408,9 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               >
                 <Button
                   onClick={handleNext}
+                  disabled={
+                    currentScreen === 0 && (!userName.trim() || !userAvatar)
+                  }
                   size="lg"
                   className="group relative overflow-hidden"
                   style={{
@@ -539,6 +423,14 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                     borderRadius: "var(--radius-button)",
                     boxShadow: "0 4px 12px rgba(127, 86, 217, 0.25)",
                     border: "none",
+                    opacity:
+                      currentScreen === 0 && (!userName.trim() || !userAvatar)
+                        ? 0.5
+                        : 1,
+                    cursor:
+                      currentScreen === 0 && (!userName.trim() || !userAvatar)
+                        ? "not-allowed"
+                        : "pointer",
                   }}
                 >
                   <motion.span

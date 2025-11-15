@@ -461,14 +461,130 @@ function estimateWillFollow(personality: CharacterPersonality): boolean {
 
 /**
  * Adapt advice text to character's financial literacy level
+ * Expands short advice points into full, actionable advice messages
  */
 function adaptAdviceToLiteracy(
   advicePoint: string,
   literacyLevel: number,
 ): string {
-  // For now, return the advice point as-is
-  // In future, could simplify language for low literacy
-  // or add more detail for high literacy
+  // Expand the advice point into a full, actionable message
+  const lower = advicePoint.toLowerCase();
+
+  // Budgeting-related advice
+  if (lower.includes("track") && lower.includes("expense")) {
+    return "Start tracking all your expenses for the next 1-2 weeks. Write down or use your banking app to see exactly where your money goes. This will help you identify areas where you can cut back and make better financial decisions.";
+  }
+
+  if (lower.includes("budget") && lower.includes("realistic")) {
+    return "Let's build a realistic budget together. List all your income sources and fixed expenses (rent, utilities, insurance), then allocate money for variable costs like food, transport, and personal spending. Don't forget to include a small savings goal, even if it's just 5-10€ per month to start.";
+  }
+
+  if (lower.includes("50/30/20") || lower.includes("50-30-20")) {
+    return "Try using the 50/30/20 budgeting rule: 50% of your income for needs (rent, food, utilities), 30% for wants (entertainment, hobbies), and 20% for savings and debt payments. Adjust these percentages based on your specific situation, especially if you're a student or have high rent costs.";
+  }
+
+  if (lower.includes("category") || lower.includes("categories")) {
+    return "Break down your spending into clear categories: Housing, Food, Transportation, Entertainment, Savings, etc. This makes it much easier to see patterns and identify where you might be overspending. Most banking apps can do this automatically for you.";
+  }
+
+  // Saving-related advice
+  if (lower.includes("emergency fund")) {
+    return "Start building an emergency fund with a goal of 3-6 months of living expenses. Begin small - even 500€ can cover many unexpected costs like car repairs or medical bills. Set up an automatic transfer to a separate savings account each month, even if it's just 20-50€ to start.";
+  }
+
+  if (lower.includes("automatic") && lower.includes("sav")) {
+    return "Set up automatic transfers to savings right after you get paid - this way you 'pay yourself first' before spending on other things. Even a small amount like 5-10% of your income adds up over time. Most banks let you schedule automatic transfers in their app.";
+  }
+
+  if (lower.includes("goal") && (lower.includes("specific") || lower.includes("set"))) {
+    return "Set a specific savings goal with a clear timeline and amount. For example: 'Save 1,000€ for travel in 6 months' or 'Build a 2,000€ emergency fund by end of year'. Having a concrete target makes it easier to stay motivated and track your progress.";
+  }
+
+  // Debt-related advice
+  if (lower.includes("debt") && (lower.includes("high") || lower.includes("interest"))) {
+    return "Focus on paying off your highest interest rate debts first (like credit cards). Make minimum payments on everything, but put any extra money toward the debt with the highest APR. This saves you the most money in interest charges over time.";
+  }
+
+  if (lower.includes("snowball") || lower.includes("smallest debt")) {
+    return "Try the debt snowball method: Pay off your smallest debt first while making minimum payments on others. Once the smallest is paid off, take that payment amount and add it to the next smallest debt. This creates momentum and keeps you motivated with quick wins.";
+  }
+
+  if (lower.includes("consolidat")) {
+    return "Consider consolidating your debts into a single loan with a lower interest rate. Contact your bank about a consolidation loan - this can simplify your payments and potentially save money on interest. Make sure to compare the total cost including any fees before switching.";
+  }
+
+  // Student-specific advice
+  if (lower.includes("student") && lower.includes("discount")) {
+    return "Take full advantage of student discounts! Get a student public transport card (usually 50% off), use student prices for museums, gyms, and software, and check if local restaurants offer student deals. This can easily save you 50-100€ per month.";
+  }
+
+  if (lower.includes("student loan") || lower.includes("kela")) {
+    return "Understand your KELA benefits and student loan options. The student grant + housing support might not be enough, but the student loan has a very low interest rate. Consider taking only what you need, and remember you don't have to start paying it back until after graduation and your income reaches a certain level.";
+  }
+
+  if (lower.includes("part-time") || lower.includes("work")) {
+    return "If you're considering part-time work, aim for max 10-15 hours per week during the school year to avoid impacting your studies. Weekend or evening work often pays better. Make sure to check how it affects your KELA benefits - you can earn up to ~970€/month without losing your study grant.";
+  }
+
+  // Investment-related advice
+  if (lower.includes("invest") && lower.includes("start")) {
+    return "Before investing, make sure you have an emergency fund and no high-interest debt. Start with low-cost index funds which spread risk across many companies. Consider investing through your bank or platforms like Nordnet. Start small and learn as you go - even 50€/month can grow significantly over time.";
+  }
+
+  if (lower.includes("risk") && lower.includes("understand")) {
+    return "Make sure you understand your risk tolerance before investing. Stocks can go up and down in the short term, so only invest money you won't need for at least 5 years. Diversify your investments across different sectors and countries to reduce risk. Never invest in something you don't understand.";
+  }
+
+  // Emergency/crisis advice
+  if (lower.includes("payment plan") || lower.includes("creditor")) {
+    return "Contact your creditors as soon as possible if you're having trouble making payments. Most are willing to work out a payment plan rather than having you default. Be honest about your situation and propose a realistic payment amount you can actually afford. Getting this in writing is important.";
+  }
+
+  if (lower.includes("financial counsel")) {
+    return "Consider reaching out to a free financial counseling service. Many municipalities offer free debt counseling, and organizations like Takuu-Säätiö provide advice on managing financial difficulties. They can help negotiate with creditors and create a realistic repayment plan.";
+  }
+
+  // Scam awareness
+  if (lower.includes("scam") || lower.includes("red flag")) {
+    return "Watch out for red flags: Pressure to act immediately, promises of 'guaranteed' high returns, requests for upfront payments, or offers that seem too good to be true. Legitimate investments have risks, and legitimate companies don't pressure you or ask for payment in gift cards or cryptocurrency.";
+  }
+
+  if (lower.includes("research") && (lower.includes("investment") || lower.includes("opportunity"))) {
+    return "Always research thoroughly before investing money anywhere. Check if the company is registered with Finnish Financial Supervisory Authority (FIN-FSA), read independent reviews, and ask yourself: 'How do they make money?' Legitimate businesses have clear, transparent business models.";
+  }
+
+  // Loan-related advice
+  if (lower.includes("compare") && lower.includes("loan")) {
+    return "Always compare loan offers from multiple banks before deciding. Look at the total cost of the loan (APRC/todellinen vuosikorko), not just the monthly payment. Use comparison websites like Vertaa.fi or check offers from at least 3 different banks. Sometimes you can negotiate better rates.";
+  }
+
+  if (lower.includes("terms") || lower.includes("contract")) {
+    return "Read the loan contract carefully before signing anything. Pay special attention to: Total cost of credit, what happens if you miss a payment, any fees for early repayment, and whether the interest rate is fixed or variable. Don't hesitate to ask questions if something is unclear.";
+  }
+
+  // Insurance advice
+  if (lower.includes("insurance") && lower.includes("need")) {
+    return "Review what insurance you actually need vs. what's optional. As a student/young adult, essential ones are: home insurance (especially if you rent), and personal liability insurance. Life insurance and income protection become more important when you have dependents or a mortgage.";
+  }
+
+  // Generic/fallback - still make it more actionable
+  if (lower.includes("plan") || lower.includes("create")) {
+    return advicePoint + " Write down the specific steps you need to take, set deadlines for each step, and identify any resources or help you might need. Breaking it down into smaller actions makes it much more manageable.";
+  }
+
+  if (lower.includes("talk") || lower.includes("discuss") || lower.includes("contact")) {
+    return advicePoint + " Prepare what you want to say beforehand, write down any questions you have, and don't be afraid to ask for clarification if you don't understand something. It's their job to help you, so take advantage of their expertise.";
+  }
+
+  if (lower.includes("calculate") || lower.includes("work out")) {
+    return advicePoint + " Use a calculator or spreadsheet to work through the numbers. Write down all the relevant figures so you can see the math clearly and verify that it makes sense for your situation.";
+  }
+
+  // Default: Add more context to make it actionable
+  if (advicePoint.length < 100) {
+    return advicePoint + " Take this step by step, and don't worry if it feels overwhelming at first - everyone starts somewhere. The important thing is to start taking action now rather than waiting for the perfect moment.";
+  }
+
   return advicePoint;
 }
 
