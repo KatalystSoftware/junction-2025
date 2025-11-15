@@ -421,6 +421,12 @@ Respond ONLY with a JSON object in this exact format:
 ✅ Your main question was answered
 ✅ You have no genuine new questions
 
+CRITICAL: When setting conversationEnding=true, you MUST include a final message:
+- Thank them (if advice was good)
+- Acknowledge you'll try their suggestion
+- Or express you'll think about it (if advice was unclear)
+- Example: {"messages": ["Thanks! I'll give that a try."], "conversationEnding": true}
+
 Default to TRUE unless you genuinely need ONE more clarification.
 When in doubt, END THE CONVERSATION.
 

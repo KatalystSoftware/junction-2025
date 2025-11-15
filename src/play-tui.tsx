@@ -35,6 +35,7 @@ interface ThreadData {
   characterName: string;
   messages: Message[];
   unreadCount: number;
+  status: "active" | "completed";
 }
 
 // ============================================================================
@@ -49,6 +50,7 @@ function App() {
   const [inputValue, setInputValue] = useState("");
   const [statusMessage, setStatusMessage] = useState("Initializing...");
   const [showStats, setShowStats] = useState(false);
+  const [showAllThreads, setShowAllThreads] = useState(false); // Toggle active/all threads
   const [isLoading, setIsLoading] = useState(false);
   const [bossReview, setBossReview] = useState<any>(null);
   const [quiz, setQuiz] = useState<any>(null);
@@ -82,6 +84,17 @@ function App() {
       return;
     }
 
+    // Toggle history/all threads
+    if (input === "h" && !inputValue) {
+      setShowAllThreads(!showAllThreads);
+      setStatusMessage(
+        showAllThreads
+          ? "Showing active threads only"
+          : "Showing all threads (history)",
+      );
+      return;
+    }
+
     // New consultation
     if (input === "n" && !inputValue) {
       handleNewConsultation();
@@ -91,7 +104,10 @@ function App() {
     // Switch threads (1-9)
     if (/^[1-9]$/.test(input) && !inputValue) {
       const threadIndex = parseInt(input) - 1;
-      const threadList = Array.from(threads.values());
+      // Filter based on current view (active only or all)
+      const threadList = Array.from(threads.values()).filter((t) =>
+        showAllThreads ? true : t.status === "active",
+      );
       if (threadIndex < threadList.length) {
         const targetThread = threadList[threadIndex];
         setCurrentThreadId(targetThread.threadId);
@@ -103,7 +119,11 @@ function App() {
           updated.set(targetThread.threadId, thread);
           setThreads(updated);
         }
-        setStatusMessage(`Switched to ${targetThread.characterName}`);
+        setStatusMessage(
+          `Switched to ${targetThread.characterName}${targetThread.status === "completed" ? " (completed)" : ""}`,
+        );
+      } else {
+        setStatusMessage(`Invalid thread number. Use 1-${threadList.length}`);
       }
       return;
     }
@@ -264,6 +284,7 @@ function App() {
             },
           ],
           unreadCount: 0,
+          status: "active",
         };
 
         const updated = new Map(threads);
@@ -344,17 +365,25 @@ function App() {
           `${thread.characterName} left. Reputation: ${response.stateUpdate.reputation}`,
         );
 
-        // Remove thread
-        updated.delete(currentThreadId);
-        setThreads(updated);
+        // Mark thread as completed instead of deleting
+        const completedThread = updated.get(currentThreadId);
+        if (completedThread) {
+          completedThread.status = "completed";
+          updated.set(currentThreadId, completedThread);
+          setThreads(updated);
+        }
 
-        // Switch to another thread if available
-        const remaining = Array.from(updated.values());
-        if (remaining.length > 0) {
-          setCurrentThreadId(remaining[0].threadId);
+        // Switch to another active thread if available
+        const activeThreads = Array.from(updated.values()).filter(
+          (t) => t.status === "active",
+        );
+        if (activeThreads.length > 0) {
+          setCurrentThreadId(activeThreads[0].threadId);
         } else {
           setCurrentThreadId(null);
-          setStatusMessage("No active threads. Press 'n' for new client");
+          setStatusMessage(
+            "No active threads. Press 'n' for new client (or 'h' to view history)",
+          );
         }
       } else {
         setStatusMessage("Type your response");
@@ -420,26 +449,44 @@ function App() {
           paddingX={1}
         >
           <Text bold color="yellow">
-            Active Threads ({threads.size})
+            {showAllThreads ? "All Threads" : "Active Threads"} (
+            {
+              Array.from(threads.values()).filter((t) =>
+                showAllThreads ? true : t.status === "active",
+              ).length
+            }
+            )
           </Text>
           <Text dimColor> </Text>
-          {Array.from(threads.values()).map((thread, index) => {
-            const isCurrent = thread.threadId === currentThreadId;
-            const indicator = isCurrent ? "►" : " ";
-            const unreadBadge =
-              thread.unreadCount > 0 ? ` (${thread.unreadCount})` : "";
-            return (
-              <Text
-                key={thread.threadId}
-                color={isCurrent ? "green" : "white"}
-                bold={isCurrent}
-              >
-                {indicator}[{index + 1}] {thread.characterName}
-                {unreadBadge}
-              </Text>
-            );
-          })}
-          {threads.size === 0 && <Text dimColor>No active threads</Text>}
+          {Array.from(threads.values())
+            .filter((t) => (showAllThreads ? true : t.status === "active"))
+            .map((thread, index) => {
+              const isCurrent = thread.threadId === currentThreadId;
+              const isCompleted = thread.status === "completed";
+              const indicator = isCurrent ? "►" : " ";
+              const statusIcon = isCompleted ? "✓ " : "";
+              const unreadBadge =
+                thread.unreadCount > 0 ? ` (${thread.unreadCount})` : "";
+              return (
+                <Text
+                  key={thread.threadId}
+                  color={isCompleted ? "gray" : isCurrent ? "green" : "white"}
+                  bold={isCurrent}
+                  dimColor={isCompleted}
+                >
+                  {indicator}[{index + 1}] {statusIcon}
+                  {thread.characterName}
+                  {unreadBadge}
+                </Text>
+              );
+            })}
+          {threads.size === 0 && <Text dimColor>No threads</Text>}
+          {!showAllThreads &&
+            Array.from(threads.values()).filter((t) => t.status === "active")
+              .length === 0 &&
+            threads.size > 0 && (
+              <Text dimColor>No active threads (press 'h' for history)</Text>
+            )}
           <Text dimColor> </Text>
           <Text dimColor>───────────────</Text>
           {showStats ? (
@@ -449,6 +496,7 @@ function App() {
               <Text dimColor>Commands:</Text>
               <Text dimColor>1-9 Switch</Text>
               <Text dimColor>n New</Text>
+              <Text dimColor>h History</Text>
               <Text dimColor>s Stats</Text>
               <Text dimColor>q Quit</Text>
             </>
