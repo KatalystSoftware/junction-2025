@@ -5,7 +5,7 @@
  * No local state, no localStorage, no client-side duplication
  */
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { ChatSidebar } from "./ChatSidebar";
 import { ChatWindow } from "./ChatWindow";
 import type { Contact, Message } from "../types/ui";
@@ -86,11 +86,38 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
 
   // Handle responses from mutations
   useEffect(() => {
-    const response = game.lastStartResponse || game.lastMessageResponse;
+    // Determine which response to process - prefer the one we haven't processed yet
+    let response = null;
+    let isFromMessage = false;
+
+    // Check if we have a new message response to process
+    if (
+      game.lastMessageResponse &&
+      game.lastMessageResponse !== processedMessageResponse.current
+    ) {
+      response = game.lastMessageResponse;
+      isFromMessage = true;
+    }
+    // Otherwise check if we have a new start response to process
+    else if (
+      game.lastStartResponse &&
+      game.lastStartResponse !== processedStartResponse.current
+    ) {
+      response = game.lastStartResponse;
+      isFromMessage = false;
+    }
+
     if (!response) return;
 
     console.log("📥 Got response:", response.type);
     console.log("📥 Full response:", response);
+
+    // Mark this response as processed
+    if (isFromMessage) {
+      processedMessageResponse.current = game.lastMessageResponse;
+    } else {
+      processedStartResponse.current = game.lastStartResponse;
+    }
 
     // Handle character info from response
     if (response.threadMetadata && response.threadId) {
@@ -103,8 +130,12 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       );
     }
 
-    // Handle advice choices
-    if (response.adviceChoices && response.threadId) {
+    // Handle advice choices (only set if present and non-empty)
+    if (
+      response.adviceChoices &&
+      response.adviceChoices.length > 0 &&
+      response.threadId
+    ) {
       console.log("🎯 Got advice choices for thread", response.threadId);
       // Store in component state for display
       setAdviceChoicesByThread((prev) => ({
@@ -183,6 +214,10 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
   }>({});
   const [conversationEndDataByThread, setConversationEndDataByThread] =
     useState<{ [threadId: string]: any }>({});
+
+  // Track which responses we've already processed to avoid duplicate processing
+  const processedStartResponse = useRef<any>(null);
+  const processedMessageResponse = useRef<any>(null);
 
   // Derive boss acknowledgment choices from conversation state
   useEffect(() => {
