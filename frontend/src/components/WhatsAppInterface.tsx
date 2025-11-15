@@ -106,6 +106,14 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       response = game.lastStartResponse;
       isFromMessage = false;
     }
+    // Otherwise check if we have an auto-started consultation from init
+    else if (
+      game.autoStartedConsultation &&
+      game.autoStartedConsultation !== processedAutoStartResponse.current
+    ) {
+      response = game.autoStartedConsultation;
+      isFromMessage = false;
+    }
 
     if (!response) return;
 
@@ -115,8 +123,10 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
     // Mark this response as processed
     if (isFromMessage) {
       processedMessageResponse.current = game.lastMessageResponse;
-    } else {
+    } else if (game.lastStartResponse && response === game.lastStartResponse) {
       processedStartResponse.current = game.lastStartResponse;
+    } else if (game.autoStartedConsultation && response === game.autoStartedConsultation) {
+      processedAutoStartResponse.current = game.autoStartedConsultation;
     }
 
     // Handle character info from response
@@ -235,7 +245,7 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       setSelectedContactId("boss-pinned");
       setShowChat(true); // Show the chat window
     }
-  }, [game.lastStartResponse, game.lastMessageResponse]);
+  }, [game.lastStartResponse, game.lastMessageResponse, game.autoStartedConsultation]);
 
   // Auto-select first contact if none selected
   useEffect(() => {
@@ -258,6 +268,7 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
   // Track which responses we've already processed to avoid duplicate processing
   const processedStartResponse = useRef<any>(null);
   const processedMessageResponse = useRef<any>(null);
+  const processedAutoStartResponse = useRef<any>(null);
 
   // Derive boss acknowledgment choices from conversation state
   useEffect(() => {

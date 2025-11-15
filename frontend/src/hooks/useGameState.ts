@@ -148,6 +148,7 @@ export function useGameState() {
     // Latest response data
     lastStartResponse: startConsultationMutation.data,
     lastMessageResponse: sendMessageMutation.data,
+    autoStartedConsultation: gameState?.autoStartedConsultation, // Auto-started from init sanity check
 
     // Actions
     startConsultation: () => startConsultationMutation.mutate(),

@@ -162,6 +162,7 @@ interface InitResponse {
     string,
     { name: string; age: number; occupation: string }
   >;
+  autoStartedConsultation?: GameResponse; // Auto-started if no active threads
 }
 
 interface StartConsultationRequest {

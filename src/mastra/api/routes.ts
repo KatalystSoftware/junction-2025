@@ -138,6 +138,7 @@ interface InitResponse {
     Array<{ role: "user" | "assistant"; content: string; isVoice?: boolean; audioUrl?: string; voiceUrgency?: string }>
   >;
   threadMetadata?: Record<string, ThreadMetadata>;
+  autoStartedConsultation?: ClientSafeGameResponse; // Auto-started if no active threads
 }
 
 app.post("/init", async (c) => {
@@ -195,12 +196,94 @@ app.post("/init", async (c) => {
       await saveSession(sessionId, advisorState);
     }
 
+    // SANITY CHECK: Auto-start consultation if onboarding is done and no active threads
+    let autoStartedConsultation: ClientSafeGameResponse | undefined;
+
+    if (advisorState.hasCompletedOnboarding) {
+      // Count active (non-resolved) threads
+      const activeThreadCount = Object.values(advisorState.activeThreads).filter(
+        (thread) => thread.status !== "resolved"
+      ).length;
+
+      if (activeThreadCount === 0) {
+        console.log("🚨 SANITY CHECK: No active threads detected, auto-starting consultation...");
+
+        try {
+          // Auto-start a new consultation
+          const gameResponse = await startNewConsultation(
+            advisorState.advisorId,
+            advisorState
+          );
+
+          // Convert to Maps for processing
+          const historiesMap = threadHistories
+            ? new Map(Object.entries(threadHistories))
+            : new Map();
+          const metadataMap = threadMetadata
+            ? new Map(Object.entries(threadMetadata))
+            : new Map();
+
+          // Process the consultation response (same logic as /start-consultation)
+          if (gameResponse.type === "character_message" && gameResponse.threadId && gameResponse.messages) {
+            const threadId = gameResponse.threadId;
+            const existingHistory = historiesMap.get(threadId) || [];
+
+            // Add character's initial messages
+            for (const msg of gameResponse.messages) {
+              const messageEntry: { role: "assistant"; content: string; isVoice?: boolean; audioUrl?: string; voiceUrgency?: string } = {
+                role: "assistant" as const,
+                content: msg,
+              };
+
+              // Include voice data if present
+              if (gameResponse.voiceNeeded && gameResponse.voiceConfig) {
+                messageEntry.isVoice = true;
+                messageEntry.audioUrl = gameResponse.voiceConfig.audioUrl;
+                messageEntry.voiceUrgency = gameResponse.voiceConfig.urgency;
+              }
+
+              existingHistory.push(messageEntry);
+            }
+
+            historiesMap.set(threadId, existingHistory);
+            console.log(`💬 Auto-started: Saved initial message(s) to thread ${threadId.substring(0, 8)}...`);
+
+            // Save character metadata if provided
+            if (gameResponse.characterInfo) {
+              metadataMap.set(threadId, gameResponse.characterInfo);
+              console.log(`👤 Auto-started: Saved character metadata for thread ${threadId.substring(0, 8)}...`);
+            }
+          }
+
+          // Save updated state with the new consultation
+          await saveSession(
+            sessionId,
+            gameResponse.stateUpdate,
+            historiesMap,
+            metadataMap
+          );
+
+          // Update our response data
+          advisorState = gameResponse.stateUpdate;
+          threadHistories = Object.fromEntries(historiesMap);
+          threadMetadata = Object.fromEntries(metadataMap);
+          autoStartedConsultation = toClientSafeGameResponse(gameResponse);
+
+          console.log("✅ Auto-started consultation successfully");
+        } catch (error) {
+          console.error("❌ Failed to auto-start consultation:", error);
+          // Don't fail the whole request, just log and continue
+        }
+      }
+    }
+
     return c.json<InitResponse>({
       sessionId,
       advisorState: toClientSafeAdvisorState(advisorState),
       isNewSession,
       threadHistories,
       threadMetadata,
+      autoStartedConsultation,
     });
   } catch (error) {
     console.error("❌ Error in /init:", error);

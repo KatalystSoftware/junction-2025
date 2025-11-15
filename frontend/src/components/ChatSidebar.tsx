@@ -222,6 +222,7 @@ export function ChatSidebar({
                 selectedContactId === bossContact.id
                   ? "var(--muted)"
                   : "transparent",
+              minWidth: 0,
             }}
             onMouseEnter={(e) => {
               if (selectedContactId !== bossContact.id) {
@@ -234,7 +235,7 @@ export function ChatSidebar({
               }
             }}
           >
-            <div className="relative">
+            <div className="relative" style={{ flexShrink: 0 }}>
               <Avatar className="w-12 h-12">
                 <AvatarImage
                   src={bossContact.avatarImage}
@@ -262,9 +263,25 @@ export function ChatSidebar({
               )}
             </div>
 
-            <div className="flex-1 min-w-0 text-left">
+            <div
+              style={{
+                flex: "1 1 0",
+                minWidth: 0,
+                width: 0,
+                textAlign: "left",
+                overflow: "hidden",
+              }}
+            >
               <div className="flex items-center justify-between gap-2 mb-0.5">
-                <div className="flex items-center gap-1.5 min-w-0">
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.375rem",
+                    minWidth: 0,
+                    flex: 1,
+                  }}
+                >
                   <Pin
                     className="w-3.5 h-3.5 rotate-45"
                     style={{
@@ -274,12 +291,14 @@ export function ChatSidebar({
                     }}
                   />
                   <span
-                    className="truncate"
                     style={{
                       fontFamily: "Inter, sans-serif",
                       fontSize: "var(--text-base)",
                       fontWeight: "var(--font-weight-medium)",
                       color: "var(--card-foreground)",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
                     }}
                   >
                     {bossContact.name}
@@ -313,9 +332,16 @@ export function ChatSidebar({
                 </span>
               </div>
 
-              <div className="flex items-center justify-between gap-2">
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: "0.5rem",
+                  minWidth: 0,
+                }}
+              >
                 <p
-                  className="flex-1 min-w-0 truncate"
                   style={{
                     fontFamily: "Inter, sans-serif",
                     fontSize: "var(--text-sm)",
@@ -327,6 +353,11 @@ export function ChatSidebar({
                       bossContact.unreadCount > 0
                         ? "var(--font-weight-medium)"
                         : "var(--font-weight-normal)",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    flex: 1,
+                    minWidth: 0,
                   }}
                 >
                   {bossContact.lastMessage}
@@ -336,6 +367,7 @@ export function ChatSidebar({
                     className="flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full"
                     style={{
                       backgroundColor: "var(--primary)",
+                      flexShrink: 0,
                     }}
                   >
                     <span
@@ -364,6 +396,7 @@ export function ChatSidebar({
                   selectedContactId === contact.id
                     ? "var(--muted)"
                     : "transparent",
+                minWidth: 0,
               }}
               onMouseEnter={(e) => {
                 if (selectedContactId !== contact.id) {
@@ -376,7 +409,7 @@ export function ChatSidebar({
                 }
               }}
             >
-              <div className="relative">
+              <div className="relative" style={{ flexShrink: 0 }}>
                 <Avatar className="w-12 h-12">
                   <AvatarImage src={contact.avatarImage} alt={contact.name} />
                   <AvatarFallback
@@ -401,15 +434,27 @@ export function ChatSidebar({
                 )}
               </div>
 
-              <div className="flex-1 min-w-0 text-left">
+              <div
+                style={{
+                  flex: "1 1 0",
+                  minWidth: 0,
+                  width: 0,
+                  textAlign: "left",
+                  overflow: "hidden",
+                }}
+              >
                 <div className="flex items-center justify-between gap-2 mb-1">
                   <span
-                    className="truncate"
                     style={{
                       fontFamily: "Inter, sans-serif",
                       fontSize: "var(--text-base)",
                       fontWeight: "var(--font-weight-medium)",
                       color: "var(--card-foreground)",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      flex: 1,
+                      minWidth: 0,
                     }}
                   >
                     {contact.name}
@@ -425,9 +470,16 @@ export function ChatSidebar({
                     {contact.timestamp}
                   </span>
                 </div>
-                <div className="flex items-center justify-between gap-2">
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: "0.5rem",
+                    minWidth: 0,
+                  }}
+                >
                   <p
-                    className="flex-1 min-w-0 truncate"
                     style={{
                       fontFamily: "Inter, sans-serif",
                       fontSize: "var(--text-sm)",
@@ -439,6 +491,11 @@ export function ChatSidebar({
                         contact.unreadCount > 0
                           ? "var(--font-weight-medium)"
                           : "var(--font-weight-normal)",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      flex: 1,
+                      minWidth: 0,
                     }}
                   >
                     {contact.lastMessage}
@@ -448,6 +505,7 @@ export function ChatSidebar({
                       className="flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full"
                       style={{
                         backgroundColor: "var(--primary)",
+                        flexShrink: 0,
                       }}
                     >
                       <span
