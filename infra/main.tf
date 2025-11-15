@@ -63,6 +63,11 @@ resource "google_cloud_run_v2_service" "app" {
       }
 
       env {
+        name  = "ELEVENLABS_API_KEY"
+        value = var.elevenlabs_api_key
+      }
+
+      env {
         name  = "DATABASE_URL"
         value = format(
           "postgresql://%s:%s@%s:5432/%s",

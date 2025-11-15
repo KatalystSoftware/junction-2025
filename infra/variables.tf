@@ -27,6 +27,12 @@ variable "google_generative_ai_api_key" {
   sensitive   = true
 }
 
+variable "elevenlabs_api_key" {
+  description = "API key for ElevenLabs voice synthesis"
+  type        = string
+  sensitive   = true
+}
+
 variable "bastion_zone" {
   description = "GCE zone for bastion host"
   type        = string
