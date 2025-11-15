@@ -26,26 +26,47 @@ function createMockAdvisorState(): AdvisorState {
     sessions.push({
       sessionId: `session-${i}`,
       characterId: `character-${i % 5}`, // 5 different characters
+      characterName: `Character ${i % 5}`,
       scenarioId: `scenario-${i}`,
       timestamp,
+      playerAdvice: ["Good advice"],
+      characterReactions: ["Thanks!"],
       adviceQualityScore: quality,
       topicsCovered: [
         ["budgeting", "saving", "debt_management"][i % 3] as any,
       ],
+      followUpScheduled: false,
+      outcomeRevealed: false,
       evaluation: {
-        adviceQuality: quality,
-        communicationEffectiveness: quality + Math.random() - 0.5,
-        learningObjectives: quality + Math.random() - 0.5,
-        characterProgression: quality + Math.random() - 0.5,
+        strengths: ["Good advice"],
+        weaknesses: [],
+        missedOpportunities: [],
         wasEmpathetic: quality >= 7,
         wasActionable: quality >= 6,
         wasAccurate: quality >= 7,
+        dimensions: {
+          adviceQuality: quality,
+          communicationEffectiveness: quality + Math.random() - 0.5,
+          learningObjectives: quality + Math.random() - 0.5,
+          characterProgression: quality + Math.random() - 0.5,
+        },
+        characterProgression: {
+          willFollowAdvice: quality >= 7,
+          confidence: quality / 10,
+          emotionalChange: "positive",
+          problemMovement: "improving",
+          expectedOutcome: "good",
+        },
       },
       financialProjection: {
         monthlySavings: 100 + Math.random() * 200,
+        monthlyExpenseReduction: 50 + Math.random() * 100,
+        monthlyDebtPayment: 100 + Math.random() * 200,
         totalSaved: 1000 + Math.random() * 5000,
-        savingsRate: 0.1 + Math.random() * 0.2,
         totalDebtReduced: 500 + Math.random() * 2000,
+        totalInterestSaved: 50 + Math.random() * 150,
+        savingsRate: 0.1 + Math.random() * 0.2,
+        debtReductionRate: 0.05 + Math.random() * 0.1,
         monthsToGoal: 12,
         emergencyFundProgress: Math.random(),
         debtFreeProgress: Math.random(),
@@ -57,11 +78,13 @@ function createMockAdvisorState(): AdvisorState {
   }
 
   const advisorState: AdvisorState = {
-    sessionId: "test-session",
+    advisorId: "test-advisor",
     sessionHistory: sessions,
     totalSessions: sessions.length,
+    totalClientsHelped: 5,
     reputation: 75,
     skillLevel: 6,
+    specializations: ["budgeting", "saving"],
     topicsExpertise: {
       budgeting: 7,
       saving: 6,
@@ -78,13 +101,16 @@ function createMockAdvisorState(): AdvisorState {
     lifetimeDebtCleared: 28000,
     advisorCoins: 1500,
     activeClients: [],
-    activeThreads: [],
-    conversationHistory: [],
+    activeThreads: {},
+    godBossRelationship: 7,
+    learningMaterials: [],
     currentStreak: 3,
+    lastStreakCheckSession: sessions.length - 3,
     currentGoal: null,
     achievementsUnlocked: ["first_client", "ten_clients", "skill_level_3"],
     careerTier: 2,
     lastReviewSession: 10,
+    hasCompletedOnboarding: true,
   };
 
   return advisorState;

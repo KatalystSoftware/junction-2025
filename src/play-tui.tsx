@@ -40,6 +40,13 @@ import type {
   TrustTier,
 } from "./mastra/types/game-types.ts";
 import { Modal } from "./components/Modal.tsx";
+import {
+  calculateAnalyticsDashboard,
+  renderPerformancePanel,
+  renderTopicExpertisePanel,
+  renderCharacterStatsPanel,
+  renderFinancialImpactPanel,
+} from "./mastra/analytics/index.ts";
 
 // ============================================================================
 // Helper Functions
@@ -142,7 +149,13 @@ function App() {
   const [inputValue, setInputValue] = useState("");
   const [statusMessage, setStatusMessage] = useState("Initializing...");
   const [activePanel, setActivePanel] = useState<
-    "stats" | "relationships" | "progress" | "achievements" | "help" | null
+    | "stats"
+    | "relationships"
+    | "progress"
+    | "achievements"
+    | "analytics"
+    | "help"
+    | null
   >(null);
   const [showAllThreads, setShowAllThreads] = useState(false); // Toggle active/all threads
   const [isLoading, setIsLoading] = useState(false);
@@ -272,15 +285,16 @@ function App() {
       return;
     }
 
-    // Toggle panels (s=stats, r=relationships, p=progress, a=achievements, ?=help)
+    // Toggle panels (s=stats, r=relationships, p=progress, a=achievements, d=analytics/dashboard, ?=help)
     const panelKeys: Record<
       string,
-      "stats" | "relationships" | "progress" | "achievements" | "help"
+      "stats" | "relationships" | "progress" | "achievements" | "analytics" | "help"
     > = {
       s: "stats",
       r: "relationships",
       p: "progress",
       a: "achievements",
+      d: "analytics",
       "?": "help",
     };
 
@@ -1083,6 +1097,8 @@ function App() {
             <ProgressPanel advisorState={advisorState} />
           ) : activePanel === "achievements" ? (
             <AchievementsPanel advisorState={advisorState} />
+          ) : activePanel === "analytics" ? (
+            <AnalyticsPanel advisorState={advisorState} />
           ) : activePanel === "help" ? (
             <HelpPanel />
           ) : (
@@ -1516,6 +1532,50 @@ function AchievementsPanel({ advisorState }: { advisorState: AdvisorState }) {
 }
 
 // ============================================================================
+// Analytics Panel Component
+// ============================================================================
+
+function AnalyticsPanel({ advisorState }: { advisorState: AdvisorState }) {
+  const dashboard = calculateAnalyticsDashboard(advisorState);
+
+  return (
+    <Box flexDirection="column">
+      <Text bold color="cyan">
+        📊 Analytics Dashboard [Press d to close]
+      </Text>
+      <Text dimColor>
+        Comprehensive performance analysis across all metrics
+      </Text>
+      <Text dimColor> </Text>
+
+      {/* Performance Stats */}
+      {renderPerformancePanel(dashboard.performance)}
+
+      <Text dimColor> </Text>
+
+      {/* Topic Expertise */}
+      {renderTopicExpertisePanel(dashboard.topicExpertise)}
+
+      <Text dimColor> </Text>
+
+      {/* Character Success Rates */}
+      {renderCharacterStatsPanel(dashboard.characterSuccess)}
+
+      <Text dimColor> </Text>
+
+      {/* Financial Impact */}
+      {renderFinancialImpactPanel(dashboard.financialImpact)}
+
+      <Text dimColor> </Text>
+      <Text dimColor>
+        💡 Tip: Use this dashboard to identify strengths and areas for
+        improvement
+      </Text>
+    </Box>
+  );
+}
+
+// ============================================================================
 // Help Panel Component
 // ============================================================================
 
@@ -1540,6 +1600,7 @@ function HelpPanel() {
       <Text dimColor>r Relationships</Text>
       <Text dimColor>p Progress</Text>
       <Text dimColor>a Achievements</Text>
+      <Text dimColor>d Analytics dashboard</Text>
       <Text dimColor>? Help (this panel)</Text>
       <Text dimColor> </Text>
       <Text bold color="cyan">

@@ -183,9 +183,9 @@ export function renderTopicExpertisePanel(expertise: TopicRadarChartData) {
         </Text>
       </Box>
 
-      <Text dimColor marginTop={1}>
-        Top 5 Topics:
-      </Text>
+      <Box marginTop={1}>
+        <Text dimColor>Top 5 Topics:</Text>
+      </Box>
       {topTopics.map((topic) => (
         <Box key={topic.topic} flexDirection="column" marginTop={1}>
           <Box flexDirection="row" justifyContent="space-between">
@@ -198,9 +198,11 @@ export function renderTopicExpertisePanel(expertise: TopicRadarChartData) {
             <Text color={getExpertiseColor(topic.expertiseLevel)}>
               {getExpertiseBar(topic.expertiseLevel)}
             </Text>
-            <Text color="gray" marginLeft={1}>
-              ({topic.sessionCount} sessions, {topic.successRate.toFixed(0)}% success)
-            </Text>
+            <Box marginLeft={1}>
+              <Text color="gray">
+                ({topic.sessionCount} sessions, {topic.successRate.toFixed(0)}% success)
+              </Text>
+            </Box>
           </Box>
         </Box>
       ))}
@@ -294,9 +296,9 @@ export function renderCharacterStatsPanel(analytics: CharacterAnalytics) {
         </Text>
       </Box>
 
-      <Text dimColor marginTop={1}>
-        Top Clients:
-      </Text>
+      <Box marginTop={1}>
+        <Text dimColor>Top Clients:</Text>
+      </Box>
       {topCharacters.map((char) => (
         <Box key={char.characterId} flexDirection="column" marginTop={1}>
           <Box flexDirection="row" justifyContent="space-between">
@@ -409,9 +411,9 @@ export function renderFinancialImpactPanel(impact: FinancialImpactStats) {
         </Box>
       )}
 
-      <Text dimColor marginTop={1}>
-        Top Impact by Topic:
-      </Text>
+      <Box marginTop={1}>
+        <Text dimColor>Top Impact by Topic:</Text>
+      </Box>
       {topTopics.map((topic) => {
         const totalImpact = topic.totalSavings + topic.totalDebtCleared;
         return (

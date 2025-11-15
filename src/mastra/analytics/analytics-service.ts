@@ -37,7 +37,8 @@ export class AnalyticsService {
    * Load advisor state from session store
    */
   async loadAdvisorState(sessionId: string): Promise<void> {
-    this.advisorState = await loadSession(sessionId);
+    const session = await loadSession(sessionId);
+    this.advisorState = session?.advisorState || null;
   }
 
   /**
@@ -169,18 +170,19 @@ export function getAnalyticsService(): AnalyticsService {
 export async function getAnalyticsForSession(
   sessionId: string
 ): Promise<AnalyticsDashboard | null> {
-  const advisorState = await loadSession(sessionId);
-  if (!advisorState) return null;
-  return calculateAnalyticsDashboard(advisorState);
+  const session = await loadSession(sessionId);
+  if (!session?.advisorState) return null;
+  return calculateAnalyticsDashboard(session.advisorState);
 }
 
 /**
  * Get analytics summary for a specific session
  */
 export async function getAnalyticsSummaryForSession(sessionId: string) {
-  const advisorState = await loadSession(sessionId);
-  if (!advisorState) return null;
+  const session = await loadSession(sessionId);
+  if (!session?.advisorState) return null;
 
+  const advisorState = session.advisorState;
   const performance = calculatePerformanceStats(advisorState);
   const financial = calculateFinancialImpact(advisorState);
   const expertise = calculateTopicExpertise(advisorState);
