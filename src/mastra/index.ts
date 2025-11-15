@@ -1,29 +1,37 @@
 import { Mastra } from "@mastra/core/mastra";
 import { PinoLogger } from "@mastra/loggers";
 import { LibSQLStore } from "@mastra/libsql";
-import { weatherWorkflow } from "./workflows/weather-workflow";
-import { weatherAgent } from "./agents/weather-agent";
-import {
-  toolCallAppropriatenessScorer,
-  completenessScorer,
-  translationScorer,
-} from "./scorers/weather-scorer";
+
+// Elämäpeli 2025 Game Agents
+import { gameMasterAgent } from "./agents/game-master.ts";
+import { scammerAgent } from "./agents/scammer-agent.ts";
+import { friendAgent } from "./agents/friend-agent.ts";
+import { parentAgent } from "./agents/parent-agent.ts";
+
+// Game Tools
+import { invokeScammerTool } from "./tools/invoke-scammer.ts";
+import { invokeFriendTool } from "./tools/invoke-friend.ts";
+import { invokeParentTool } from "./tools/invoke-parent.ts";
 
 export const mastra = new Mastra({
-  workflows: { weatherWorkflow },
-  agents: { weatherAgent },
-  scorers: {
-    toolCallAppropriatenessScorer,
-    completenessScorer,
-    translationScorer,
+  agents: {
+    gameMasterAgent,
+    scammerAgent,
+    friendAgent,
+    parentAgent,
+  },
+  tools: {
+    invokeScammerTool,
+    invokeFriendTool,
+    invokeParentTool,
   },
   storage: new LibSQLStore({
     id: "mastra-agent-store",
-    // stores observability, scores, ... into memory storage, if it needs to persist, change to file:../mastra.db
-    url: ":memory:",
+    // Use file storage for persistence
+    url: "file:../elamapeli.db",
   }),
   logger: new PinoLogger({
-    name: "Mastra",
+    name: "Elämäpeli-2025",
     level: "info",
   }),
 });

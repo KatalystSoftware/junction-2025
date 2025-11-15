@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --env-file=.env src/test-game.ts",
+    "test:game": "node --env-file=.env src/test-game.ts",
     "dev": "mastra dev",
     "build": "mastra build",
     "start": "mastra start",
