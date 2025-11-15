@@ -264,6 +264,9 @@ export async function handleAdvisorResponse(
     throw new Error("Character or scenario not found");
   }
 
+  // Get character memory (conversation history from previous sessions)
+  const characterMemory = character.conversationHistory || [];
+
   // Invoke character agent
   const characterTool = mastra.getTool("invokeCharacterTool");
   if (!characterTool) {
@@ -275,6 +278,7 @@ export async function handleAdvisorResponse(
     scenario,
     advisorMessage,
     conversationHistory: conversationHistory || [],
+    characterMemory,
   });
 
   // Evaluate advice quality using AI-based evaluation
@@ -308,6 +312,22 @@ export async function handleAdvisorResponse(
 
   // If conversation is ending, save session
   if (characterResponse.conversationEnding) {
+    // Collect all advisor advice from the conversation
+    const allAdvisorAdvice = conversationHistory
+      ? conversationHistory
+          .filter((msg) => msg.role === "user")
+          .map((msg) => msg.content)
+      : [];
+    allAdvisorAdvice.push(advisorMessage);
+
+    // Collect all character responses
+    const allCharacterResponses = conversationHistory
+      ? conversationHistory
+          .filter((msg) => msg.role === "assistant")
+          .map((msg) => msg.content)
+      : [];
+    allCharacterResponses.push(...characterResponse.messages);
+
     // Create consultation session record with detailed evaluation
     const session: ConsultationSession = {
       sessionId: `session_${Date.now()}`,
@@ -315,8 +335,8 @@ export async function handleAdvisorResponse(
       characterName: character.name,
       scenarioId: scenario.scenarioId,
       timestamp: new Date().toISOString(),
-      playerAdvice: [advisorMessage], // Would accumulate all advice in full implementation
-      characterReactions: characterResponse.messages,
+      playerAdvice: allAdvisorAdvice,
+      characterReactions: allCharacterResponses,
       adviceQualityScore: adviceEvaluation.qualityScore,
       topicsCovered: adviceEvaluation.topicsCovered || [scenario.topic],
       followUpScheduled: false,
@@ -340,6 +360,15 @@ export async function handleAdvisorResponse(
     advisorState.totalSessions += 1;
     advisorState.totalClientsHelped += 1;
 
+    // Save character memory for future sessions
+    characterPool.saveCharacterMemory(character.characterId, {
+      sessionId: session.sessionId,
+      timestamp: session.timestamp,
+      advisorAdvice: allAdvisorAdvice,
+      characterResponses: allCharacterResponses,
+      outcome: adviceEvaluation.outcome,
+    });
+
     // Update character relationship
     characterPool.updateCharacterRelationship(character.characterId, {
       visitCount: character.relationshipState.visitCount + 1,
@@ -348,7 +377,7 @@ export async function handleAdvisorResponse(
         (adviceEvaluation.willFollowAdvice ? 0.1 : -0.05),
       adviceFollowed: {
         scenarioId: scenario.scenarioId,
-        adviceGiven: [advisorMessage],
+        adviceGiven: allAdvisorAdvice,
         followed: adviceEvaluation.willFollowAdvice,
         outcome: adviceEvaluation.outcome,
       },
