@@ -10,6 +10,7 @@ import type {
   Character,
   Scenario,
   CharacterResponse,
+  CharacterConversationMemory,
 } from "../types/game-types.ts";
 
 /**
@@ -102,6 +103,73 @@ function getPersonalityDescription(character: Character): string {
 }
 
 /**
+ * Build memory context for returning characters
+ */
+function buildMemoryContext(
+  character: Character,
+  conversationHistory: CharacterConversationMemory[],
+): string {
+  if (!conversationHistory || conversationHistory.length === 0) {
+    return "";
+  }
+
+  const trustLevel = character.relationshipState.trustLevel;
+  let relationshipFeeling = "";
+
+  if (trustLevel > 0.7) {
+    relationshipFeeling =
+      "You trust this advisor and feel comfortable being open with them.";
+  } else if (trustLevel > 0.5) {
+    relationshipFeeling =
+      "You're cautiously optimistic about this advisor but still evaluating them.";
+  } else if (trustLevel > 0.3) {
+    relationshipFeeling =
+      "You're somewhat skeptical about this advisor based on past experiences.";
+  } else {
+    relationshipFeeling =
+      "You don't really trust this advisor and may be frustrated with their previous advice.";
+  }
+
+  const memorySummaries = conversationHistory
+    .slice(-3)
+    .map((mem, idx) => {
+      const sessionNum = idx + 1;
+      const date = new Date(mem.timestamp).toLocaleDateString("fi-FI");
+      const adviceSummary = mem.advisorAdvice.join("; ");
+      const outcomeDescription =
+        mem.outcome === "positive"
+          ? "It helped! Things went well."
+          : mem.outcome === "negative"
+            ? "It didn't really help or made things worse."
+            : "Mixed results - some things helped, others didn't.";
+
+      return `Session ${sessionNum} (${date}):
+- Their advice: ${adviceSummary}
+- What happened: ${outcomeDescription}`;
+    })
+    .join("\n\n");
+
+  return `
+═══════════════════════════════════════════════════════════════════════
+PREVIOUS INTERACTIONS WITH THIS ADVISOR
+═══════════════════════════════════════════════════════════════════════
+
+You have visited this financial advisor before. Here's your history with them:
+
+${memorySummaries}
+
+YOUR CURRENT FEELINGS ABOUT THEM:
+${relationshipFeeling}
+
+IMPORTANT: You naturally remember these previous interactions and may reference them in conversation.
+- If they gave good advice before, you might say "Last time you suggested... and it really helped!"
+- If their advice didn't work, you might be more hesitant or frustrated: "I tried what you said last time, but..."
+- Your openness and honesty are affected by how much you trust them.
+
+`;
+}
+
+/**
  * Get response guidelines based on personality
  */
 function getResponseGuidelines(
@@ -145,6 +213,7 @@ IMPORTANT BEHAVIORAL RULES:
 export function createCharacterAgent(
   character: Character,
   scenario: Scenario,
+  conversationHistory?: CharacterConversationMemory[],
 ): Agent {
   const languageStyle = getLanguageStyleDescription(
     character.communicationStyle.language,
@@ -153,6 +222,10 @@ export function createCharacterAgent(
 
   const personalityDesc = getPersonalityDescription(character);
   const responseGuidelines = getResponseGuidelines(character, scenario);
+  const memoryContext = buildMemoryContext(
+    character,
+    conversationHistory || [],
+  );
 
   const instructions = `
 You are ${character.name}, a ${character.age}-year-old ${character.occupation}.
@@ -161,6 +234,8 @@ BACKGROUND:
 ${character.background}
 
 ${personalityDesc}
+
+${memoryContext}
 
 YOUR CURRENT FINANCIAL SITUATION:
 - Income level: ${character.financialProfile.incomeLevel} (€${character.financialProfile.typicalMonthlyIncome}/month)

@@ -10,6 +10,7 @@ import type {
   Character,
   Scenario,
   CharacterResponse,
+  CharacterConversationMemory,
 } from "../types/game-types.ts";
 
 export const invokeCharacterTool = {
@@ -24,13 +25,23 @@ export const invokeCharacterTool = {
       role: "user" | "assistant";
       content: string;
     }>;
+    characterMemory?: CharacterConversationMemory[];
   }) => {
     try {
-      const { character, scenario, advisorMessage, conversationHistory } =
-        context;
+      const {
+        character,
+        scenario,
+        advisorMessage,
+        conversationHistory,
+        characterMemory,
+      } = context;
 
-      // Create character agent dynamically
-      const characterAgent = createCharacterAgent(character, scenario);
+      // Create character agent dynamically with memory
+      const characterAgent = createCharacterAgent(
+        character,
+        scenario,
+        characterMemory,
+      );
 
       // Build conversation history for context
       let prompt = `The advisor has responded to your initial message:\n\n"${advisorMessage}"\n\nRespond in character.`;

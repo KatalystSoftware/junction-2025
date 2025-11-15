@@ -38,6 +38,14 @@ export interface CharacterRelationshipState {
   adviceFollowedHistory: AdviceOutcome[];
 }
 
+export interface CharacterConversationMemory {
+  sessionId: string;
+  timestamp: string;
+  advisorAdvice: string[];
+  characterResponses: string[];
+  outcome: "positive" | "negative" | "neutral";
+}
+
 export interface AdviceOutcome {
   scenarioId: string;
   adviceGiven: string[];
@@ -56,6 +64,8 @@ export interface Character {
   financialProfile: CharacterFinancialProfile;
   communicationStyle: CharacterCommunicationStyle;
   relationshipState: CharacterRelationshipState;
+  conversationHistory: CharacterConversationMemory[];
+  advisorNotes: string; // Summary of past interactions
 }
 
 // ============================================================================
