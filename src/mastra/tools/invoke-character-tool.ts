@@ -102,6 +102,13 @@ export const invokeCharacterTool = {
     } catch (error) {
       console.error("❌ Error invoking character agent:", error);
 
+      if (
+        process.env.TEST_CACHE_MODE === "record" ||
+        process.env.TEST_CACHE_MODE === "replay"
+      ) {
+        throw error;
+      }
+
       // Return friendly fallback in English
       return {
         messages: [

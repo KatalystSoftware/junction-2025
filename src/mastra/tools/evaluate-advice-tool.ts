@@ -147,6 +147,13 @@ Please evaluate this advice comprehensively across all dimensions.
     } catch (error) {
       console.error("❌ Error evaluating advice with AI:", error);
 
+      if (
+        process.env.TEST_CACHE_MODE === "record" ||
+        process.env.TEST_CACHE_MODE === "replay"
+      ) {
+        throw error;
+      }
+
       // Fallback to simple heuristic evaluation if AI fails
       console.log("⚠️ Falling back to heuristic evaluation");
 
