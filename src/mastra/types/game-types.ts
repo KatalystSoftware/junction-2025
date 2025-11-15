@@ -87,11 +87,29 @@ export interface CharacterCommunicationStyle {
   callsWhenEmotional: boolean; // Use voice when upset/excited
 }
 
+export type TrustTier =
+  | "stranger" // 0-0.2: Just met
+  | "acquaintance" // 0.2-0.4: Getting to know you
+  | "trusted" // 0.4-0.6: Starting to trust
+  | "close" // 0.6-0.8: Close relationship
+  | "best_friend"; // 0.8-1.0: Deep trust, unlocks special scenarios
+
+export interface RelationshipProgression {
+  timestamp: string;
+  trustLevel: number;
+  event: "advice_positive" | "advice_negative" | "decay" | "recommendation";
+  trustChange: number;
+}
+
 export interface CharacterRelationshipState {
   trustLevel: number; // 0-1: How much they trust the advisor
+  trustTier: TrustTier; // Calculated from trustLevel
   visitCount: number;
   lastVisit: string | null; // ISO date
   adviceFollowedHistory: AdviceOutcome[];
+  progressionHistory: RelationshipProgression[]; // Track trust changes over time
+  decayApplied: number; // Total decay applied
+  wasRecommended: boolean; // True if character was unlocked via recommendation
 }
 
 export interface CharacterConversationMemory {
@@ -492,6 +510,21 @@ export interface GameResponse {
 
   // Character recommendation notification
   recommendationMessage?: string;
+
+  // Trust tier change notification
+  tierChangeNotification?: {
+    characterName: string;
+    oldTier: TrustTier;
+    newTier: TrustTier;
+    trustLevel: number;
+  };
+
+  // Trust decay notifications
+  decayNotifications?: Array<{
+    characterName: string;
+    decayAmount: number;
+    newTrustLevel: number;
+  }>;
 
   // NEW: Post-consultation results
   financialResults?: {

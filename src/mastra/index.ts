@@ -17,7 +17,11 @@ import { evaluateAdviceTool } from "./tools/evaluate-advice-tool.ts";
 import { queryFinnishKnowledgeTool } from "./tools/query-finnish-knowledge-tool.ts";
 
 // Character Pool Manager
-import { characterPool } from "./game/character-pool-manager.ts";
+import {
+  characterPool,
+  getTrustTierInfo,
+  calculateTrustTier,
+} from "./game/character-pool-manager.ts";
 
 // Get current file path for resolving character files
 const __filename = fileURLToPath(import.meta.url);
@@ -66,4 +70,4 @@ async function initializeCharacterPool() {
 // Initialize on module load
 initializeCharacterPool().catch(console.error);
 
-export { characterPool };
+export { characterPool, getTrustTierInfo, calculateTrustTier };
