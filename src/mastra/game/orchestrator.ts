@@ -81,7 +81,7 @@ export function createNewAdvisor(advisorId: string): AdvisorState {
     // NEW: Financial Simulation
     currentGameMonth: "2025-01", // Start at January 2025 (game time, not real-time)
     simulatedMonthsPassed: 0,
-    databasePath: process.env.DATABASE_URL || "postgresql://junction_user:junction_dev_password@localhost:5432/junction2025",
+    databasePath: process.env.DATABASE_URL || "postgresql://junction_user:junction_dev_password@localhost:5433/junction2025",
   };
 }
 

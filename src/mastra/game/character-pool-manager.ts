@@ -159,7 +159,7 @@ export class CharacterPoolManager {
         "../simulation/initial-history-generator.ts"
       );
 
-      const dbPath = "saves/advisor_default.db";
+      const dbPath = process.env.DATABASE_URL || "postgresql://junction_user:junction_dev_password@localhost:5433/junction2025";
       const engine = new SimulationEngine(dbPath);
 
       const allCharacters = this.getAllCharacters();
@@ -167,21 +167,20 @@ export class CharacterPoolManager {
 
       for (const character of allCharacters) {
         // Check if character already has simulation history
-        const state = engine.getCharacterState(character.characterId);
-        const hasHistory =
-          state &&
-          engine.getRecentTransactions(character.characterId, 1).length > 0;
+        const state = await engine.getCharacterState(character.characterId);
+        const transactions = await engine.getRecentTransactions(character.characterId, 1);
+        const hasHistory = state && transactions.length > 0;
 
         if (!hasHistory) {
           console.log(
             `   📊 Generating 6-month financial history for ${character.name}...`,
           );
-          generateInitialHistory(character, engine);
+          await generateInitialHistory(character, engine);
           initializedCount++;
         }
       }
 
-      engine.close();
+      await engine.close();
 
       if (initializedCount > 0) {
         console.log(

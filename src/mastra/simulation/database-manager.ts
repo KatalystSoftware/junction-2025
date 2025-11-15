@@ -24,6 +24,7 @@ import type {
 
 export class SimulationDatabaseManager {
   private pool: Pool;
+  private initialized: Promise<void>;
 
   constructor(connectionString: string) {
     this.pool = new Pool({
@@ -32,7 +33,14 @@ export class SimulationDatabaseManager {
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 2000,
     });
-    this.initializeSchema();
+    this.initialized = this.initializeSchema();
+  }
+
+  /**
+   * Ensure schema is initialized before operations
+   */
+  private async ensureInitialized(): Promise<void> {
+    await this.initialized;
   }
 
   // ============================================================================
@@ -142,6 +150,7 @@ export class SimulationDatabaseManager {
   // ============================================================================
 
   async createCharacterState(state: CharacterFinancialState): Promise<void> {
+    await this.ensureInitialized();
     await this.pool.query(
       `
       INSERT INTO character_states (
@@ -164,6 +173,7 @@ export class SimulationDatabaseManager {
   async getCharacterState(
     characterId: string
   ): Promise<CharacterFinancialState | null> {
+    await this.ensureInitialized();
     const result = await this.pool.query(
       `SELECT * FROM character_states WHERE character_id = $1`,
       [characterId]
@@ -199,6 +209,7 @@ export class SimulationDatabaseManager {
   }
 
   async updateCharacterState(state: CharacterFinancialState): Promise<void> {
+    await this.ensureInitialized();
     await this.pool.query(
       `
       UPDATE character_states
@@ -268,6 +279,7 @@ export class SimulationDatabaseManager {
    * Batch insert transactions (much faster than individual inserts)
    */
   async insertTransactionsBatch(transactions: Transaction[]): Promise<void> {
+    await this.ensureInitialized();
     const client = await this.pool.connect();
     try {
       await client.query("BEGIN");
@@ -308,6 +320,7 @@ export class SimulationDatabaseManager {
   }
 
   async getTransactions(query: TransactionQuery): Promise<Transaction[]> {
+    await this.ensureInitialized();
     let sql = `SELECT * FROM transactions WHERE character_id = $1`;
     const params: any[] = [query.characterId];
     let paramIndex = 2;
@@ -474,6 +487,7 @@ export class SimulationDatabaseManager {
   // ============================================================================
 
   async insertMonthlySummary(summary: MonthSummary): Promise<void> {
+    await this.ensureInitialized();
     await this.pool.query(
       `
       INSERT INTO monthly_summaries (

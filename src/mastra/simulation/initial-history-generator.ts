@@ -16,16 +16,16 @@ import { SimulationEngine } from "./simulation-engine.ts";
 /**
  * Generate initial 6-month transaction history for a character
  */
-export function generateInitialHistory(
+export async function generateInitialHistory(
   character: Character,
   simulationEngine: SimulationEngine,
-): void {
+): Promise<void> {
   // Don't regenerate if already has history
-  const existingState = simulationEngine.getCharacterState(
+  const existingState = await simulationEngine.getCharacterState(
     character.characterId,
   );
   if (existingState) {
-    const existingTxns = simulationEngine.getRecentTransactions(
+    const existingTxns = await simulationEngine.getRecentTransactions(
       character.characterId,
       10,
     );
@@ -38,7 +38,7 @@ export function generateInitialHistory(
   const startMonth = getMonthsAgo(6);
 
   // Initialize character in simulation
-  simulationEngine.initializeCharacter(character);
+  await simulationEngine.initializeCharacter(character);
 
   // Simulate 6 months of history
   const config: SimulationConfig = {
@@ -48,7 +48,7 @@ export function generateInitialHistory(
     applyAdviceEffects: false, // No advice yet
   };
 
-  simulationEngine.simulateMonths(character, config);
+  await simulationEngine.simulateMonths(character, config);
 
   // Mark character as having history
   if (character.financialSimulation) {
