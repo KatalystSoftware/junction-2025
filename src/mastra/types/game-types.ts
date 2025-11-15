@@ -154,6 +154,28 @@ export interface ConsultationSession {
   followUpScheduled: boolean;
   outcomeRevealed: boolean;
   duration?: number; // Number of message exchanges
+  evaluation?: {
+    // Detailed AI evaluation results
+    strengths: string[];
+    weaknesses: string[];
+    missedOpportunities: string[];
+    wasActionable: boolean;
+    wasEmpathetic: boolean;
+    wasAccurate: boolean;
+    dimensions?: {
+      adviceQuality: number;
+      communicationEffectiveness: number;
+      learningObjectives: number;
+      characterProgression: number;
+    };
+    characterProgression?: {
+      willFollowAdvice: boolean;
+      confidence: number;
+      emotionalChange: string;
+      problemMovement: string;
+      expectedOutcome: string;
+    };
+  };
 }
 
 export interface CompletedMaterial {
