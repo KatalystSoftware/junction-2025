@@ -170,6 +170,54 @@ IMPORTANT: You naturally remember these previous interactions and may reference 
 }
 
 /**
+ * Detect language from advisor's message
+ */
+function detectLanguage(message?: string): "finnish" | "english" {
+  if (!message) return "english"; // Default to English
+
+  // Simple heuristic: check for common Finnish words/patterns
+  const finnishPatterns = [
+    /\b(hei|moi|kiitos|ole|on|ja|mutta|että|voin|pitää|kannattaa|pitäisi)\b/i,
+    /ä|ö/i, // Finnish characters
+  ];
+
+  const hasFinnishPatterns = finnishPatterns.some((pattern) =>
+    pattern.test(message),
+  );
+  return hasFinnishPatterns ? "finnish" : "english";
+}
+
+/**
+ * Get language style based on advisor's language
+ */
+function getLanguageStyleForAdvisor(
+  formality: "casual" | "semi-formal" | "formal",
+  advisorLanguage: "finnish" | "english",
+): string {
+  if (advisorLanguage === "finnish") {
+    const styles = {
+      casual:
+        "Use casual Finnish. Conversational tone, some slang okay, like texting a friend. Examples: 'Moi!', 'Kiitos!', 'Tosi hyvä'",
+      "semi-formal":
+        "Use semi-formal Finnish. Conversational but polite, correct grammar, occasional emoji if fits the mood.",
+      formal:
+        "Use formal Finnish. Complete sentences, correct grammar, no slang, professional but warm.",
+    };
+    return `RESPOND IN FINNISH (the advisor is using Finnish):\n${styles[formality]}`;
+  } else {
+    const styles = {
+      casual:
+        "Use casual English. Conversational tone, contractions okay, like texting a friend. Examples: 'Hey!', 'Thanks!', 'That's great'",
+      "semi-formal":
+        "Use semi-formal English. Conversational but polite, correct grammar, friendly tone.",
+      formal:
+        "Use formal English. Complete sentences, correct grammar, professional but warm.",
+    };
+    return `RESPOND IN ENGLISH (the advisor is using English):\n${styles[formality]}`;
+  }
+}
+
+/**
  * Get response guidelines based on personality
  */
 function getResponseGuidelines(
@@ -243,16 +291,19 @@ BEHAVIORAL RULES:
 }
 
 /**
- * Create a dynamic character agent
+ * Create a dynamic character agent with dynamic language matching
  */
 export function createCharacterAgent(
   character: Character,
   scenario: Scenario,
   conversationHistory?: CharacterConversationMemory[],
+  advisorMessage?: string,
 ): Agent {
-  const languageStyle = getLanguageStyleDescription(
-    character.communicationStyle.language,
+  // Detect advisor's language and match it
+  const advisorLanguage = detectLanguage(advisorMessage);
+  const languageStyle = getLanguageStyleForAdvisor(
     character.communicationStyle.formality,
+    advisorLanguage,
   );
 
   const personalityDesc = getPersonalityDescription(character);

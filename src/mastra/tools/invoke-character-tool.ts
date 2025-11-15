@@ -36,11 +36,12 @@ export const invokeCharacterTool = {
         characterMemory,
       } = context;
 
-      // Create character agent dynamically with memory
+      // Create character agent dynamically with memory and advisor message for language detection
       const characterAgent = createCharacterAgent(
         character,
         scenario,
         characterMemory,
+        advisorMessage,
       );
 
       // Build conversation history for context
@@ -95,9 +96,11 @@ export const invokeCharacterTool = {
     } catch (error) {
       console.error("❌ Error invoking character agent:", error);
 
-      // Return friendly fallback
+      // Return friendly fallback in English
       return {
-        messages: ["Kiitos avusta! Mietin tätä hetken ja palaan asiaan."],
+        messages: [
+          "Thanks for the advice! I'll think about this and get back to you.",
+        ],
         emotionalState: "thoughtful",
         conversationEnding: true,
         adviceQualityFeedback: {

@@ -6,13 +6,13 @@
     "difficulty": 0.5,
     "topic": "saving",
     "triggerConditions": {
-      "advisorSkillLevel": { "min": 2, "max": 10 },
+      "advisorSkillLevel": { "min": 0, "max": 10 },
       "isFollowUp": false,
       "requiresPreviousScenario": null
     },
     "initialContact": {
       "method": "text",
-      "message": "Hello. I'm a 35-year-old nurse and mother of two children. We now have our finances under control, but I'd like to start saving for the children's future and my own retirement. Where should I start? Is a savings account best or should I invest in something?",
+      "message": "Hi. I'm a 35-year-old nurse and mother of two. We have our finances under control now, but I'd like to start saving for my children's future and my own retirement. Where should I start? Is a savings account best, or should I already invest in something?",
       "voiceMessage": {
         "enabled": false
       }
@@ -59,7 +59,7 @@
     "difficulty": 0.6,
     "topic": "investing",
     "triggerConditions": {
-      "advisorSkillLevel": { "min": 2, "max": 10 },
+      "advisorSkillLevel": { "min": 0, "max": 10 },
       "isFollowUp": true,
       "requiresPreviousScenario": "scenario_sari_savings_001",
       "characterMinVisits": 1

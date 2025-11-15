@@ -12,7 +12,7 @@
     },
     "initialContact": {
       "method": "text",
-      "message": "Hei! Mun rahat tuppaa loppuu aina ennen kuun loppua, vaikka mulla on osa-aikatyö kahvilassa. En oikee osaa budjetoida... Voisitko auttaa? 😅",
+      "message": "Hey! My money always runs out before the end of the month, even though I have a part-time job at a café. I don't really know how to budget... Could you help? 😅",
       "voiceMessage": {
         "enabled": false
       }
@@ -70,7 +70,7 @@
     },
     "initialContact": {
       "method": "text",
-      "message": "Hei taas! 😊 Kiitos tosi paljon niistä neuvoista! Mä oon nyt seuraanu menoja kaksi viikkoo ja tein budjettiin. Huomasin et mä käytän tosi paljon rahaa ulkona syömiseen... Voisinko mä jotenkin vähentää sitä mut silti nähä kavereita? 🤔",
+      "message": "Hey again! 😊 Thanks so much for the advice! I've been tracking my expenses for two weeks and made a budget. I noticed I spend a lot on eating out... Could I somehow reduce that but still see my friends? 🤔",
       "voiceMessage": {
         "enabled": false
       }
@@ -113,7 +113,7 @@
     },
     "initialContact": {
       "method": "text",
-      "message": "Hei... mä yritin tehä sitä budjettii mut se on jotenkin niin vaikeeta 😔 Rahat loppuu edelleen ja en oikee ymmärrä mihin ne menee. Oonks mä vaan huono rahojen kanssa?",
+      "message": "Hey... I tried to make that budget but it's somehow so difficult 😔 Money still runs out and I don't really understand where it goes. Am I just bad with money?",
       "voiceMessage": {
         "enabled": false
       }
@@ -154,10 +154,10 @@
     },
     "initialContact": {
       "method": "voice",
-      "message": "Hei. Mulla on nyt kasautunut 8000 euroa kulutusluottoa viimeisen kolmen vuoden aikana. Korko on joku 15% ja mä en oikein tiedä miten pääsis tästä eroon. Alkaa painaa mieltä tosi paljon. Voitko auttaa?",
+      "message": "Hi. I've accumulated €8,000 in consumer debt over the past three years. The interest rate is about 15% and I don't really know how to get out of this. It's weighing heavily on my mind. Can you help?",
       "voiceMessage": {
         "enabled": true,
-        "transcription": "Hei. Mulla on nyt kasautunut 8000 euroa kulutusluottoa viimeisen kolmen vuoden aikana. Korko on joku 15% ja mä en oikein tiedä miten pääsis tästä eroon. Alkaa painaa mieltä tosi paljon. Voitko auttaa?",
+        "transcription": "Hi. I've accumulated €8,000 in consumer debt over the past three years. The interest rate is about 15% and I don't really know how to get out of this. It's weighing heavily on my mind. Can you help?",
         "urgency": "concerned"
       }
     },
@@ -210,7 +210,7 @@
     },
     "initialContact": {
       "method": "text",
-      "message": "Hei! Mä sain sen yhdistelylainan! Korko putosi 15%:sta 7%:iin 🎉 Kiitos avusta. Nyt mulla ois kysymys: kuinka paljon mun kannattais maksaa kuussa pois velkaa? Mietin et voinko maksaa enemmän kun minimi.",
+      "message": "Hey! I got that consolidation loan! The interest dropped from 15% to 7% 🎉 Thanks for the help. Now I have a question: how much should I pay off per month? I'm wondering if I can pay more than the minimum.",
       "voiceMessage": {
         "enabled": false
       }
@@ -246,13 +246,13 @@
     "difficulty": 0.5,
     "topic": "saving",
     "triggerConditions": {
-      "advisorSkillLevel": { "min": 2, "max": 10 },
+      "advisorSkillLevel": { "min": 0, "max": 10 },
       "isFollowUp": false,
       "requiresPreviousScenario": null
     },
     "initialContact": {
       "method": "text",
-      "message": "Hei. Olen 35-vuotias sairaanhoitaja ja kahden lapsen äiti. Meillä on nyt talous hallussa, mutta haluaisin alkaa säästämään lasten tulevaisuuteen ja omaan eläkkeeseen. Mistä kannattaisi aloittaa? Onko säästötili paras vai pitäisikö jo sijoittaa johonkin?",
+      "message": "Hi. I'm a 35-year-old nurse and mother of two. We have our finances under control now, but I'd like to start saving for my children's future and my own retirement. Where should I start? Is a savings account best, or should I already invest in something?",
       "voiceMessage": {
         "enabled": false
       }
@@ -299,14 +299,14 @@
     "difficulty": 0.6,
     "topic": "investing",
     "triggerConditions": {
-      "advisorSkillLevel": { "min": 2, "max": 10 },
+      "advisorSkillLevel": { "min": 0, "max": 10 },
       "isFollowUp": true,
       "requiresPreviousScenario": "scenario_sari_savings_001",
       "characterMinVisits": 1
     },
     "initialContact": {
       "method": "text",
-      "message": "Hei! Olen nyt tutkinut niitä indeksirahastoja joista puhuttiin. Nordnetissä on paljon vaihtoehtoja... Mihin rahastoihin kannattaisi sijoittaa? Onko joku tietty hyvä vai pitääkö hajautaa moneen?",
+      "message": "Hi! I've been researching those index funds we talked about. There are many options on Nordnet... Which funds should I invest in? Is there a specific good one or should I diversify across many?",
       "voiceMessage": {
         "enabled": false
       }
@@ -349,7 +349,7 @@
     },
     "initialContact": {
       "method": "text",
-      "message": "Moikka! Yks mun kaveri laitto viestiä et on tehny 5000€ jollain kryptojutulla viikossa 😳 Pitääks mun pelätä et se on huijaus vai voinks mäki yrittää? En haluu tehä tyhmää mut en haluu myöskään jäädä paitsi jos se on oikeesti hyvä juttu...",
+      "message": "Hey! One of my friends messaged me that he made €5,000 with some crypto thing in a week 😳 Should I be worried it's a scam or can I try it too? I don't want to do something stupid but I also don't want to miss out if it's actually a good thing...",
       "voiceMessage": {
         "enabled": false
       }
@@ -401,7 +401,7 @@
     },
     "initialContact": {
       "method": "text",
-      "message": "Hei! Kiitos muuten siitä varoituksesta, mun kaveri olikin eksynyt pyramidihuijaukseen 😬 Mut nyt mulla on hyvii uutisii - sain kesätyöpaikan! Palkka on about 1200€/kk. Mitä mun pitäis tehä ekalla palkalla? Haluun oppia tekee oikein! 💪",
+      "message": "Hey! Thanks for that warning by the way, my friend had gotten caught up in a pyramid scheme 😬 But now I have good news - I got a summer job! The salary is about €1,200/month. What should I do with my first paycheck? I want to learn to do it right! 💪",
       "voiceMessage": {
         "enabled": false
       }
