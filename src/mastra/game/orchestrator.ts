@@ -66,6 +66,10 @@ export function createNewAdvisor(advisorId: string): AdvisorState {
     learningMaterials: [],
     totalSessions: 0,
     lastReviewSession: 0,
+    hasCompletedOnboarding: false,
+    // Performance streak tracking
+    currentStreak: 0,
+    lastStreakCheckSession: 0,
     // NEW: Gamification fields
     advisorCoins: 0,
     lifetimeSavingsGenerated: 0,
@@ -86,9 +90,59 @@ export async function startNewConsultation(
   // Load or create advisor state
   let advisorState = currentState || createNewAdvisor(advisorId);
 
+  // Check if this is the first time - trigger onboarding
+  if (!advisorState.hasCompletedOnboarding) {
+    const { invokeBossOnboardingTool } = await import(
+      "../tools/invoke-boss-onboarding-tool.ts"
+    );
+
+    // Detect language from any previous messages (though unlikely at first time)
+    const language: "finnish" | "english" = "english"; // Default to English for first session
+
+    const onboardingMessage = await invokeBossOnboardingTool.execute({
+      language,
+    });
+
+    // Mark onboarding as completed so it doesn't show again
+    advisorState.hasCompletedOnboarding = true;
+
+    return {
+      type: "onboarding",
+      onboardingMessage,
+      stateUpdate: advisorState,
+    };
+  }
+
   // Apply trust decay for characters not visited recently
   if (advisorState.totalSessions > 0) {
     characterPool.applyTrustDecay(advisorState.totalSessions);
+  }
+
+  // Check if we should trigger boss check-in based on performance streak
+  const streak = advisorState.currentStreak;
+  const shouldCheckin = Math.abs(streak) >= 2 && advisorState.totalSessions > 0;
+
+  if (shouldCheckin) {
+    const { invokeBossCheckinTool } = await import(
+      "../tools/invoke-boss-checkin-tool.ts"
+    );
+
+    const recentSessions = advisorState.sessionHistory.slice(-3);
+    const checkinMessage = await invokeBossCheckinTool.execute({
+      streak,
+      recentSessions,
+      advisorReputation: advisorState.reputation,
+      advisorSkillLevel: advisorState.skillLevel,
+    });
+
+    // Reset streak after check-in to avoid repeated messages
+    advisorState.currentStreak = 0;
+
+    return {
+      type: "boss_checkin",
+      checkinMessage,
+      stateUpdate: advisorState,
+    };
   }
 
   // Get Game Master agent
@@ -618,6 +672,28 @@ export async function handleAdvisorResponse(
       0,
       Math.min(100, advisorState.reputation + repChange),
     );
+
+    // Update performance streak
+    const qualityScore = adviceEvaluation.qualityScore;
+    if (qualityScore >= 7) {
+      // Good performance
+      if (advisorState.currentStreak >= 0) {
+        advisorState.currentStreak += 1;
+      } else {
+        advisorState.currentStreak = 1; // Reset from negative streak
+      }
+    } else if (qualityScore <= 4) {
+      // Poor performance
+      if (advisorState.currentStreak <= 0) {
+        advisorState.currentStreak -= 1;
+      } else {
+        advisorState.currentStreak = -1; // Reset from positive streak
+      }
+    } else {
+      // Neutral performance (score 5-6) - reset streak
+      advisorState.currentStreak = 0;
+    }
+    advisorState.lastStreakCheckSession = advisorState.totalSessions;
 
     // Update topic expertise for all topics covered in the evaluation
     const topicsToUpdate = adviceEvaluation.topicsCovered || [scenario.topic];

@@ -75,6 +75,8 @@ function App() {
   const [activePanel, setActivePanel] = useState<'stats' | 'relationships' | 'progress' | 'achievements' | null>(null);
   const [showAllThreads, setShowAllThreads] = useState(false); // Toggle active/all threads
   const [isLoading, setIsLoading] = useState(false);
+  const [onboardingMessage, setOnboardingMessage] = useState<any>(null);
+  const [checkinMessage, setCheckinMessage] = useState<any>(null);
   const [bossReview, setBossReview] = useState<any>(null);
   const [quiz, setQuiz] = useState<any>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -276,6 +278,20 @@ function App() {
     }
 
     // Close boss review modal and start quiz if available
+    // Handle onboarding modal dismissal
+    if (onboardingMessage && input === " ") {
+      setOnboardingMessage(null);
+      setStatusMessage("Press 'n' to meet your first client!");
+      return;
+    }
+
+    // Handle boss check-in modal dismissal
+    if (checkinMessage && input === " ") {
+      setCheckinMessage(null);
+      setStatusMessage("Press 'n' for new consultation");
+      return;
+    }
+
     if (bossReview && input === " ") {
       if (bossReview.quiz) {
         // Start quiz
@@ -483,6 +499,34 @@ function App() {
         advisorState.advisorId,
         advisorState,
       );
+
+      // Onboarding
+      if (consultation.type === "onboarding" && consultation.onboardingMessage) {
+        setOnboardingMessage(consultation.onboardingMessage);
+        setAdvisorState(consultation.stateUpdate);
+        setStatusMessage("Welcome! Press SPACE to continue");
+        setIsLoading(false);
+
+        // Auto-save after onboarding
+        if (sessionId) {
+          await saveSession(sessionId, consultation.stateUpdate, getThreadHistoriesForSave(threads));
+        }
+        return;
+      }
+
+      // Boss check-in
+      if (consultation.type === "boss_checkin" && consultation.checkinMessage) {
+        setCheckinMessage(consultation.checkinMessage);
+        setAdvisorState(consultation.stateUpdate);
+        setStatusMessage("Boss check-in! Press SPACE to continue");
+        setIsLoading(false);
+
+        // Auto-save after check-in
+        if (sessionId) {
+          await saveSession(sessionId, consultation.stateUpdate, getThreadHistoriesForSave(threads));
+        }
+        return;
+      }
 
       // Boss review
       if (consultation.type === "god_boss_review" && consultation.review) {
@@ -774,6 +818,16 @@ function App() {
         response={finalResults.response}
       />
     );
+  }
+
+  // Onboarding modal
+  if (onboardingMessage) {
+    return <OnboardingModal message={onboardingMessage} />;
+  }
+
+  // Boss check-in modal
+  if (checkinMessage) {
+    return <BossCheckinModal message={checkinMessage} />;
   }
 
   // Boss review modal
@@ -1677,6 +1731,80 @@ function FinalResultsModal({
 // ============================================================================
 // Boss Review Modal Component
 // ============================================================================
+
+function OnboardingModal({ message }: { message: any }) {
+  return (
+    <Modal
+      title={`👔 ${message.welcomeTitle}`}
+      color="cyan"
+      continueText="Press SPACE to meet your first client"
+    >
+      <Text color="cyan" bold>
+        {message.introduction}
+      </Text>
+      <Text> </Text>
+
+      <Text color="white" bold>
+        🎯 Your Role:
+      </Text>
+      <Text color="white">{message.roleExplanation}</Text>
+      <Text> </Text>
+
+      <Text color="white" bold>
+        💼 How It Works:
+      </Text>
+      <Text color="white">{message.howItWorks}</Text>
+      <Text> </Text>
+
+      <Text color="yellow" bold>
+        📋 What I Expect:
+      </Text>
+      <Text color="yellow">{message.expectations}</Text>
+      <Text> </Text>
+
+      <Text color="green" bold>
+        💪 Remember:
+      </Text>
+      <Text color="green">{message.encouragement}</Text>
+      <Text> </Text>
+
+      <Text color="cyan">{message.readyMessage}</Text>
+    </Modal>
+  );
+}
+
+function BossCheckinModal({ message }: { message: any }) {
+  return (
+    <Modal
+      title="👔 BOSS CHECK-IN"
+      color="blue"
+      continueText="Press SPACE to continue"
+    >
+      <Text color="blue" bold>
+        {message.greeting}
+      </Text>
+      <Text> </Text>
+
+      <Text color="white">{message.observation}</Text>
+      <Text> </Text>
+
+      <Text color="cyan">{message.mainMessage}</Text>
+      <Text> </Text>
+
+      {message.advice && (
+        <>
+          <Text color="yellow" bold>
+            💡 Quick Tip:
+          </Text>
+          <Text color="yellow">{message.advice}</Text>
+          <Text> </Text>
+        </>
+      )}
+
+      <Text color="green">{message.closing}</Text>
+    </Modal>
+  );
+}
 
 function BossReviewModal({ review }: { review: any }) {
   return (

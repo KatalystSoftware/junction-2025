@@ -341,6 +341,11 @@ export interface AdvisorState {
   learningMaterials: CompletedMaterial[];
   totalSessions: number;
   lastReviewSession: number; // Session count when last reviewed
+  hasCompletedOnboarding: boolean; // Whether the user has seen the welcome onboarding
+
+  // Performance streak tracking
+  currentStreak: number; // Positive for consecutive good sessions (score >= 7), negative for consecutive bad sessions (score <= 4), 0 for neutral or mixed
+  lastStreakCheckSession: number; // Session number when streak was last updated
 
   // NEW: Gamification & Earnings
   advisorCoins: number; // Currency earned from successful consultations
@@ -414,6 +419,24 @@ export interface CharacterResponse {
     score: number; // 0-10
     reasoning: string;
   };
+}
+
+export interface BossOnboardingMessage {
+  welcomeTitle: string;
+  introduction: string;
+  roleExplanation: string;
+  howItWorks: string;
+  expectations: string;
+  encouragement: string;
+  readyMessage: string;
+}
+
+export interface BossCheckinMessage {
+  greeting: string;
+  observation: string;
+  mainMessage: string;
+  advice: string;
+  closing: string;
 }
 
 export interface GodBossReview {
@@ -490,7 +513,13 @@ export interface Achievement {
 }
 
 export interface GameResponse {
-  type: "character_message" | "god_boss_review" | "conversation_end";
+  type: "character_message" | "god_boss_review" | "conversation_end" | "onboarding" | "boss_checkin";
+
+  // For onboarding
+  onboardingMessage?: BossOnboardingMessage;
+
+  // For boss check-in
+  checkinMessage?: BossCheckinMessage;
 
   // For character messages
   threadId?: string;
