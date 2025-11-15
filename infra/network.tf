@@ -3,6 +3,11 @@ resource "google_project_service" "service_networking" {
   disable_on_destroy = false
 }
 
+resource "google_project_service" "vpcaccess" {
+  service            = "vpcaccess.googleapis.com"
+  disable_on_destroy = false
+}
+
 resource "google_compute_network" "private" {
   name                    = "private-network"
   auto_create_subnetworks = false
@@ -24,3 +29,17 @@ resource "google_service_networking_connection" "private_vpc_connection" {
   depends_on = [google_project_service.service_networking]
 }
 
+resource "google_vpc_access_connector" "serverless" {
+  name          = "serverless-connector"
+  region        = var.region
+  network       = google_compute_network.private.name
+  ip_cidr_range = "10.8.0.0/28"
+
+  min_throughput = 200
+  max_throughput = 300
+
+  depends_on = [
+    google_project_service.vpcaccess,
+    google_compute_network.private,
+  ]
+}
