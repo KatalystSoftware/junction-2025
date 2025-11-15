@@ -21,14 +21,14 @@
         "accountId": "acc_sari_001",
         "bankName": "OP",
         "accountType": "checking",
-        "balance": 1850.00,
+        "balance": 1850.0,
         "currency": "EUR"
       },
       {
         "accountId": "acc_sari_002",
         "bankName": "OP",
         "accountType": "savings",
-        "balance": 8200.00,
+        "balance": 8200.0,
         "currency": "EUR"
       }
     ],
@@ -76,7 +76,7 @@
       {
         "subscriptionId": "sub_sari_003",
         "name": "Mobile Phone Plan",
-        "monthlyCost": 24.90,
+        "monthlyCost": 24.9,
         "category": "utilities",
         "currency": "EUR",
         "startDate": "2021-01-01"
@@ -84,7 +84,7 @@
       {
         "subscriptionId": "sub_sari_004",
         "name": "Elisa Viihde",
-        "monthlyCost": 19.90,
+        "monthlyCost": 19.9,
         "category": "entertainment",
         "currency": "EUR",
         "startDate": "2022-09-01"

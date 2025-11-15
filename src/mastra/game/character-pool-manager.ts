@@ -361,8 +361,7 @@ export class CharacterPoolManager {
           !this.usedScenarios.has(s.scenarioId) &&
           advisorState.skillLevel >=
             s.triggerConditions.advisorSkillLevel.min &&
-          advisorState.skillLevel <=
-            s.triggerConditions.advisorSkillLevel.max,
+          advisorState.skillLevel <= s.triggerConditions.advisorSkillLevel.max,
       );
 
       if (initialScenarios.length === 0) {
@@ -390,8 +389,34 @@ export class CharacterPoolManager {
         return a.scenario.scenarioId.localeCompare(b.scenario.scenarioId);
       })[0];
     } else {
-      selectedPair =
-        candidatePairs[Math.floor(Math.random() * candidatePairs.length)];
+      // BEGINNER DIFFICULTY PROGRESSION
+      // For first 5 sessions, strongly prefer easier scenarios (difficulty < 0.5)
+      // After that, allow all difficulties with slight preference for easier ones
+      const isBeginner = advisorState.totalSessions < 5;
+      const isEarlyGame = advisorState.totalSessions < 10;
+
+      // Sort by difficulty (easiest first)
+      const sortedPairs = [...candidatePairs].sort(
+        (a, b) => a.scenario.difficulty - b.scenario.difficulty,
+      );
+
+      if (isBeginner) {
+        // First 5 sessions: 80% chance of easiest third, 20% chance of rest
+        const easyThreshold = Math.ceil(sortedPairs.length / 3);
+        const easyPairs = sortedPairs.slice(0, Math.max(1, easyThreshold));
+        const usePairs = Math.random() < 0.8 ? easyPairs : sortedPairs;
+        selectedPair = usePairs[Math.floor(Math.random() * usePairs.length)];
+      } else if (isEarlyGame) {
+        // Sessions 6-10: 60% chance of easier half, 40% chance of rest
+        const easyHalf = Math.ceil(sortedPairs.length / 2);
+        const easyPairs = sortedPairs.slice(0, Math.max(1, easyHalf));
+        const usePairs = Math.random() < 0.6 ? easyPairs : sortedPairs;
+        selectedPair = usePairs[Math.floor(Math.random() * usePairs.length)];
+      } else {
+        // After 10 sessions: completely random, all difficulties fair game
+        selectedPair =
+          sortedPairs[Math.floor(Math.random() * sortedPairs.length)];
+      }
     }
 
     return selectedPair;

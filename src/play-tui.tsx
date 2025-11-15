@@ -187,7 +187,8 @@ function App() {
 
             // Update topic expertise based on quiz topic
             if (quiz.topic && updatedState.topicsExpertise) {
-              const topic = quiz.topic as keyof typeof updatedState.topicsExpertise;
+              const topic =
+                quiz.topic as keyof typeof updatedState.topicsExpertise;
               updatedState.topicsExpertise = {
                 ...updatedState.topicsExpertise,
                 [topic]:

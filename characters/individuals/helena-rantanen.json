@@ -21,14 +21,14 @@
         "accountId": "acc_helena_001",
         "bankName": "Nordea",
         "accountType": "checking",
-        "balance": 2850.00,
+        "balance": 2850.0,
         "currency": "EUR"
       },
       {
         "accountId": "acc_helena_002",
         "bankName": "Nordea",
         "accountType": "savings",
-        "balance": 28500.00,
+        "balance": 28500.0,
         "currency": "EUR"
       }
     ],
@@ -54,7 +54,7 @@
       {
         "subscriptionId": "sub_helena_003",
         "name": "Mobile Phone Plan",
-        "monthlyCost": 24.90,
+        "monthlyCost": 24.9,
         "category": "utilities",
         "currency": "EUR",
         "startDate": "2021-01-01"
@@ -62,7 +62,7 @@
       {
         "subscriptionId": "sub_helena_004",
         "name": "Gym Membership",
-        "monthlyCost": 39.90,
+        "monthlyCost": 39.9,
         "category": "fitness",
         "currency": "EUR",
         "startDate": "2023-06-01"

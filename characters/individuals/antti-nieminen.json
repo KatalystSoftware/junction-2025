@@ -21,14 +21,14 @@
         "accountId": "acc_antti_001",
         "bankName": "OP Business",
         "accountType": "checking",
-        "balance": 4200.00,
+        "balance": 4200.0,
         "currency": "EUR"
       },
       {
         "accountId": "acc_antti_002",
         "bankName": "OP",
         "accountType": "savings",
-        "balance": 2800.00,
+        "balance": 2800.0,
         "currency": "EUR"
       }
     ],
@@ -36,7 +36,7 @@
       {
         "cardId": "cc_antti_001",
         "issuer": "OP Business Visa",
-        "balance": 8500.00,
+        "balance": 8500.0,
         "creditLimit": 15000,
         "interestRate": 16.9,
         "minimumPayment": 250,
@@ -45,7 +45,7 @@
       {
         "cardId": "cc_antti_002",
         "issuer": "Nordea Mastercard",
-        "balance": 3200.00,
+        "balance": 3200.0,
         "creditLimit": 8000,
         "interestRate": 15.9,
         "minimumPayment": 100,
@@ -88,7 +88,7 @@
       {
         "subscriptionId": "sub_antti_002",
         "name": "Mobile Phone Plan",
-        "monthlyCost": 34.90,
+        "monthlyCost": 34.9,
         "category": "utilities",
         "currency": "EUR",
         "startDate": "2019-01-01"
@@ -104,7 +104,7 @@
       {
         "subscriptionId": "sub_antti_004",
         "name": "Business Insurance",
-        "monthlyCost": 285.00,
+        "monthlyCost": 285.0,
         "category": "other",
         "currency": "EUR",
         "startDate": "2018-01-01"

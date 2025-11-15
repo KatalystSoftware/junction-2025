@@ -21,7 +21,7 @@
         "accountId": "acc_mikko_001",
         "bankName": "Nordea",
         "accountType": "checking",
-        "balance": 42.50,
+        "balance": 42.5,
         "currency": "EUR"
       }
     ],
@@ -29,7 +29,7 @@
       {
         "cardId": "cc_mikko_001",
         "issuer": "S-Pankki Student Card",
-        "balance": 890.00,
+        "balance": 890.0,
         "creditLimit": 1000,
         "interestRate": 16.9,
         "minimumPayment": 30,
@@ -61,7 +61,7 @@
       {
         "subscriptionId": "sub_mikko_002",
         "name": "Mobile Phone Plan",
-        "monthlyCost": 19.90,
+        "monthlyCost": 19.9,
         "category": "utilities",
         "currency": "EUR",
         "startDate": "2023-01-01"

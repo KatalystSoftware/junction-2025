@@ -21,14 +21,14 @@
         "accountId": "acc_kaisa_001",
         "bankName": "OP",
         "accountType": "checking",
-        "balance": 950.00,
+        "balance": 950.0,
         "currency": "EUR"
       },
       {
         "accountId": "acc_kaisa_002",
         "bankName": "OP",
         "accountType": "savings",
-        "balance": 2100.00,
+        "balance": 2100.0,
         "currency": "EUR"
       }
     ],
@@ -36,7 +36,7 @@
       {
         "cardId": "cc_kaisa_001",
         "issuer": "OP Visa",
-        "balance": 420.00,
+        "balance": 420.0,
         "creditLimit": 3000,
         "interestRate": 14.9,
         "minimumPayment": 30,
@@ -56,7 +56,7 @@
       {
         "subscriptionId": "sub_kaisa_002",
         "name": "Mobile Phone Plan",
-        "monthlyCost": 24.90,
+        "monthlyCost": 24.9,
         "category": "utilities",
         "currency": "EUR",
         "startDate": "2024-04-01"
@@ -64,7 +64,7 @@
       {
         "subscriptionId": "sub_kaisa_003",
         "name": "Daycare for Children",
-        "monthlyCost": 320.00,
+        "monthlyCost": 320.0,
         "category": "other",
         "currency": "EUR",
         "startDate": "2024-05-01"

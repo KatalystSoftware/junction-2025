@@ -28,7 +28,7 @@ import type {
 export function createNewAdvisor(advisorId: string): AdvisorState {
   return {
     advisorId,
-    reputation: 50, // Start at middle reputation
+    reputation: 65, // Start above middle to give buffer for early mistakes
     skillLevel: 1, // Beginner
     specializations: [],
     topicsExpertise: {
@@ -427,19 +427,62 @@ export async function handleAdvisorResponse(
         4;
     }
 
-    // Calculate changes based on comprehensive evaluation
-    const skillChange = (avgDimensionScore - 5) * 0.02; // -0.1 to +0.1
-    const repChange = Math.round((avgDimensionScore - 5) * 2); // -10 to +10
+    // BEGINNER-FRIENDLY EVALUATION SCALING
+    // Scale penalties and rewards based on skill level to make early game more forgiving
+    const isBeginner = advisorState.skillLevel < 3;
+    const isIntermediate = advisorState.skillLevel < 6;
 
-    // Bonus/penalty for specific evaluation criteria
+    // Skill change: beginners get faster learning (+50% bonus)
+    let skillChangeMultiplier = 1.0;
+    if (isBeginner) {
+      skillChangeMultiplier = 1.5; // 50% faster skill growth for beginners
+    } else if (isIntermediate) {
+      skillChangeMultiplier = 1.2; // 20% faster for intermediate
+    }
+
+    const skillChange = (avgDimensionScore - 5) * 0.02 * skillChangeMultiplier; // Scaled: -0.1 to +0.15 for beginners
+
+    // Reputation change: beginners get reduced penalties
+    let repChangeMultiplier = 1.0;
+    let penaltyReduction = 0;
+    if (isBeginner) {
+      penaltyReduction = 0.5; // Reduce penalties by 50% for beginners
+      repChangeMultiplier = 1.3; // Increase rewards by 30%
+    } else if (isIntermediate) {
+      penaltyReduction = 0.3; // Reduce penalties by 30% for intermediate
+      repChangeMultiplier = 1.1; // Increase rewards by 10%
+    }
+
+    let repChange = Math.round((avgDimensionScore - 5) * 2);
+    if (repChange > 0) {
+      // Positive: apply multiplier
+      repChange = Math.round(repChange * repChangeMultiplier);
+    } else {
+      // Negative: apply penalty reduction
+      repChange = Math.round(repChange * (1 - penaltyReduction));
+    }
+
+    // Bonus/penalty for specific evaluation criteria (scaled for beginners)
     if (adviceEvaluation.wasEmpathetic) {
-      advisorState.reputation = Math.min(100, advisorState.reputation + 2);
+      const empathyBonus = isBeginner ? 3 : 2; // Extra reward for beginners
+      advisorState.reputation = Math.min(
+        100,
+        advisorState.reputation + empathyBonus,
+      );
     }
     if (adviceEvaluation.wasActionable) {
-      advisorState.skillLevel = Math.min(10, advisorState.skillLevel + 0.01);
+      const actionableBonus = isBeginner ? 0.02 : 0.01; // Double skill gain for beginners
+      advisorState.skillLevel = Math.min(
+        10,
+        advisorState.skillLevel + actionableBonus,
+      );
     }
     if (!adviceEvaluation.wasAccurate) {
-      advisorState.reputation = Math.max(0, advisorState.reputation - 5);
+      const accuracyPenalty = isBeginner ? 2 : 5; // Gentler penalty for beginners
+      advisorState.reputation = Math.max(
+        0,
+        advisorState.reputation - accuracyPenalty,
+      );
     }
 
     advisorState.skillLevel = Math.max(

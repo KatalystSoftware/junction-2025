@@ -21,14 +21,14 @@
         "accountId": "acc_liisa_001",
         "bankName": "Nordea",
         "accountType": "checking",
-        "balance": 2400.00,
+        "balance": 2400.0,
         "currency": "EUR"
       },
       {
         "accountId": "acc_liisa_002",
         "bankName": "Nordea",
         "accountType": "savings",
-        "balance": 42000.00,
+        "balance": 42000.0,
         "currency": "EUR"
       }
     ],
@@ -68,7 +68,7 @@
       {
         "subscriptionId": "sub_liisa_002",
         "name": "Mobile Phone Plan",
-        "monthlyCost": 24.90,
+        "monthlyCost": 24.9,
         "category": "utilities",
         "currency": "EUR",
         "startDate": "2018-01-01"
@@ -76,7 +76,7 @@
       {
         "subscriptionId": "sub_liisa_003",
         "name": "Newspaper Subscription",
-        "monthlyCost": 28.00,
+        "monthlyCost": 28.0,
         "category": "other",
         "currency": "EUR",
         "startDate": "2015-01-01"
