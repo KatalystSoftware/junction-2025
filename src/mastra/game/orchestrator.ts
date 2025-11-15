@@ -102,6 +102,7 @@ function getCurrentMonth(advisorState?: AdvisorState): string {
 export async function startNewConsultation(
   advisorId: string,
   currentState?: AdvisorState,
+  userLanguage: string = "en",
 ): Promise<GameResponse> {
   // Load or create advisor state
   let advisorState = currentState || createNewAdvisor(advisorId);
@@ -112,8 +113,13 @@ export async function startNewConsultation(
       "../tools/invoke-boss-onboarding-tool.ts"
     );
 
-    // Detect language from any previous messages (though unlikely at first time)
-    const language: "finnish" | "english" = "english"; // Default to English for first session
+    // Map user language codes to boss tool format
+    const languageMap: Record<string, "finnish" | "english" | "swedish"> = {
+      fi: "finnish",
+      en: "english",
+      sv: "swedish",
+    };
+    const language = languageMap[userLanguage] || "english";
 
     const onboardingMessage = await invokeBossOnboardingTool.execute({
       language,
@@ -415,6 +421,7 @@ Respond with ONLY valid JSON (NO markdown):
       scenario,
       advisorLanguage,
       character,
+      advisorState.totalSessions, // Pass total sessions for scenario number calculation
     );
 
     // Get all active threads for UI
@@ -480,6 +487,7 @@ export async function handleAdvisorResponse(
   advisorMessage: string,
   currentState: AdvisorState,
   conversationHistory?: Array<{ role: "user" | "assistant"; content: string }>,
+  userLanguage: string = "en",
 ): Promise<GameResponse> {
   let advisorState = { ...currentState };
   let recommendationMessage: string | undefined;
@@ -523,6 +531,7 @@ export async function handleAdvisorResponse(
       advisorMessage,
       conversationHistory: conversationHistory || [],
       characterMemory,
+      userLanguage,
     });
   } catch (error) {
     console.error("Character tool failed:", error);

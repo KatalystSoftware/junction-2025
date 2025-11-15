@@ -303,6 +303,7 @@ interface StartConsultationRequest {
     Array<{ role: "user" | "assistant"; content: string; isVoice?: boolean; audioUrl?: string; voiceUrgency?: string }>
   >;
   threadMetadata?: Record<string, ThreadMetadata>;
+  userLanguage?: string; // User's preferred language: 'en', 'fi', or 'sv'
 }
 
 interface StartConsultationResponse extends ClientSafeGameResponse {
@@ -311,17 +312,18 @@ interface StartConsultationResponse extends ClientSafeGameResponse {
 
 app.post("/start-consultation", async (c) => {
   try {
-    const { sessionId, advisorState, threadHistories, threadMetadata } =
+    const { sessionId, advisorState, threadHistories, threadMetadata, userLanguage } =
       await c.req.json<StartConsultationRequest>();
 
     console.log(
-      `🎬 Starting consultation for session: ${sessionId.substring(0, 8)}...`,
+      `🎬 Starting consultation for session: ${sessionId.substring(0, 8)}... (language: ${userLanguage || "en"})`,
     );
 
     // Call orchestrator to get next character/scenario
     const gameResponse = await startNewConsultation(
       advisorState.advisorId,
       advisorState,
+      userLanguage || "en",
     );
 
     // Convert threadHistories and threadMetadata to Maps
@@ -367,9 +369,25 @@ app.post("/start-consultation", async (c) => {
 
         // Include voice data if present
         if (gameResponse.voiceNeeded && gameResponse.voiceConfig) {
+          console.log(
+            `🎤 Voice message detected! Adding to history:`,
+            {
+              enabled: gameResponse.voiceConfig.enabled,
+              urgency: gameResponse.voiceConfig.urgency,
+              hasAudio: !!gameResponse.voiceConfig.audioUrl,
+            },
+          );
           messageEntry.isVoice = true;
           messageEntry.audioUrl = gameResponse.voiceConfig.audioUrl;
           messageEntry.voiceUrgency = gameResponse.voiceConfig.urgency;
+        } else {
+          console.log(
+            `📝 Regular text message (no voice):`,
+            {
+              voiceNeeded: gameResponse.voiceNeeded,
+              hasVoiceConfig: !!gameResponse.voiceConfig,
+            },
+          );
         }
 
         existingHistory.push(messageEntry);
@@ -415,9 +433,11 @@ app.post("/start-consultation", async (c) => {
     const threadHistoriesObject = Object.fromEntries(historiesMap);
     const threadMetadataObject = Object.fromEntries(metadataMap);
 
+    // Log thread count instead of full content to reduce noise
     console.log(
       "📤 Returning threadHistories:",
-      JSON.stringify(threadHistoriesObject, null, 2),
+      Object.keys(threadHistoriesObject).length,
+      "threads",
     );
 
     return c.json<StartConsultationResponse>({
@@ -447,6 +467,7 @@ interface SendMessageRequest {
     Array<{ role: "user" | "assistant"; content: string; isVoice?: boolean; audioUrl?: string; voiceUrgency?: string }>
   >;
   threadMetadata?: Record<string, ThreadMetadata>;
+  userLanguage?: string; // User's preferred language: 'en', 'fi', or 'sv'
 }
 
 interface SendMessageResponse extends ClientSafeGameResponse {
@@ -463,10 +484,11 @@ app.post("/send-message", async (c) => {
       conversationHistory,
       threadHistories,
       threadMetadata,
+      userLanguage,
     } = await c.req.json<SendMessageRequest>();
 
     console.log(
-      `💬 Message in thread ${threadId.substring(0, 8)}... from session ${sessionId.substring(0, 8)}...`,
+      `💬 Message in thread ${threadId.substring(0, 8)}... from session ${sessionId.substring(0, 8)}... (language: ${userLanguage || "en"})`,
     );
 
     let gameResponse;
@@ -509,6 +531,7 @@ app.post("/send-message", async (c) => {
         message,
         advisorState,
         conversationHistory,
+        userLanguage || "en",
       );
 
       // Add user message and character response to threadHistories

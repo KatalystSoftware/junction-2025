@@ -33,6 +33,7 @@ export const invokeCharacterTool = {
       content: string;
     }>;
     characterMemory?: CharacterConversationMemory[];
+    userLanguage?: string;
   }) => {
     try {
       const {
@@ -41,6 +42,7 @@ export const invokeCharacterTool = {
         advisorMessage,
         conversationHistory,
         characterMemory,
+        userLanguage = "en",
       } = context;
 
       // Create character agent dynamically with memory and advisor message for language detection
@@ -137,8 +139,44 @@ export const invokeCharacterTool = {
         }
       }
 
+      // Translate messages if user language is not English
+      let finalMessages = parsed.messages || [text];
+      if (userLanguage !== "en") {
+        const languageNames: Record<string, string> = {
+          fi: "Finnish",
+          sv: "Swedish",
+        };
+        const targetLanguage = languageNames[userLanguage] || "English";
+
+        finalMessages = await Promise.all(
+          finalMessages.map(async (message: string) => {
+            try {
+              const translationPrompt = `Translate the following text to ${targetLanguage}. Keep the same tone, emotion, and formality. Only return the translated text, nothing else:\n\n${message}`;
+              const translationResponse = await cachedGenerate(
+                "translation",
+                `${character.characterId}_${userLanguage}_${message.substring(0, 50)}`,
+                translationPrompt,
+                async () => {
+                  const { Model } = await import("@mastra/core");
+                  const model = new Model({
+                    provider: "GOOGLE",
+                    name: "gemini-2.0-flash-exp",
+                    toolChoice: "auto",
+                  });
+                  return await model.generate(translationPrompt);
+                }
+              );
+              return translationResponse.text || message;
+            } catch (error) {
+              console.error("Translation failed, using original:", error);
+              return message;
+            }
+          })
+        );
+      }
+
       return {
-        messages: parsed.messages || [text],
+        messages: finalMessages,
         emotionalState,
         conversationEnding: parsed.conversationEnding || false,
         voiceNeeded: shouldGenerateVoice && voiceConfig?.enabled,

@@ -234,6 +234,20 @@ class GameAPI {
   ): Promise<GameResponse> {
     const sessionId = getOrCreateSessionId();
 
+    // Get user language preference from localStorage
+    let userLanguage = "en"; // default
+    try {
+      const userProfileStr = localStorage.getItem("userProfile");
+      if (userProfileStr) {
+        const userProfile = JSON.parse(userProfileStr);
+        if (userProfile.language) {
+          userLanguage = userProfile.language;
+        }
+      }
+    } catch (e) {
+      console.error("Failed to get user language:", e);
+    }
+
     const response = await fetch(`${this.baseUrl}/start-consultation`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -242,6 +256,7 @@ class GameAPI {
         advisorState,
         threadHistories,
         threadMetadata,
+        userLanguage,
       } as StartConsultationRequest),
     });
 
@@ -274,6 +289,20 @@ class GameAPI {
   ): Promise<GameResponse> {
     const sessionId = getOrCreateSessionId();
 
+    // Get user language preference from localStorage
+    let userLanguage = "en"; // default
+    try {
+      const userProfileStr = localStorage.getItem("userProfile");
+      if (userProfileStr) {
+        const userProfile = JSON.parse(userProfileStr);
+        if (userProfile.language) {
+          userLanguage = userProfile.language;
+        }
+      }
+    } catch (e) {
+      console.error("Failed to get user language:", e);
+    }
+
     const response = await fetch(`${this.baseUrl}/send-message`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -285,6 +314,7 @@ class GameAPI {
         conversationHistory,
         threadHistories,
         threadMetadata,
+        userLanguage,
       } as SendMessageRequest),
     });
 
