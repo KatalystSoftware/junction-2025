@@ -11,6 +11,11 @@ import type {
   ConsultationSession,
 } from "../types/game-types.ts";
 import { cachedGenerate } from "../test-cache.ts";
+import {
+  withRetry,
+  isRetryableError,
+  logError,
+} from "../utils/error-recovery.ts";
 
 export const invokeGodBossTool = {
   id: "invokeGodBossTool",
@@ -62,12 +67,20 @@ ADVISOR CONTEXT:
 Provide comprehensive feedback following your review format.
 `;
 
-      // Invoke God/Boss agent
-      const response = await cachedGenerate(
-        "agent",
-        "godBoss_review",
-        prompt,
-        () => godBossAgent.generate(prompt),
+      // Invoke God/Boss agent with retry logic
+      const response = await withRetry(
+        () =>
+          cachedGenerate(
+            "agent",
+            "godBoss_review",
+            prompt,
+            () => godBossAgent.generate(prompt),
+          ),
+        "God/Boss Review Agent",
+        {
+          maxAttempts: 3,
+          shouldRetry: isRetryableError,
+        },
       );
 
       const text = response.text || "";

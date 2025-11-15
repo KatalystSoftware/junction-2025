@@ -25,6 +25,12 @@ import type {
   ThreadInfo,
   ConversationMessage,
 } from "../types/game-types.ts";
+import {
+  withRetry,
+  isRetryableError,
+  logError,
+  getUserFriendlyError,
+} from "../utils/error-recovery.ts";
 
 /**
  * Initialize a new advisor with default state
@@ -136,16 +142,25 @@ Should you: send a new character, send a returning character (follow-up), or tri
 Respond with ONLY valid JSON (NO markdown):
 `;
 
-  const gmResult = await cachedGenerate(
-    "agent",
-    "gameMaster_decision",
-    gmPrompt,
-    () => gmAgent.generate(gmPrompt),
-  );
-
-  // Parse Game Master's decision
+  // Call Game Master with retry logic
   let decision: GameMasterDecision;
   try {
+    const gmResult = await withRetry(
+      () =>
+        cachedGenerate(
+          "agent",
+          "gameMaster_decision",
+          gmPrompt,
+          () => gmAgent.generate(gmPrompt),
+        ),
+      "Game Master Agent",
+      {
+        maxAttempts: 3,
+        shouldRetry: isRetryableError,
+      },
+    );
+
+    // Parse Game Master's decision
     let jsonText = gmResult.text.trim();
     // Strip markdown code blocks
     jsonText = jsonText
@@ -155,7 +170,8 @@ Respond with ONLY valid JSON (NO markdown):
 
     decision = JSON.parse(jsonText);
   } catch (error) {
-    console.error("Failed to parse GM decision:", gmResult.text);
+    console.error("Failed to get GM decision after retries:", error);
+    logError("Game Master Decision", error, 3, 3, false);
 
     // Fallback: send a new character
     const newCharResult = characterPool.getNewCharacter(advisorState);
@@ -165,7 +181,7 @@ Respond with ONLY valid JSON (NO markdown):
 
     decision = {
       action: "send_character",
-      reasoning: "Fallback decision after parse error",
+      reasoning: "Fallback decision after error",
       characterId: newCharResult.character.characterId,
       scenarioId: newCharResult.scenario.scenarioId,
       isNewCharacter: true,
@@ -315,21 +331,45 @@ export async function handleAdvisorResponse(
   // Get character memory (conversation history from previous sessions)
   const characterMemory = character.conversationHistory || [];
 
-  // Invoke character agent
+  // Invoke character agent with error recovery
   const characterTool = mastra.getTool("invokeCharacterTool");
   if (!characterTool) {
     throw new Error("Character tool not found");
   }
 
-  const characterResponse = await characterTool.execute({
-    character,
-    scenario,
-    advisorMessage,
-    conversationHistory: conversationHistory || [],
-    characterMemory,
-  });
+  let characterResponse: any;
+  try {
+    characterResponse = await withRetry(
+      () =>
+        characterTool.execute({
+          character,
+          scenario,
+          advisorMessage,
+          conversationHistory: conversationHistory || [],
+          characterMemory,
+        }),
+      `Character Tool (${character.name})`,
+      {
+        maxAttempts: 3,
+        shouldRetry: isRetryableError,
+      },
+    );
+  } catch (error) {
+    console.error("Character tool failed after retries:", error);
+    logError(`Character Tool (${character.name})`, error, 3, 3, false);
 
-  // Evaluate advice quality using AI-based evaluation
+    // Fallback: graceful generic response
+    characterResponse = {
+      messages: [
+        "Thanks for your advice! I'll think about this and get back to you.",
+      ],
+      emotionalState: "thoughtful",
+      conversationEnding: true,
+      voiceNeeded: false,
+    };
+  }
+
+  // Evaluate advice quality using AI-based evaluation with error recovery
   const evaluateTool = mastra.getTool("evaluateAdviceTool");
   let adviceEvaluation: any = {
     qualityScore: 5,
@@ -345,13 +385,28 @@ export async function handleAdvisorResponse(
   };
 
   if (evaluateTool) {
-    adviceEvaluation = await evaluateTool.execute({
-      advice: advisorMessage,
-      scenario,
-      characterPersonality: character.personality,
-      character, // Pass full character for more context
-      conversationHistory, // Pass conversation history for context
-    });
+    try {
+      adviceEvaluation = await withRetry(
+        () =>
+          evaluateTool.execute({
+            advice: advisorMessage,
+            scenario,
+            characterPersonality: character.personality,
+            character, // Pass full character for more context
+            conversationHistory, // Pass conversation history for context
+          }),
+        "Advice Evaluation Tool",
+        {
+          maxAttempts: 3,
+          shouldRetry: isRetryableError,
+        },
+      );
+    } catch (error) {
+      console.error("Evaluation tool failed after retries:", error);
+      logError("Advice Evaluation Tool", error, 3, 3, false);
+      // Keep default evaluation values as fallback
+      console.log("⚠️ Using default evaluation values");
+    }
   }
 
   // Update thread status
@@ -720,19 +775,52 @@ export async function handleAdviceChoice(
 
   const adviceText = selectedChoice.fullAdviceText;
 
-  // Evaluate the advice using the evaluate tool
+  // Evaluate the advice using the evaluate tool with error recovery
   const evaluateTool = mastra.getTool("evaluateAdviceTool");
   if (!evaluateTool) {
     throw new Error("Evaluate tool not found");
   }
 
-  const adviceEvaluation = await evaluateTool.execute({
-    advice: adviceText,
-    scenario,
-    characterPersonality: character.personality,
-    character,
-    conversationHistory: conversationHistory || [],
-  });
+  let adviceEvaluation: any;
+  try {
+    adviceEvaluation = await withRetry(
+      () =>
+        evaluateTool.execute({
+          advice: adviceText,
+          scenario,
+          characterPersonality: character.personality,
+          character,
+          conversationHistory: conversationHistory || [],
+        }),
+      "Advice Evaluation Tool (Choice)",
+      {
+        maxAttempts: 3,
+        shouldRetry: isRetryableError,
+      },
+    );
+  } catch (error) {
+    console.error("Evaluation tool failed after retries:", error);
+    logError("Advice Evaluation Tool (Choice)", error, 3, 3, false);
+
+    // Fallback: use neutral evaluation
+    adviceEvaluation = {
+      qualityScore: 5,
+      willFollowAdvice: true, // Assume positive in fallback
+      outcome: "neutral",
+      strengths: ["Provided guidance"],
+      weaknesses: [],
+      missedOpportunities: [],
+      topicsCovered: [scenario.topic],
+      wasActionable: true,
+      wasEmpathetic: true,
+      wasAccurate: true,
+      financialProjection: {
+        totalSaved: 0,
+        totalDebtReduced: 0,
+        estimatedMonthlyImpact: 0,
+      },
+    };
+  }
 
   // Character accepts the advice (almost always)
   const characterAccepts = Math.random() > 0.1; // 90% acceptance rate
@@ -924,17 +1012,44 @@ async function triggerGodBossReview(
     };
   }
 
-  // Invoke God/Boss tool
+  // Invoke God/Boss tool with error recovery
   const godBossTool = mastra.getTool("invokeGodBossTool");
   if (!godBossTool) {
     throw new Error("God/Boss tool not found");
   }
 
-  const review = await godBossTool.execute({
-    sessionsToReview,
-    advisorReputation: advisorState.reputation,
-    advisorSkillLevel: advisorState.skillLevel,
-  });
+  let review: any;
+  try {
+    review = await withRetry(
+      () =>
+        godBossTool.execute({
+          sessionsToReview,
+          advisorReputation: advisorState.reputation,
+          advisorSkillLevel: advisorState.skillLevel,
+        }),
+      "God/Boss Review Tool",
+      {
+        maxAttempts: 3,
+        shouldRetry: isRetryableError,
+      },
+    );
+  } catch (error) {
+    console.error("God/Boss review failed after retries:", error);
+    logError("God/Boss Review Tool", error, 3, 3, false);
+
+    // Fallback: use generic positive review
+    review = {
+      overallScore: 6,
+      strengthsIdentified: ["You're making progress"],
+      areasForImprovement: ["Keep practicing and learning"],
+      learningMaterials: [],
+      encouragingMessage:
+        "An error occurred during review, but keep up the good work! 💪",
+      reputationChange: 0,
+      skillLevelChange: 0,
+      topicsExpertiseUpdates: {},
+    };
+  }
 
   // Update advisor state based on review
   advisorState.reputation = Math.max(
