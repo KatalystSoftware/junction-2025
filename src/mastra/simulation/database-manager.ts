@@ -22,18 +22,32 @@ import type {
   SpendingModel,
 } from "./simulation-types.ts";
 
+// Singleton connection pool - shared across all database manager instances
+let sharedPool: Pool | null = null;
+let initializationPromise: Promise<void> | null = null;
+
 export class SimulationDatabaseManager {
   private pool: Pool;
   private initialized: Promise<void>;
 
   constructor(connectionString: string) {
-    this.pool = new Pool({
-      connectionString,
-      max: 20,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000,
-    });
-    this.initialized = this.initializeSchema();
+    // Reuse existing pool if available, otherwise create new one
+    if (!sharedPool) {
+      sharedPool = new Pool({
+        connectionString,
+        max: 20,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 2000,
+      });
+      console.log("📊 Created new PostgreSQL connection pool for simulation");
+    }
+    this.pool = sharedPool;
+
+    // Initialize schema only once
+    if (!initializationPromise) {
+      initializationPromise = this.initializeSchema();
+    }
+    this.initialized = initializationPromise;
   }
 
   /**
@@ -166,17 +180,17 @@ export class SimulationDatabaseManager {
         JSON.stringify(state.spendingModel),
         state.createdAt,
         state.updatedAt,
-      ]
+      ],
     );
   }
 
   async getCharacterState(
-    characterId: string
+    characterId: string,
   ): Promise<CharacterFinancialState | null> {
     await this.ensureInitialized();
     const result = await this.pool.query(
       `SELECT * FROM character_states WHERE character_id = $1`,
-      [characterId]
+      [characterId],
     );
 
     if (result.rows.length === 0) return null;
@@ -196,7 +210,7 @@ export class SimulationDatabaseManager {
 
   async updateCharacterBalance(
     characterId: string,
-    newBalance: number
+    newBalance: number,
   ): Promise<void> {
     await this.pool.query(
       `
@@ -204,7 +218,7 @@ export class SimulationDatabaseManager {
       SET current_balance = $1, updated_at = $2
       WHERE character_id = $3
     `,
-      [newBalance, new Date().toISOString(), characterId]
+      [newBalance, new Date().toISOString(), characterId],
     );
   }
 
@@ -227,7 +241,7 @@ export class SimulationDatabaseManager {
         JSON.stringify(state.spendingModel),
         new Date().toISOString(),
         state.characterId,
-      ]
+      ],
     );
   }
 
@@ -271,7 +285,7 @@ export class SimulationDatabaseManager {
         transaction.adviceInfluenced ? 1 : 0,
         transaction.metadata ? JSON.stringify(transaction.metadata) : null,
         transaction.createdAt,
-      ]
+      ],
     );
   }
 
@@ -306,7 +320,7 @@ export class SimulationDatabaseManager {
             txn.adviceInfluenced ? 1 : 0,
             txn.metadata ? JSON.stringify(txn.metadata) : null,
             txn.createdAt,
-          ]
+          ],
         );
       }
 
@@ -377,14 +391,14 @@ export class SimulationDatabaseManager {
 
   async getRecentTransactions(
     characterId: string,
-    limit: number = 100
+    limit: number = 100,
   ): Promise<Transaction[]> {
     return this.getTransactions({ characterId, limit });
   }
 
   async getTransactionsByMonth(
     characterId: string,
-    month: string
+    month: string,
   ): Promise<Transaction[]> {
     const startDate = `${month}-01`;
     const endDate = `${month}-31`; // Simple approximation
@@ -395,7 +409,7 @@ export class SimulationDatabaseManager {
   async getTransactionCount(characterId: string): Promise<number> {
     const result = await this.pool.query(
       `SELECT COUNT(*) as count FROM transactions WHERE character_id = $1`,
-      [characterId]
+      [characterId],
     );
 
     return parseInt(result.rows[0].count);
@@ -425,7 +439,7 @@ export class SimulationDatabaseManager {
         effect.metadata ? JSON.stringify(effect.metadata) : null,
         effect.isActive ? 1 : 0,
         effect.createdAt,
-      ]
+      ],
     );
   }
 
@@ -467,7 +481,7 @@ export class SimulationDatabaseManager {
   async deactivateAdviceEffect(effectId: string): Promise<void> {
     await this.pool.query(
       `UPDATE advice_effects SET is_active = 0 WHERE id = $1`,
-      [effectId]
+      [effectId],
     );
   }
 
@@ -478,7 +492,7 @@ export class SimulationDatabaseManager {
       SET is_active = 0
       WHERE expires_date IS NOT NULL AND expires_date <= $1 AND is_active = 1
     `,
-      [currentDate]
+      [currentDate],
     );
   }
 
@@ -512,20 +526,20 @@ export class SimulationDatabaseManager {
         summary.transactionCount,
         summary.debtReduction,
         summary.createdAt,
-      ]
+      ],
     );
   }
 
   async getMonthlySummary(
     characterId: string,
-    month: string
+    month: string,
   ): Promise<MonthSummary | null> {
     const result = await this.pool.query(
       `
       SELECT * FROM monthly_summaries
       WHERE character_id = $1 AND month = $2
     `,
-      [characterId, month]
+      [characterId, month],
     );
 
     if (result.rows.length === 0) return null;
@@ -546,7 +560,7 @@ export class SimulationDatabaseManager {
 
   async getMonthlySummaries(
     characterId: string,
-    limit?: number
+    limit?: number,
   ): Promise<MonthSummary[]> {
     let sql = `
       SELECT * FROM monthly_summaries
@@ -585,7 +599,7 @@ export class SimulationDatabaseManager {
   async getSpendingByCategory(
     characterId: string,
     startDate: string,
-    endDate: string
+    endDate: string,
   ): Promise<Record<string, number>> {
     const result = await this.pool.query(
       `
@@ -597,7 +611,7 @@ export class SimulationDatabaseManager {
         AND amount < 0
       GROUP BY category
     `,
-      [characterId, startDate, endDate]
+      [characterId, startDate, endDate],
     );
 
     const spending: Record<string, number> = {};
@@ -614,7 +628,7 @@ export class SimulationDatabaseManager {
   async getTotalIncome(
     characterId: string,
     startDate: string,
-    endDate: string
+    endDate: string,
   ): Promise<number> {
     const result = await this.pool.query(
       `
@@ -625,7 +639,7 @@ export class SimulationDatabaseManager {
         AND date <= $3
         AND amount > 0
     `,
-      [characterId, startDate, endDate]
+      [characterId, startDate, endDate],
     );
 
     return parseFloat(result.rows[0].total) || 0;
@@ -637,7 +651,7 @@ export class SimulationDatabaseManager {
   async getTotalExpenses(
     characterId: string,
     startDate: string,
-    endDate: string
+    endDate: string,
   ): Promise<number> {
     const result = await this.pool.query(
       `
@@ -648,7 +662,7 @@ export class SimulationDatabaseManager {
         AND date <= $3
         AND amount < 0
     `,
-      [characterId, startDate, endDate]
+      [characterId, startDate, endDate],
     );
 
     return parseFloat(result.rows[0].total) || 0;
@@ -658,7 +672,7 @@ export class SimulationDatabaseManager {
    * Get transactions influenced by advisor's advice
    */
   async getAdviceInfluencedTransactions(
-    characterId: string
+    characterId: string,
   ): Promise<Transaction[]> {
     const transactions = await this.getTransactions({ characterId });
     return transactions.filter((t) => t.adviceInfluenced);
@@ -670,9 +684,12 @@ export class SimulationDatabaseManager {
 
   /**
    * Close database connection pool
+   * NOTE: Since we use a singleton pool, this is a no-op.
+   * The pool will be closed when the application exits.
    */
   async close(): Promise<void> {
-    await this.pool.end();
+    // Don't close the shared pool - it's reused across the application
+    // The pool will be cleaned up when the process exits
   }
 
   /**
@@ -684,13 +701,13 @@ export class SimulationDatabaseManager {
     totalAdviceEffects: number;
   }> {
     const txnResult = await this.pool.query(
-      "SELECT COUNT(*) as count FROM transactions"
+      "SELECT COUNT(*) as count FROM transactions",
     );
     const charResult = await this.pool.query(
-      "SELECT COUNT(*) as count FROM character_states"
+      "SELECT COUNT(*) as count FROM character_states",
     );
     const effectResult = await this.pool.query(
-      "SELECT COUNT(*) as count FROM advice_effects"
+      "SELECT COUNT(*) as count FROM advice_effects",
     );
 
     return {
@@ -716,11 +733,12 @@ export class SimulationDatabaseManager {
       ]);
       await client.query(
         "DELETE FROM monthly_summaries WHERE character_id = $1",
-        [characterId]
+        [characterId],
       );
-      await client.query("DELETE FROM character_states WHERE character_id = $1", [
-        characterId,
-      ]);
+      await client.query(
+        "DELETE FROM character_states WHERE character_id = $1",
+        [characterId],
+      );
 
       await client.query("COMMIT");
     } catch (error) {

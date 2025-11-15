@@ -3,6 +3,7 @@
   "name": "Minna Virtanen",
   "age": 22,
   "occupation": "University Student",
+  "gender": "female",
   "background": "First-year student in Helsinki. Just moved out from parents' home and living alone for the first time. Works part-time at a café. Has never made a budget before.",
   "personality": {
     "impulsiveness": 0.7,

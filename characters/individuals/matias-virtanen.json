@@ -3,6 +3,7 @@
   "name": "Matias Virtanen",
   "age": 18,
   "occupation": "Vocational School Student (Electrician Training)",
+  "gender": "male",
   "background": "Just started at vocational school in Tampere studying to become an electrician. Receiving KELA student benefits and living in a shared student apartment. First time managing money independently. Parents are blue-collar workers who taught him to value hard work but didn't teach much about finances. Has a small student loan and confused about student benefits system.",
   "personality": {
     "impulsiveness": 0.5,

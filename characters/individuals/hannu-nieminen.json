@@ -3,6 +3,7 @@
   "name": "Hannu Nieminen",
   "age": 65,
   "occupation": "Recently Retired IT Manager",
+  "gender": "male",
   "background": "Just retired IT manager in Helsinki after 40 years of work. Worked through tech boom and made good money but also lost some in dot-com bubble. Owns apartment and has decent pension plus some investments. Nervous about market volatility in retirement - should he move investments to safer options or stay in stocks? Also interested in cryptocurrency but wife thinks he's too old to start investing in 'internet money'. Wants to enjoy retirement traveling but worried about running out of money.",
   "personality": {
     "impulsiveness": 0.4,

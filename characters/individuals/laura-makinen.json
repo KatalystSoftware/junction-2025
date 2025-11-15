@@ -3,6 +3,7 @@
   "name": "Laura Mäkinen",
   "age": 35,
   "occupation": "Single Mother, Administrative Assistant",
+  "gender": "female",
   "background": "Single mother with two children (ages 7 and 9) working as administrative assistant in Jyväskylä. Divorced two years ago. Receives some child support but it's irregular. Manages on tight budget with daycare costs and children's activities. Worries constantly about emergency expenses. Has minimal savings and feels she's living paycheck to paycheck despite working full-time. Wants to provide for kids and build security but doesn't know where to start.",
   "personality": {
     "impulsiveness": 0.3,

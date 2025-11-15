@@ -3,6 +3,7 @@
   "name": "Petri Koskinen",
   "age": 19,
   "occupation": "High School Student",
+  "gender": "male",
   "background": "Final year high school student. Has seen many crypto scams on social media and among friends. Uncertain about money in general. Just got his first summer job and wants to learn to make good decisions.",
   "personality": {
     "impulsiveness": 0.6,

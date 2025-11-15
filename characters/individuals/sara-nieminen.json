@@ -3,6 +3,7 @@
   "name": "Sara Nieminen",
   "age": 24,
   "occupation": "Elementary School Teacher",
+  "gender": "female",
   "background": "Recently graduated elementary school teacher in Oulu starting her first permanent position. Good stable salary but modest compared to private sector friends. Student loans from university years. Interested in investing but intimidated by stock market. Friends talk about index funds and she wants to start but doesn't know where to begin. Also wondering about teacher's pension system and whether she should save additionally.",
   "personality": {
     "impulsiveness": 0.3,

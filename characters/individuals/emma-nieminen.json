@@ -3,6 +3,7 @@
   "name": "Emma Nieminen",
   "age": 19,
   "occupation": "Gap Year (Working at Clothing Store)",
+  "gender": "female",
   "background": "Taking a gap year after lukio before deciding on university. Working full-time at H&M in Helsinki saving money for backpacking through Southeast Asia. Has saved diligently but worried about managing money while traveling. Also considering whether to start university studies or continue working. Lives with roommates to save on rent.",
   "personality": {
     "impulsiveness": 0.4,

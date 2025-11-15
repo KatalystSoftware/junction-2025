@@ -3,6 +3,7 @@
   "name": "Markku Salonen",
   "age": 45,
   "occupation": "Sales Manager (Divorced)",
+  "gender": "male",
   "background": "Divorced sales manager in Helsinki with two children who live with ex-wife. Paying child support which takes significant portion of income. Recently moved to smaller apartment to save money. Relationship with ex is tense around money. Wants to maintain good relationship with kids and provide for them but struggling to save for own future. Also concerned about life insurance and making sure kids are provided for if something happens to him.",
   "personality": {
     "impulsiveness": 0.4,

@@ -3,6 +3,7 @@
   "name": "Pekka Virtanen",
   "age": 62,
   "occupation": "Bank Manager (Approaching Retirement)",
+  "gender": "male",
   "background": "Bank manager in Tampere approaching retirement in 3 years. Worked in banking for 35 years so understands financial products but now needs to make decisions for himself. Considering whether to retire at 65 or work longer for higher pension. Has good occupational pension but wants to understand all retirement options. Also concerned about healthcare costs in retirement and whether to get private health insurance. Wife already retired as teacher.",
   "personality": {
     "impulsiveness": 0.2,

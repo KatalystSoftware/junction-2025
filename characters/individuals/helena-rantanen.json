@@ -3,6 +3,7 @@
   "name": "Helena Rantanen",
   "age": 25,
   "occupation": "Marketing Manager",
+  "gender": "female",
   "background": "Young professional working at a tech startup in Helsinki. Recently promoted to marketing manager with good salary. Grew up in family that avoided credit cards and debt entirely. Now wanting to build credit score for future (apartment purchase). Never had a credit card. Financially conservative but wants to use modern financial tools responsibly.",
   "personality": {
     "impulsiveness": 0.3,

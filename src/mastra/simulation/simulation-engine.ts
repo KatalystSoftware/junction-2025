@@ -31,14 +31,23 @@ import {
   applyDebtPayment,
   getMonthlyDebtReduction,
 } from "./debt-interest-calculator.ts";
+import { getSimulationDatabaseUrl } from "../config/database.ts";
 
 export class SimulationEngine {
-  private db: SimulationDatabaseManager;
+  private db: SimulationDatabaseManager | null;
   private transactionGenerator: TransactionGenerator;
+  private enabled: boolean;
 
-  constructor(connectionString: string) {
-    this.db = new SimulationDatabaseManager(connectionString);
+  constructor() {
+    // Get database URL from environment - never pass as parameter
+    const dbUrl = getSimulationDatabaseUrl();
+    this.enabled = dbUrl !== null;
+    this.db = dbUrl ? new SimulationDatabaseManager(dbUrl) : null;
     this.transactionGenerator = new TransactionGenerator();
+
+    if (!this.enabled) {
+      console.log("⚠️ Financial simulation disabled - DATABASE_URL not configured");
+    }
   }
 
   /**
@@ -46,6 +55,8 @@ export class SimulationEngine {
    * Called when character first appears in game
    */
   async initializeCharacter(character: Character): Promise<void> {
+    if (!this.enabled || !this.db) return;
+
     // Check if already initialized
     const existing = await this.db.getCharacterState(character.characterId);
     if (existing) return;
@@ -82,6 +93,20 @@ export class SimulationEngine {
     month: string,
     applyAdviceEffects: boolean = true,
   ): Promise<SimulatedMonth> {
+    if (!this.enabled || !this.db) {
+      // Return empty simulation result
+      return {
+        month,
+        characterId: character.characterId,
+        transactions: [],
+        startBalance: 0,
+        endBalance: 0,
+        incomeTotal: 0,
+        expensesTotal: 0,
+        debtReduction: 0,
+      };
+    }
+
     // Get character's financial state
     let state = await this.db.getCharacterState(character.characterId);
     if (!state) {
@@ -240,7 +265,10 @@ export class SimulationEngine {
         applyAdviceEffects: true,
       };
 
-      results[character.characterId] = await this.simulateMonths(character, config);
+      results[character.characterId] = await this.simulateMonths(
+        character,
+        config,
+      );
     }
 
     return results;
@@ -249,7 +277,10 @@ export class SimulationEngine {
   /**
    * Get character's current financial state
    */
-  async getCharacterState(characterId: string): Promise<CharacterFinancialState | null> {
+  async getCharacterState(
+    characterId: string,
+  ): Promise<CharacterFinancialState | null> {
+    if (!this.enabled || !this.db) return null;
     return await this.db.getCharacterState(characterId);
   }
 
@@ -260,13 +291,18 @@ export class SimulationEngine {
     characterId: string,
     limit: number = 100,
   ): Promise<Transaction[]> {
+    if (!this.enabled || !this.db) return [];
     return await this.db.getRecentTransactions(characterId, limit);
   }
 
   /**
    * Get monthly summaries for character
    */
-  async getMonthlySummaries(characterId: string, limit?: number): Promise<MonthSummary[]> {
+  async getMonthlySummaries(
+    characterId: string,
+    limit?: number,
+  ): Promise<MonthSummary[]> {
+    if (!this.enabled || !this.db) return [];
     return await this.db.getMonthlySummaries(characterId, limit);
   }
 
@@ -277,6 +313,8 @@ export class SimulationEngine {
     characterId: string,
     baseSpending: SpendingModel,
   ): Promise<SpendingModel> {
+    if (!this.enabled || !this.db) return baseSpending;
+
     const activeEffects = await this.db.getActiveAdviceEffects(characterId);
     let modified = { ...baseSpending };
 
@@ -376,13 +414,14 @@ export class SimulationEngine {
    * Deactivate expired advice effects
    */
   async deactivateExpiredEffects(currentDate: string): Promise<void> {
+    if (!this.enabled || !this.db) return;
     await this.db.deactivateExpiredEffects(currentDate);
   }
 
   /**
    * Get database instance (for advanced queries)
    */
-  getDatabase(): SimulationDatabaseManager {
+  getDatabase(): SimulationDatabaseManager | null {
     return this.db;
   }
 
@@ -390,6 +429,7 @@ export class SimulationEngine {
    * Close database connection
    */
   async close(): Promise<void> {
+    if (!this.db) return;
     await this.db.close();
   }
 }

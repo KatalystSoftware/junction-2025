@@ -18,7 +18,96 @@ import {
   generateSessionId,
   type ThreadMetadata,
 } from "../persistence/session-store.ts";
-import type { AdvisorState, GameResponse } from "../types/game-types.ts";
+import type {
+  AdvisorState,
+  GameResponse,
+  ThreadInfo,
+  ConsultationSession,
+  FinancialTopic,
+  TopicExpertise,
+  SessionGoal,
+  CompletedMaterial,
+} from "../types/game-types.ts";
+
+/**
+ * Client-safe version of AdvisorState - only fields the frontend needs
+ * Excludes sensitive server-only fields like database credentials
+ */
+export interface ClientSafeAdvisorState {
+  reputation: number;
+  skillLevel: number;
+  specializations: FinancialTopic[];
+  topicsExpertise: TopicExpertise;
+  sessionHistory: ConsultationSession[];
+  totalClientsHelped: number;
+  activeClients: string[];
+  activeThreads: Record<string, ThreadInfo>;
+  godBossRelationship: number;
+  learningMaterials: CompletedMaterial[];
+  totalSessions: number;
+  lastReviewSession: number;
+  hasCompletedOnboarding: boolean;
+  currentStreak: number;
+  lastStreakCheckSession: number;
+  advisorCoins: number;
+  lifetimeSavingsGenerated: number;
+  lifetimeDebtCleared: number;
+  currentGoal: SessionGoal | null;
+  achievementsUnlocked: string[];
+  careerTier: number;
+}
+
+/**
+ * Map server AdvisorState to client-safe version
+ * Explicitly includes only fields the frontend needs
+ */
+function toClientSafeAdvisorState(state: AdvisorState): ClientSafeAdvisorState {
+  return {
+    reputation: state.reputation,
+    skillLevel: state.skillLevel,
+    specializations: state.specializations,
+    topicsExpertise: state.topicsExpertise,
+    sessionHistory: state.sessionHistory,
+    totalClientsHelped: state.totalClientsHelped,
+    activeClients: state.activeClients,
+    activeThreads: state.activeThreads,
+    godBossRelationship: state.godBossRelationship,
+    learningMaterials: state.learningMaterials,
+    totalSessions: state.totalSessions,
+    lastReviewSession: state.lastReviewSession,
+    hasCompletedOnboarding: state.hasCompletedOnboarding,
+    currentStreak: state.currentStreak,
+    lastStreakCheckSession: state.lastStreakCheckSession,
+    advisorCoins: state.advisorCoins,
+    lifetimeSavingsGenerated: state.lifetimeSavingsGenerated,
+    lifetimeDebtCleared: state.lifetimeDebtCleared,
+    currentGoal: state.currentGoal,
+    achievementsUnlocked: state.achievementsUnlocked,
+    careerTier: state.careerTier,
+  };
+}
+
+/**
+ * Client-safe version of GameResponse - sanitizes nested state
+ */
+interface ClientSafeGameResponse extends Omit<GameResponse, "stateUpdate"> {
+  stateUpdate?: ClientSafeAdvisorState;
+}
+
+/**
+ * Map GameResponse to client-safe version
+ */
+function toClientSafeGameResponse(
+  response: GameResponse
+): ClientSafeGameResponse {
+  const { stateUpdate, ...rest } = response;
+  return {
+    ...rest,
+    stateUpdate: stateUpdate
+      ? toClientSafeAdvisorState(stateUpdate)
+      : undefined,
+  };
+}
 
 // Create router
 const app = new Hono();
@@ -29,7 +118,7 @@ app.use(
   cors({
     origin: ["http://localhost:3000", "http://localhost:5173"], // Vite dev servers
     credentials: true,
-  }),
+  })
 );
 
 // ============================================================================
@@ -42,7 +131,7 @@ interface InitRequest {
 
 interface InitResponse {
   sessionId: string;
-  advisorState: AdvisorState;
+  advisorState: ClientSafeAdvisorState;
   isNewSession: boolean;
   threadHistories?: Record<
     string,
@@ -68,7 +157,7 @@ app.post("/init", async (c) => {
       const savedSession = await loadSession(sessionId);
       if (savedSession) {
         console.log(
-          `📂 Loaded existing session: ${sessionId.substring(0, 8)}...`,
+          `📂 Loaded existing session: ${sessionId.substring(0, 8)}...`
         );
         advisorState = savedSession.advisorState;
 
@@ -78,16 +167,16 @@ app.post("/init", async (c) => {
           threadMetadata = Object.fromEntries(savedSession.threadMetadata);
         }
         console.log(
-          `💬 Loaded ${Object.keys(threadHistories).length} thread histories`,
+          `💬 Loaded ${Object.keys(threadHistories).length} thread histories`
         );
         console.log(
-          `📊 Loaded ${Object.keys(threadMetadata).length} thread metadata`,
+          `📊 Loaded ${Object.keys(threadMetadata).length} thread metadata`
         );
 
         // Don't save - we just loaded this data, don't overwrite it
       } else {
         console.log(
-          `⚠️ Session ${sessionId.substring(0, 8)}... not found, creating new`,
+          `⚠️ Session ${sessionId.substring(0, 8)}... not found, creating new`
         );
         advisorState = createNewAdvisor(sessionId);
         isNewSession = true;
@@ -108,7 +197,7 @@ app.post("/init", async (c) => {
 
     return c.json<InitResponse>({
       sessionId,
-      advisorState,
+      advisorState: toClientSafeAdvisorState(advisorState),
       isNewSession,
       threadHistories,
       threadMetadata,
@@ -133,7 +222,7 @@ interface StartConsultationRequest {
   threadMetadata?: Record<string, ThreadMetadata>;
 }
 
-interface StartConsultationResponse extends GameResponse {
+interface StartConsultationResponse extends ClientSafeGameResponse {
   sessionId: string;
 }
 
@@ -143,13 +232,13 @@ app.post("/start-consultation", async (c) => {
       await c.req.json<StartConsultationRequest>();
 
     console.log(
-      `🎬 Starting consultation for session: ${sessionId.substring(0, 8)}...`,
+      `🎬 Starting consultation for session: ${sessionId.substring(0, 8)}...`
     );
 
     // Call orchestrator to get next character/scenario
     const gameResponse = await startNewConsultation(
       advisorState.advisorId,
-      advisorState,
+      advisorState
     );
 
     // Convert threadHistories and threadMetadata to Maps
@@ -173,7 +262,7 @@ app.post("/start-consultation", async (c) => {
       console.log("👔 historiesMap size:", historiesMap.size);
       console.log(
         "👔 historiesMap has boss-pinned:",
-        historiesMap.has("boss-pinned"),
+        historiesMap.has("boss-pinned")
       );
     }
 
@@ -193,16 +282,30 @@ app.post("/start-consultation", async (c) => {
 
       historiesMap.set(threadId, existingHistory);
       console.log(
-        `💬 Saved ${gameResponse.messages.length} initial message(s) to thread ${threadId.substring(0, 8)}...`,
+        `💬 Saved ${gameResponse.messages.length} initial message(s) to thread ${threadId.substring(0, 8)}...`
       );
 
       // Save character metadata if provided
       if (gameResponse.characterInfo) {
         metadataMap.set(threadId, gameResponse.characterInfo);
         console.log(
-          `👤 Saved character metadata for thread ${threadId.substring(0, 8)}...`,
+          `👤 Saved character metadata for thread ${threadId.substring(0, 8)}...`
         );
       }
+    }
+
+    // If this is a boss check-in, save it to boss threadHistories
+    if (gameResponse.type === "boss_checkin" && gameResponse.checkinMessage) {
+      const msg = gameResponse.checkinMessage;
+      const bossHistory = historiesMap.get("boss-pinned") || [];
+
+      // Format the check-in message
+      const checkinContent = `${msg.greeting}\n\n${msg.observation}\n\n${msg.mainMessage}\n\n${msg.advice}\n\n${msg.closing}`;
+
+      bossHistory.push({ role: "assistant" as const, content: checkinContent });
+      historiesMap.set("boss-pinned", bossHistory);
+
+      console.log("👔 Saved boss check-in message to historiesMap");
     }
 
     // Save updated state with histories and metadata
@@ -210,7 +313,7 @@ app.post("/start-consultation", async (c) => {
       sessionId,
       gameResponse.stateUpdate,
       historiesMap,
-      metadataMap,
+      metadataMap
     );
 
     // Convert Maps back to objects for response
@@ -219,11 +322,11 @@ app.post("/start-consultation", async (c) => {
 
     console.log(
       "📤 Returning threadHistories:",
-      JSON.stringify(threadHistoriesObject, null, 2),
+      JSON.stringify(threadHistoriesObject, null, 2)
     );
 
     return c.json<StartConsultationResponse>({
-      ...gameResponse,
+      ...toClientSafeGameResponse(gameResponse),
       sessionId,
       threadHistories: threadHistoriesObject,
       threadMetadata: threadMetadataObject,
@@ -251,7 +354,7 @@ interface SendMessageRequest {
   threadMetadata?: Record<string, ThreadMetadata>;
 }
 
-interface SendMessageResponse extends GameResponse {
+interface SendMessageResponse extends ClientSafeGameResponse {
   sessionId: string;
 }
 
@@ -268,7 +371,7 @@ app.post("/send-message", async (c) => {
     } = await c.req.json<SendMessageRequest>();
 
     console.log(
-      `💬 Message in thread ${threadId.substring(0, 8)}... from session ${sessionId.substring(0, 8)}...`,
+      `💬 Message in thread ${threadId.substring(0, 8)}... from session ${sessionId.substring(0, 8)}...`
     );
 
     let gameResponse;
@@ -300,7 +403,7 @@ app.post("/send-message", async (c) => {
       const bossHistory = historiesMap.get("boss-pinned") || [];
       bossHistory.push(
         { role: "user" as const, content: message },
-        { role: "assistant" as const, content: bossResponse },
+        { role: "assistant" as const, content: bossResponse }
       );
       historiesMap.set("boss-pinned", bossHistory);
       console.log("👔 Saved boss conversation to threadHistories");
@@ -310,7 +413,7 @@ app.post("/send-message", async (c) => {
         threadId,
         message,
         advisorState,
-        conversationHistory,
+        conversationHistory
       );
 
       // Add user message and character response to threadHistories
@@ -328,7 +431,7 @@ app.post("/send-message", async (c) => {
 
       historiesMap.set(threadId, threadHistory);
       console.log(
-        `💬 Saved conversation to thread ${threadId.substring(0, 8)}... (now ${threadHistory.length} messages)`,
+        `💬 Saved conversation to thread ${threadId.substring(0, 8)}... (now ${threadHistory.length} messages)`
       );
     }
 
@@ -337,7 +440,7 @@ app.post("/send-message", async (c) => {
       sessionId,
       gameResponse.stateUpdate,
       historiesMap,
-      metadataMap,
+      metadataMap
     );
 
     // Convert Maps back to objects for response
@@ -345,7 +448,7 @@ app.post("/send-message", async (c) => {
     const threadMetadataObject = Object.fromEntries(metadataMap);
 
     return c.json<SendMessageResponse>({
-      ...gameResponse,
+      ...toClientSafeGameResponse(gameResponse),
       sessionId,
       threadHistories: threadHistoriesObject,
       threadMetadata: threadMetadataObject,
@@ -373,7 +476,9 @@ app.get("/session/:sessionId", async (c) => {
 
     return c.json({
       exists: true,
-      advisorState: savedSession?.advisorState,
+      advisorState: savedSession?.advisorState
+        ? toClientSafeAdvisorState(savedSession.advisorState)
+        : undefined,
       lastSaved: savedSession?.savedAt,
     });
   } catch (error) {
@@ -389,7 +494,6 @@ app.get("/session/:sessionId", async (c) => {
 app.get("/financial-overview/:characterId", async (c) => {
   try {
     const characterId = c.req.param("characterId");
-    const databasePath = c.req.query("database") || "saves/advisor_default.db";
 
     console.log(`📊 Getting financial overview for character: ${characterId}`);
 
@@ -397,7 +501,7 @@ app.get("/financial-overview/:characterId", async (c) => {
     const { SimulationEngine } = await import(
       "../simulation/simulation-engine.ts"
     );
-    const engine = new SimulationEngine(databasePath);
+    const engine = new SimulationEngine();
 
     const state = engine.getCharacterState(characterId);
     if (!state) {
@@ -419,7 +523,7 @@ app.get("/financial-overview/:characterId", async (c) => {
     const spending = db.getSpendingByCategory(
       characterId,
       currentMonth.month + "-01",
-      currentMonth.month + "-31",
+      currentMonth.month + "-31"
     );
 
     // Calculate net income
@@ -449,22 +553,22 @@ app.get("/financial-overview/:characterId", async (c) => {
     const anomalies: string[] = [];
     if (spending.coffee && Math.abs(spending.coffee) > 60) {
       anomalies.push(
-        `High coffee spending: €${Math.abs(spending.coffee).toFixed(2)}/month`,
+        `High coffee spending: €${Math.abs(spending.coffee).toFixed(2)}/month`
       );
     }
     if (spending.onlineShopping && Math.abs(spending.onlineShopping) > 100) {
       anomalies.push(
-        `Frequent online shopping: €${Math.abs(spending.onlineShopping).toFixed(2)}/month`,
+        `Frequent online shopping: €${Math.abs(spending.onlineShopping).toFixed(2)}/month`
       );
     }
     if (spending.dining && Math.abs(spending.dining) > 150) {
       anomalies.push(
-        `High dining/delivery costs: €${Math.abs(spending.dining).toFixed(2)}/month`,
+        `High dining/delivery costs: €${Math.abs(spending.dining).toFixed(2)}/month`
       );
     }
     if (currentMonth.totalExpenses > currentMonth.totalIncome) {
       anomalies.push(
-        `SPENDING EXCEEDS INCOME by €${(currentMonth.totalExpenses - currentMonth.totalIncome).toFixed(2)}`,
+        `SPENDING EXCEEDS INCOME by €${(currentMonth.totalExpenses - currentMonth.totalIncome).toFixed(2)}`
       );
     }
 
@@ -495,7 +599,6 @@ app.get("/transactions/:characterId", async (c) => {
   try {
     const characterId = c.req.param("characterId");
     const limit = parseInt(c.req.query("limit") || "50");
-    const databasePath = c.req.query("database") || "saves/advisor_default.db";
 
     console.log(`💰 Getting transactions for character: ${characterId}`);
 
@@ -503,7 +606,7 @@ app.get("/transactions/:characterId", async (c) => {
     const { SimulationEngine } = await import(
       "../simulation/simulation-engine.ts"
     );
-    const engine = new SimulationEngine(databasePath);
+    const engine = new SimulationEngine();
 
     const state = engine.getCharacterState(characterId);
     if (!state) {

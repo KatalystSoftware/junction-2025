@@ -3,6 +3,7 @@
   "name": "Raija Koskinen",
   "age": 67,
   "occupation": "Retired Teacher",
+  "gender": "female",
   "background": "Retired elementary school teacher in Oulu living on teacher's pension. Pension is decent but less than salary was. Owns apartment outright (no mortgage). Widowed 5 years ago, living alone. Adult children live in other cities. Wants to enjoy retirement and travel but worried about making pension last. Also concerned about inflation eating into fixed income. Considering whether to downsize apartment and invest the proceeds or keep current home.",
   "personality": {
     "impulsiveness": 0.3,

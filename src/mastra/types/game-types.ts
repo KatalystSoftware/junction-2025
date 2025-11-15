@@ -137,6 +137,7 @@ export interface Character {
   age: number;
   occupation: string;
   background: string;
+  gender: "male" | "female"; // For avatar generation
   personality: CharacterPersonality;
   financialProfile: CharacterFinancialProfile;
   communicationStyle: CharacterCommunicationStyle;
@@ -376,7 +377,6 @@ export interface AdvisorState {
   // NEW: Financial Simulation
   currentGameMonth: string; // Current game month in YYYY-MM format (session-based, not real-time)
   simulatedMonthsPassed: number; // Total months simulated since game start
-  databasePath?: string; // Path to SQLite database
 }
 
 // ============================================================================
@@ -406,6 +406,7 @@ export interface ConversationThread {
     name: string;
     age: number;
     occupation: string;
+    gender: "male" | "female";
   };
 }
 
@@ -560,6 +561,7 @@ export interface GameResponse {
     name: string;
     age: number;
     occupation: string;
+    gender: "male" | "female";
   };
   // NEW: Scenario financial context for pre-consultation dashboard
   scenarioFinancialContext?: {
@@ -651,7 +653,7 @@ export interface GameResponse {
   >;
   threadMetadata?: Record<
     string,
-    { name: string; age: number; occupation: string }
+    { name: string; age: number; occupation: string; gender: "male" | "female" }
   >;
 }
 

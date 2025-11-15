@@ -3,6 +3,7 @@
   "name": "Esko Lahtinen",
   "age": 70,
   "occupation": "Retired Engineer (Widower)",
+  "gender": "male",
   "background": "Retired mechanical engineer and recent widower in Lappeenranta. Wife passed away 8 months ago and he's dealing with inheritance issues and estate planning. Has good pension and owns house. Three adult children and five grandchildren. Wants to make sure estate is properly planned so children inherit without complications. Also considering giving financial gifts to grandchildren for education. Dealing with loneliness and grief while trying to manage finances that wife usually handled.",
   "personality": {
     "impulsiveness": 0.2,

@@ -178,6 +178,46 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       }, 3000);
     }
 
+    // Handle boss check-in
+    if (response.type === "boss_checkin") {
+      console.log("👔 Boss check-in received");
+
+      // Select boss chat to show the check-in message
+      setSelectedContactId("boss-pinned");
+      setShowChat(true);
+
+      // Set acknowledgment choices for boss check-in
+      setAdviceChoicesByThread((prev) => ({
+        ...prev,
+        "boss-pinned": [
+          {
+            choiceId: "checkin_1",
+            actionText: "Thank boss and acknowledge feedback",
+            icon: "🙏",
+            projectedOutcome: "Show appreciation for guidance",
+            fullAdviceText:
+              "Thanks for the feedback, I really appreciate you taking the time to review my work. I'll keep your advice in mind for the next client.",
+          },
+          {
+            choiceId: "checkin_2",
+            actionText: "Commit to improvement",
+            icon: "📈",
+            projectedOutcome: "Demonstrate growth mindset",
+            fullAdviceText:
+              "Got it! I'll work on being more specific and actionable with my advice. I can see where I need to improve.",
+          },
+          {
+            choiceId: "checkin_3",
+            actionText: "Express gratitude for mentorship",
+            icon: "💡",
+            projectedOutcome: "Build rapport with boss",
+            fullAdviceText:
+              "Thank you, that's really helpful advice. It's great to have someone guiding me through this learning process. I'll apply these insights moving forward.",
+          },
+        ],
+      }));
+    }
+
     // Handle new thread (select it)
     if (response.isNewThread && response.threadId) {
       console.log("✨ New thread created:", response.threadId);
@@ -237,9 +277,30 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
         setAdviceChoicesByThread((prev) => ({
           ...prev,
           "boss-pinned": [
-            { fullAdviceText: "Understood! I'm ready to help clients." },
-            { fullAdviceText: "Got it! Let's get started." },
-            { fullAdviceText: "Thanks! I'll do my best." },
+            {
+              choiceId: "onboarding_1",
+              actionText: "Acknowledge and express readiness",
+              icon: "👍",
+              projectedOutcome: "Start helping clients",
+              fullAdviceText:
+                "Understood! I'm ready to help clients and give them the best financial advice I can. Thanks for the overview!",
+            },
+            {
+              choiceId: "onboarding_2",
+              actionText: "Show enthusiasm to begin",
+              icon: "🚀",
+              projectedOutcome: "Get started immediately",
+              fullAdviceText:
+                "Got it! Let's get started. I'm excited to meet clients and help them with their financial challenges.",
+            },
+            {
+              choiceId: "onboarding_3",
+              actionText: "Express gratitude and commitment",
+              icon: "💪",
+              projectedOutcome: "Commit to doing well",
+              fullAdviceText:
+                "Thanks! I'll do my best to provide quality advice and keep learning. Looking forward to working with you!",
+            },
           ],
         }));
       }
@@ -260,15 +321,17 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
   const handleSendMessage = (content: string) => {
     if (!selectedContactId) return;
 
-    // Special handling for boss acknowledgment (first consultation trigger)
-    if (
-      selectedContactId === "boss-pinned" &&
-      game.advisorState?.hasCompletedOnboarding
-    ) {
-      const hasThreads =
-        Object.keys(game.advisorState.activeThreads || {}).length > 0;
-      if (!hasThreads) {
-        console.log("👔 Boss acknowledged! Starting first consultation...");
+    // Special handling for boss messages with advice choices (onboarding or check-in)
+    if (selectedContactId === "boss-pinned") {
+      const hasAdviceChoices =
+        adviceChoicesByThread["boss-pinned"] &&
+        adviceChoicesByThread["boss-pinned"].length > 0;
+
+      if (hasAdviceChoices) {
+        // This is either onboarding or check-in acknowledgment
+        console.log(
+          "👔 Boss message acknowledged! Starting next consultation...",
+        );
 
         // Send acknowledgment to boss (will be saved to threadHistories)
         game.sendMessage(selectedContactId, content);
@@ -286,7 +349,7 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       }
     }
 
-    // Send to server (including regular boss messages)
+    // Send to server (including regular boss messages and regular client messages)
     console.log("📤 Sending message to thread:", selectedContactId);
     game.sendMessage(selectedContactId, content);
 

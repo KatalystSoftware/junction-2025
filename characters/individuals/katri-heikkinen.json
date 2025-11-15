@@ -3,6 +3,7 @@
   "name": "Katri Heikkinen",
   "age": 38,
   "occupation": "Dentist (Private Practice)",
+  "gender": "female",
   "background": "Dentist with own private practice in Lahti. High income earner but also high expenses with business costs, staff salaries, and equipment. Married with one child. Household income very comfortable but paying significant taxes. Heard about various tax optimization strategies but unsure what's legal and beneficial. Also considering investments and retirement planning. Wants to be smart with money but doesn't have time to research everything.",
   "personality": {
     "impulsiveness": 0.2,

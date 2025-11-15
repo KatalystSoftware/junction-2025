@@ -100,7 +100,13 @@ export interface GameResponse {
 
   // Various response data
   onboardingMessage?: any;
-  checkinMessage?: any;
+  checkinMessage?: {
+    greeting: string;
+    observation: string;
+    mainMessage: string;
+    advice: string;
+    closing: string;
+  };
   threadId?: string;
   messages?: string[];
   voiceNeeded?: boolean;

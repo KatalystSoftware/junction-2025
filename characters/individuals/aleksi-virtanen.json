@@ -3,6 +3,7 @@
   "name": "Aleksi Virtanen",
   "age": 29,
   "occupation": "Freelance Graphic Designer",
+  "gender": "male",
   "background": "Freelance graphic designer and illustrator working from home in Turku. Income varies wildly month to month - sometimes 4000€, sometimes 1500€. Loves the creative freedom but stressed about financial instability. Confused about YEL (entrepreneur pension insurance) requirements and tax prepayments. Has no employer benefits like occupational healthcare or pension. Wants to understand how to budget with irregular income and what insurances are essential.",
   "personality": {
     "impulsiveness": 0.5,

@@ -3,6 +3,7 @@
   "name": "Tuomas Lehtonen",
   "age": 26,
   "occupation": "Software Developer",
+  "gender": "male",
   "background": "Software developer at a gaming company in Helsinki with good salary. Tech-savvy and interested in cryptocurrency and NFTs but realizes he doesn't actually understand them financially. Friends are all talking about crypto investments and he feels left out. Has disposable income but unsure how much to allocate to risky investments. Also interested in tax implications of crypto in Finland.",
   "personality": {
     "impulsiveness": 0.5,

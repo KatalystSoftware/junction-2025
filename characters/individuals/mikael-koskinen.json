@@ -3,6 +3,7 @@
   "name": "Mikael Koskinen",
   "age": 36,
   "occupation": "Sales Manager (Company Car)",
+  "gender": "male",
   "background": "Sales manager at pharmaceutical company with company car benefit. Good salary but confused about company car taxation and whether it's actually beneficial. The taxable value seems high and he's paying a lot in taxes for the benefit. Wondering if he should negotiate for higher salary instead of car, or if there are ways to optimize this. Also has stock options from company that will vest soon and no idea how they're taxed in Finland.",
   "personality": {
     "impulsiveness": 0.4,

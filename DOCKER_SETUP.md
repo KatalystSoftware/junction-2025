@@ -5,6 +5,7 @@ This guide explains how to run PostgreSQL for Junction 2025 using Docker or Podm
 ## Prerequisites
 
 Either:
+
 - **Docker**: Install from [docker.com](https://docs.docker.com/get-docker/)
 - **Podman**: Install from [podman.io](https://podman.io/getting-started/installation)
 
@@ -25,11 +26,13 @@ Edit `.env` to change default passwords and settings (recommended for production
 ### 2. Start PostgreSQL
 
 **Using Docker:**
+
 ```bash
 docker compose up -d
 ```
 
 **Using Podman:**
+
 ```bash
 podman-compose up -d
 # or
@@ -37,6 +40,7 @@ docker-compose up -d  # Podman supports docker-compose command
 ```
 
 This will:
+
 - Start PostgreSQL 16 on port 5432
 - Create the database and user
 - Set up persistent volumes for data
@@ -45,6 +49,7 @@ This will:
 ### 3. Verify It's Running
 
 **Check container status:**
+
 ```bash
 docker compose ps
 # or
@@ -52,6 +57,7 @@ podman-compose ps
 ```
 
 **Check PostgreSQL logs:**
+
 ```bash
 docker compose logs postgres
 # or
@@ -59,6 +65,7 @@ podman-compose logs postgres
 ```
 
 **Test connection:**
+
 ```bash
 docker compose exec postgres psql -U junction_user -d junction2025
 # or
@@ -75,6 +82,7 @@ podman-compose exec postgres psql -U junction_user -d junction2025
 - **Password**: junction_dev_password (configurable via `POSTGRES_PASSWORD`)
 
 **Connection String:**
+
 ```
 postgresql://junction_user:junction_dev_password@localhost:5432/junction2025
 ```
@@ -95,6 +103,7 @@ Access pgAdmin at: http://localhost:5050
 - **Password**: admin (configurable via `PGADMIN_PASSWORD`)
 
 **Add PostgreSQL Server in pgAdmin:**
+
 1. Click "Add New Server"
 2. General tab: Name = "Junction 2025"
 3. Connection tab:
@@ -107,21 +116,25 @@ Access pgAdmin at: http://localhost:5050
 ## Common Commands
 
 ### Start Services
+
 ```bash
 docker compose up -d
 ```
 
 ### Stop Services
+
 ```bash
 docker compose down
 ```
 
 ### Stop Services and Remove Data
+
 ```bash
 docker compose down -v
 ```
 
 ### View Logs
+
 ```bash
 # All services
 docker compose logs -f
@@ -134,26 +147,31 @@ docker compose --profile admin logs -f pgadmin
 ```
 
 ### Restart Services
+
 ```bash
 docker compose restart
 ```
 
 ### Access PostgreSQL CLI
+
 ```bash
 docker compose exec postgres psql -U junction_user -d junction2025
 ```
 
 ### Run SQL File
+
 ```bash
 docker compose exec -T postgres psql -U junction_user -d junction2025 < your-script.sql
 ```
 
 ### Backup Database
+
 ```bash
 docker compose exec -T postgres pg_dump -U junction_user junction2025 > backup.sql
 ```
 
 ### Restore Database
+
 ```bash
 docker compose exec -T postgres psql -U junction_user -d junction2025 < backup.sql
 ```
@@ -163,6 +181,7 @@ docker compose exec -T postgres psql -U junction_user -d junction2025 < backup.s
 The database schema is **automatically created by the application** on first connection using `CREATE TABLE IF NOT EXISTS` statements. No manual setup or SQL scripts are required.
 
 The application creates:
+
 - 4 tables: `character_states`, `transactions`, `advice_effects`, `monthly_summaries`
 - 6 indexes for query optimization
 - Foreign key constraints
@@ -179,17 +198,17 @@ docker compose up -d
 
 ## Environment Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `POSTGRES_DB` | junction2025 | Database name |
-| `POSTGRES_USER` | junction_user | Database user |
-| `POSTGRES_PASSWORD` | junction_dev_password | Database password |
-| `POSTGRES_HOST` | localhost | Database host (for app) |
-| `POSTGRES_PORT` | 5432 | PostgreSQL port |
-| `DATABASE_URL` | postgresql://... | Full connection string |
-| `PGADMIN_EMAIL` | admin@junction.local | pgAdmin login email |
-| `PGADMIN_PASSWORD` | admin | pgAdmin password |
-| `PGADMIN_PORT` | 5050 | pgAdmin web UI port |
+| Variable            | Default               | Description             |
+| ------------------- | --------------------- | ----------------------- |
+| `POSTGRES_DB`       | junction2025          | Database name           |
+| `POSTGRES_USER`     | junction_user         | Database user           |
+| `POSTGRES_PASSWORD` | junction_dev_password | Database password       |
+| `POSTGRES_HOST`     | localhost             | Database host (for app) |
+| `POSTGRES_PORT`     | 5432                  | PostgreSQL port         |
+| `DATABASE_URL`      | postgresql://...      | Full connection string  |
+| `PGADMIN_EMAIL`     | admin@junction.local  | pgAdmin login email     |
+| `PGADMIN_PASSWORD`  | admin                 | pgAdmin password        |
+| `PGADMIN_PORT`      | 5050                  | pgAdmin web UI port     |
 
 ## Data Persistence
 
@@ -234,6 +253,7 @@ docker compose logs postgres
 ```
 
 Common issues:
+
 - Port already in use
 - Invalid environment variables
 - Corrupted volume data (try `docker compose down -v`)
@@ -241,6 +261,7 @@ Common issues:
 ### Cannot Connect from Application
 
 Ensure:
+
 1. PostgreSQL is running: `docker compose ps`
 2. Port is correct in `.env`
 3. Connection string matches `.env` settings
@@ -252,11 +273,12 @@ Update your application's database configuration to use the PostgreSQL connectio
 
 ```typescript
 // Instead of SQLite file path
-const dbPath = 'saves/advisor_123.db';
+const dbPath = "saves/advisor_123.db";
 
 // Use PostgreSQL connection string
-const connectionString = process.env.DATABASE_URL ||
-  'postgresql://junction_user:junction_dev_password@localhost:5432/junction2025';
+const connectionString =
+  process.env.DATABASE_URL ||
+  "postgresql://junction_user:junction_dev_password@localhost:5432/junction2025";
 ```
 
 ## Production Deployment

@@ -3,6 +3,7 @@
   "name": "Kaisa Virtanen",
   "age": 32,
   "occupation": "Nurse",
+  "gender": "female",
   "background": "Recently divorced after 8 years of marriage. Has two children (ages 5 and 7) with shared custody. Works as a nurse in Oulu. During marriage, her ex-husband handled all finances. Now living alone for the first time and managing her own money. Receives child support but finding it challenging to budget as a single parent. Wants to build financial independence.",
   "personality": {
     "impulsiveness": 0.3,

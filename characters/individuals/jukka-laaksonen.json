@@ -3,6 +3,7 @@
   "name": "Jukka Laaksonen",
   "age": 28,
   "occupation": "Retail Store Clerk",
+  "gender": "male",
   "background": "Works full-time in retail. Has accumulated €8,000 in consumer debt over the past three years. Stressed about the situation. Lives in Tampere, renting an apartment.",
   "personality": {
     "impulsiveness": 0.5,

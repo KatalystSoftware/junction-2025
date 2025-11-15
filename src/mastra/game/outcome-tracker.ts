@@ -51,7 +51,10 @@ export async function recordBaseline(
     const state = await engine.getCharacterState(character.characterId);
     if (!state) return null;
 
-    const summaries = await engine.getMonthlySummaries(character.characterId, 1);
+    const summaries = await engine.getMonthlySummaries(
+      character.characterId,
+      1,
+    );
     const currentMonth = summaries[0];
     if (!currentMonth) return null;
 

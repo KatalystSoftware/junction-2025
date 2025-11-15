@@ -3,6 +3,7 @@
   "name": "Antti Nieminen",
   "age": 45,
   "occupation": "Entrepreneur",
+  "gender": "male",
   "background": "Runs a small construction company in Espoo with 8 employees. Business has been running for 7 years but recently facing cash flow issues due to late client payments. Married with two teenage children. Stressed about keeping business afloat while maintaining family stability.",
   "personality": {
     "impulsiveness": 0.4,

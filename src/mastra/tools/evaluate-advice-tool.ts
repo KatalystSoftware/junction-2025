@@ -23,8 +23,7 @@ import type {
  * Helper: Load transaction context for evaluation
  */
 async function getTransactionContextForEvaluation(
-  characterId: string,
-  databasePath: string = "saves/advisor_default.db",
+  characterId: string
 ): Promise<{
   spending: Record<string, number>;
   anomalies: string[];
@@ -36,7 +35,7 @@ async function getTransactionContextForEvaluation(
     const { SimulationEngine } = await import(
       "../simulation/simulation-engine.ts"
     );
-    const engine = new SimulationEngine(databasePath);
+    const engine = new SimulationEngine();
 
     const state = engine.getCharacterState(characterId);
     if (!state) {
@@ -69,7 +68,7 @@ async function getTransactionContextForEvaluation(
     const spending = db.getSpendingByCategory(
       characterId,
       currentMonth.month + "-01",
-      currentMonth.month + "-31",
+      currentMonth.month + "-31"
     );
     engine.close();
 
@@ -77,22 +76,22 @@ async function getTransactionContextForEvaluation(
     const anomalies: string[] = [];
     if (spending.coffee && Math.abs(spending.coffee) > 60) {
       anomalies.push(
-        `High coffee spending: €${Math.abs(spending.coffee).toFixed(2)}/month`,
+        `High coffee spending: €${Math.abs(spending.coffee).toFixed(2)}/month`
       );
     }
     if (spending.onlineShopping && Math.abs(spending.onlineShopping) > 100) {
       anomalies.push(
-        `Excessive online shopping: €${Math.abs(spending.onlineShopping).toFixed(2)}/month`,
+        `Excessive online shopping: €${Math.abs(spending.onlineShopping).toFixed(2)}/month`
       );
     }
     if (spending.dining && Math.abs(spending.dining) > 150) {
       anomalies.push(
-        `High dining/delivery costs: €${Math.abs(spending.dining).toFixed(2)}/month`,
+        `High dining/delivery costs: €${Math.abs(spending.dining).toFixed(2)}/month`
       );
     }
     if (currentMonth.totalExpenses > currentMonth.totalIncome) {
       anomalies.push(
-        `Spending exceeds income by €${(currentMonth.totalExpenses - currentMonth.totalIncome).toFixed(2)}`,
+        `Spending exceeds income by €${(currentMonth.totalExpenses - currentMonth.totalIncome).toFixed(2)}`
       );
     }
 
@@ -120,7 +119,7 @@ async function getTransactionContextForEvaluation(
  */
 function checkCategoryMentions(
   advice: string,
-  spending: Record<string, number>,
+  spending: Record<string, number>
 ): {
   mentionedCategories: string[];
   missedCategories: string[];
@@ -160,7 +159,7 @@ function checkCategoryMentions(
   for (const [category, keywords] of Object.entries(categoryKeywords)) {
     if (significantCategories.includes(category)) {
       const mentioned = keywords.some((keyword) =>
-        adviceLower.includes(keyword),
+        adviceLower.includes(keyword)
       );
       if (mentioned) {
         mentionedCategories.push(category);
@@ -169,7 +168,7 @@ function checkCategoryMentions(
   }
 
   const missedCategories = significantCategories.filter(
-    (cat) => !mentionedCategories.includes(cat),
+    (cat) => !mentionedCategories.includes(cat)
   );
 
   return { mentionedCategories, missedCategories };
@@ -180,7 +179,7 @@ function checkCategoryMentions(
  */
 function checkAnomalyAwareness(
   advice: string,
-  anomalies: string[],
+  anomalies: string[]
 ): {
   addressedAnomalies: number;
   totalAnomalies: number;
@@ -242,7 +241,7 @@ function filterEmpathyFeedback(items: string[]): string[] {
   ];
 
   return items.filter(
-    (item) => !empathyPatterns.some((pattern) => pattern.test(item)),
+    (item) => !empathyPatterns.some((pattern) => pattern.test(item))
   );
 }
 
@@ -259,7 +258,6 @@ export const evaluateAdviceTool = {
       role: "user" | "assistant";
       content: string;
     }>;
-    databasePath?: string;
   }) => {
     try {
       const {
@@ -268,7 +266,6 @@ export const evaluateAdviceTool = {
         characterPersonality,
         character,
         conversationHistory,
-        databasePath,
       } = context;
 
       // Load transaction context if character available
@@ -282,16 +279,15 @@ export const evaluateAdviceTool = {
 
       if (character?.characterId) {
         transactionContext = await getTransactionContextForEvaluation(
-          character.characterId,
-          databasePath,
+          character.characterId
         );
         categoryAnalysis = checkCategoryMentions(
           advice,
-          transactionContext.spending,
+          transactionContext.spending
         );
         anomalyAnalysis = checkAnomalyAwareness(
           advice,
-          transactionContext.anomalies,
+          transactionContext.anomalies
         );
       }
 
@@ -377,7 +373,7 @@ Please evaluate this advice comprehensively across all dimensions, including tra
         "agent",
         "evaluator_advice",
         evaluationPrompt,
-        () => evaluatorAgent.generate(evaluationPrompt),
+        () => evaluatorAgent.generate(evaluationPrompt)
       );
 
       // Parse JSON response
@@ -407,7 +403,7 @@ Please evaluate this advice comprehensively across all dimensions, including tra
         // Bonus for mentioning significant categories (+0.3 per category, max +1.5)
         const mentionBonus = Math.min(
           categoryAnalysis.mentionedCategories.length * 0.3,
-          1.5,
+          1.5
         );
         scoreModifier += mentionBonus;
 
@@ -415,7 +411,7 @@ Please evaluate this advice comprehensively across all dimensions, including tra
         if (categoryAnalysis.missedCategories.length > 0) {
           const missedPenalty = Math.min(
             categoryAnalysis.missedCategories.length * 0.5,
-            2.0,
+            2.0
           );
           scoreModifier -= missedPenalty;
         }
@@ -466,7 +462,7 @@ Please evaluate this advice comprehensively across all dimensions, including tra
         qualityScore,
         willFollowAdvice,
         willFollowConfidence,
-        extractedActions, // Pass extracted actions for accurate calculation
+        extractedActions // Pass extracted actions for accurate calculation
       );
 
       // Ensure arrays are never empty - add generic feedback if missing
@@ -479,7 +475,7 @@ Please evaluate this advice comprehensively across all dimensions, including tra
         // Strengths for transaction awareness
         if (categoryAnalysis.mentionedCategories.length > 0) {
           strengths.push(
-            `Noticed specific spending patterns: ${categoryAnalysis.mentionedCategories.join(", ")}`,
+            `Noticed specific spending patterns: ${categoryAnalysis.mentionedCategories.join(", ")}`
           );
         }
         if (
@@ -490,14 +486,14 @@ Please evaluate this advice comprehensively across all dimensions, including tra
           strengths.push("Addressed all highlighted spending anomalies");
         } else if (anomalyAnalysis.addressedAnomalies > 0) {
           strengths.push(
-            `Addressed ${anomalyAnalysis.addressedAnomalies} of ${anomalyAnalysis.totalAnomalies} spending anomalies`,
+            `Addressed ${anomalyAnalysis.addressedAnomalies} of ${anomalyAnalysis.totalAnomalies} spending anomalies`
           );
         }
 
         // Weaknesses for missing data
         if (categoryAnalysis.missedCategories.length > 0) {
           weaknesses.push(
-            `Failed to address significant spending in: ${categoryAnalysis.missedCategories.join(", ")}`,
+            `Failed to address significant spending in: ${categoryAnalysis.missedCategories.join(", ")}`
           );
         }
         if (
@@ -505,7 +501,7 @@ Please evaluate this advice comprehensively across all dimensions, including tra
           anomalyAnalysis.totalAnomalies > 0
         ) {
           weaknesses.push(
-            `Ignored all ${anomalyAnalysis.totalAnomalies} highlighted spending anomalies`,
+            `Ignored all ${anomalyAnalysis.totalAnomalies} highlighted spending anomalies`
           );
         }
 
@@ -517,7 +513,7 @@ Please evaluate this advice comprehensively across all dimensions, including tra
               !advice.toLowerCase().includes("coffee")
             ) {
               missedOpportunities.push(
-                `Could have addressed high coffee spending (€${Math.abs(transactionContext.spending.coffee || 0).toFixed(2)}/month)`,
+                `Could have addressed high coffee spending (€${Math.abs(transactionContext.spending.coffee || 0).toFixed(2)}/month)`
               );
             }
             if (
@@ -526,7 +522,7 @@ Please evaluate this advice comprehensively across all dimensions, including tra
               !advice.toLowerCase().includes("temu")
             ) {
               missedOpportunities.push(
-                `Could have addressed excessive online shopping (€${Math.abs(transactionContext.spending.onlineShopping || 0).toFixed(2)}/month)`,
+                `Could have addressed excessive online shopping (€${Math.abs(transactionContext.spending.onlineShopping || 0).toFixed(2)}/month)`
               );
             }
             if (
@@ -535,7 +531,7 @@ Please evaluate this advice comprehensively across all dimensions, including tra
               !advice.toLowerCase().includes("restaurant")
             ) {
               missedOpportunities.push(
-                `Could have addressed high dining/delivery costs (€${Math.abs(transactionContext.spending.dining || 0).toFixed(2)}/month)`,
+                `Could have addressed high dining/delivery costs (€${Math.abs(transactionContext.spending.dining || 0).toFixed(2)}/month)`
               );
             }
           });
@@ -560,18 +556,18 @@ Please evaluate this advice comprehensively across all dimensions, including tra
       if (weaknesses.length === 0 && qualityScore < 8) {
         if (qualityScore < 4) {
           weaknesses.push(
-            "Advice did not adequately address the specific problem",
+            "Advice did not adequately address the specific problem"
           );
           weaknesses.push(
-            "Lacked concrete, actionable steps appropriate for the situation",
+            "Lacked concrete, actionable steps appropriate for the situation"
           );
         } else if (qualityScore < 6) {
           weaknesses.push(
-            "Advice could be more specific to the client's situation",
+            "Advice could be more specific to the client's situation"
           );
         } else {
           weaknesses.push(
-            "Minor improvements could make the advice more actionable",
+            "Minor improvements could make the advice more actionable"
           );
         }
       }
@@ -642,7 +638,7 @@ Please evaluate this advice comprehensively across all dimensions, including tra
       // Basic checks
       const hasNumbers = /\d+/.test(advice);
       const hasSteps = /\d+\.|first|then|finally|1\)|2\)/.test(
-        advice.toLowerCase(),
+        advice.toLowerCase()
       );
       const wasActionable = hasNumbers || hasSteps;
 
@@ -696,7 +692,7 @@ Please evaluate this advice comprehensively across all dimensions, including tra
         score,
         willFollowAdvice,
         willFollowConfidence,
-        fallbackActions, // Pass extracted actions
+        fallbackActions // Pass extracted actions
       );
 
       return {

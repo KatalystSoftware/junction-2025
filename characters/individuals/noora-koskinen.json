@@ -3,6 +3,7 @@
   "name": "Noora Koskinen",
   "age": 22,
   "occupation": "University Student (Business School)",
+  "gender": "female",
   "background": "Third-year business student at Aalto University in Espoo. Receiving full KELA student grant, housing supplement, and has taken out student loans each year. Works part-time as a tutor to supplement income. Stressed about accumulating student debt but everyone says it's normal. Parents live in small town and can't provide much financial support. Wants to understand if student loans are really 'good debt' and how to manage them.",
   "personality": {
     "impulsiveness": 0.4,

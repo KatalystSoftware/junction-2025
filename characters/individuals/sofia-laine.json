@@ -3,6 +3,7 @@
   "name": "Sofia Laine",
   "age": 29,
   "occupation": "Startup Founder",
+  "gender": "female",
   "background": "Founded a sustainable fashion tech startup in Helsinki 18 months ago. Raised €200,000 in seed funding. Company has 3 employees. Struggling to separate personal and business finances. Takes irregular salary from company. Used personal credit card for business expenses. Stressed about investor expectations and cash burn rate. Passionate about the business but financially overwhelmed.",
   "personality": {
     "impulsiveness": 0.7,

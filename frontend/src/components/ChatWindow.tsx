@@ -70,12 +70,8 @@ export function ChatWindow({
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Get multiple choice options from backend (if provided)
-  const multipleChoiceOptions =
-    adviceChoices.length > 0
-      ? adviceChoices.map(
-          (choice: any) => choice.fullAdviceText || choice.actionText,
-        )
-      : [];
+  // Keep the full choice objects to display actionText + projectedOutcome
+  const multipleChoiceOptions = adviceChoices.length > 0 ? adviceChoices : [];
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -128,8 +124,10 @@ export function ChatWindow({
     setInputValue("");
   };
 
-  const handleOptionClick = (option: string) => {
-    onSendMessage(option);
+  const handleOptionClick = (choice: any) => {
+    // Send the fullAdviceText if it exists, otherwise send actionText or the whole choice
+    const messageToSend = choice.fullAdviceText || choice.actionText || choice;
+    onSendMessage(messageToSend);
     setIsInputFocused(false);
   };
 
@@ -140,10 +138,17 @@ export function ChatWindow({
     // Check if input is a number between 1-5 and auto-select the option
     const num = parseInt(value);
     if (value.length === 1 && num >= 1 && num <= 5) {
-      const selectedOption = multipleChoiceOptions[num - 1];
-      onSendMessage(selectedOption);
-      setInputValue("");
-      setIsInputFocused(false);
+      const selectedChoice = multipleChoiceOptions[num - 1];
+      if (selectedChoice) {
+        // Send the fullAdviceText if it exists, otherwise send actionText or the whole choice
+        const messageToSend =
+          selectedChoice.fullAdviceText ||
+          selectedChoice.actionText ||
+          selectedChoice;
+        onSendMessage(messageToSend);
+        setInputValue("");
+        setIsInputFocused(false);
+      }
     }
   };
 
@@ -385,6 +390,7 @@ export function ChatWindow({
                       fontSize: "var(--text-sm)",
                       fontWeight: "var(--font-weight-normal)",
                       lineHeight: 1.5,
+                      whiteSpace: "pre-line",
                     }}
                   >
                     {message.content}
@@ -493,77 +499,124 @@ export function ChatWindow({
               </p>
             </div>
             <div className="space-y-2">
-              {multipleChoiceOptions.map((option, index) => (
-                <button
-                  key={index}
-                  onMouseDown={(e) => {
-                    e.preventDefault(); // Prevent input blur
-                  }}
-                  onClick={() => handleOptionClick(option)}
-                  className="w-full text-left px-4 py-3 rounded-lg transition-all duration-200 border"
-                  style={{
-                    backgroundColor: "var(--muted)",
-                    borderColor: "transparent",
-                    borderRadius: "var(--radius-button)",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = "var(--primary)";
-                    e.currentTarget.style.borderColor = "var(--primary)";
-                    e.currentTarget.style.transform = "translateX(4px)";
-                    const textElements =
-                      e.currentTarget.querySelectorAll("span");
-                    textElements.forEach((el) => {
-                      (el as HTMLElement).style.color =
-                        "var(--primary-foreground)";
-                    });
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "var(--muted)";
-                    e.currentTarget.style.borderColor = "transparent";
-                    e.currentTarget.style.transform = "translateX(0)";
-                    const numberElement =
-                      e.currentTarget.querySelector(".option-number");
-                    const textElement =
-                      e.currentTarget.querySelector(".option-text");
-                    if (numberElement) {
-                      (numberElement as HTMLElement).style.color =
-                        "var(--primary)";
-                    }
-                    if (textElement) {
-                      (textElement as HTMLElement).style.color =
-                        "var(--card-foreground)";
-                    }
-                  }}
-                >
-                  <div className="flex gap-3 items-start">
-                    <span
-                      className="option-number"
-                      style={{
-                        fontFamily: "Inter, sans-serif",
-                        fontSize: "var(--text-sm)",
-                        fontWeight: "var(--font-weight-semibold)",
-                        color: "var(--primary)",
-                        transition: "color 0.2s",
-                        flexShrink: 0,
-                      }}
-                    >
-                      {index + 1}.
-                    </span>
-                    <span
-                      className="option-text"
-                      style={{
-                        fontFamily: "Inter, sans-serif",
-                        fontSize: "var(--text-sm)",
-                        fontWeight: "var(--font-weight-normal)",
-                        color: "var(--card-foreground)",
-                        transition: "color 0.2s",
-                      }}
-                    >
-                      {option}
-                    </span>
-                  </div>
-                </button>
-              ))}
+              {multipleChoiceOptions.map((choice, index) => {
+                // Support both old format (string) and new format (object with actionText)
+                const isObject = typeof choice === "object" && choice !== null;
+                const displayText = isObject
+                  ? choice.actionText || choice.fullAdviceText || ""
+                  : choice;
+                const icon = isObject && choice.icon ? choice.icon : "";
+                const projectedOutcome = isObject
+                  ? choice.projectedOutcome
+                  : "";
+
+                return (
+                  <button
+                    key={index}
+                    onMouseDown={(e) => {
+                      e.preventDefault(); // Prevent input blur
+                    }}
+                    onClick={() => handleOptionClick(choice)}
+                    className="w-full text-left px-4 py-3 rounded-lg transition-all duration-200 border"
+                    style={{
+                      backgroundColor: "var(--muted)",
+                      borderColor: "transparent",
+                      borderRadius: "var(--radius-button)",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "var(--primary)";
+                      e.currentTarget.style.borderColor = "var(--primary)";
+                      e.currentTarget.style.transform = "translateX(4px)";
+                      const textElements =
+                        e.currentTarget.querySelectorAll("span");
+                      textElements.forEach((el) => {
+                        (el as HTMLElement).style.color =
+                          "var(--primary-foreground)";
+                      });
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "var(--muted)";
+                      e.currentTarget.style.borderColor = "transparent";
+                      e.currentTarget.style.transform = "translateX(0)";
+                      const numberElement =
+                        e.currentTarget.querySelector(".option-number");
+                      const textElements =
+                        e.currentTarget.querySelectorAll(".option-text");
+                      if (numberElement) {
+                        (numberElement as HTMLElement).style.color =
+                          "var(--primary)";
+                      }
+                      textElements.forEach((el) => {
+                        (el as HTMLElement).style.color =
+                          "var(--card-foreground)";
+                      });
+                    }}
+                  >
+                    <div className="flex gap-3 items-start">
+                      <span
+                        className="option-number"
+                        style={{
+                          fontFamily: "Inter, sans-serif",
+                          fontSize: "var(--text-sm)",
+                          fontWeight: "var(--font-weight-semibold)",
+                          color: "var(--primary)",
+                          transition: "color 0.2s",
+                          flexShrink: 0,
+                        }}
+                      >
+                        {index + 1}.
+                      </span>
+                      <div style={{ flex: 1 }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.5rem",
+                          }}
+                        >
+                          {icon && (
+                            <span
+                              style={{
+                                fontSize: "var(--text-base)",
+                              }}
+                            >
+                              {icon}
+                            </span>
+                          )}
+                          <span
+                            className="option-text"
+                            style={{
+                              fontFamily: "Inter, sans-serif",
+                              fontSize: "var(--text-sm)",
+                              fontWeight: "var(--font-weight-semibold)",
+                              color: "var(--card-foreground)",
+                              transition: "color 0.2s",
+                            }}
+                          >
+                            {displayText}
+                          </span>
+                        </div>
+                        {projectedOutcome && (
+                          <span
+                            className="option-text"
+                            style={{
+                              fontFamily: "Inter, sans-serif",
+                              fontSize: "var(--text-xs)",
+                              fontWeight: "var(--font-weight-normal)",
+                              color: "var(--muted-foreground)",
+                              transition: "color 0.2s",
+                              display: "block",
+                              marginTop: "0.25rem",
+                            }}
+                          >
+                            {projectedOutcome}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}

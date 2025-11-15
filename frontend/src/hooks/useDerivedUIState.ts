@@ -7,6 +7,7 @@
 
 import { useMemo } from "react";
 import type { Contact, Message } from "../types/ui";
+import { generateAvatarUrl, getAvatarInitials } from "../utils/avatarUtils";
 
 interface AdvisorState {
   activeThreads: Record<
@@ -28,7 +29,12 @@ interface ThreadHistories {
 }
 
 interface CharacterInfo {
-  [threadId: string]: { name: string; age: number; occupation: string };
+  [threadId: string]: {
+    name: string;
+    age: number;
+    occupation: string;
+    gender: "male" | "female";
+  };
 }
 
 function formatTimestamp(date: Date): string {
@@ -66,8 +72,10 @@ export function useDerivedUIState(
       return {
         id: thread.threadId,
         name: charInfo?.name || "Client",
-        avatar: (charInfo?.name || "CL").substring(0, 2).toUpperCase(),
-        avatarImage: `https://api.dicebear.com/7.x/avataaars/svg?seed=${thread.characterId}`,
+        avatar: charInfo?.name ? getAvatarInitials(charInfo.name) : "CL",
+        avatarImage: charInfo?.gender
+          ? generateAvatarUrl(thread.characterId, charInfo.gender)
+          : `https://api.dicebear.com/7.x/avataaars/svg?seed=${thread.characterId}`,
         lastMessage: lastMessage?.content || "New consultation",
         timestamp: formatTimestamp(new Date(thread.lastMessageAt)),
         lastMessageTime: new Date(thread.lastMessageAt),

@@ -3,6 +3,7 @@
   "name": "Sari Mäkinen",
   "age": 35,
   "occupation": "Nurse",
+  "gender": "female",
   "background": "Mother of two children. Spouse works in construction. Wants to start saving for the children's future and her own retirement but doesn't know where to start. Lives in Oulu in an owned apartment.",
   "personality": {
     "impulsiveness": 0.3,

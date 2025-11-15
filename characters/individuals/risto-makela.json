@@ -3,6 +3,7 @@
   "name": "Risto Mäkelä",
   "age": 50,
   "occupation": "Construction Worker",
+  "gender": "male",
   "background": "Construction worker in Kuopio with 30 years in the industry. Back and knee problems getting worse - doctor says he might not be able to continue physical work much longer. Worried about disability pension and whether he'd qualify. Also concerned about health insurance coverage if he can't work. Wife works as cashier. Three adult children, one still at home studying. Modest savings but not enough to retire early. Stressed about future.",
   "personality": {
     "impulsiveness": 0.3,

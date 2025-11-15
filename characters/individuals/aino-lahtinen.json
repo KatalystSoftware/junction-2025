@@ -3,6 +3,7 @@
   "name": "Aino Lahtinen",
   "age": 17,
   "occupation": "High School Student (Part-time Barista)",
+  "gender": "female",
   "background": "17-year-old high school student in Espoo working her first part-time job at a local café. Lives with parents but wants to start managing her own money responsibly. Earns around 400€/month from weekend work. Excited about financial independence but lacks basic knowledge about taxes, savings, and budgeting. Dreams of studying abroad after lukio.",
   "personality": {
     "impulsiveness": 0.6,

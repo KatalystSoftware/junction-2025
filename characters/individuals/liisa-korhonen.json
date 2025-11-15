@@ -3,6 +3,7 @@
   "name": "Liisa Korhonen",
   "age": 58,
   "occupation": "Teacher",
+  "gender": "female",
   "background": "High school mathematics teacher in Turku for 32 years. Planning to retire in 7 years at 65. Divorced 10 years ago. Has adult children who are independent. Worried about whether pension will be enough for comfortable retirement. Lives in owned apartment with mortgage almost paid off.",
   "personality": {
     "impulsiveness": 0.2,

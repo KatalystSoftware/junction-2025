@@ -159,7 +159,9 @@ export class CharacterPoolManager {
         "../simulation/initial-history-generator.ts"
       );
 
-      const dbPath = process.env.DATABASE_URL || "postgresql://junction_user:junction_dev_password@localhost:5433/junction2025";
+      const dbPath =
+        process.env.DATABASE_URL ||
+        "postgresql://junction_user:junction_dev_password@localhost:5433/junction2025";
       const engine = new SimulationEngine(dbPath);
 
       const allCharacters = this.getAllCharacters();
@@ -168,7 +170,10 @@ export class CharacterPoolManager {
       for (const character of allCharacters) {
         // Check if character already has simulation history
         const state = await engine.getCharacterState(character.characterId);
-        const transactions = await engine.getRecentTransactions(character.characterId, 1);
+        const transactions = await engine.getRecentTransactions(
+          character.characterId,
+          1,
+        );
         const hasHistory = state && transactions.length > 0;
 
         if (!hasHistory) {

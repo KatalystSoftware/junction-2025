@@ -3,6 +3,7 @@
   "name": "Tiina Korhonen",
   "age": 40,
   "occupation": "Small Business Owner (Café)",
+  "gender": "female",
   "background": "Owns small café in Porvoo. Fulfilling dream of running own business but financially stressful. Revenue varies seasonally with tourism. Confused about proper business insurance - what does she really need? Property insurance, liability insurance, business interruption insurance all recommended but expensive. Also managing YEL payments and trying to balance business growth with personal financial security. Married but business is her responsibility.",
   "personality": {
     "impulsiveness": 0.4,

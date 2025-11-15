@@ -3,6 +3,7 @@
   "name": "Mikko Salonen",
   "age": 23,
   "occupation": "Unemployed",
+  "gender": "male",
   "background": "Recent university graduate with a bachelor's degree in business. Lost his first job after 6 months due to company downsizing. Living in a shared apartment in Helsinki. Emergency fund depleted after 3 months of unemployment. Receiving unemployment benefits but struggling to make ends meet. Feeling discouraged about job market.",
   "personality": {
     "impulsiveness": 0.6,

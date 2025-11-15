@@ -24,7 +24,8 @@
     "init:knowledge-base": "node --env-file=.env src/mastra/rag/init-knowledge-base.ts",
     "init:knowledge-base:enhanced": "node --env-file=.env src/mastra/rag/init-knowledge-base-enhanced.ts",
     "update:news": "node --env-file=.env src/mastra/rag/update-news-index.ts",
-    "view-transactions": "node --env-file=.env src/view-transactions.ts"
+    "view-transactions": "node --env-file=.env src/view-transactions.ts",
+    "db:start": "docker compose  --env-file .env up"
   },
   "keywords": [],
   "author": "",

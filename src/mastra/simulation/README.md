@@ -85,7 +85,7 @@ const januaryTxns = db.getTransactionsByMonth(character.characterId, "2025-01");
 const spending = db.getSpendingByCategory(
   character.characterId,
   "2025-01-01",
-  "2025-01-31",
+  "2025-01-31"
 );
 console.log(spending); // { groceries: 250, dining: 180, coffee: 65, ... }
 ```
@@ -163,7 +163,7 @@ const transactions = generator.generateMonthTransactions(
   character,
   "2025-01",
   spendingModel,
-  startBalance,
+  startBalance
 );
 
 // Generates:
@@ -206,7 +206,7 @@ const effects = createAdviceEffects(
   characterId,
   sessionId,
   actions,
-  0.8, // 80% chance character follows
+  0.8 // 80% chance character follows
 );
 
 // Effects persist in database and modify spending model
@@ -263,12 +263,12 @@ CREATE INDEX idx_transactions_advice ON transactions(advice_influenced);
 // In startNewConsultation():
 import { SimulationEngine } from "./simulation/simulation-engine.ts";
 
-const engine = new SimulationEngine(advisorState.databasePath!);
+const engine = new SimulationEngine();
 
 // Calculate months elapsed since last consultation
 const monthsElapsed = calculateMonthsElapsed(
   advisorState.lastSimulatedDate,
-  getCurrentMonth(),
+  getCurrentMonth()
 );
 
 if (monthsElapsed > 0) {
@@ -310,7 +310,7 @@ const db = engine.getDatabase();
 const spending = db.getSpendingByCategory(
   characterId,
   "2025-01-01",
-  "2025-03-31",
+  "2025-03-31"
 );
 
 // Advice-influenced transactions
@@ -356,7 +356,7 @@ const txns = generator.generateMonthTransactions(
   character,
   "2025-01",
   spendingModel,
-  500,
+  500
 );
 
 // Assertions

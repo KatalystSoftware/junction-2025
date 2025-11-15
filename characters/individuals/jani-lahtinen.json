@@ -3,6 +3,7 @@
   "name": "Jani Lahtinen",
   "age": 42,
   "occupation": "Factory Worker",
+  "gender": "male",
   "background": "Factory worker in Rauma in paper industry for 20 years. Physically demanding work and body is starting to show wear. Heard about 'varhaiseläke' (early retirement) options and wondering if he qualifies. Wife works part-time as cleaner. Two teenage kids. Modest savings but owns small house with mortgage. Concerned about how early retirement would affect pension and whether they could manage financially. Also worried about health insurance if he stops working.",
   "personality": {
     "impulsiveness": 0.3,

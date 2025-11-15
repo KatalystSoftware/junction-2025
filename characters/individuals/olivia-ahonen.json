@@ -3,6 +3,7 @@
   "name": "Olivia Ahonen",
   "age": 28,
   "occupation": "Registered Nurse",
+  "gender": "female",
   "background": "Nurse at Helsinki University Hospital working rotating shifts including nights and weekends. Earns decent salary with shift bonuses but irregular schedule makes budgeting challenging. Wants to buy her first apartment but concerned about mortgage approval with shift-based income. Also dealing with expensive work-related costs like scrubs and professional development. Single and independent.",
   "personality": {
     "impulsiveness": 0.3,

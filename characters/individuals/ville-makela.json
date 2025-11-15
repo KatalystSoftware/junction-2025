@@ -3,6 +3,7 @@
   "name": "Ville Mäkelä",
   "age": 40,
   "occupation": "IT Consultant (Freelance)",
+  "gender": "male",
   "background": "Freelance IT consultant in Helsinki for 5 years. Income varies significantly month to month - some months €6,000, others €2,000. Married with one child. Wife has stable job. Struggles with tax planning and budgeting with irregular income. Has missed tax prepayment deadlines. Worried about large tax bill at end of year.",
   "personality": {
     "impulsiveness": 0.6,
