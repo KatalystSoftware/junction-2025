@@ -7,7 +7,13 @@
 
 import React, { useState, useEffect } from "react";
 import { render, Box, Text, useInput, useApp } from "ink";
-import { characterPool, getTrustTierInfo } from "./mastra/index.ts";
+import { writeFileSync, mkdirSync } from "fs";
+import { tmpdir } from "os";
+import { join } from "path";
+import {
+  characterPool,
+  getTrustTierInfo,
+} from "./mastra/index.ts";
 import {
   startNewConsultation,
   handleAdvisorResponse,
@@ -39,6 +45,50 @@ import type {
 import { Modal } from "./components/Modal.tsx";
 
 // ============================================================================
+// Helper Functions
+// ============================================================================
+
+/**
+ * Save voice audio from base64 data URL to a temporary file
+ * Returns the file path for playback
+ */
+function saveVoiceAudio(audioDataUrl: string, characterName: string): string | null {
+  try {
+    // Extract base64 data from data URL
+    const base64Match = audioDataUrl.match(/^data:audio\/([^;]+);base64,(.+)$/);
+    if (!base64Match) {
+      console.error("Invalid audio data URL format");
+      return null;
+    }
+
+    const [, extension, base64Data] = base64Match;
+    const audioBuffer = Buffer.from(base64Data, 'base64');
+
+    // Create temp directory for voice files
+    const voiceDir = join(tmpdir(), 'junction-voice-messages');
+    try {
+      mkdirSync(voiceDir, { recursive: true });
+    } catch (err) {
+      // Directory might already exist, that's fine
+    }
+
+    // Generate filename with timestamp
+    const timestamp = Date.now();
+    const sanitizedName = characterName.replace(/[^a-z0-9]/gi, '_');
+    const filename = `voice_${sanitizedName}_${timestamp}.${extension || 'mp3'}`;
+    const filepath = join(voiceDir, filename);
+
+    // Write audio file
+    writeFileSync(filepath, audioBuffer);
+
+    return filepath;
+  } catch (error) {
+    console.error("Failed to save voice audio:", error);
+    return null;
+  }
+}
+
+// ============================================================================
 // Types
 // ============================================================================
 
@@ -48,6 +98,7 @@ interface Message {
   timestamp: Date;
   isVoice?: boolean;
   voiceUrgency?: "calm" | "concerned" | "urgent" | "excited";
+  audioFilePath?: string; // Path to saved audio file
 }
 
 interface ThreadData {
@@ -580,6 +631,12 @@ function App() {
         const newThreadId = consultation.threadId;
         const characterName = consultation.characterInfo.name;
 
+        // Save voice audio if present
+        let audioFilePath: string | undefined;
+        if (consultation.voiceNeeded && consultation.voiceConfig?.audioUrl) {
+          audioFilePath = saveVoiceAudio(consultation.voiceConfig.audioUrl, characterName) || undefined;
+        }
+
         // Create new thread
         const newThread: ThreadData = {
           threadId: newThreadId,
@@ -596,6 +653,7 @@ function App() {
               timestamp: new Date(),
               isVoice: consultation.voiceNeeded,
               voiceUrgency: consultation.voiceConfig?.urgency,
+              audioFilePath,
             },
           ],
           unreadCount: 0,
@@ -608,7 +666,13 @@ function App() {
         setThreads(updated);
         setCurrentThreadId(newThreadId);
         setAdvisorState(consultation.stateUpdate);
-        setStatusMessage(`New client: ${characterName}`);
+
+        // Show status with voice playback instructions if voice message
+        if (consultation.voiceNeeded && audioFilePath) {
+          setStatusMessage(`New client: ${characterName} | 🎧 Voice message saved! Play: open "${audioFilePath}"`);
+        } else {
+          setStatusMessage(`New client: ${characterName}`);
+        }
 
         // Auto-save after new consultation
         if (sessionId) {
@@ -743,6 +807,12 @@ function App() {
 
       setAdvisorState(response.stateUpdate);
 
+      // Save voice audio if present
+      let audioFilePath: string | undefined;
+      if (response.voiceNeeded && response.voiceConfig?.audioUrl) {
+        audioFilePath = saveVoiceAudio(response.voiceConfig.audioUrl, thread.characterName) || undefined;
+      }
+
       // Add messages to thread
       const updatedMessages = [...thread.messages, userMessage];
       if (response.messages && response.messages.length > 0) {
@@ -752,6 +822,7 @@ function App() {
           timestamp: new Date(),
           isVoice: response.voiceNeeded,
           voiceUrgency: response.voiceConfig?.urgency,
+          audioFilePath,
         });
       }
 
@@ -828,6 +899,9 @@ function App() {
           setStatusMessage(
             `${tierInfo.icon} ${response.tierChangeNotification.characterName} trusts you more! (${tierInfo.name})`,
           );
+        } else if (response.voiceNeeded && audioFilePath) {
+          // Voice message received
+          setStatusMessage(`🎧 Voice message received! Play: open "${audioFilePath}"`);
         } else {
           setStatusMessage("Type your response");
         }
@@ -1080,9 +1154,16 @@ function ConversationPanel({ thread }: { thread: ThreadData }) {
             ) : msg.role === "user" ? (
               <Text color="green">💼 You: {msg.content}</Text>
             ) : (
-              <Text color="blue">
-                {msg.isVoice ? getVoiceIcon(msg.voiceUrgency) : "💬"} {thread.characterName}: "{msg.content}"
-              </Text>
+              <>
+                <Text color="blue">
+                  {msg.isVoice ? getVoiceIcon(msg.voiceUrgency) : "💬"} {thread.characterName}: "{msg.content}"
+                </Text>
+                {msg.isVoice && msg.audioFilePath && (
+                  <Text dimColor color="cyan">
+                    🎧 Audio saved: {msg.audioFilePath}
+                  </Text>
+                )}
+              </>
             )}
           </Box>
         );
