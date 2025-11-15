@@ -117,21 +117,27 @@ async function buildTransactionContext(character: Character): Promise<string> {
     );
 
     const engine = new SimulationEngine();
-    const state = engine.getCharacterState(character.characterId);
+    const state = await engine.getCharacterState(character.characterId);
 
     if (!state) {
-      engine.close();
+      await engine.close();
       return "";
     }
 
     // Get recent transactions
-    const recentTxns = engine.getRecentTransactions(character.characterId, 10);
+    const recentTxns = await engine.getRecentTransactions(
+      character.characterId,
+      10,
+    );
 
     // Get monthly summary
-    const summaries = engine.getMonthlySummaries(character.characterId, 1);
+    const summaries = await engine.getMonthlySummaries(
+      character.characterId,
+      1,
+    );
     const currentMonth = summaries[0];
 
-    engine.close();
+    await engine.close();
 
     if (!recentTxns.length && !currentMonth) {
       return "";

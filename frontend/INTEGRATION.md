@@ -278,7 +278,6 @@ Sessions are automatically managed:
 - UUID generated on first visit
 - Stored in `localStorage` as `elamapeli_session_id`
 - Persists across page reloads
-- Backend stores in SQLite (`elamapeli.db`)
 
 To reset: `localStorage.clear()` or use `clearSession()` from `sessionManager`.
 

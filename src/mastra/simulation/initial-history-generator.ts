@@ -18,16 +18,16 @@ import { SimulationEngine } from "./simulation-engine.ts";
  */
 export async function generateInitialHistory(
   character: Character,
-  simulationEngine: SimulationEngine
+  simulationEngine: SimulationEngine,
 ): Promise<void> {
   // Don't regenerate if already has history
   const existingState = await simulationEngine.getCharacterState(
-    character.characterId
+    character.characterId,
   );
   if (existingState) {
     const existingTxns = await simulationEngine.getRecentTransactions(
       character.characterId,
-      10
+      10,
     );
     if (existingTxns.length > 0) {
       return; // Already has history
@@ -132,7 +132,7 @@ export function calculateStartingBalance(character: Character): number {
  */
 export function adjustSpendingForHistory(
   character: Character,
-  monthsAgo: number
+  monthsAgo: number,
 ): number {
   // For characters with debt, show gradually increasing spending that led to debt
   if (character.financialProfile.hasDebt) {

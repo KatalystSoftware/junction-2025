@@ -60,6 +60,8 @@ export async function recordBaseline(
 
     // Get category spending breakdown
     const db = engine.getDatabase();
+    if (!db) return null;
+
     const spending = await db.getSpendingByCategory(
       character.characterId,
       currentMonth.month + "-01",
@@ -101,6 +103,8 @@ export async function updateOutcomeWithFollowUp(
 
     // Get follow-up category spending
     const db = engine.getDatabase();
+    if (!db) return outcome;
+
     const followUpSpending = await db.getSpendingByCategory(
       outcome.characterId,
       currentMonth.month + "-01",

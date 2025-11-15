@@ -52,7 +52,7 @@ import { Modal } from "./components/Modal.tsx";
  */
 function saveVoiceAudio(
   audioDataUrl: string,
-  characterName: string
+  characterName: string,
 ): string | null {
   try {
     // Extract base64 data from data URL
@@ -140,7 +140,7 @@ interface ThreadData {
  * Returns structured data for display in FinancialOverviewBox component
  */
 async function getFinancialOverview(
-  characterId: string
+  characterId: string,
 ): Promise<FinancialOverview | null> {
   try {
     const { SimulationEngine } = await import(
@@ -148,29 +148,34 @@ async function getFinancialOverview(
     );
     const engine = new SimulationEngine();
 
-    const state = engine.getCharacterState(characterId);
+    const state = await engine.getCharacterState(characterId);
     if (!state) {
-      engine.close();
+      await engine.close();
       return null;
     }
 
-    const recentTxns = engine.getRecentTransactions(characterId, 10);
-    const summaries = engine.getMonthlySummaries(characterId, 1);
+    const recentTxns = await engine.getRecentTransactions(characterId, 10);
+    const summaries = await engine.getMonthlySummaries(characterId, 1);
     const currentMonth = summaries[0];
 
     if (!currentMonth) {
-      engine.close();
+      await engine.close();
       return null;
     }
 
     // Get spending by category
     const db = engine.getDatabase();
-    const spending = db.getSpendingByCategory(
+    if (!db) {
+      await engine.close();
+      return null;
+    }
+
+    const spending = await db.getSpendingByCategory(
       characterId,
       currentMonth.month + "-01",
-      currentMonth.month + "-31"
+      currentMonth.month + "-31",
     );
-    engine.close();
+    await engine.close();
 
     // Calculate net income
     const netIncome = currentMonth.totalIncome - currentMonth.totalExpenses;
@@ -199,22 +204,22 @@ async function getFinancialOverview(
     const anomalies: string[] = [];
     if (spending.coffee && Math.abs(spending.coffee) > 60) {
       anomalies.push(
-        `High coffee spending: €${Math.abs(spending.coffee).toFixed(2)}/month`
+        `High coffee spending: €${Math.abs(spending.coffee).toFixed(2)}/month`,
       );
     }
     if (spending.onlineShopping && Math.abs(spending.onlineShopping) > 100) {
       anomalies.push(
-        `Frequent online shopping: €${Math.abs(spending.onlineShopping).toFixed(2)}/month`
+        `Frequent online shopping: €${Math.abs(spending.onlineShopping).toFixed(2)}/month`,
       );
     }
     if (spending.dining && Math.abs(spending.dining) > 150) {
       anomalies.push(
-        `High dining/delivery costs: €${Math.abs(spending.dining).toFixed(2)}/month`
+        `High dining/delivery costs: €${Math.abs(spending.dining).toFixed(2)}/month`,
       );
     }
     if (currentMonth.totalExpenses > currentMonth.totalIncome) {
       anomalies.push(
-        `SPENDING EXCEEDS INCOME by €${(currentMonth.totalExpenses - currentMonth.totalIncome).toFixed(2)}`
+        `SPENDING EXCEEDS INCOME by €${(currentMonth.totalExpenses - currentMonth.totalIncome).toFixed(2)}`,
       );
     }
 
@@ -287,7 +292,7 @@ function App() {
 
   // Helper: Convert threads to format for saving (extract histories and metadata)
   const getThreadDataForSave = (
-    threadMap: Map<string, ThreadData>
+    threadMap: Map<string, ThreadData>,
   ): {
     histories: Map<
       string,
@@ -345,18 +350,18 @@ function App() {
 
         if (savedState) {
           setStatusMessage(
-            `✅ Loaded session from ${new Date(savedState.savedAt).toLocaleString()}`
+            `✅ Loaded session from ${new Date(savedState.savedAt).toLocaleString()}`,
           );
         } else {
           setStatusMessage(
-            `⚠️ Session not found, creating new session with UUID ${formatSessionId(providedUuid)}`
+            `⚠️ Session not found, creating new session with UUID ${formatSessionId(providedUuid)}`,
           );
         }
       } else {
         // Generate new session UUID
         currentSessionId = generateSessionId();
         setStatusMessage(
-          `✨ New session: ${formatSessionId(currentSessionId)}`
+          `✨ New session: ${formatSessionId(currentSessionId)}`,
         );
       }
 
@@ -398,13 +403,12 @@ function App() {
               try {
                 const fetched = await getFinancialOverview(
                   metadata.characterId,
-                  "saves/advisor_default.db" // Use shared database
                 );
                 financialOverview = fetched || undefined;
               } catch (error) {
                 console.error(
                   `Failed to fetch financial overview for ${metadata.characterId}:`,
-                  error
+                  error,
                 );
               }
             }
@@ -463,7 +467,7 @@ function App() {
 
     if (panelKeys[input] && !inputValue) {
       setActivePanel(
-        activePanel === panelKeys[input] ? null : panelKeys[input]
+        activePanel === panelKeys[input] ? null : panelKeys[input],
       );
       return;
     }
@@ -474,7 +478,7 @@ function App() {
       setStatusMessage(
         showAllThreads
           ? "Showing active threads only"
-          : "Showing all threads (history)"
+          : "Showing all threads (history)",
       );
       return;
     }
@@ -500,7 +504,7 @@ function App() {
           handleChoiceSelection(choiceIndex);
         } else {
           setStatusMessage(
-            `Invalid choice. Select 1-${currentThread.adviceChoices.length}`
+            `Invalid choice. Select 1-${currentThread.adviceChoices.length}`,
           );
         }
         return;
@@ -510,7 +514,7 @@ function App() {
       const threadIndex = parseInt(input) - 1;
       // Filter based on current view (active only or all)
       const threadList = Array.from(threads.values()).filter((t) =>
-        showAllThreads ? true : t.status === "active"
+        showAllThreads ? true : t.status === "active",
       );
       if (threadIndex < threadList.length) {
         const targetThread = threadList[threadIndex];
@@ -524,7 +528,7 @@ function App() {
           setThreads(updated);
         }
         setStatusMessage(
-          `Switched to ${targetThread.characterName}${targetThread.status === "completed" ? " (completed)" : ""}`
+          `Switched to ${targetThread.characterName}${targetThread.status === "completed" ? " (completed)" : ""}`,
         );
       } else {
         setStatusMessage(`Invalid thread number. Use 1-${threadList.length}`);
@@ -582,7 +586,7 @@ function App() {
         setStatusMessage(
           isCorrect
             ? "✅ Correct! Press SPACE to continue"
-            : "❌ Incorrect. Press SPACE to continue"
+            : "❌ Incorrect. Press SPACE to continue",
         );
       }
       return;
@@ -597,12 +601,12 @@ function App() {
         // Move to next question
         setCurrentQuestionIndex(currentQuestionIndex + 1);
         setStatusMessage(
-          `Question ${currentQuestionIndex + 2}/${quiz.questions.length}`
+          `Question ${currentQuestionIndex + 2}/${quiz.questions.length}`,
         );
       } else {
         // Quiz complete - calculate results
         const correctCount = quiz.questions.filter(
-          (q: any, i: number) => quizAnswers[i] === q.correctAnswer
+          (q: any, i: number) => quizAnswers[i] === q.correctAnswer,
         ).length;
         const scorePercentage = (correctCount / quiz.questions.length) * 100;
 
@@ -649,7 +653,7 @@ function App() {
 
         // Show results (will be handled by QuizResultsModal)
         setStatusMessage(
-          `Quiz complete! Score: ${scorePercentage.toFixed(0)}% (Press SPACE to continue)`
+          `Quiz complete! Score: ${scorePercentage.toFixed(0)}% (Press SPACE to continue)`,
         );
       }
       return;
@@ -705,7 +709,7 @@ function App() {
 
         // Switch to another active thread if available
         const activeThreads = Array.from(updated.values()).filter(
-          (t) => t.status === "active"
+          (t) => t.status === "active",
         );
         if (activeThreads.length > 0) {
           setCurrentThreadId(activeThreads[0].threadId);
@@ -713,7 +717,7 @@ function App() {
         } else {
           setCurrentThreadId(null);
           setStatusMessage(
-            "No active threads. Press 'n' for new client (or 'h' to view history)"
+            "No active threads. Press 'n' for new client (or 'h' to view history)",
           );
         }
       }
@@ -754,7 +758,7 @@ function App() {
     try {
       const consultation = await startNewConsultation(
         advisorState.advisorId,
-        advisorState
+        advisorState,
       );
 
       // Onboarding
@@ -774,7 +778,7 @@ function App() {
             sessionId,
             consultation.stateUpdate,
             histories,
-            metadata
+            metadata,
           );
         }
         return;
@@ -794,7 +798,7 @@ function App() {
             sessionId,
             consultation.stateUpdate,
             histories,
-            metadata
+            metadata,
           );
         }
         return;
@@ -814,7 +818,7 @@ function App() {
             sessionId,
             consultation.stateUpdate,
             histories,
-            metadata
+            metadata,
           );
         }
         return;
@@ -842,14 +846,9 @@ function App() {
         const characterId = threadInfo?.characterId || "";
 
         // Load financial overview (structured data)
-        // NOTE: Always use shared database (advisor_default.db) since financial simulation
-        // is shared across all sessions, not session-specific
         const financialOverview =
           characterId && characterId.length > 0
-            ? await getFinancialOverview(
-                characterId,
-                "saves/advisor_default.db" // Use shared database, not session-specific
-              )
+            ? await getFinancialOverview(characterId)
             : null;
 
         // Create new thread
@@ -944,7 +943,7 @@ function App() {
         // Show status with voice playback instructions if voice message
         if (consultation.voiceNeeded && audioFilePath) {
           setStatusMessage(
-            `New client: ${characterName} | 🎧 Voice message saved! Play: open "${audioFilePath}"`
+            `New client: ${characterName} | 🎧 Voice message saved! Play: open "${audioFilePath}"`,
           );
         } else {
           setStatusMessage(`New client: ${characterName}`);
@@ -957,7 +956,7 @@ function App() {
             sessionId,
             consultation.stateUpdate,
             histories,
-            metadata
+            metadata,
           );
         }
       } else {
@@ -999,7 +998,7 @@ function App() {
         currentThreadId,
         choiceIndex,
         advisorState,
-        history
+        history,
       );
 
       setAdvisorState(response.stateUpdate);
@@ -1080,7 +1079,7 @@ function App() {
         currentThreadId,
         message,
         advisorState,
-        history
+        history,
       );
 
       setAdvisorState(response.stateUpdate);
@@ -1152,7 +1151,7 @@ function App() {
         // Add tier change to status message
         if (response.tierChangeNotification) {
           const tierInfo = getTrustTierInfo(
-            response.tierChangeNotification.newTier
+            response.tierChangeNotification.newTier,
           );
           statusMsg = `${tierInfo.icon} ${response.tierChangeNotification.characterName} is now ${tierInfo.name}! ${statusMsg}`;
         }
@@ -1171,15 +1170,15 @@ function App() {
         // Show tier change notification even during conversation
         if (response.tierChangeNotification) {
           const tierInfo = getTrustTierInfo(
-            response.tierChangeNotification.newTier
+            response.tierChangeNotification.newTier,
           );
           setStatusMessage(
-            `${tierInfo.icon} ${response.tierChangeNotification.characterName} trusts you more! (${tierInfo.name})`
+            `${tierInfo.icon} ${response.tierChangeNotification.characterName} trusts you more! (${tierInfo.name})`,
           );
         } else if (response.voiceNeeded && audioFilePath) {
           // Voice message received
           setStatusMessage(
-            `🎧 Voice message received! Play: open "${audioFilePath}"`
+            `🎧 Voice message received! Play: open "${audioFilePath}"`,
           );
         } else {
           setStatusMessage("Type your response");
@@ -1288,7 +1287,7 @@ function App() {
             {showAllThreads ? "All Threads" : "Active Threads"} (
             {
               Array.from(threads.values()).filter((t) =>
-                showAllThreads ? true : t.status === "active"
+                showAllThreads ? true : t.status === "active",
               ).length
             }
             )
@@ -1646,7 +1645,7 @@ function getTrustHearts(trustLevel: number): string {
 }
 
 function getOutcomeIcon(
-  outcome: "helped" | "struggling" | "pending" | "unknown"
+  outcome: "helped" | "struggling" | "pending" | "unknown",
 ): string {
   switch (outcome) {
     case "helped":
@@ -1688,7 +1687,7 @@ function getTrustProgressBar(trustLevel: number): string {
 
 function RelationshipsPanel({ advisorState }: { advisorState: AdvisorState }) {
   const relationships = characterPool.getCharacterRelationships(
-    advisorState.advisorId
+    advisorState.advisorId,
   );
 
   if (relationships.length === 0) {
@@ -2056,7 +2055,7 @@ function QuizResultsModal({
   advisorState: AdvisorState | null;
 }) {
   const correctCount = quiz.questions.filter(
-    (q: any, i: number) => answers[i] === q.correctAnswer
+    (q: any, i: number) => answers[i] === q.correctAnswer,
   ).length;
   const scorePercentage = (correctCount / quiz.questions.length) * 100;
 
@@ -2445,7 +2444,7 @@ function FinalResultsModal({
                         <Text key={category} color="green">
                           {emoji} {category}: €{Math.round(amount)} (€
                           {Math.round(
-                            amount / projection.projectionPeriodMonths
+                            amount / projection.projectionPeriodMonths,
                           )}
                           /month)
                         </Text>

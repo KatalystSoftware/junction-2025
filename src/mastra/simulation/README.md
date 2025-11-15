@@ -1,6 +1,6 @@
 # Financial Simulation System
 
-A realistic transaction-based financial simulation for Elämäpeli 2025, featuring granular transactions with real Finnish merchants, personality-driven spending, and SQLite persistence.
+A realistic transaction-based financial simulation for Elämäpeli 2025, featuring granular transactions with real Finnish merchants, personality-driven spending, and postgres persistence.
 
 ## 🎯 Overview
 
@@ -11,7 +11,7 @@ The simulation system creates **20-40 realistic transactions per month** for eac
 - ✅ **Realistic Transactions**: Salary, rent, subscriptions, groceries, dining, coffee, transport, entertainment, online shopping, impulse purchases
 - ✅ **Real Finnish Merchants**: Temu, Wolt, S-Market, HSL, Espresso House, Netflix, Spotify, etc.
 - ✅ **Personality-Driven**: Impulsive characters buy from Temu, emotional characters order Wolt
-- ✅ **SQLite Database**: Unlimited transaction history, fast queries, analytics
+- ✅ **Postgres Database**: Unlimited transaction history, fast queries, analytics
 - ✅ **Monthly Tick System**: 1 consultation = 1 simulated month
 - ✅ **Advice Effects**: Advisor's advice actually changes spending behavior
 - ✅ **6-Month History**: Each character starts with realistic backstory
@@ -21,7 +21,7 @@ The simulation system creates **20-40 realistic transactions per month** for eac
 ```
 src/mastra/simulation/
 ├── simulation-types.ts              # Type definitions
-├── database-manager.ts              # SQLite operations
+├── database-manager.ts              # Postgres operations
 ├── merchant-database.ts             # Finnish merchant lists
 ├── spending-model.ts                # Personality → spending patterns
 ├── transaction-generator.ts         # Generate monthly transactions
@@ -85,7 +85,7 @@ const januaryTxns = db.getTransactionsByMonth(character.characterId, "2025-01");
 const spending = db.getSpendingByCategory(
   character.characterId,
   "2025-01-01",
-  "2025-01-31"
+  "2025-01-31",
 );
 console.log(spending); // { groceries: 250, dining: 180, coffee: 65, ... }
 ```
@@ -163,7 +163,7 @@ const transactions = generator.generateMonthTransactions(
   character,
   "2025-01",
   spendingModel,
-  startBalance
+  startBalance,
 );
 
 // Generates:
@@ -206,7 +206,7 @@ const effects = createAdviceEffects(
   characterId,
   sessionId,
   actions,
-  0.8 // 80% chance character follows
+  0.8, // 80% chance character follows
 );
 
 // Effects persist in database and modify spending model
@@ -268,7 +268,7 @@ const engine = new SimulationEngine();
 // Calculate months elapsed since last consultation
 const monthsElapsed = calculateMonthsElapsed(
   advisorState.lastSimulatedDate,
-  getCurrentMonth()
+  getCurrentMonth(),
 );
 
 if (monthsElapsed > 0) {
@@ -310,7 +310,7 @@ const db = engine.getDatabase();
 const spending = db.getSpendingByCategory(
   characterId,
   "2025-01-01",
-  "2025-03-31"
+  "2025-03-31",
 );
 
 // Advice-influenced transactions
@@ -356,7 +356,7 @@ const txns = generator.generateMonthTransactions(
   character,
   "2025-01",
   spendingModel,
-  500
+  500,
 );
 
 // Assertions
@@ -421,6 +421,4 @@ When adding new features:
 
 ## 📚 References
 
-- SQLite documentation: https://www.sqlite.org/docs.html
-- better-sqlite3: https://github.com/WiseLibs/better-sqlite3
 - Financial simulation best practices: FINANCIAL_SIMULATION_PLAN.md

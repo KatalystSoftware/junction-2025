@@ -98,7 +98,7 @@ interface ClientSafeGameResponse extends Omit<GameResponse, "stateUpdate"> {
  * Map GameResponse to client-safe version
  */
 function toClientSafeGameResponse(
-  response: GameResponse
+  response: GameResponse,
 ): ClientSafeGameResponse {
   const { stateUpdate, ...rest } = response;
   return {
@@ -118,7 +118,7 @@ app.use(
   cors({
     origin: ["http://localhost:3000", "http://localhost:5173"], // Vite dev servers
     credentials: true,
-  })
+  }),
 );
 
 // ============================================================================
@@ -157,7 +157,7 @@ app.post("/init", async (c) => {
       const savedSession = await loadSession(sessionId);
       if (savedSession) {
         console.log(
-          `📂 Loaded existing session: ${sessionId.substring(0, 8)}...`
+          `📂 Loaded existing session: ${sessionId.substring(0, 8)}...`,
         );
         advisorState = savedSession.advisorState;
 
@@ -167,16 +167,16 @@ app.post("/init", async (c) => {
           threadMetadata = Object.fromEntries(savedSession.threadMetadata);
         }
         console.log(
-          `💬 Loaded ${Object.keys(threadHistories).length} thread histories`
+          `💬 Loaded ${Object.keys(threadHistories).length} thread histories`,
         );
         console.log(
-          `📊 Loaded ${Object.keys(threadMetadata).length} thread metadata`
+          `📊 Loaded ${Object.keys(threadMetadata).length} thread metadata`,
         );
 
         // Don't save - we just loaded this data, don't overwrite it
       } else {
         console.log(
-          `⚠️ Session ${sessionId.substring(0, 8)}... not found, creating new`
+          `⚠️ Session ${sessionId.substring(0, 8)}... not found, creating new`,
         );
         advisorState = createNewAdvisor(sessionId);
         isNewSession = true;
@@ -232,13 +232,13 @@ app.post("/start-consultation", async (c) => {
       await c.req.json<StartConsultationRequest>();
 
     console.log(
-      `🎬 Starting consultation for session: ${sessionId.substring(0, 8)}...`
+      `🎬 Starting consultation for session: ${sessionId.substring(0, 8)}...`,
     );
 
     // Call orchestrator to get next character/scenario
     const gameResponse = await startNewConsultation(
       advisorState.advisorId,
-      advisorState
+      advisorState,
     );
 
     // Convert threadHistories and threadMetadata to Maps
@@ -262,7 +262,7 @@ app.post("/start-consultation", async (c) => {
       console.log("👔 historiesMap size:", historiesMap.size);
       console.log(
         "👔 historiesMap has boss-pinned:",
-        historiesMap.has("boss-pinned")
+        historiesMap.has("boss-pinned"),
       );
     }
 
@@ -282,14 +282,14 @@ app.post("/start-consultation", async (c) => {
 
       historiesMap.set(threadId, existingHistory);
       console.log(
-        `💬 Saved ${gameResponse.messages.length} initial message(s) to thread ${threadId.substring(0, 8)}...`
+        `💬 Saved ${gameResponse.messages.length} initial message(s) to thread ${threadId.substring(0, 8)}...`,
       );
 
       // Save character metadata if provided
       if (gameResponse.characterInfo) {
         metadataMap.set(threadId, gameResponse.characterInfo);
         console.log(
-          `👤 Saved character metadata for thread ${threadId.substring(0, 8)}...`
+          `👤 Saved character metadata for thread ${threadId.substring(0, 8)}...`,
         );
       }
     }
@@ -313,7 +313,7 @@ app.post("/start-consultation", async (c) => {
       sessionId,
       gameResponse.stateUpdate,
       historiesMap,
-      metadataMap
+      metadataMap,
     );
 
     // Convert Maps back to objects for response
@@ -322,7 +322,7 @@ app.post("/start-consultation", async (c) => {
 
     console.log(
       "📤 Returning threadHistories:",
-      JSON.stringify(threadHistoriesObject, null, 2)
+      JSON.stringify(threadHistoriesObject, null, 2),
     );
 
     return c.json<StartConsultationResponse>({
@@ -371,7 +371,7 @@ app.post("/send-message", async (c) => {
     } = await c.req.json<SendMessageRequest>();
 
     console.log(
-      `💬 Message in thread ${threadId.substring(0, 8)}... from session ${sessionId.substring(0, 8)}...`
+      `💬 Message in thread ${threadId.substring(0, 8)}... from session ${sessionId.substring(0, 8)}...`,
     );
 
     let gameResponse;
@@ -403,7 +403,7 @@ app.post("/send-message", async (c) => {
       const bossHistory = historiesMap.get("boss-pinned") || [];
       bossHistory.push(
         { role: "user" as const, content: message },
-        { role: "assistant" as const, content: bossResponse }
+        { role: "assistant" as const, content: bossResponse },
       );
       historiesMap.set("boss-pinned", bossHistory);
       console.log("👔 Saved boss conversation to threadHistories");
@@ -413,7 +413,7 @@ app.post("/send-message", async (c) => {
         threadId,
         message,
         advisorState,
-        conversationHistory
+        conversationHistory,
       );
 
       // Add user message and character response to threadHistories
@@ -431,7 +431,7 @@ app.post("/send-message", async (c) => {
 
       historiesMap.set(threadId, threadHistory);
       console.log(
-        `💬 Saved conversation to thread ${threadId.substring(0, 8)}... (now ${threadHistory.length} messages)`
+        `💬 Saved conversation to thread ${threadId.substring(0, 8)}... (now ${threadHistory.length} messages)`,
       );
     }
 
@@ -440,7 +440,7 @@ app.post("/send-message", async (c) => {
       sessionId,
       gameResponse.stateUpdate,
       historiesMap,
-      metadataMap
+      metadataMap,
     );
 
     // Convert Maps back to objects for response
@@ -503,27 +503,32 @@ app.get("/financial-overview/:characterId", async (c) => {
     );
     const engine = new SimulationEngine();
 
-    const state = engine.getCharacterState(characterId);
+    const state = await engine.getCharacterState(characterId);
     if (!state) {
-      engine.close();
+      await engine.close();
       return c.json({ error: "Character not found" }, 404);
     }
 
-    const recentTxns = engine.getRecentTransactions(characterId, 10);
-    const summaries = engine.getMonthlySummaries(characterId, 1);
+    const recentTxns = await engine.getRecentTransactions(characterId, 10);
+    const summaries = await engine.getMonthlySummaries(characterId, 1);
     const currentMonth = summaries[0];
 
     if (!currentMonth) {
-      engine.close();
+      await engine.close();
       return c.json({ error: "No financial data available" }, 404);
     }
 
     // Get spending by category
     const db = engine.getDatabase();
-    const spending = db.getSpendingByCategory(
+    if (!db) {
+      await engine.close();
+      return c.json({ error: "Database not available" }, 500);
+    }
+
+    const spending = await db.getSpendingByCategory(
       characterId,
       currentMonth.month + "-01",
-      currentMonth.month + "-31"
+      currentMonth.month + "-31",
     );
 
     // Calculate net income
@@ -553,22 +558,22 @@ app.get("/financial-overview/:characterId", async (c) => {
     const anomalies: string[] = [];
     if (spending.coffee && Math.abs(spending.coffee) > 60) {
       anomalies.push(
-        `High coffee spending: €${Math.abs(spending.coffee).toFixed(2)}/month`
+        `High coffee spending: €${Math.abs(spending.coffee).toFixed(2)}/month`,
       );
     }
     if (spending.onlineShopping && Math.abs(spending.onlineShopping) > 100) {
       anomalies.push(
-        `Frequent online shopping: €${Math.abs(spending.onlineShopping).toFixed(2)}/month`
+        `Frequent online shopping: €${Math.abs(spending.onlineShopping).toFixed(2)}/month`,
       );
     }
     if (spending.dining && Math.abs(spending.dining) > 150) {
       anomalies.push(
-        `High dining/delivery costs: €${Math.abs(spending.dining).toFixed(2)}/month`
+        `High dining/delivery costs: €${Math.abs(spending.dining).toFixed(2)}/month`,
       );
     }
     if (currentMonth.totalExpenses > currentMonth.totalIncome) {
       anomalies.push(
-        `SPENDING EXCEEDS INCOME by €${(currentMonth.totalExpenses - currentMonth.totalIncome).toFixed(2)}`
+        `SPENDING EXCEEDS INCOME by €${(currentMonth.totalExpenses - currentMonth.totalIncome).toFixed(2)}`,
       );
     }
 
@@ -582,7 +587,7 @@ app.get("/financial-overview/:characterId", async (c) => {
       anomalies,
     };
 
-    engine.close();
+    await engine.close();
 
     return c.json(overview);
   } catch (error) {
@@ -608,14 +613,14 @@ app.get("/transactions/:characterId", async (c) => {
     );
     const engine = new SimulationEngine();
 
-    const state = engine.getCharacterState(characterId);
+    const state = await engine.getCharacterState(characterId);
     if (!state) {
-      engine.close();
+      await engine.close();
       return c.json({ error: "Character not found" }, 404);
     }
 
-    const transactions = engine.getRecentTransactions(characterId, limit);
-    engine.close();
+    const transactions = await engine.getRecentTransactions(characterId, limit);
+    await engine.close();
 
     return c.json({
       characterId,
