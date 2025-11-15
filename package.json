@@ -7,6 +7,7 @@
     "test": "node --env-file=.env src/test-game.ts",
     "test:game": "node --env-file=.env src/test-game.ts",
     "play": "node --env-file=.env src/play-interactive.ts",
+    "play:tui": "tsx --env-file=.env src/play-tui.tsx",
     "dev": "mastra dev",
     "build": "mastra build",
     "start": "mastra start",
@@ -26,12 +27,16 @@
     "@mastra/libsql": "1.0.0-beta.0",
     "@mastra/loggers": "1.0.0-beta.0",
     "@mastra/memory": "1.0.0-beta.0",
+    "ink": "^6.5.0",
+    "react": "^19.2.0",
     "zod": "^4.1.12"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
+    "@types/react": "^19.2.5",
     "mastra": "1.0.0-beta.1",
     "prettier": "^3.6.2",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   }
 }
