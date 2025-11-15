@@ -1042,7 +1042,7 @@ function App() {
       <Box flexGrow={1} flexDirection="row">
         {/* Sidebar - Thread List */}
         <Box
-          width={25}
+          width={activePanel === "analytics" ? 80 : activePanel ? 50 : 25}
           borderStyle="single"
           borderColor="gray"
           flexDirection="column"
@@ -1167,14 +1167,15 @@ function App() {
               currentThread.adviceChoices.length > 0;
 
             if (activePanel) {
-              return `[${activePanel === "help" ? "?" : activePanel[0]}] Close • [?] Help • [q] Quit`;
+              const key = activePanel === "help" ? "?" : activePanel === "analytics" ? "d" : activePanel[0];
+              return `[${key}] Close • [?] Help • [q] Quit`;
             }
 
             if (hasChoices) {
               return `🎯 [1-${currentThread!.adviceChoices!.length}] Select advice • [n] New • [h] History • [?] Help • [q] Quit`;
             }
 
-            return `[n] New${currentThreadId ? " • [1-9] Switch thread" : ""} • [h] History • [s] Stats • [r] Relationships • [p] Progress • [a] Achievements • [?] Help • [q] Quit`;
+            return `[n] New${currentThreadId ? " • [1-9] Switch thread" : ""} • [h] History • [s] Stats • [r] Relationships • [p] Progress • [a] Achievements • [d] Analytics • [?] Help • [q] Quit`;
           })()}
         </Text>
       </Box>
