@@ -31,7 +31,6 @@
       }
     },
     "idealAdvice": [
-      "Validate that this is a major life transition and learning is normal",
       "Start with tracking all expenses for 2-4 weeks",
       "Create categories: housing, kids (childcare, clothes, activities), food, utilities, personal",
       "Ensure child support is in separate mental/physical account for kid expenses",
@@ -42,10 +41,8 @@
     ],
     "commonMistakes": [
       "Overwhelming with complex budgeting systems",
-      "Not acknowledging the emotional difficulty of divorce",
       "Ignoring the variability of expenses with shared custody",
       "Not mentioning available single parent support systems",
-      "Being judgmental about lack of financial knowledge",
       "Treating child support as personal income"
     ],
     "followUpScenarios": [
@@ -91,20 +88,14 @@
       }
     },
     "idealAdvice": [
-      "Celebrate the amazing progress! This is a huge achievement",
       "Continue building emergency fund to 3-6 months expenses",
       "Emergency fund first, then consider investing",
-      "Explain importance of financial independence for peace of mind",
+      "Explain importance of financial independence for long-term security",
       "Consider children's savings accounts for their future",
       "Once emergency fund solid, look into low-risk investments",
-      "Explore continuing education about personal finance",
-      "You're doing great - trust yourself"
+      "Explore continuing education about personal finance"
     ],
-    "commonMistakes": [
-      "Not celebrating the progress adequately",
-      "Pushing investments before adequate emergency fund",
-      "Ignoring the emotional importance of financial independence post-divorce"
-    ]
+    "commonMistakes": ["Pushing investments before adequate emergency fund"]
   },
   {
     "scenarioId": "scenario_kaisa_struggling_003",
@@ -139,19 +130,16 @@
       }
     },
     "idealAdvice": [
-      "Reassure that everyone faces unexpected expenses - this is normal",
       "Build \"irregular expenses\" category into budget (kids, car, etc.)",
-      "Explain that asking for help doesn't mean failure - it means being practical",
+      "Asking for help is practical resource management when needed",
       "Create sinking funds for predictable irregular costs",
       "Start very small emergency fund (even €20/month adds up)",
       "Kids expenses are genuinely unpredictable - build flexibility into budget",
       "Consider if you can reduce some kid activity costs without hurting them",
-      "This is a learning process - be kind to yourself"
+      "Budgets require ongoing adjustment based on real data"
     ],
     "commonMistakes": [
-      "Not addressing the emotional self-judgment",
       "Suggesting to cut all kid expenses (not realistic or fair to children)",
-      "Implying that needing help is a failure",
       "Not normalizing that budgets need adjustment"
     ]
   }

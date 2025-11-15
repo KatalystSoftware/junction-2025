@@ -138,9 +138,59 @@ export class CharacterPoolManager {
       console.log(
         `✅ Loaded ${this.characters.size} characters and ${this.scenarios.size} scenarios`,
       );
+
+      // Initialize financial simulation with 6-month history
+      await this.initializeFinancialSimulation();
     } catch (error) {
       console.error("❌ Error loading character/scenario files:", error);
       throw error;
+    }
+  }
+
+  /**
+   * Initialize financial simulation for all characters with 6-month history
+   */
+  private async initializeFinancialSimulation(): Promise<void> {
+    try {
+      const { SimulationEngine } = await import(
+        "../simulation/simulation-engine.ts"
+      );
+      const { generateInitialHistory } = await import(
+        "../simulation/initial-history-generator.ts"
+      );
+
+      const dbPath = "saves/advisor_default.db";
+      const engine = new SimulationEngine(dbPath);
+
+      const allCharacters = this.getAllCharacters();
+      let initializedCount = 0;
+
+      for (const character of allCharacters) {
+        // Check if character already has simulation history
+        const state = engine.getCharacterState(character.characterId);
+        const hasHistory =
+          state &&
+          engine.getRecentTransactions(character.characterId, 1).length > 0;
+
+        if (!hasHistory) {
+          console.log(
+            `   📊 Generating 6-month financial history for ${character.name}...`,
+          );
+          generateInitialHistory(character, engine);
+          initializedCount++;
+        }
+      }
+
+      engine.close();
+
+      if (initializedCount > 0) {
+        console.log(
+          `   ✅ Initialized ${initializedCount} characters with financial history`,
+        );
+      }
+    } catch (error) {
+      console.error("⚠️  Could not initialize financial simulation:", error);
+      // Don't throw - simulation is optional
     }
   }
 

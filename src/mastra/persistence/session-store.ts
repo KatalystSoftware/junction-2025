@@ -6,7 +6,34 @@
  */
 
 import { storage } from "../index.ts";
-import type { AdvisorState } from "../types/game-types.ts";
+import type { AdvisorState, AdviceChoice } from "../types/game-types.ts";
+
+// Thread metadata types (matching play-tui.tsx)
+export interface FinancialOverview {
+  balance: number;
+  monthlyIncome: number;
+  monthlyExpenses: number;
+  netIncome: number;
+  topCategories: Array<{
+    category: string;
+    amount: number;
+    percentage: number;
+  }>;
+  recentTransactions: Array<{
+    date: string;
+    description: string;
+    amount: number;
+  }>;
+  anomalies: string[];
+}
+
+export interface ThreadMetadata {
+  characterId?: string;
+  characterName: string;
+  status: "active" | "completed";
+  financialOverview?: FinancialOverview;
+  adviceChoices?: AdviceChoice[];
+}
 
 export interface SavedSession {
   sessionId: string;
@@ -15,10 +42,7 @@ export interface SavedSession {
     string,
     Array<{ role: "user" | "assistant"; content: string }>
   >;
-  characterInfo: Map<
-    string,
-    { name: string; age: number; occupation: string }
-  >;
+  threadMetadata?: Map<string, ThreadMetadata>;
   savedAt: string;
 }
 
@@ -39,10 +63,7 @@ export async function saveSession(
     string,
     Array<{ role: "user" | "assistant"; content: string }>
   >,
-  characterInfo?: Map<
-    string,
-    { name: string; age: number; occupation: string }
-  >,
+  threadMetadata?: Map<string, ThreadMetadata>,
 ): Promise<void> {
   // Prepare metadata for quick lookups
   const metadata: Record<string, unknown> = {
@@ -56,7 +77,7 @@ export async function saveSession(
   const sessionData = {
     advisorState,
     threadHistories: threadHistories ? Object.fromEntries(threadHistories) : {},
-    characterInfo: characterInfo ? Object.fromEntries(characterInfo) : {},
+    threadMetadata: threadMetadata ? Object.fromEntries(threadMetadata) : {},
     savedAt: metadata.lastActive,
   };
 
@@ -108,17 +129,16 @@ export async function loadSession(
       Array<{ role: "user" | "assistant"; content: string }>
     >(Object.entries(sessionData.threadHistories || {}));
 
-    // Convert character info back to Map
-    const characterInfo = new Map<
-      string,
-      { name: string; age: number; occupation: string }
-    >(Object.entries(sessionData.characterInfo || {}));
+    // Convert thread metadata back to Map
+    const threadMetadata = new Map<string, ThreadMetadata>(
+      Object.entries(sessionData.threadMetadata || {}),
+    );
 
     return {
       sessionId,
       advisorState: sessionData.advisorState,
       threadHistories,
-      characterInfo,
+      threadMetadata,
       savedAt: sessionData.savedAt,
     };
   } catch (error) {

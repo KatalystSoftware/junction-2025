@@ -33,7 +33,6 @@
       }
     },
     "idealAdvice": [
-      "Acknowledge the stress and validate concern for employees",
       "Immediate action: contact clients directly about payment schedules",
       "Consider invoice factoring or short-term business line of credit",
       "Review payment terms and implement stricter policies (deposits, progress payments)",
@@ -46,9 +45,7 @@
       "Suggesting personal loans to cover business expenses (bad practice)",
       "Recommending firing employees without exploring all options",
       "Not addressing the urgent payroll deadline",
-      "Focusing only on loan without addressing receivables collection",
-      "Being judgmental about business management",
-      "Ignoring the human element (employees, family stress)"
+      "Focusing only on loan without addressing receivables collection"
     ],
     "followUpScenarios": [
       {
@@ -94,7 +91,6 @@
       }
     },
     "idealAdvice": [
-      "Celebrate solving the immediate crisis",
       "Build cash reserve equal to 2-3 months of operating expenses",
       "Implement stricter payment terms (50% deposit, progress payments)",
       "Set up automated payment reminders and follow-up system",
@@ -104,7 +100,6 @@
       "Meet with accountant quarterly to review financial health"
     ],
     "commonMistakes": [
-      "Not acknowledging the successful crisis management",
       "Suggesting overly conservative approach that limits growth",
       "Ignoring the need for working capital in construction business"
     ]
@@ -143,20 +138,16 @@
       }
     },
     "idealAdvice": [
-      "Provide emotional support - this is a crisis point",
       "Immediate: legal advice on collecting overdue payments",
       "Consider hiring collection agency for severely overdue invoices",
       "Meet with business advisor to assess if business is viable",
       "If closing: proper procedures to minimize personal liability",
       "If continuing: radical restructuring needed",
-      "Family counseling - business stress affecting marriage",
       "Don't make permanent decisions in crisis mode - get professional help first"
     ],
     "commonMistakes": [
       "Immediately saying to close business without assessment",
-      "Ignoring the severe emotional and family toll",
-      "Not addressing the immediate legal/collection issues",
-      "Being judgmental about using personal savings"
+      "Not addressing the immediate legal/collection issues"
     ]
   }
 ]

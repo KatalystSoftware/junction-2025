@@ -36,13 +36,11 @@
       "Create debt payoff plan (snowball or avalanche method)",
       "Look for ways to increase income or reduce expenses",
       "Consider contacting financial counseling services",
-      "Emphasize this is solvable and provide hope"
+      "Explain concrete steps to solve this problem"
     ],
     "commonMistakes": [
       "Don't stress, debt is normal for people your age",
-      "Being judgmental about how debt was accumulated",
       "Suggesting bankruptcy immediately (too extreme for €8k)",
-      "Not addressing the emotional weight",
       "Giving vague advice without actionable steps",
       "Ignoring high interest rate problem"
     ],
@@ -84,7 +82,6 @@
       }
     },
     "idealAdvice": [
-      "Celebrate the progress (big win!)",
       "Explain minimum vs. accelerated payoff tradeoffs",
       "Help create emergency fund while paying debt (balanced approach)",
       "Calculate interest savings from extra payments",
@@ -93,7 +90,6 @@
     ],
     "commonMistakes": [
       "Suggesting to pay all extra money to debt without emergency fund",
-      "Not acknowledging the great progress made",
       "Being too aggressive with payoff plan"
     ]
   }
