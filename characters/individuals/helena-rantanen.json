@@ -1,0 +1,32 @@
+{
+  "characterId": "char_helena_010",
+  "name": "Helena Rantanen",
+  "age": 25,
+  "occupation": "Marketing Manager",
+  "background": "Young professional working at a tech startup in Helsinki. Recently promoted to marketing manager with good salary. Grew up in family that avoided credit cards and debt entirely. Now wanting to build credit score for future (apartment purchase). Never had a credit card. Financially conservative but wants to use modern financial tools responsibly.",
+  "personality": {
+    "impulsiveness": 0.3,
+    "trustingness": 0.6,
+    "financial_literacy": 0.6,
+    "stubbornness": 0.4,
+    "emotionality": 0.3
+  },
+  "financialProfile": {
+    "incomeLevel": "medium",
+    "typicalMonthlyIncome": 3400,
+    "hasDebt": false,
+    "hasSavings": "good"
+  },
+  "communicationStyle": {
+    "formality": "semi-formal",
+    "language": "casual_adult_finnish",
+    "prefersVoice": 0.2,
+    "callsWhenEmotional": false
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

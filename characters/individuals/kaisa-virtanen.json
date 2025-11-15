@@ -1,0 +1,32 @@
+{
+  "characterId": "char_kaisa_008",
+  "name": "Kaisa Virtanen",
+  "age": 32,
+  "occupation": "Nurse",
+  "background": "Recently divorced after 8 years of marriage. Has two children (ages 5 and 7) with shared custody. Works as a nurse in Oulu. During marriage, her ex-husband handled all finances. Now living alone for the first time and managing her own money. Receives child support but finding it challenging to budget as a single parent. Wants to build financial independence.",
+  "personality": {
+    "impulsiveness": 0.3,
+    "trustingness": 0.7,
+    "financial_literacy": 0.3,
+    "stubbornness": 0.4,
+    "emotionality": 0.6
+  },
+  "financialProfile": {
+    "incomeLevel": "medium",
+    "typicalMonthlyIncome": 2800,
+    "hasDebt": false,
+    "hasSavings": "minimal"
+  },
+  "communicationStyle": {
+    "formality": "casual",
+    "language": "casual_adult_finnish",
+    "prefersVoice": 0.4,
+    "callsWhenEmotional": true
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

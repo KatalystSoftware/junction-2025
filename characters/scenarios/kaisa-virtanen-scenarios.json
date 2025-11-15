@@ -1,0 +1,158 @@
+[
+  {
+    "scenarioId": "scenario_kaisa_divorce_001",
+    "characterId": "char_kaisa_008",
+    "scenarioType": "post_divorce_finances",
+    "difficulty": 0.5,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Hi. My divorce was finalized two months ago and I'm completely overwhelmed. I have two kids and I've never managed finances alone - my ex handled everything. I earn €2,800 and get €600 child support, but I don't know how to make a budget with kids involved. Where do I even start?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Recently divorced, first time managing own finances, single parent responsibilities",
+      "emotionalState": "overwhelmed, uncertain, determined to learn",
+      "urgency": "medium",
+      "specificDetails": {
+        "monthlyIncome": 2800,
+        "childSupport": 600,
+        "numberOfChildren": 2,
+        "childAges": [5, 7],
+        "sharedCustody": true,
+        "neverBudgetedBefore": true
+      }
+    },
+    "idealAdvice": [
+      "Validate that this is a major life transition and learning is normal",
+      "Start with tracking all expenses for 2-4 weeks",
+      "Create categories: housing, kids (childcare, clothes, activities), food, utilities, personal",
+      "Ensure child support is in separate mental/physical account for kid expenses",
+      "Build small emergency fund (€500-1000 as first goal)",
+      "Consider that expenses may differ on weeks with vs without kids",
+      "Look into single parent benefits and tax deductions in Finland",
+      "Start simple - complexity can be added later"
+    ],
+    "commonMistakes": [
+      "Overwhelming with complex budgeting systems",
+      "Not acknowledging the emotional difficulty of divorce",
+      "Ignoring the variability of expenses with shared custody",
+      "Not mentioning available single parent support systems",
+      "Being judgmental about lack of financial knowledge",
+      "Treating child support as personal income"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_kaisa_confidence_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 3
+      },
+      {
+        "scenarioId": "scenario_kaisa_struggling_003",
+        "triggeredBy": "bad_advice_or_not_followed",
+        "delayInSessions": 2
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_kaisa_confidence_002",
+    "characterId": "char_kaisa_008",
+    "scenarioType": "post_divorce_building_independence",
+    "difficulty": 0.4,
+    "topic": "saving",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_kaisa_divorce_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Thank you so much! I've been budgeting for two months now and I finally feel in control of my money. I even have €400 saved! 😊 I want to keep building my independence. Should I focus on saving more or maybe start investing? I want to be financially secure on my own.",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Successfully budgeting, building confidence, wants to grow financial independence",
+      "emotionalState": "proud, motivated, empowered",
+      "urgency": "low",
+      "specificDetails": {
+        "savedAmount": 400,
+        "budgetingSuccessfully": true,
+        "wantsFinancialIndependence": true
+      }
+    },
+    "idealAdvice": [
+      "Celebrate the amazing progress! This is a huge achievement",
+      "Continue building emergency fund to 3-6 months expenses",
+      "Emergency fund first, then consider investing",
+      "Explain importance of financial independence for peace of mind",
+      "Consider children's savings accounts for their future",
+      "Once emergency fund solid, look into low-risk investments",
+      "Explore continuing education about personal finance",
+      "You're doing great - trust yourself"
+    ],
+    "commonMistakes": [
+      "Not celebrating the progress adequately",
+      "Pushing investments before adequate emergency fund",
+      "Ignoring the emotional importance of financial independence post-divorce"
+    ]
+  },
+  {
+    "scenarioId": "scenario_kaisa_struggling_003",
+    "characterId": "char_kaisa_008",
+    "scenarioType": "post_divorce_overwhelmed",
+    "difficulty": 0.5,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_kaisa_divorce_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "I tried to make a budget but there's so many unexpected costs with kids - new shoes, school trips, birthday parties. Then my car broke down. I had to ask my parents for money and I feel like such a failure. I thought I could do this on my own.",
+      "voiceMessage": {
+        "enabled": true,
+        "transcription": "I tried to make a budget but there's so many unexpected costs with kids - new shoes, school trips, birthday parties. Then my car broke down. I had to ask my parents for money and I feel like such a failure. I thought I could do this on my own.",
+        "urgency": "concerned"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Budget derailed by unexpected expenses, feeling inadequate",
+      "emotionalState": "discouraged, feeling like failure, frustrated",
+      "urgency": "medium",
+      "specificDetails": {
+        "carRepair": 800,
+        "unexpectedKidExpenses": 200,
+        "borrowedFromParents": 600,
+        "feelingInadequate": true
+      }
+    },
+    "idealAdvice": [
+      "Reassure that everyone faces unexpected expenses - this is normal",
+      "Build \"irregular expenses\" category into budget (kids, car, etc.)",
+      "Explain that asking for help doesn't mean failure - it means being practical",
+      "Create sinking funds for predictable irregular costs",
+      "Start very small emergency fund (even €20/month adds up)",
+      "Kids expenses are genuinely unpredictable - build flexibility into budget",
+      "Consider if you can reduce some kid activity costs without hurting them",
+      "This is a learning process - be kind to yourself"
+    ],
+    "commonMistakes": [
+      "Not addressing the emotional self-judgment",
+      "Suggesting to cut all kid expenses (not realistic or fair to children)",
+      "Implying that needing help is a failure",
+      "Not normalizing that budgets need adjustment"
+    ]
+  }
+]

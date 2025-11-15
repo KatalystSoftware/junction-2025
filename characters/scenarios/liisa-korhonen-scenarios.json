@@ -1,0 +1,159 @@
+[
+  {
+    "scenarioId": "scenario_liisa_retirement_001",
+    "characterId": "char_liisa_006",
+    "scenarioType": "retirement_planning",
+    "difficulty": 0.6,
+    "topic": "retirement",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Hello. I'm 58 and planning to retire at 65. I checked my pension estimate and it will be about €2,100 per month. I currently earn €3,200. I have €45,000 in savings and my mortgage (€180/month) ends in 3 years. Will this be enough? Should I work longer?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Planning retirement in 7 years, concerned about income reduction",
+      "emotionalState": "worried, uncertain, wanting to plan properly",
+      "urgency": "medium",
+      "specificDetails": {
+        "currentIncome": 3200,
+        "expectedPension": 2100,
+        "savingsAmount": 45000,
+        "mortgagePayment": 180,
+        "mortgageYearsLeft": 3,
+        "yearsUntilRetirement": 7,
+        "age": 58
+      }
+    },
+    "idealAdvice": [
+      "Validate that starting to plan now is smart (7 years is good timeframe)",
+      "Calculate actual retirement budget needs (typically 70-80% of current income)",
+      "Account for mortgage ending - that frees up €180/month",
+      "Explain pension optimization strategies (working a few years longer increases pension significantly)",
+      "Review voluntary pension savings options (if wants to boost retirement income)",
+      "Consider part-time work in early retirement if desired",
+      "Create retirement budget including healthcare, hobbies, travel plans",
+      "Discuss inflation protection and investment of savings"
+    ],
+    "commonMistakes": [
+      "Automatically saying income is too low without analyzing actual needs",
+      "Not considering mortgage ending in calculation",
+      "Ignoring that expenses typically decrease in retirement",
+      "Not asking about desired retirement lifestyle",
+      "Pushing aggressive investments without understanding risk tolerance",
+      "Not discussing healthcare costs in retirement"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_liisa_retirement_optimized_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 3
+      },
+      {
+        "scenarioId": "scenario_liisa_retirement_anxious_003",
+        "triggeredBy": "bad_advice_or_not_followed",
+        "delayInSessions": 2
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_liisa_retirement_optimized_002",
+    "characterId": "char_liisa_006",
+    "scenarioType": "retirement_planning_followup",
+    "difficulty": 0.5,
+    "topic": "retirement",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_liisa_retirement_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Thank you for the retirement planning help! I made a detailed budget and realized I'll actually be fine with €2,100, especially after the mortgage ends. I'm feeling much better about it. Now I'm thinking about what to do with my €45,000 savings. Should I invest some of it or keep it safe?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Retirement anxiety resolved, now optimizing savings strategy",
+      "emotionalState": "relieved, confident, ready to optimize",
+      "urgency": "low",
+      "specificDetails": {
+        "savingsAmount": 45000,
+        "riskTolerance": "moderate",
+        "yearsUntilRetirement": 7,
+        "hasEmergencyFund": true
+      }
+    },
+    "idealAdvice": [
+      "Acknowledge the great progress in planning",
+      "Explain age-based investment strategy (7 years is medium-term horizon)",
+      "Suggest balanced portfolio (mix of stocks and bonds appropriate for age)",
+      "Keep emergency fund liquid (6 months expenses)",
+      "Consider tax-advantaged retirement accounts in Finland",
+      "Gradual shift to more conservative investments as retirement approaches",
+      "Low-cost index funds or pension insurance products",
+      "Review and rebalance annually"
+    ],
+    "commonMistakes": [
+      "Suggesting high-risk investments too close to retirement",
+      "Recommending putting all savings in investments (need emergency fund)",
+      "Not considering tax implications",
+      "Overly complicated investment strategies"
+    ]
+  },
+  {
+    "scenarioId": "scenario_liisa_retirement_anxious_003",
+    "characterId": "char_liisa_006",
+    "scenarioType": "retirement_planning_anxiety",
+    "difficulty": 0.5,
+    "topic": "retirement",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_liisa_retirement_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I've been thinking more about retirement and I'm getting really worried. What if I get sick? What if there's a recession? My friend says I should work until 68 to get maximum pension. Should I give up my retirement plans and work longer? I'm feeling quite stressed about this.",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Retirement anxiety increased, overthinking scenarios",
+      "emotionalState": "anxious, confused by conflicting advice",
+      "urgency": "medium",
+      "specificDetails": {
+        "healthConcerns": true,
+        "recessionFears": true,
+        "peerPressure": true,
+        "consideringWorkingLonger": true
+      }
+    },
+    "idealAdvice": [
+      "Address the anxiety with reassurance and facts",
+      "Explain Finland's healthcare system coverage in retirement",
+      "Discuss emergency fund purpose (handling unexpected costs)",
+      "Working longer is an option, not a necessity - depends on health and desires",
+      "Break down \"what if\" scenarios with actual numbers",
+      "Each year worked adds about 1.5% to pension in Finland",
+      "Create contingency plans rather than worst-case planning",
+      "Suggest focusing on what can be controlled"
+    ],
+    "commonMistakes": [
+      "Reinforcing anxiety without providing facts",
+      "Automatically agreeing to work longer without discussing quality of life",
+      "Not addressing emotional aspects of retirement transition",
+      "Providing too many scenarios that increase anxiety"
+    ]
+  }
+]

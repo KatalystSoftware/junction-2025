@@ -1,0 +1,170 @@
+[
+  {
+    "scenarioId": "scenario_eero_inheritance_001",
+    "characterId": "char_eero_011",
+    "scenarioType": "inheritance_planning",
+    "difficulty": 0.6,
+    "topic": "retirement",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Hello. My mother is 92 and in poor health. I expect to inherit about €120,000 within the next year or two. My wife and I are both retired - we get €3,200 total in pensions monthly and have €80,000 in savings. We want to use the inheritance wisely and also leave something for our children. What should we do with it?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Expecting large inheritance, wants to plan wisely for legacy and enjoyment",
+      "emotionalState": "thoughtful, responsible, slightly sad about mother's condition",
+      "urgency": "low",
+      "specificDetails": {
+        "expectedInheritance": 120000,
+        "currentSavings": 80000,
+        "monthlyPension": 3200,
+        "ownHomeOutright": true,
+        "numberOfChildren": 3,
+        "mothersAge": 92
+      }
+    },
+    "idealAdvice": [
+      "Acknowledge the difficult situation with mother's health",
+      "Don't make decisions until inheritance is actually received",
+      "Consider what mother would want you to do with it",
+      "Split into: emergency fund, enjoyment fund, children's inheritance",
+      "Keep substantial emergency fund for healthcare/home repairs (€30-40k)",
+      "Use some for retirement enjoyment (travel, hobbies) - you've earned it",
+      "Invest remainder conservatively for children's inheritance",
+      "Consider tax-efficient gifting to children (gifts under €5,000/year tax-free in Finland)",
+      "Write a will if you haven't already",
+      "Discuss plans with children to avoid future conflicts"
+    ],
+    "commonMistakes": [
+      "Not acknowledging the emotional aspect of parent's mortality",
+      "Suggesting aggressive investments at age 65",
+      "Recommending giving all to children without enjoying any",
+      "Not mentioning estate planning/will",
+      "Ignoring potential healthcare costs in old age",
+      "Not discussing Finnish inheritance tax implications"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_eero_inheritance_received_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 5
+      },
+      {
+        "scenarioId": "scenario_eero_family_conflict_003",
+        "triggeredBy": "bad_advice_or_not_followed",
+        "delayInSessions": 3
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_eero_inheritance_received_002",
+    "characterId": "char_eero_011",
+    "scenarioType": "inheritance_received",
+    "difficulty": 0.5,
+    "topic": "retirement",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_eero_inheritance_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "My mother passed away last month. We received €115,000 after estate settlement. We're grieving but also want to honor her memory by using the money wisely. My wife and I want to take a nice trip - we've always dreamed of visiting New Zealand - but feel guilty spending 'her' money on ourselves. Is it okay to use some for this?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Inheritance received, grieving, guilty about using money for enjoyment",
+      "emotionalState": "sad, guilty, conflicted",
+      "urgency": "low",
+      "specificDetails": {
+        "inheritanceReceived": 115000,
+        "recentLoss": true,
+        "dreamTrip": "New Zealand",
+        "estimatedTripCost": 8000,
+        "feelingGuilty": true
+      }
+    },
+    "idealAdvice": [
+      "Express condolences for the loss",
+      "Your mother likely would want you to enjoy life and be happy",
+      "Using a portion for meaningful experiences honors her memory",
+      "A €8,000-10,000 trip from €115,000 is very reasonable (less than 10%)",
+      "Set up three buckets: immediate enjoyment, security, legacy",
+      "Security fund: €40,000 (combined with your savings)",
+      "Enjoyment fund: €15,000 (trip + other retirement activities)",
+      "Legacy fund: €60,000 (invest conservatively for children)",
+      "Take the trip - create positive memories during difficult time",
+      "Your financial security is also a gift to your children (won't burden them)"
+    ],
+    "commonMistakes": [
+      "Not addressing the grief and guilt",
+      "Encouraging spending all the money",
+      "Making it seem irresponsible to enjoy any of it",
+      "Not creating a clear plan for the full amount"
+    ]
+  },
+  {
+    "scenarioId": "scenario_eero_family_conflict_003",
+    "characterId": "char_eero_011",
+    "scenarioType": "inheritance_family_issues",
+    "difficulty": 0.7,
+    "topic": "retirement",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_eero_inheritance_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "We have a problem. My mother passed and left everything to me. My sister is furious - she says I manipulated mother. She's threatening legal action. I did care for mother these last years while she lived abroad, but I never asked for all of it. My children are also asking when they'll get 'their share.' This is tearing our family apart. What do I do?",
+      "voiceMessage": {
+        "enabled": true,
+        "transcription": "We have a problem. My mother passed and left everything to me. My sister is furious - she says I manipulated mother. She's threatening legal action. I did care for mother these last years while she lived abroad, but I never asked for all of it. My children are also asking when they'll get 'their share.' This is tearing our family apart. What do I do?",
+        "urgency": "urgent"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Family conflict over inheritance, sister threatening lawsuit, children demanding money",
+      "emotionalState": "stressed, hurt, defensive, overwhelmed",
+      "urgency": "high",
+      "specificDetails": {
+        "receivedFullInheritance": true,
+        "sisterLivesAbroad": true,
+        "sisterThreateningLawsuit": true,
+        "childrenDemanding": true,
+        "providedCareForMother": true,
+        "familyConflict": true
+      }
+    },
+    "idealAdvice": [
+      "This is primarily a family/legal issue, not just financial",
+      "Consult with estate lawyer immediately regarding sister's claims",
+      "In Finland, children have right to legal share of inheritance",
+      "Don't make financial decisions under family pressure",
+      "Consider voluntary family mediation to resolve conflict",
+      "Your children don't have legal right to YOUR inheritance",
+      "If you choose to share with sister, do it properly with legal documentation",
+      "Protect yourself legally before being generous",
+      "Don't let guilt or pressure make you act hastily",
+      "This requires professional legal and possibly psychological help"
+    ],
+    "commonMistakes": [
+      "Giving financial advice when this needs legal counsel",
+      "Suggesting to immediately split money to appease everyone",
+      "Not acknowledging the severe emotional toll",
+      "Ignoring the legal complexities of Finnish inheritance law",
+      "Taking sides in family dispute"
+    ]
+  }
+]

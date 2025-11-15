@@ -1,0 +1,32 @@
+{
+  "characterId": "char_ville_009",
+  "name": "Ville Mäkelä",
+  "age": 40,
+  "occupation": "IT Consultant (Freelance)",
+  "background": "Freelance IT consultant in Helsinki for 5 years. Income varies significantly month to month - some months €6,000, others €2,000. Married with one child. Wife has stable job. Struggles with tax planning and budgeting with irregular income. Has missed tax prepayment deadlines. Worried about large tax bill at end of year.",
+  "personality": {
+    "impulsiveness": 0.6,
+    "trustingness": 0.5,
+    "financial_literacy": 0.5,
+    "stubbornness": 0.5,
+    "emotionality": 0.4
+  },
+  "financialProfile": {
+    "incomeLevel": "medium",
+    "typicalMonthlyIncome": 4200,
+    "hasDebt": false,
+    "hasSavings": "moderate"
+  },
+  "communicationStyle": {
+    "formality": "casual",
+    "language": "casual_adult_finnish",
+    "prefersVoice": 0.3,
+    "callsWhenEmotional": false
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "characterId": "char_eero_011",
+  "name": "Eero Salo",
+  "age": 65,
+  "occupation": "Retired",
+  "background": "Recently retired electrician from Jyväskylä. Worked for 42 years. Receives pension of €1,800/month. Wife also retired with pension of €1,400/month. Own their home outright. Have €80,000 in savings. Expect to inherit €120,000 from elderly parent within next few years. Concerned about estate planning and how to leave something for their three adult children. Want to enjoy retirement but also be responsible.",
+  "personality": {
+    "impulsiveness": 0.2,
+    "trustingness": 0.7,
+    "financial_literacy": 0.4,
+    "stubbornness": 0.6,
+    "emotionality": 0.3
+  },
+  "financialProfile": {
+    "incomeLevel": "medium",
+    "typicalMonthlyIncome": 1800,
+    "hasDebt": false,
+    "hasSavings": "good"
+  },
+  "communicationStyle": {
+    "formality": "semi-formal",
+    "language": "casual_adult_finnish",
+    "prefersVoice": 0.4,
+    "callsWhenEmotional": false
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

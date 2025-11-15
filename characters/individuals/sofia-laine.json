@@ -1,0 +1,32 @@
+{
+  "characterId": "char_sofia_012",
+  "name": "Sofia Laine",
+  "age": 29,
+  "occupation": "Startup Founder",
+  "background": "Founded a sustainable fashion tech startup in Helsinki 18 months ago. Raised €200,000 in seed funding. Company has 3 employees. Struggling to separate personal and business finances. Takes irregular salary from company. Used personal credit card for business expenses. Stressed about investor expectations and cash burn rate. Passionate about the business but financially overwhelmed.",
+  "personality": {
+    "impulsiveness": 0.7,
+    "trustingness": 0.4,
+    "financial_literacy": 0.5,
+    "stubbornness": 0.8,
+    "emotionality": 0.7
+  },
+  "financialProfile": {
+    "incomeLevel": "low",
+    "typicalMonthlyIncome": 2000,
+    "hasDebt": true,
+    "hasSavings": "none"
+  },
+  "communicationStyle": {
+    "formality": "casual",
+    "language": "casual_adult_finnish",
+    "prefersVoice": 0.5,
+    "callsWhenEmotional": true
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

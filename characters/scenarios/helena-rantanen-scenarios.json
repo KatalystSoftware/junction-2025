@@ -1,0 +1,108 @@
+[
+  {
+    "scenarioId": "scenario_helena_creditcard_001",
+    "characterId": "char_helena_010",
+    "scenarioType": "building_credit",
+    "difficulty": 0.3,
+    "topic": "credit_score",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Hi! I'm 25 and I've never had a credit card. My parents always said they're dangerous, so I've just used my debit card. But I'm thinking of buying an apartment in a few years and I've heard having a credit history helps. Should I get a credit card? And how do I use it without getting into trouble like my parents warned?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Wants to build credit history, no previous credit experience, family fears about credit cards",
+      "emotionalState": "curious, cautious, responsible",
+      "urgency": "low",
+      "specificDetails": {
+        "age": 25,
+        "noCreditHistory": true,
+        "planningApartmentPurchase": true,
+        "timeframe": "few years",
+        "hasStableIncome": true,
+        "parentalWarnings": true
+      }
+    },
+    "idealAdvice": [
+      "Validate parents' concern - credit cards CAN be dangerous if misused",
+      "In Finland, credit history is less important than in US, but still helpful",
+      "Get card with no annual fee and good benefits",
+      "Use it like debit card: only spend what you have",
+      "Pay full balance every month - never carry a balance",
+      "Set up automatic payment to avoid ever missing a payment",
+      "Start with low credit limit to minimize risk",
+      "Use for regular purchases (groceries, gas) and pay off immediately",
+      "This will build payment history without costing you anything"
+    ],
+    "commonMistakes": [
+      "Dismissing parents' concerns without acknowledging valid points",
+      "Not explaining that Finland's credit system differs from US",
+      "Recommending high credit limits for beginners",
+      "Not emphasizing paying full balance monthly",
+      "Making credit cards sound scary rather than empowering",
+      "Not discussing specific strategies to avoid debt"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_helena_credit_success_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 4
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_helena_credit_success_002",
+    "characterId": "char_helena_010",
+    "scenarioType": "credit_building_success",
+    "difficulty": 0.2,
+    "topic": "credit_score",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_helena_creditcard_001",
+      "characterMinVisits": 1
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Quick update - I got a credit card 6 months ago and it's been great! I use it for groceries and gas, and the automatic payment pays it off in full every month. I've never paid a cent in interest and I'm earning cashback. My parents are still skeptical, but I'm managing it well. I'm thinking of applying for a small loan to further build my credit. Good idea?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Successfully using credit card responsibly, wants to optimize credit building",
+      "emotionalState": "confident, responsible, slightly proud",
+      "urgency": "low",
+      "specificDetails": {
+        "hasUsedCardResponsibly": true,
+        "monthsOfHistory": 6,
+        "neverPaidInterest": true,
+        "parentsStillSkeptical": true,
+        "consideringLoan": true
+      }
+    },
+    "idealAdvice": [
+      "Excellent job using credit responsibly!",
+      "DON'T take out a loan just to build credit - that's expensive and unnecessary",
+      "Continue current strategy - it's working perfectly",
+      "When you're ready to buy apartment, you'll have payment history",
+      "Focus on saving for down payment instead",
+      "6 months is good start, 1-2 years is even better",
+      "Your parents might come around when they see your responsibility",
+      "Credit building is a side benefit, not a goal in itself"
+    ],
+    "commonMistakes": [
+      "Agreeing that taking out unnecessary loan is good idea",
+      "Not celebrating the successful responsible use",
+      "Overcomplicating credit building strategies",
+      "Not emphasizing that saving for down payment is more important than credit score"
+    ]
+  }
+]
