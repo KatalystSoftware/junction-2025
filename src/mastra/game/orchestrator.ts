@@ -250,12 +250,15 @@ Respond with ONLY valid JSON (NO markdown):
       situation: scenario.problemContext.currentSituation,
     };
 
-    // Generate advice choices for the player
-    const adviceChoices = generateAdviceChoices(
-      scenario,
-      character.personality,
-      [], // No conversation history yet (first turn)
-    );
+    // Generate advice choices for the player (only for first session)
+    const adviceChoices =
+      advisorState.totalSessions === 0
+        ? generateAdviceChoices(
+            scenario,
+            character.personality,
+            [], // No conversation history yet (first turn)
+          )
+        : undefined;
 
     // Return initial character message with advice choices
     return {
@@ -270,7 +273,7 @@ Respond with ONLY valid JSON (NO markdown):
         occupation: character.occupation,
       },
       scenarioFinancialContext,
-      adviceChoices, // NEW: Provide choices to player
+      adviceChoices, // NEW: Provide choices to player (only first session)
       stateUpdate: advisorState,
       activeThreads,
     };

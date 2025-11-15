@@ -11,6 +11,7 @@ import { characterPool } from "./mastra/index.ts";
 import {
   startNewConsultation,
   handleAdvisorResponse,
+  handleAdviceChoice,
   createNewAdvisor,
   getActiveThreads,
 } from "./mastra/game/orchestrator.ts";
@@ -18,6 +19,7 @@ import type {
   AdvisorState,
   ConversationThread,
   GameResponse,
+  AdviceChoice,
 } from "./mastra/types/game-types.ts";
 
 // ============================================================================
@@ -36,6 +38,7 @@ interface ThreadData {
   messages: Message[];
   unreadCount: number;
   status: "active" | "completed";
+  adviceChoices?: AdviceChoice[];
 }
 
 // ============================================================================
@@ -57,6 +60,12 @@ function App() {
   const [quiz, setQuiz] = useState<any>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [quizAnswers, setQuizAnswers] = useState<number[]>([]);
+  const [showQuizFeedback, setShowQuizFeedback] = useState(false);
+  const [lastQuizAnswer, setLastQuizAnswer] = useState<number | null>(null);
+  const [finalResults, setFinalResults] = useState<{
+    characterName: string;
+    response: GameResponse;
+  } | null>(null);
 
   // Initialize game
   useEffect(() => {
@@ -110,8 +119,26 @@ function App() {
       return;
     }
 
-    // Switch threads (1-9)
+    // Handle number input (1-9)
     if (/^[1-9]$/.test(input) && !inputValue) {
+      // Check if current thread has advice choices - if so, this is a choice selection
+      const currentThread = currentThreadId ? threads.get(currentThreadId) : null;
+      if (
+        currentThread?.adviceChoices &&
+        currentThread.adviceChoices.length > 0
+      ) {
+        const choiceIndex = parseInt(input) - 1;
+        if (choiceIndex < currentThread.adviceChoices.length) {
+          handleChoiceSelection(choiceIndex);
+        } else {
+          setStatusMessage(
+            `Invalid choice. Select 1-${currentThread.adviceChoices.length}`,
+          );
+        }
+        return;
+      }
+
+      // Otherwise, treat as thread switching
       const threadIndex = parseInt(input) - 1;
       // Filter based on current view (active only or all)
       const threadList = Array.from(threads.values()).filter((t) =>
@@ -144,6 +171,8 @@ function App() {
         setQuiz(bossReview.quiz);
         setCurrentQuestionIndex(0);
         setQuizAnswers([]);
+        setShowQuizFeedback(false);
+        setLastQuizAnswer(null);
         setBossReview(null);
         setStatusMessage("Quiz started! Select your answer (1-4)");
       } else {
@@ -153,66 +182,83 @@ function App() {
     }
 
     // Handle quiz answer input
-    if (quiz && !inputValue) {
+    if (quiz && !showQuizFeedback && !inputValue) {
       if (/^[1-4]$/.test(input)) {
         const answerIndex = parseInt(input) - 1;
         const updatedAnswers = [...quizAnswers, answerIndex];
         setQuizAnswers(updatedAnswers);
+        setLastQuizAnswer(answerIndex);
+        setShowQuizFeedback(true);
 
-        if (currentQuestionIndex + 1 < quiz.questions.length) {
-          // Move to next question
-          setCurrentQuestionIndex(currentQuestionIndex + 1);
-          setStatusMessage(
-            `Question ${currentQuestionIndex + 2}/${quiz.questions.length}`,
-          );
-        } else {
-          // Quiz complete - calculate results
-          const correctCount = quiz.questions.filter(
-            (q: any, i: number) => updatedAnswers[i] === q.correctAnswer,
-          ).length;
-          const scorePercentage = (correctCount / quiz.questions.length) * 100;
+        const currentQuestion = quiz.questions[currentQuestionIndex];
+        const isCorrect = answerIndex === currentQuestion.correctAnswer;
+        setStatusMessage(
+          isCorrect
+            ? "✅ Correct! Press SPACE to continue"
+            : "❌ Incorrect. Press SPACE to continue",
+        );
+      }
+      return;
+    }
 
-          let skillBonus = 0;
-          let reputationBonus = 0;
+    // Handle moving to next question after feedback
+    if (quiz && showQuizFeedback && input === " ") {
+      setShowQuizFeedback(false);
+      setLastQuizAnswer(null);
 
-          if (scorePercentage >= 80) {
-            skillBonus = 0.3;
-            reputationBonus = 5;
-          } else if (scorePercentage >= 60) {
-            skillBonus = 0.2;
-            reputationBonus = 3;
-          } else if (scorePercentage >= 40) {
-            skillBonus = 0.1;
-            reputationBonus = 1;
-          }
+      if (currentQuestionIndex + 1 < quiz.questions.length) {
+        // Move to next question
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+        setStatusMessage(
+          `Question ${currentQuestionIndex + 2}/${quiz.questions.length}`,
+        );
+      } else {
+        // Quiz complete - calculate results
+        const correctCount = quiz.questions.filter(
+          (q: any, i: number) => quizAnswers[i] === q.correctAnswer,
+        ).length;
+        const scorePercentage = (correctCount / quiz.questions.length) * 100;
 
-          // Apply bonuses
-          if (advisorState && (skillBonus > 0 || reputationBonus > 0)) {
-            const updatedState = {
-              ...advisorState,
-              skillLevel: advisorState.skillLevel + skillBonus,
-              reputation: advisorState.reputation + reputationBonus,
-            };
+        let skillBonus = 0;
+        let reputationBonus = 0;
 
-            // Update topic expertise based on quiz topic
-            if (quiz.topic && updatedState.topicsExpertise) {
-              const topic =
-                quiz.topic as keyof typeof updatedState.topicsExpertise;
-              updatedState.topicsExpertise = {
-                ...updatedState.topicsExpertise,
-                [topic]:
-                  (updatedState.topicsExpertise[topic] || 0) + skillBonus,
-              };
-            }
-
-            setAdvisorState(updatedState);
-          }
-
-          // Show results (will be handled by QuizResultsModal)
-          setStatusMessage(
-            `Quiz complete! Score: ${scorePercentage.toFixed(0)}% (Press SPACE to continue)`,
-          );
+        if (scorePercentage >= 80) {
+          skillBonus = 0.3;
+          reputationBonus = 5;
+        } else if (scorePercentage >= 60) {
+          skillBonus = 0.2;
+          reputationBonus = 3;
+        } else if (scorePercentage >= 40) {
+          skillBonus = 0.1;
+          reputationBonus = 1;
         }
+
+        // Apply bonuses
+        if (advisorState && (skillBonus > 0 || reputationBonus > 0)) {
+          const updatedState = {
+            ...advisorState,
+            skillLevel: advisorState.skillLevel + skillBonus,
+            reputation: advisorState.reputation + reputationBonus,
+          };
+
+          // Update topic expertise based on quiz topic
+          if (quiz.topic && updatedState.topicsExpertise) {
+            const topic =
+              quiz.topic as keyof typeof updatedState.topicsExpertise;
+            updatedState.topicsExpertise = {
+              ...updatedState.topicsExpertise,
+              [topic]:
+                (updatedState.topicsExpertise[topic] || 0) + skillBonus,
+            };
+          }
+
+          setAdvisorState(updatedState);
+        }
+
+        // Show results (will be handled by QuizResultsModal)
+        setStatusMessage(
+          `Quiz complete! Score: ${scorePercentage.toFixed(0)}% (Press SPACE to continue)`,
+        );
       }
       return;
     }
@@ -221,29 +267,70 @@ function App() {
     if (
       quiz &&
       currentQuestionIndex >= quiz.questions.length &&
+      !showQuizFeedback &&
       input === " "
     ) {
       setQuiz(null);
       setCurrentQuestionIndex(0);
       setQuizAnswers([]);
+      setShowQuizFeedback(false);
+      setLastQuizAnswer(null);
       setStatusMessage("Ready! Press 'n' for new consultation");
       return;
     }
 
-    // Text input handling
-    if (key.return && inputValue.trim()) {
-      handleSendMessage(inputValue.trim());
-      setInputValue("");
+    // Close final results modal
+    if (finalResults && input === " ") {
+      const threadIdToClose = currentThreadId;
+      setFinalResults(null);
+
+      // Mark thread as completed
+      if (threadIdToClose) {
+        const updated = new Map(threads);
+        const thread = updated.get(threadIdToClose);
+        if (thread) {
+          thread.status = "completed";
+          updated.set(threadIdToClose, thread);
+          setThreads(updated);
+        }
+
+        // Switch to another active thread if available
+        const activeThreads = Array.from(updated.values()).filter(
+          (t) => t.status === "active",
+        );
+        if (activeThreads.length > 0) {
+          setCurrentThreadId(activeThreads[0].threadId);
+          setStatusMessage(`Switched to ${activeThreads[0].characterName}`);
+        } else {
+          setCurrentThreadId(null);
+          setStatusMessage(
+            "No active threads. Press 'n' for new client (or 'h' to view history)",
+          );
+        }
+      }
       return;
     }
 
-    if (key.backspace || key.delete) {
-      setInputValue((prev) => prev.slice(0, -1));
-      return;
-    }
+    // Text input handling (only if no choices available)
+    const currentThread = currentThreadId ? threads.get(currentThreadId) : null;
+    const hasChoices =
+      currentThread?.adviceChoices && currentThread.adviceChoices.length > 0;
 
-    if (input && !key.ctrl && !key.meta) {
-      setInputValue((prev) => prev + input);
+    if (!hasChoices) {
+      if (key.return && inputValue.trim()) {
+        handleSendMessage(inputValue.trim());
+        setInputValue("");
+        return;
+      }
+
+      if (key.backspace || key.delete) {
+        setInputValue((prev) => prev.slice(0, -1));
+        return;
+      }
+
+      if (input && !key.ctrl && !key.meta) {
+        setInputValue((prev) => prev + input);
+      }
     }
   });
 
@@ -296,6 +383,7 @@ function App() {
           ],
           unreadCount: 0,
           status: "active",
+          adviceChoices: consultation.adviceChoices,
         };
 
         const updated = new Map(threads);
@@ -306,6 +394,82 @@ function App() {
         setStatusMessage(`New client: ${characterName}`);
       } else {
         setStatusMessage("No characters available");
+      }
+    } catch (error) {
+      setStatusMessage(`Error: ${error}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle choice selection
+  const handleChoiceSelection = async (choiceIndex: number) => {
+    if (!advisorState || !currentThreadId) {
+      setStatusMessage("No active thread. Press 'n' for new consultation");
+      return;
+    }
+
+    const thread = threads.get(currentThreadId);
+    if (!thread || !thread.adviceChoices) return;
+
+    setIsLoading(true);
+    setStatusMessage("Processing your advice...");
+
+    try {
+      const selectedChoice = thread.adviceChoices[choiceIndex];
+
+      const history: Array<{ role: "user" | "assistant"; content: string }> =
+        thread.messages
+          .filter((m) => m.role !== "system")
+          .map((m) => ({
+            role: m.role as "user" | "assistant",
+            content: m.content,
+          }));
+
+      // Call handleAdviceChoice
+      const response = await handleAdviceChoice(
+        currentThreadId,
+        choiceIndex,
+        advisorState,
+        history,
+      );
+
+      setAdvisorState(response.stateUpdate);
+
+      // Add user's choice and response to messages
+      const userMessage: Message = {
+        role: "user",
+        content: `[Selected: ${selectedChoice.actionText}]`,
+        timestamp: new Date(),
+      };
+
+      const updatedMessages = [...thread.messages, userMessage];
+      if (response.messages && response.messages.length > 0) {
+        updatedMessages.push({
+          role: "assistant",
+          content: response.messages.join("\n\n"),
+          timestamp: new Date(),
+        });
+      }
+
+      const updated = new Map(threads);
+      updated.set(currentThreadId, {
+        ...thread,
+        messages: updatedMessages,
+        adviceChoices: undefined, // Clear choices after selection
+      });
+      setThreads(updated);
+
+      // Check if conversation ended
+      if (response.type === "conversation_end") {
+        // Show final results modal
+        setFinalResults({
+          characterName: thread.characterName,
+          response: response,
+        });
+        setStatusMessage("Consultation complete! Press SPACE to continue");
+      } else {
+        setStatusMessage("Type your response");
       }
     } catch (error) {
       setStatusMessage(`Error: ${error}`);
@@ -372,35 +536,12 @@ function App() {
 
       // Check if conversation ended
       if (response.type === "conversation_end") {
-        let endMessage = `${thread.characterName} left. Reputation: ${response.stateUpdate.reputation}`;
-
-        // Show recommendation message if any
-        if (response.recommendationMessage) {
-          endMessage = response.recommendationMessage;
-        }
-
-        setStatusMessage(endMessage);
-
-        // Mark thread as completed instead of deleting
-        const completedThread = updated.get(currentThreadId);
-        if (completedThread) {
-          completedThread.status = "completed";
-          updated.set(currentThreadId, completedThread);
-          setThreads(updated);
-        }
-
-        // Switch to another active thread if available
-        const activeThreads = Array.from(updated.values()).filter(
-          (t) => t.status === "active",
-        );
-        if (activeThreads.length > 0) {
-          setCurrentThreadId(activeThreads[0].threadId);
-        } else {
-          setCurrentThreadId(null);
-          setStatusMessage(
-            "No active threads. Press 'n' for new client (or 'h' to view history)",
-          );
-        }
+        // Show final results modal
+        setFinalResults({
+          characterName: thread.characterName,
+          response: response,
+        });
+        setStatusMessage("Consultation complete! Press SPACE to continue");
       } else {
         setStatusMessage("Type your response");
       }
@@ -419,6 +560,16 @@ function App() {
     );
   }
 
+  // Final results modal
+  if (finalResults) {
+    return (
+      <FinalResultsModal
+        characterName={finalResults.characterName}
+        response={finalResults.response}
+      />
+    );
+  }
+
   // Boss review modal
   if (bossReview) {
     return <BossReviewModal review={bossReview} />;
@@ -426,7 +577,16 @@ function App() {
 
   // Quiz modal
   if (quiz) {
-    if (currentQuestionIndex < quiz.questions.length) {
+    if (showQuizFeedback && lastQuizAnswer !== null) {
+      // Show feedback for current question
+      return (
+        <QuizFeedbackModal
+          quiz={quiz}
+          currentQuestionIndex={currentQuestionIndex}
+          userAnswer={lastQuizAnswer}
+        />
+      );
+    } else if (currentQuestionIndex < quiz.questions.length) {
       return (
         <QuizQuestionModal
           quiz={quiz}
@@ -551,9 +711,17 @@ function App() {
 
       {/* Input box */}
       <Box borderStyle="single" borderColor="green" paddingX={1}>
-        <Text color="green">💼 You: </Text>
-        <Text>{inputValue}</Text>
-        <Text color="gray">█</Text>
+        {currentThreadId &&
+        threads.get(currentThreadId)?.adviceChoices &&
+        threads.get(currentThreadId)!.adviceChoices!.length > 0 ? (
+          <Text dimColor>Select an option above (1-{threads.get(currentThreadId)!.adviceChoices!.length})</Text>
+        ) : (
+          <>
+            <Text color="green">💼 You: </Text>
+            <Text>{inputValue}</Text>
+            <Text color="gray">█</Text>
+          </>
+        )}
       </Box>
     </Box>
   );
@@ -588,6 +756,27 @@ function ConversationPanel({ thread }: { thread: ThreadData }) {
           )}
         </Box>
       ))}
+
+      {/* Show advice choices if available */}
+      {thread.adviceChoices && thread.adviceChoices.length > 0 && (
+        <Box flexDirection="column" paddingTop={1}>
+          <Box borderStyle="single" borderColor="yellow" paddingX={1}>
+            <Text bold color="yellow">
+              💡 Your Advice Options:
+            </Text>
+          </Box>
+          {thread.adviceChoices.map((choice, index) => (
+            <Box key={index} flexDirection="column" paddingY={0}>
+              <Text color="cyan">
+                [{index + 1}] {choice.icon} {choice.actionText}
+              </Text>
+              <Text dimColor>    {choice.projectedOutcome}</Text>
+            </Box>
+          ))}
+          <Text dimColor> </Text>
+          <Text dimColor>Press 1-{thread.adviceChoices.length} to select</Text>
+        </Box>
+      )}
     </Box>
   );
 }
@@ -735,6 +924,76 @@ function QuizQuestionModal({
 }
 
 // ============================================================================
+// Quiz Feedback Modal Component
+// ============================================================================
+
+function QuizFeedbackModal({
+  quiz,
+  currentQuestionIndex,
+  userAnswer,
+}: {
+  quiz: any;
+  currentQuestionIndex: number;
+  userAnswer: number;
+}) {
+  const question = quiz.questions[currentQuestionIndex];
+  const isCorrect = userAnswer === question.correctAnswer;
+
+  return (
+    <Box
+      flexDirection="column"
+      padding={2}
+      borderStyle="double"
+      borderColor={isCorrect ? "green" : "red"}
+    >
+      <Text bold color={isCorrect ? "green" : "red"}>
+        {isCorrect ? "✅ CORRECT!" : "❌ INCORRECT"}
+      </Text>
+      <Text> </Text>
+
+      <Box
+        borderStyle="single"
+        borderColor="blue"
+        paddingX={1}
+        flexDirection="column"
+      >
+        <Text color="blue">{question.question}</Text>
+      </Box>
+      <Text> </Text>
+
+      <Text color="yellow">Your answer:</Text>
+      <Text color={isCorrect ? "green" : "red"}>
+        • {question.options[userAnswer]}
+      </Text>
+      <Text> </Text>
+
+      {!isCorrect && (
+        <>
+          <Text color="yellow">Correct answer:</Text>
+          <Text color="green">• {question.options[question.correctAnswer]}</Text>
+          <Text> </Text>
+        </>
+      )}
+
+      <Box
+        borderStyle="single"
+        borderColor="cyan"
+        paddingX={1}
+        flexDirection="column"
+      >
+        <Text bold color="cyan">
+          💡 Explanation:
+        </Text>
+        <Text color="cyan">{question.explanation}</Text>
+      </Box>
+      <Text> </Text>
+
+      <Text dimColor>Press SPACE to continue</Text>
+    </Box>
+  );
+}
+
+// ============================================================================
 // Quiz Results Modal Component
 // ============================================================================
 
@@ -832,6 +1091,172 @@ function QuizResultsModal({
       })}
       <Text> </Text>
 
+      <Text dimColor>Press SPACE to continue</Text>
+    </Box>
+  );
+}
+
+// ============================================================================
+// Final Results Modal Component
+// ============================================================================
+
+function FinalResultsModal({
+  characterName,
+  response,
+}: {
+  characterName: string;
+  response: GameResponse;
+}) {
+  const financialResults = response.financialResults;
+  const projection = financialResults?.projection;
+  const coinsEarned = financialResults?.coinsEarned || 0;
+
+  return (
+    <Box
+      flexDirection="column"
+      padding={2}
+      borderStyle="double"
+      borderColor="green"
+    >
+      <Text bold color="green">
+        ✨ CONSULTATION COMPLETE ✨
+      </Text>
+      <Text color="cyan">Client: {characterName}</Text>
+      <Text> </Text>
+
+      {/* Character's final response */}
+      {response.messages && response.messages.length > 0 && (
+        <>
+          <Box
+            borderStyle="single"
+            borderColor="blue"
+            paddingX={1}
+            flexDirection="column"
+          >
+            <Text color="blue">💬 {characterName} says:</Text>
+            <Text color="blue">"{response.messages[0]}"</Text>
+          </Box>
+          <Text> </Text>
+        </>
+      )}
+
+      {/* Financial Impact */}
+      {projection && (
+        <>
+          <Text bold color="yellow">
+            💰 FINANCIAL IMPACT
+          </Text>
+          <Text dimColor>─────────────────────────</Text>
+
+          {projection.totalSaved !== undefined && projection.totalSaved !== 0 && (
+            <>
+              {projection.totalSaved > 0 ? (
+                <>
+                  <Text color="green">
+                    📈 Client will save: {Math.round(projection.totalSaved)}€
+                    over {projection.projectionPeriodMonths} months
+                  </Text>
+                  {projection.monthlySavings > 0 && (
+                    <Text color="cyan">
+                      ({Math.round(projection.monthlySavings)}€/month average)
+                    </Text>
+                  )}
+                </>
+              ) : (
+                <>
+                  <Text color="red" bold>
+                    ⚠️ WARNING: Client will lose{" "}
+                    {Math.abs(Math.round(projection.totalSaved))}€
+                  </Text>
+                  {projection.monthlySavings < 0 && (
+                    <Text color="red">
+                      Deficit: {Math.abs(Math.round(projection.monthlySavings))}
+                      €/month
+                    </Text>
+                  )}
+                </>
+              )}
+            </>
+          )}
+
+          {projection.totalDebtReduced !== undefined &&
+            projection.totalDebtReduced !== 0 && (
+              <>
+                {projection.totalDebtReduced > 0 ? (
+                  <>
+                    <Text color="green">
+                      💳 Debt reduced by:{" "}
+                      {Math.round(projection.totalDebtReduced)}€
+                    </Text>
+                    {projection.totalInterestSaved > 0 && (
+                      <Text color="green">
+                        Interest saved:{" "}
+                        {Math.round(projection.totalInterestSaved)}€
+                      </Text>
+                    )}
+                    {projection.monthsToGoal > 0 &&
+                      projection.monthsToGoal < 999 && (
+                        <Text color="cyan">
+                          Debt-free in: {Math.round(projection.monthsToGoal)}{" "}
+                          months
+                        </Text>
+                      )}
+                  </>
+                ) : (
+                  <>
+                    <Text color="red" bold>
+                      ⚠️ Debt will INCREASE by{" "}
+                      {Math.abs(Math.round(projection.totalDebtReduced))}€
+                    </Text>
+                    <Text color="red" bold>
+                      This advice made the problem WORSE!
+                    </Text>
+                  </>
+                )}
+              </>
+            )}
+
+          {projection.emergencyFundProgress > 0 &&
+            projection.emergencyFundProgress < 1 && (
+              <Text color="cyan">
+                🛡️ Emergency Fund:{" "}
+                {Math.round(projection.emergencyFundProgress * 100)}% toward
+                3-month goal
+              </Text>
+            )}
+          {projection.emergencyFundProgress >= 1 && (
+            <Text color="green">🛡️ Emergency Fund: GOAL REACHED! ✅</Text>
+          )}
+          <Text> </Text>
+        </>
+      )}
+
+      {/* Earnings */}
+      <Text dimColor>─────────────────────────</Text>
+      <Text bold color={coinsEarned > 10 ? "green" : coinsEarned > 0 ? "yellow" : "red"}>
+        💎 YOU EARNED: +{coinsEarned} coins
+      </Text>
+
+      {coinsEarned > 10 && (
+        <Text color="green">✅ Quality Bonus! Great advice!</Text>
+      )}
+      {coinsEarned === 10 && <Text color="yellow">✓ Decent advice</Text>}
+      {coinsEarned > 0 && coinsEarned < 10 && (
+        <Text color="yellow">⚠️ Advice had some issues</Text>
+      )}
+      {coinsEarned === 0 && (
+        <Text color="red">❌ Poor advice - caused harm to client</Text>
+      )}
+
+      {/* Recommendation message */}
+      {response.recommendationMessage && (
+        <>
+          <Text> </Text>
+          <Text color="cyan">{response.recommendationMessage}</Text>
+        </>
+      )}
+
+      <Text> </Text>
       <Text dimColor>Press SPACE to continue</Text>
     </Box>
   );
