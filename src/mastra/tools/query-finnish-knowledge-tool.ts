@@ -40,7 +40,7 @@ export const queryFinnishKnowledgeTool = createTool({
     query: z
       .string()
       .describe(
-        "The question or topic to query. Examples: 'budgeting best practices', 'debt management principles', 'quality criteria for investment advice'"
+        "The question or topic to query. Examples: 'budgeting best practices', 'debt management principles', 'quality criteria for investment advice'",
       ),
     topic: z
       .enum([
@@ -65,17 +65,19 @@ export const queryFinnishKnowledgeTool = createTool({
   outputSchema: z.object({
     results: z.array(
       z.object({
-        text: z.string().describe("The relevant content from the knowledge base"),
+        text: z
+          .string()
+          .describe("The relevant content from the knowledge base"),
         section: z.string().describe("The section this content is from"),
         topic: z.string().describe("The topic category"),
         source: z.string().describe("The source citation"),
         score: z.number().describe("Relevance score (0-1)"),
-      })
+      }),
     ),
     summary: z.string().describe("A brief summary of the findings"),
   }),
-  execute: async ({ context }) => {
-    const { query, topic, topK = 3 } = context;
+  execute: async (input) => {
+    const { query, topic, topK = 3 } = input;
 
     try {
       // Generate embedding for the query
@@ -106,7 +108,9 @@ export const queryFinnishKnowledgeTool = createTool({
         text: result.metadata?.text || "",
         section: result.metadata?.section || "Unknown",
         topic: result.metadata?.topic || "general",
-        source: result.metadata?.source || "Finnish Financial Literacy Knowledge Base",
+        source:
+          result.metadata?.source ||
+          "Finnish Financial Literacy Knowledge Base",
         score: result.score,
       }));
 
@@ -125,7 +129,10 @@ export const queryFinnishKnowledgeTool = createTool({
       };
     } catch (error: any) {
       // If index doesn't exist or other error, return helpful message
-      if (error.message?.includes("no such table") || error.message?.includes("not found")) {
+      if (
+        error.message?.includes("no such table") ||
+        error.message?.includes("not found")
+      ) {
         return {
           results: [],
           summary:

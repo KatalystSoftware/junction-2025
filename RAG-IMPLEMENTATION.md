@@ -21,6 +21,7 @@ A comprehensive knowledge base compiled from authentic Finnish public sources:
 - **Helsinki Deaconess Foundation** - Taloustaito project for at-risk youth
 
 **Content Includes**:
+
 - Budgeting principles and best practices
 - Saving strategies and allocation recommendations
 - Debt management guidelines (avoiding over-indebtedness)
@@ -33,12 +34,14 @@ A comprehensive knowledge base compiled from authentic Finnish public sources:
 ### 2. Vector Store Implementation
 
 **Technology Stack**:
+
 - **Vector Database**: LibSQL (lightweight, file-based SQLite with vector extensions)
 - **Embedding Model**: OpenAI `text-embedding-3-small` (1536 dimensions)
 - **Chunking Strategy**: Semantic section-based chunking (by ## markdown headers)
 - **Search Method**: Cosine similarity
 
 **Files**:
+
 - `src/mastra/rag/init-knowledge-base.ts` - Initialization script to chunk, embed, and store knowledge
 - `knowledge-base.db` - Vector database (generated after initialization)
 
@@ -49,6 +52,7 @@ A comprehensive knowledge base compiled from authentic Finnish public sources:
 A Mastra tool that enables agents to query the Finnish financial literacy knowledge base.
 
 **Features**:
+
 - Semantic search using embedding similarity
 - Topic filtering (budgeting, saving, debt, investing, etc.)
 - Configurable result count (topK)
@@ -56,6 +60,7 @@ A Mastra tool that enables agents to query the Finnish financial literacy knowle
 - Relevance scoring
 
 **Input Schema**:
+
 ```typescript
 {
   query: string,        // e.g., "budgeting best practices"
@@ -65,6 +70,7 @@ A Mastra tool that enables agents to query the Finnish financial literacy knowle
 ```
 
 **Output Schema**:
+
 ```typescript
 {
   results: Array<{
@@ -83,6 +89,7 @@ A Mastra tool that enables agents to query the Finnish financial literacy knowle
 **Location**: `src/mastra/agents/evaluator-agent.ts`
 
 The evaluator agent now:
+
 - Has access to `queryFinnishKnowledge` tool
 - Is instructed to query the knowledge base for relevant topics before evaluation
 - Cross-references advice against Finnish financial literacy standards
@@ -90,6 +97,7 @@ The evaluator agent now:
 - Includes `researchBackedEvaluation` field in output JSON
 
 **New Evaluation Workflow**:
+
 1. Review the advice given and identify main topic
 2. **Query knowledge base** for relevant Finnish standards
 3. Compare advice against scenario ideals AND research-backed standards
@@ -98,6 +106,7 @@ The evaluator agent now:
 6. Include research-backed evaluation in output
 
 **New Output Fields**:
+
 ```typescript
 {
   // ... existing fields ...
@@ -142,6 +151,7 @@ npm install
 ```
 
 New dependencies added:
+
 - `@ai-sdk/openai` - OpenAI SDK for embeddings
 - `ai` - Vercel AI SDK for embedding generation
 
@@ -154,6 +164,7 @@ npm run init:knowledge-base
 ```
 
 This will:
+
 1. Read `knowledge-base/finnish-financial-literacy.md`
 2. Chunk into ~36 semantic sections
 3. Generate 1536-dimensional embeddings for each chunk
@@ -161,6 +172,7 @@ This will:
 5. Create searchable vector index
 
 **Expected Output**:
+
 ```
 🚀 Initializing Finnish Financial Literacy Knowledge Base...
 📖 Reading knowledge base file...
@@ -206,14 +218,14 @@ The RAG system is automatically integrated. When the evaluator agent receives ad
 You can also query the knowledge base directly in code:
 
 ```typescript
-import { queryFinnishKnowledgeTool } from './src/mastra/tools/query-finnish-knowledge-tool';
+import { queryFinnishKnowledgeTool } from "./src/mastra/tools/query-finnish-knowledge-tool";
 
 const result = await queryFinnishKnowledgeTool.execute({
   context: {
     query: "What are the budgeting best practices for young people?",
     topic: "budgeting",
-    topK: 3
-  }
+    topK: 3,
+  },
 });
 
 console.log(result.summary);
@@ -240,6 +252,7 @@ All evaluations now reference authentic Finnish financial education standards in
 ### 2. Source Citations
 
 Every evaluation includes specific citations like:
+
 - "Bank of Finland Learn Economy materials on budgeting"
 - "Yrityskylä program curriculum - savings module"
 - "Finnish National Financial Literacy Strategy - Budget allocation recommendations"
@@ -247,6 +260,7 @@ Every evaluation includes specific citations like:
 ### 3. Alignment Scoring
 
 Evaluations assess how well advice aligns with Finnish standards:
+
 - "Fully aligns with Finnish budgeting best practices"
 - "Partially aligns but missing emergency fund emphasis"
 - "Contradicts Finnish debt management guidelines"
@@ -334,6 +348,7 @@ If Finnish financial literacy standards change or new research is published:
 ### Monitoring Quality
 
 Review evaluator outputs for:
+
 - Appropriate use of `queryFinnishKnowledge` tool
 - Relevant citations in `researchBackedEvaluation`
 - Accurate alignment assessments
@@ -342,6 +357,7 @@ Review evaluator outputs for:
 ## Future Enhancements
 
 Potential improvements:
+
 1. **Multi-language Support** - Add Swedish and English Finnish materials
 2. **Temporal Tracking** - Track how advice quality improves over time against standards
 3. **Additional Sources** - Expand with more Finnish research and programs
@@ -377,6 +393,7 @@ All materials are used for educational purposes in alignment with their intended
 ### Empty Results from Query
 
 **Possible causes**:
+
 - Query doesn't match knowledge base content
 - Topic filter too restrictive
 - Increase `topK` parameter

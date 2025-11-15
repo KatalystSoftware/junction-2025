@@ -49,6 +49,7 @@ node --env-file=.env src/mastra/rag/init-knowledge-base.ts
 ```
 
 This will:
+
 1. Read the Finnish financial literacy knowledge base
 2. Chunk it into semantic sections
 3. Generate embeddings using OpenAI's `text-embedding-3-small` model
@@ -62,6 +63,7 @@ The evaluator agent automatically has access to the knowledge base through the `
 ### Query Examples
 
 The tool can be queried for:
+
 - Budgeting best practices
 - Debt management principles
 - Saving strategies
@@ -71,6 +73,7 @@ The tool can be queried for:
 ### Topics
 
 Available topic filters:
+
 - `budgeting`
 - `saving`
 - `debt_management`
@@ -108,6 +111,7 @@ To update the knowledge base:
 ## Citations
 
 All content in the knowledge base includes proper citations to:
+
 - Source organization
 - Publication date where available
 - URLs to original materials

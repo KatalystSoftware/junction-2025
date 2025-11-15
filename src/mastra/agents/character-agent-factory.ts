@@ -218,6 +218,23 @@ function getLanguageStyleForAdvisor(
 }
 
 /**
+ * Get conversation examples in the appropriate language
+ */
+function getConversationExamples(
+  advisorLanguage: "finnish" | "english",
+): string {
+  if (advisorLanguage === "finnish") {
+    return `Example of good flow:
+- Advisor gives advice → You: "Kiitos! Kokeilen tuota." → conversationEnding=true
+- Advisor gives vague advice → You: "Mitä tarkoitat säästämisellä?" → Advisor clarifies → You: "Ok ymmärrän, kiitos!" → conversationEnding=true`;
+  } else {
+    return `Example of good flow:
+- Advisor gives advice → You: "Thanks! I'll try that." → conversationEnding=true
+- Advisor gives vague advice → You: "What do you mean by saving?" → Advisor clarifies → You: "Ok I understand, thanks!" → conversationEnding=true`;
+  }
+}
+
+/**
  * Get response guidelines based on personality
  */
 function getResponseGuidelines(
@@ -312,6 +329,7 @@ export function createCharacterAgent(
     character,
     conversationHistory || [],
   );
+  const conversationExamples = getConversationExamples(advisorLanguage);
 
   const instructions = `
 You are ${character.name}, a ${character.age}-year-old ${character.occupation}.
@@ -352,9 +370,7 @@ CONVERSATION FLOW (KEEP IT SHORT):
 4. Once you get advice → wrap up immediately (thank them + end)
 5. MAXIMUM 2-3 total exchanges, then you MUST end the conversation
 
-Example of good flow:
-- Advisor gives advice → You: "Kiitos! Kokeilen tuota." → conversationEnding=true
-- Advisor gives vague advice → You: "Mitä tarkoitat säästämisellä?" → Advisor clarifies → You: "Ok ymmärrän, kiitos!" → conversationEnding=true
+${conversationExamples}
 
 ═══════════════════════════════════════════════════════════════════════
 CRITICAL SECRECY & IMMERSION RULES - YOU MUST FOLLOW
@@ -381,6 +397,13 @@ Reveal information:
 ✅ Based on trust level with the advisor
 
 Stay completely immersed in your character. You are ${character.name}, not a program.
+
+═══════════════════════════════════════════════════════════════════════
+CRITICAL: LANGUAGE MATCHING
+═══════════════════════════════════════════════════════════════════════
+${advisorLanguage === "finnish" ? "⚠️ THE ADVISOR IS USING FINNISH - YOU MUST RESPOND IN FINNISH!" : "⚠️ THE ADVISOR IS USING ENGLISH - YOU MUST RESPOND IN ENGLISH!"}
+
+Match the advisor's language EXACTLY. Your messages should be in ${advisorLanguage === "finnish" ? "FINNISH" : "ENGLISH"}.
 
 ═══════════════════════════════════════════════════════════════════════
 OUTPUT FORMAT:

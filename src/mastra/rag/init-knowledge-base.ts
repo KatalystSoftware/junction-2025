@@ -20,7 +20,7 @@ const __dirname = path.dirname(__filename);
 // Configuration
 const KNOWLEDGE_BASE_PATH = path.join(
   __dirname,
-  "../../../knowledge-base/finnish-financial-literacy.md"
+  "../../../knowledge-base/finnish-financial-literacy.md",
 );
 const VECTOR_INDEX_NAME = "finnish_financial_literacy";
 const EMBEDDING_MODEL = "text-embedding-3-small"; // 1536 dimensions
@@ -52,16 +52,16 @@ function extractSection(text: string, position: number): string {
  */
 function extractTopic(section: string): string {
   const topicMap: Record<string, string> = {
-    "budgeting": "budgeting",
-    "saving": "saving",
-    "investment": "investing",
-    "debt": "debt_management",
-    "risk": "risk_management",
+    budgeting: "budgeting",
+    saving: "saving",
+    investment: "investing",
+    debt: "debt_management",
+    risk: "risk_management",
     "financial landscape": "financial_system",
-    "yrityskylä": "financial_education",
-    "taloustaito": "financial_education",
-    "strategy": "policy",
-    "curriculum": "education",
+    yrityskylä: "financial_education",
+    taloustaito: "financial_education",
+    strategy: "policy",
+    curriculum: "education",
   };
 
   const lowerSection = section.toLowerCase();
@@ -112,7 +112,9 @@ function chunkMarkdown(content: string): Chunk[] {
     if (lastIndex > 0) {
       // Save previous section
       const prevMatch = sections[sections.length - 1];
-      prevMatch.content = content.substring(prevMatch.start, match.index).trim();
+      prevMatch.content = content
+        .substring(prevMatch.start, match.index)
+        .trim();
     }
 
     sections.push({
@@ -268,7 +270,9 @@ export async function initializeKnowledgeBase() {
 
   // 7. Verify index stats
   console.log("📊 Verifying index...");
-  const stats = await vectorStore.describeIndex({ indexName: VECTOR_INDEX_NAME });
+  const stats = await vectorStore.describeIndex({
+    indexName: VECTOR_INDEX_NAME,
+  });
   console.log(`   Index: ${VECTOR_INDEX_NAME}`);
   console.log(`   Dimensions: ${stats.dimension}`);
   console.log(`   Vector count: ${stats.count}`);
