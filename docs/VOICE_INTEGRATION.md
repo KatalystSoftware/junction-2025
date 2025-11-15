@@ -72,21 +72,27 @@ Each emotional state uses specific voice settings:
 Voice messages are generated based on:
 
 ### 1. Scripted Triggers
-- **2nd scenario**: Always generates voice
-- **3rd scenario**: Always generates voice
+
+- **2nd scenario**: 50% chance of voice message
+- **3rd scenario**: Guaranteed voice message (only if they didn't get it on scenario 2)
+
+**Note**: Scenario number is based on how many times the character has visited (visitCount + 1). First visit = scenario 1, second visit = scenario 2, etc.
 
 ### 2. Random Triggers
+
 - **Base chance**: 10% (1 in 10 messages)
 - **Character preference**: Adjusted by `character.communicationStyle.prefersVoice`
 - **Emotional boost**: 30% chance if `callsWhenEmotional` and highly emotional state
 
 ### 3. Emotional States that Boost Probability
+
 - Scared, crying, devastated, panicked
 - Ecstatic, thrilled, extremely excited
 
 ## Implementation Details
 
 ### Core Service
+
 `src/mastra/services/voice-service.ts`
 
 Three main functions:
@@ -114,8 +120,8 @@ Three main functions:
 ```typescript
 export interface VoiceMessageConfig {
   enabled: boolean;
-  transcription?: string;    // Text version of message
-  audioUrl?: string;         // Base64 data URL of audio
+  transcription?: string; // Text version of message
+  audioUrl?: string; // Base64 data URL of audio
   urgency?: "calm" | "concerned" | "urgent" | "excited";
 }
 ```
@@ -132,8 +138,8 @@ const characterResponse = {
     enabled: true,
     transcription: "I'm so worried about my debt!",
     audioUrl: "data:audio/mpeg;base64,//uQx...",
-    urgency: "concerned"
-  }
+    urgency: "concerned",
+  },
 };
 
 // Frontend can play the audio from voiceConfig.audioUrl
@@ -151,14 +157,16 @@ To integrate with a frontend:
 Example:
 
 ```jsx
-{response.voiceConfig?.enabled && (
-  <div className="voice-message">
-    <audio controls src={response.voiceConfig.audioUrl} />
-    <p className={`urgency-${response.voiceConfig.urgency}`}>
-      {response.voiceConfig.transcription}
-    </p>
-  </div>
-)}
+{
+  response.voiceConfig?.enabled && (
+    <div className="voice-message">
+      <audio controls src={response.voiceConfig.audioUrl} />
+      <p className={`urgency-${response.voiceConfig.urgency}`}>
+        {response.voiceConfig.transcription}
+      </p>
+    </div>
+  );
+}
 ```
 
 ## Testing
@@ -172,10 +180,12 @@ The voice service includes graceful fallbacks:
 ## Cost Considerations
 
 ElevenLabs pricing (as of 2025):
+
 - **Free tier**: 10,000 characters/month
 - **Paid plans**: Starting at $5/month for 30,000 characters
 
 With 10% triggering rate:
+
 - Average message: ~50 characters
 - 10 scenarios: ~500 characters (well within free tier)
 - 100 scenarios: ~5,000 characters (still within free tier)

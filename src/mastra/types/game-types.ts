@@ -110,6 +110,8 @@ export interface CharacterRelationshipState {
   progressionHistory: RelationshipProgression[]; // Track trust changes over time
   decayApplied: number; // Total decay applied
   wasRecommended: boolean; // True if character was unlocked via recommendation
+  hasReceivedVoiceMessage?: boolean; // Track if character has received a voice message
+  currentScenarioNumber?: number; // Current scenario number in their story arc
 }
 
 export interface CharacterConversationMemory {

@@ -5,10 +5,7 @@
  * using ElevenLabs API via Mastra
  */
 
-import type {
-  Character,
-  VoiceMessageConfig,
-} from "../types/game-types.ts";
+import type { Character, VoiceMessageConfig } from "../types/game-types.ts";
 
 /**
  * ElevenLabs voice mapping for different character personalities
@@ -154,15 +151,38 @@ function getVoiceForEmotion(
  * - Random chance (1/10 or ~10%)
  * - Character preference for voice messages
  * - Emotional intensity
- * - Scenario count (scripted for 2nd/3rd scenario)
+ * - Scenario count: 50% on scenario 2, guaranteed on scenario 3 if not received on 2
  */
 export function shouldGenerateVoiceMessage(
   character: Character,
   emotionalState: string,
   scenarioNumber: number,
 ): boolean {
-  // Scripted voice messages for 2nd or 3rd scenario
-  if (scenarioNumber === 2 || scenarioNumber === 3) {
+  const hasReceivedVoice =
+    character.relationshipState.hasReceivedVoiceMessage ?? false;
+
+  console.log(`🎤 Voice check for ${character.name}:`, {
+    scenarioNumber,
+    emotionalState,
+    hasReceivedVoice,
+    prefersVoice: character.communicationStyle.prefersVoice,
+    callsWhenEmotional: character.communicationStyle.callsWhenEmotional,
+  });
+
+  // Scenario 2: 50% chance
+  if (scenarioNumber === 2) {
+    const shouldGenerate = Math.random() < 0.5;
+    console.log(
+      `🎲 Scenario 2 voice chance (50%): ${shouldGenerate ? "YES" : "no"}`,
+    );
+    return shouldGenerate;
+  }
+
+  // Scenario 3: Guaranteed if they didn't get it on scenario 2
+  if (scenarioNumber === 3 && !hasReceivedVoice) {
+    console.log(
+      `✅ Guaranteed voice message (scenario 3, no voice on scenario 2)`,
+    );
     return true;
   }
 
@@ -181,7 +201,11 @@ export function shouldGenerateVoiceMessage(
 
   if (callsWhenEmotional && isHighlyEmotional) {
     // 30% chance when emotional and prefers voice
-    return Math.random() < 0.3;
+    const shouldGenerate = Math.random() < 0.3;
+    console.log(
+      `🎲 Emotional voice chance (30%): ${shouldGenerate ? "YES" : "no"}`,
+    );
+    return shouldGenerate;
   }
 
   // Base random chance: 1/10 (10%)
@@ -190,7 +214,12 @@ export function shouldGenerateVoiceMessage(
   // Adjust by character preference (prefersVoice is 0-1)
   const adjustedChance = baseChance * (1 + prefersVoice);
 
-  return Math.random() < adjustedChance;
+  const shouldGenerate = Math.random() < adjustedChance;
+  console.log(
+    `🎲 Random voice chance (${(adjustedChance * 100).toFixed(1)}%): ${shouldGenerate ? "YES" : "no"}`,
+  );
+
+  return shouldGenerate;
 }
 
 /**
@@ -201,16 +230,25 @@ export async function generateVoiceMessage(
   messageText: string,
   emotionalState: string,
 ): Promise<VoiceMessageConfig> {
+  console.log(`🎙️ Generating voice message for ${character.name}:`, {
+    messageLength: messageText.length,
+    emotionalState,
+  });
+
   try {
     // Check if ElevenLabs API key is available
     const apiKey = process.env.ELEVENLABS_API_KEY;
     if (!apiKey) {
-      console.warn("ELEVENLABS_API_KEY not found, skipping voice generation");
+      console.warn(
+        "⚠️ ELEVENLABS_API_KEY not found, skipping voice generation",
+      );
       return {
         enabled: false,
         transcription: messageText,
       };
     }
+
+    console.log("✅ ElevenLabs API key found, generating voice...");
 
     // Get appropriate voice for emotion
     const voiceConfig = getVoiceForEmotion(character, emotionalState);
@@ -268,6 +306,12 @@ export async function generateVoiceMessage(
       urgency = "excited";
     }
 
+    console.log(`✅ Voice message generated successfully:`, {
+      audioSize: audioBuffer.length,
+      urgency,
+      voiceId: voiceConfig.voiceId,
+    });
+
     return {
       enabled: true,
       transcription: messageText,
@@ -275,7 +319,7 @@ export async function generateVoiceMessage(
       urgency: urgency,
     };
   } catch (error) {
-    console.error("Failed to generate voice message:", error);
+    console.error("❌ Failed to generate voice message:", error);
     // Fallback to text-only
     return {
       enabled: false,

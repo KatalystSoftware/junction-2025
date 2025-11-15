@@ -99,11 +99,17 @@ export const invokeCharacterTool = {
       }
 
       // Determine emotional state (from parsed response or scenario)
-      const emotionalState = parsed.emotionalState ||
-        inferEmotionalStateFromContext(character, scenario.problemContext.emotionalState);
+      const emotionalState =
+        parsed.emotionalState ||
+        inferEmotionalStateFromContext(
+          character,
+          scenario.problemContext.emotionalState,
+        );
+
+      // Determine scenario number (visitCount + 1, since first visit is visitCount=0)
+      const scenarioNumber = (character.relationshipState.visitCount ?? 0) + 1;
 
       // Check if we should generate a voice message
-      const scenarioNumber = character.relationshipState.visitCount || 1;
       const shouldGenerateVoice = shouldGenerateVoiceMessage(
         character,
         emotionalState,
@@ -112,7 +118,11 @@ export const invokeCharacterTool = {
 
       // Generate voice message if needed
       let voiceConfig: VoiceMessageConfig | undefined;
-      if (shouldGenerateVoice && parsed.messages && parsed.messages.length > 0) {
+      if (
+        shouldGenerateVoice &&
+        parsed.messages &&
+        parsed.messages.length > 0
+      ) {
         // Generate voice for the first message (usually the most emotional one)
         const messageForVoice = parsed.messages[0];
         voiceConfig = await generateVoiceMessage(
@@ -120,6 +130,11 @@ export const invokeCharacterTool = {
           messageForVoice,
           emotionalState,
         );
+
+        // Mark that this character has received a voice message
+        if (voiceConfig?.enabled) {
+          character.relationshipState.hasReceivedVoiceMessage = true;
+        }
       }
 
       return {
