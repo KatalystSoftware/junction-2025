@@ -51,6 +51,7 @@ function App() {
   const [statusMessage, setStatusMessage] = useState("Initializing...");
   const [showStats, setShowStats] = useState(false);
   const [showAllThreads, setShowAllThreads] = useState(false); // Toggle active/all threads
+  const [showRelationships, setShowRelationships] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [bossReview, setBossReview] = useState<any>(null);
   const [quiz, setQuiz] = useState<any>(null);
@@ -81,6 +82,14 @@ function App() {
     // Toggle stats
     if (input === "s" && !inputValue) {
       setShowStats(!showStats);
+      setShowRelationships(false);
+      return;
+    }
+
+    // Toggle relationships
+    if (input === "r" && !inputValue) {
+      setShowRelationships(!showRelationships);
+      setShowStats(false);
       return;
     }
 
@@ -363,9 +372,14 @@ function App() {
 
       // Check if conversation ended
       if (response.type === "conversation_end") {
-        setStatusMessage(
-          `${thread.characterName} left. Reputation: ${response.stateUpdate.reputation}`,
-        );
+        let endMessage = `${thread.characterName} left. Reputation: ${response.stateUpdate.reputation}`;
+
+        // Show recommendation message if any
+        if (response.recommendationMessage) {
+          endMessage = response.recommendationMessage;
+        }
+
+        setStatusMessage(endMessage);
 
         // Mark thread as completed instead of deleting
         const completedThread = updated.get(currentThreadId);
@@ -493,6 +507,8 @@ function App() {
           <Text dimColor>───────────────</Text>
           {showStats ? (
             <StatsPanel advisorState={advisorState} />
+          ) : showRelationships ? (
+            <RelationshipsPanel advisorState={advisorState} />
           ) : (
             <>
               <Text dimColor>Commands:</Text>
@@ -500,6 +516,7 @@ function App() {
               <Text dimColor>n New</Text>
               <Text dimColor>h History</Text>
               <Text dimColor>s Stats</Text>
+              <Text dimColor>r Relationships</Text>
               <Text dimColor>q Quit</Text>
             </>
           )}
@@ -589,6 +606,73 @@ function StatsPanel({ advisorState }: { advisorState: AdvisorState }) {
       <Text dimColor>Skill: {advisorState.skillLevel.toFixed(1)}/10</Text>
       <Text dimColor>Sessions: {advisorState.totalSessions}</Text>
       <Text dimColor>Clients: {advisorState.totalClientsHelped}</Text>
+    </Box>
+  );
+}
+
+// ============================================================================
+// Relationships Panel Component
+// ============================================================================
+
+function getTrustHearts(trustLevel: number): string {
+  const fullHearts = Math.floor(trustLevel * 5);
+  const emptyHearts = 5 - fullHearts;
+  return "❤️".repeat(fullHearts) + "🖤".repeat(emptyHearts);
+}
+
+function getOutcomeIcon(
+  outcome: "helped" | "struggling" | "pending" | "unknown",
+): string {
+  switch (outcome) {
+    case "helped":
+      return "✅";
+    case "struggling":
+      return "⚠️";
+    case "pending":
+      return "❓";
+    default:
+      return "❓";
+  }
+}
+
+function getTrustColor(trustLevel: number): string {
+  if (trustLevel > 0.7) return "green";
+  if (trustLevel > 0.4) return "yellow";
+  return "red";
+}
+
+function RelationshipsPanel({ advisorState }: { advisorState: AdvisorState }) {
+  const relationships = characterPool.getCharacterRelationships(
+    advisorState.advisorId,
+  );
+
+  if (relationships.length === 0) {
+    return (
+      <Box flexDirection="column">
+        <Text bold color="yellow">
+          📊 Relationships
+        </Text>
+        <Text dimColor>No characters met yet</Text>
+      </Box>
+    );
+  }
+
+  return (
+    <Box flexDirection="column">
+      <Text bold color="yellow">
+        📊 Relationships
+      </Text>
+      <Text dimColor> </Text>
+      {relationships.slice(0, 5).map((rel, index) => (
+        <Box key={index} flexDirection="column">
+          <Text color={getTrustColor(rel.trustLevel)}>
+            {rel.name.substring(0, 20)}
+          </Text>
+          <Text dimColor>
+            {getTrustHearts(rel.trustLevel)} {getOutcomeIcon(rel.lastOutcome)}
+          </Text>
+        </Box>
+      ))}
     </Box>
   );
 }

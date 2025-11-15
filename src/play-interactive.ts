@@ -78,6 +78,72 @@ function printStats(advisorState: AdvisorState) {
     `   Clients Helped: ${summary.progress.totalClientsHelped}`,
     colors.yellow,
   );
+
+  // Show relationships summary
+  const relationships = characterPool.getCharacterRelationships(
+    advisorState.advisorId,
+  );
+  if (relationships.length > 0) {
+    print(`   Characters Met: ${relationships.length}`, colors.yellow);
+  }
+}
+
+function getTrustHearts(trustLevel: number): string {
+  const fullHearts = Math.floor(trustLevel * 5);
+  const emptyHearts = 5 - fullHearts;
+  return "❤️".repeat(fullHearts) + "🖤".repeat(emptyHearts);
+}
+
+function getOutcomeIcon(
+  outcome: "helped" | "struggling" | "pending" | "unknown",
+): string {
+  switch (outcome) {
+    case "helped":
+      return "✅ Helped";
+    case "struggling":
+      return "⚠️ Struggling";
+    case "pending":
+      return "❓ Pending";
+    default:
+      return "❓ Unknown";
+  }
+}
+
+function printRelationships(advisorState: AdvisorState) {
+  const relationships = characterPool.getCharacterRelationships(
+    advisorState.advisorId,
+  );
+
+  if (relationships.length === 0) {
+    print("\n📊 Your Relationships:", colors.yellow);
+    print(
+      "   You haven't met any characters yet. Start a consultation to begin!",
+      colors.yellow,
+    );
+    return;
+  }
+
+  print("\n📊 Your Relationships:", colors.yellow);
+  print("");
+
+  // Print table header
+  print("┌" + "─".repeat(68) + "┐", colors.cyan);
+  print("│ Character        │ Trust     │ Visits │ Last       │", colors.cyan);
+  print("├" + "─".repeat(68) + "┤", colors.cyan);
+
+  // Print each relationship
+  for (const rel of relationships) {
+    const nameCol = rel.name.padEnd(16).substring(0, 16);
+    const trustCol = getTrustHearts(rel.trustLevel).padEnd(9);
+    const visitsCol = rel.visitCount.toString().padEnd(6);
+    const outcomeCol = getOutcomeIcon(rel.lastOutcome).padEnd(11);
+
+    const row = `│ ${nameCol} │ ${trustCol} │ ${visitsCol} │ ${outcomeCol} │`;
+    print(row, colors.cyan);
+  }
+
+  print("└" + "─".repeat(68) + "┘", colors.cyan);
+  print("");
 }
 
 function printActiveThreads(
@@ -121,6 +187,10 @@ function printThreadCommands() {
   print("  • 'threads' or 't' - List all active threads", colors.yellow);
   print("  • 'new' or 'n' - Start new consultation", colors.yellow);
   print("  • 'stats' - View your stats", colors.yellow);
+  print(
+    "  • 'relationships' or 'r' - View character relationships",
+    colors.yellow,
+  );
   print("  • 'quit' or 'exit' - Exit game", colors.yellow);
 }
 
@@ -364,6 +434,15 @@ async function playGame() {
         continue;
       }
 
+      // Handle relationships
+      if (
+        userInput.toLowerCase() === "relationships" ||
+        userInput.toLowerCase() === "r"
+      ) {
+        printRelationships(advisorState);
+        continue;
+      }
+
       // Handle thread list
       if (
         userInput.toLowerCase() === "threads" ||
@@ -570,6 +649,14 @@ async function playGame() {
           `🎓 Skill level: ${advisorState.skillLevel.toFixed(1)}/10`,
           colors.yellow,
         );
+
+        // Show recommendation message if any
+        if (response.recommendationMessage) {
+          print(
+            "\n" + response.recommendationMessage,
+            colors.green + colors.bright,
+          );
+        }
 
         const poolStats = characterPool.getPoolStats();
         if (poolStats.pendingFollowUps > 0) {
