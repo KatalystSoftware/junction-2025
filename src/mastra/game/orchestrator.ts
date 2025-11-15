@@ -38,6 +38,40 @@ import type {
   ConversationMessage,
 } from "../types/game-types.ts";
 
+function clampValue(value: number, min: number, max: number, fallback: number) {
+  if (Number.isNaN(value) || !Number.isFinite(value)) {
+    return fallback;
+  }
+  return Math.min(max, Math.max(min, value));
+}
+
+function getSafeAverageDimensionScore(
+  qualityScore: number,
+  dimensions?: {
+    adviceQuality?: number;
+    communicationEffectiveness?: number;
+    learningObjectives?: number;
+    characterProgression?: number;
+  },
+): number {
+  if (!dimensions) return qualityScore;
+
+  const values = [
+    dimensions.adviceQuality,
+    dimensions.communicationEffectiveness,
+    dimensions.learningObjectives,
+    dimensions.characterProgression,
+  ].filter((v): v is number => typeof v === "number" && Number.isFinite(v));
+
+  if (values.length === 4) {
+    const sum = values.reduce((acc, v) => acc + v, 0);
+    const avg = sum / values.length;
+    return Number.isFinite(avg) ? avg : qualityScore;
+  }
+
+  return qualityScore;
+}
+
 /**
  * Initialize a new advisor with default state
  */
@@ -775,16 +809,10 @@ export async function handleAdvisorResponse(
     // Update skill and reputation based on comprehensive evaluation
     // Use dimension scores if available for more nuanced updates
     const dimensionScores = adviceEvaluation.dimensions;
-    let avgDimensionScore = adviceEvaluation.qualityScore;
-
-    if (dimensionScores) {
-      avgDimensionScore =
-        (dimensionScores.adviceQuality +
-          dimensionScores.communicationEffectiveness +
-          dimensionScores.learningObjectives +
-          dimensionScores.characterProgression) /
-        4;
-    }
+    const avgDimensionScore = getSafeAverageDimensionScore(
+      adviceEvaluation.qualityScore,
+      dimensionScores,
+    );
 
     // BEGINNER-FRIENDLY EVALUATION SCALING
     // Scale penalties and rewards based on skill level to make early game more forgiving
@@ -824,26 +852,34 @@ export async function handleAdvisorResponse(
     // Bonus/penalty for specific evaluation criteria (scaled for beginners)
     if (adviceEvaluation.wasActionable) {
       const actionableBonus = isBeginner ? 0.02 : 0.01; // Double skill gain for beginners
-      advisorState.skillLevel = Math.min(
-        10,
+      advisorState.skillLevel = clampValue(
         advisorState.skillLevel + actionableBonus,
+        0,
+        10,
+        1,
       );
     }
     if (!adviceEvaluation.wasAccurate) {
       const accuracyPenalty = isBeginner ? 2 : 5; // Gentler penalty for beginners
-      advisorState.reputation = Math.max(
-        0,
+      advisorState.reputation = clampValue(
         advisorState.reputation - accuracyPenalty,
+        0,
+        100,
+        70,
       );
     }
 
-    advisorState.skillLevel = Math.max(
+    advisorState.skillLevel = clampValue(
+      advisorState.skillLevel + skillChange,
       0,
-      Math.min(10, advisorState.skillLevel + skillChange),
+      10,
+      1,
     );
-    advisorState.reputation = Math.max(
+    advisorState.reputation = clampValue(
+      advisorState.reputation + repChange,
       0,
-      Math.min(100, advisorState.reputation + repChange),
+      100,
+      70,
     );
 
     // Update performance streak
