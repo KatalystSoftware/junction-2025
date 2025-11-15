@@ -15,7 +15,66 @@
     "incomeLevel": "medium",
     "typicalMonthlyIncome": 3400,
     "hasDebt": false,
-    "hasSavings": "good"
+    "hasSavings": "good",
+    "bankAccounts": [
+      {
+        "accountId": "acc_helena_001",
+        "bankName": "Nordea",
+        "accountType": "checking",
+        "balance": 2850.00,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_helena_002",
+        "bankName": "Nordea",
+        "accountType": "savings",
+        "balance": 28500.00,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [],
+    "debts": [],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_helena_001",
+        "name": "Spotify Premium",
+        "monthlyCost": 10.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2022-03-01"
+      },
+      {
+        "subscriptionId": "sub_helena_002",
+        "name": "Netflix Basic",
+        "monthlyCost": 7.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2023-01-01"
+      },
+      {
+        "subscriptionId": "sub_helena_003",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 24.90,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2021-01-01"
+      },
+      {
+        "subscriptionId": "sub_helena_004",
+        "name": "Gym Membership",
+        "monthlyCost": 39.90,
+        "category": "fitness",
+        "currency": "EUR",
+        "startDate": "2023-06-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "rent": 850,
+      "groceries": 300,
+      "transportation": 65,
+      "utilities": 45,
+      "other": 200
+    }
   },
   "communicationStyle": {
     "formality": "semi-formal",

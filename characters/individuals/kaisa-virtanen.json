@@ -15,7 +15,68 @@
     "incomeLevel": "medium",
     "typicalMonthlyIncome": 2800,
     "hasDebt": false,
-    "hasSavings": "minimal"
+    "hasSavings": "minimal",
+    "bankAccounts": [
+      {
+        "accountId": "acc_kaisa_001",
+        "bankName": "OP",
+        "accountType": "checking",
+        "balance": 950.00,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_kaisa_002",
+        "bankName": "OP",
+        "accountType": "savings",
+        "balance": 2100.00,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [
+      {
+        "cardId": "cc_kaisa_001",
+        "issuer": "OP Visa",
+        "balance": 420.00,
+        "creditLimit": 3000,
+        "interestRate": 14.9,
+        "minimumPayment": 30,
+        "currency": "EUR"
+      }
+    ],
+    "debts": [],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_kaisa_001",
+        "name": "Netflix Basic",
+        "monthlyCost": 7.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2024-06-01"
+      },
+      {
+        "subscriptionId": "sub_kaisa_002",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 24.90,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2024-04-01"
+      },
+      {
+        "subscriptionId": "sub_kaisa_003",
+        "name": "Daycare for Children",
+        "monthlyCost": 320.00,
+        "category": "other",
+        "currency": "EUR",
+        "startDate": "2024-05-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "rent": 720,
+      "groceries": 480,
+      "transportation": 85,
+      "utilities": 95,
+      "other": 180
+    }
   },
   "communicationStyle": {
     "formality": "casual",

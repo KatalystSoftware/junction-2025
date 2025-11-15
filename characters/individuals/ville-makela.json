@@ -15,7 +15,83 @@
     "incomeLevel": "medium",
     "typicalMonthlyIncome": 4200,
     "hasDebt": false,
-    "hasSavings": "moderate"
+    "hasSavings": "moderate",
+    "bankAccounts": [
+      {
+        "accountId": "acc_ville_001",
+        "bankName": "Holvi Business",
+        "accountType": "checking",
+        "balance": 6800.00,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_ville_002",
+        "bankName": "OP Personal",
+        "accountType": "checking",
+        "balance": 1200.00,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_ville_003",
+        "bankName": "OP",
+        "accountType": "savings",
+        "balance": 18000.00,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [
+      {
+        "cardId": "cc_ville_001",
+        "issuer": "OP Business Visa",
+        "balance": 1200.00,
+        "creditLimit": 10000,
+        "interestRate": 15.9,
+        "minimumPayment": 50,
+        "currency": "EUR"
+      }
+    ],
+    "debts": [],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_ville_001",
+        "name": "Microsoft 365 Business",
+        "monthlyCost": 12.50,
+        "category": "software",
+        "currency": "EUR",
+        "startDate": "2020-01-01"
+      },
+      {
+        "subscriptionId": "sub_ville_002",
+        "name": "Spotify Family",
+        "monthlyCost": 16.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2019-01-01"
+      },
+      {
+        "subscriptionId": "sub_ville_003",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 34.90,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2018-01-01"
+      },
+      {
+        "subscriptionId": "sub_ville_004",
+        "name": "Netflix Premium",
+        "monthlyCost": 19.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2020-03-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "rent": 950,
+      "groceries": 550,
+      "transportation": 180,
+      "utilities": 150,
+      "other": 300
+    }
   },
   "communicationStyle": {
     "formality": "casual",

@@ -15,7 +15,58 @@
     "incomeLevel": "medium",
     "typicalMonthlyIncome": 1800,
     "hasDebt": false,
-    "hasSavings": "good"
+    "hasSavings": "good",
+    "bankAccounts": [
+      {
+        "accountId": "acc_eero_001",
+        "bankName": "Nordea",
+        "accountType": "checking",
+        "balance": 3200.00,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_eero_002",
+        "bankName": "Nordea",
+        "accountType": "savings",
+        "balance": 82000.00,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [],
+    "debts": [],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_eero_001",
+        "name": "Elisa Viihde",
+        "monthlyCost": 19.90,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2018-01-01"
+      },
+      {
+        "subscriptionId": "sub_eero_002",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 19.90,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2015-01-01"
+      },
+      {
+        "subscriptionId": "sub_eero_003",
+        "name": "Newspaper Subscription",
+        "monthlyCost": 32.00,
+        "category": "other",
+        "currency": "EUR",
+        "startDate": "2010-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "rent": 0,
+      "groceries": 450,
+      "transportation": 80,
+      "utilities": 120,
+      "other": 250
+    }
   },
   "communicationStyle": {
     "formality": "semi-formal",
