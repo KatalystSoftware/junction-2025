@@ -66,10 +66,10 @@ resource "google_cloud_run_v2_service" "app" {
         name  = "DATABASE_URL"
         value = format(
           "postgresql://%s:%s@%s:5432/%s",
-          var.db_user,
-          random_password.db_password.result,
+          urlencode(var.db_user),
+          urlencode(random_password.db_password.result),
           google_sql_database_instance.app.private_ip_address,
-          var.db_name,
+          urlencode(var.db_name),
         )
       }
     }
