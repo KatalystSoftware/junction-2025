@@ -16,6 +16,9 @@ import type {
   FinancialTopic,
   Character,
   Scenario,
+  ConversationThread,
+  ThreadInfo,
+  ConversationMessage,
 } from "../types/game-types.ts";
 
 /**
@@ -41,8 +44,8 @@ export function createNewAdvisor(advisorId: string): AdvisorState {
     },
     sessionHistory: [],
     totalClientsHelped: 0,
-    currentClient: null,
-    currentScenario: null,
+    activeClients: [],
+    activeThreads: {},
     godBossRelationship: 5, // Neutral start
     learningMaterials: [],
     totalSessions: 0,
@@ -187,15 +190,30 @@ Respond with ONLY valid JSON (NO markdown):
     // Mark scenario as used
     characterPool.markScenarioUsed(scenario.scenarioId);
 
-    // Update advisor state
-    advisorState.currentClient = character.characterId;
-    advisorState.currentScenario = scenario.scenarioId;
+    // Create new thread
+    const threadId = `thread_${Date.now()}`;
+    const now = new Date().toISOString();
+
+    // Add to active threads
+    advisorState.activeThreads[threadId] = {
+      threadId,
+      characterId: character.characterId,
+      scenarioId: scenario.scenarioId,
+      status: "awaiting_response",
+      createdAt: now,
+      lastMessageAt: now,
+    };
+
+    // Add to active clients if not already there
+    if (!advisorState.activeClients.includes(character.characterId)) {
+      advisorState.activeClients.push(character.characterId);
+    }
 
     // Get character's initial message
     const initialContact = getCharacterInitialMessage(scenario);
 
-    // Create new thread
-    const threadId = `thread_${Date.now()}`;
+    // Get all active threads for UI
+    const activeThreads = getActiveThreads(advisorState);
 
     // Return initial character message
     return {
@@ -210,6 +228,7 @@ Respond with ONLY valid JSON (NO markdown):
         occupation: character.occupation,
       },
       stateUpdate: advisorState,
+      activeThreads,
     };
   }
 
@@ -231,13 +250,15 @@ export async function handleAdvisorResponse(
 ): Promise<GameResponse> {
   let advisorState = { ...currentState };
 
-  if (!advisorState.currentClient || !advisorState.currentScenario) {
-    throw new Error("No active consultation");
+  // Get thread info
+  const threadInfo = advisorState.activeThreads[threadId];
+  if (!threadInfo) {
+    throw new Error(`Thread ${threadId} not found`);
   }
 
   // Get character and scenario
-  const character = characterPool.getCharacter(advisorState.currentClient);
-  const scenario = characterPool.getScenario(advisorState.currentScenario);
+  const character = characterPool.getCharacter(threadInfo.characterId);
+  const scenario = characterPool.getScenario(threadInfo.scenarioId);
 
   if (!character || !scenario) {
     throw new Error("Character or scenario not found");
@@ -256,7 +277,7 @@ export async function handleAdvisorResponse(
     conversationHistory: conversationHistory || [],
   });
 
-  // Evaluate advice quality
+  // Evaluate advice quality using AI-based evaluation
   const evaluateTool = mastra.getTool("evaluateAdviceTool");
   let adviceEvaluation: any = {
     qualityScore: 5,
@@ -264,6 +285,11 @@ export async function handleAdvisorResponse(
     outcome: "neutral",
     strengths: [],
     weaknesses: [],
+    missedOpportunities: [],
+    topicsCovered: [scenario.topic],
+    wasActionable: false,
+    wasEmpathetic: false,
+    wasAccurate: true,
   };
 
   if (evaluateTool) {
@@ -271,12 +297,18 @@ export async function handleAdvisorResponse(
       advice: advisorMessage,
       scenario,
       characterPersonality: character.personality,
+      character, // Pass full character for more context
+      conversationHistory, // Pass conversation history for context
     });
   }
 
+  // Update thread status
+  threadInfo.status = "active";
+  threadInfo.lastMessageAt = new Date().toISOString();
+
   // If conversation is ending, save session
   if (characterResponse.conversationEnding) {
-    // Create consultation session record
+    // Create consultation session record with detailed evaluation
     const session: ConsultationSession = {
       sessionId: `session_${Date.now()}`,
       characterId: character.characterId,
@@ -286,10 +318,21 @@ export async function handleAdvisorResponse(
       playerAdvice: [advisorMessage], // Would accumulate all advice in full implementation
       characterReactions: characterResponse.messages,
       adviceQualityScore: adviceEvaluation.qualityScore,
-      topicsCovered: [scenario.topic],
+      topicsCovered: adviceEvaluation.topicsCovered || [scenario.topic],
       followUpScheduled: false,
       outcomeRevealed: false,
       duration: (conversationHistory?.length || 0) + 1,
+      // Store detailed evaluation for later review
+      evaluation: {
+        strengths: adviceEvaluation.strengths,
+        weaknesses: adviceEvaluation.weaknesses,
+        missedOpportunities: adviceEvaluation.missedOpportunities,
+        wasActionable: adviceEvaluation.wasActionable,
+        wasEmpathetic: adviceEvaluation.wasEmpathetic,
+        wasAccurate: adviceEvaluation.wasAccurate,
+        dimensions: adviceEvaluation.dimensions,
+        characterProgression: adviceEvaluation.characterProgression,
+      },
     };
 
     // Add to session history
@@ -335,9 +378,34 @@ export async function handleAdvisorResponse(
       }
     }
 
-    // Update skill and reputation based on performance
-    const skillChange = (adviceEvaluation.qualityScore - 5) * 0.02; // -0.1 to +0.1
-    const repChange = Math.round((adviceEvaluation.qualityScore - 5) * 2); // -10 to +10
+    // Update skill and reputation based on comprehensive evaluation
+    // Use dimension scores if available for more nuanced updates
+    const dimensionScores = adviceEvaluation.dimensions;
+    let avgDimensionScore = adviceEvaluation.qualityScore;
+
+    if (dimensionScores) {
+      avgDimensionScore =
+        (dimensionScores.adviceQuality +
+          dimensionScores.communicationEffectiveness +
+          dimensionScores.learningObjectives +
+          dimensionScores.characterProgression) /
+        4;
+    }
+
+    // Calculate changes based on comprehensive evaluation
+    const skillChange = (avgDimensionScore - 5) * 0.02; // -0.1 to +0.1
+    const repChange = Math.round((avgDimensionScore - 5) * 2); // -10 to +10
+
+    // Bonus/penalty for specific evaluation criteria
+    if (adviceEvaluation.wasEmpathetic) {
+      advisorState.reputation = Math.min(100, advisorState.reputation + 2);
+    }
+    if (adviceEvaluation.wasActionable) {
+      advisorState.skillLevel = Math.min(10, advisorState.skillLevel + 0.01);
+    }
+    if (!adviceEvaluation.wasAccurate) {
+      advisorState.reputation = Math.max(0, advisorState.reputation - 5);
+    }
 
     advisorState.skillLevel = Math.max(
       0,
@@ -348,17 +416,43 @@ export async function handleAdvisorResponse(
       Math.min(100, advisorState.reputation + repChange),
     );
 
-    // Update topic expertise
-    const topicChange = (adviceEvaluation.qualityScore - 5) * 0.05;
-    advisorState.topicsExpertise[scenario.topic] = Math.max(
-      0,
-      Math.min(10, advisorState.topicsExpertise[scenario.topic] + topicChange),
-    );
+    // Update topic expertise for all topics covered in the evaluation
+    const topicsToUpdate = adviceEvaluation.topicsCovered || [scenario.topic];
+    for (const topic of topicsToUpdate) {
+      const topicChange = (adviceEvaluation.qualityScore - 5) * 0.05;
+      advisorState.topicsExpertise[topic as FinancialTopic] = Math.max(
+        0,
+        Math.min(
+          10,
+          advisorState.topicsExpertise[topic as FinancialTopic] + topicChange,
+        ),
+      );
+    }
 
-    // Clear current client
-    advisorState.currentClient = null;
-    advisorState.currentScenario = null;
+    // Mark thread as resolved
+    threadInfo.status = "resolved";
+
+    // Remove from active clients if no other active threads
+    const hasOtherActiveThreads = Object.values(
+      advisorState.activeThreads,
+    ).some(
+      (t) =>
+        t.characterId === character.characterId &&
+        t.threadId !== threadId &&
+        t.status !== "resolved",
+    );
+    if (!hasOtherActiveThreads) {
+      advisorState.activeClients = advisorState.activeClients.filter(
+        (id) => id !== character.characterId,
+      );
+    }
+  } else {
+    // Mark thread as awaiting response (character just responded, waiting for advisor)
+    threadInfo.status = "awaiting_response";
   }
+
+  // Get all active threads for UI
+  const activeThreads = getActiveThreads(advisorState);
 
   return {
     type: characterResponse.conversationEnding
@@ -368,6 +462,7 @@ export async function handleAdvisorResponse(
     messages: characterResponse.messages,
     voiceNeeded: characterResponse.voiceNeeded,
     stateUpdate: advisorState,
+    activeThreads,
   };
 }
 
@@ -469,4 +564,99 @@ export function getAdvisorSummary(advisorState: AdvisorState) {
     },
     specializations: advisorState.specializations,
   };
+}
+
+/**
+ * Get all active conversation threads with character info
+ */
+export function getActiveThreads(
+  advisorState: AdvisorState,
+): ConversationThread[] {
+  const threads: ConversationThread[] = [];
+
+  for (const [threadId, threadInfo] of Object.entries(
+    advisorState.activeThreads,
+  )) {
+    // Skip resolved threads
+    if (threadInfo.status === "resolved") {
+      continue;
+    }
+
+    const character = characterPool.getCharacter(threadInfo.characterId);
+    if (!character) {
+      continue;
+    }
+
+    threads.push({
+      threadId,
+      characterId: threadInfo.characterId,
+      characterName: character.name,
+      scenarioId: threadInfo.scenarioId,
+      messages: [], // Messages would be stored separately in full implementation
+      status: threadInfo.status,
+      unreadCount: threadInfo.status === "awaiting_response" ? 1 : 0,
+      createdAt: threadInfo.createdAt,
+      lastMessageAt: threadInfo.lastMessageAt,
+      characterInfo: {
+        name: character.name,
+        age: character.age,
+        occupation: character.occupation,
+      },
+    });
+  }
+
+  // Sort by last message time (most recent first)
+  threads.sort(
+    (a, b) =>
+      new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime(),
+  );
+
+  return threads;
+}
+
+/**
+ * Switch to a specific thread and get its details
+ */
+export function switchThread(
+  threadId: string,
+  advisorState: AdvisorState,
+): ConversationThread | null {
+  const threadInfo = advisorState.activeThreads[threadId];
+  if (!threadInfo || threadInfo.status === "resolved") {
+    return null;
+  }
+
+  const character = characterPool.getCharacter(threadInfo.characterId);
+  const scenario = characterPool.getScenario(threadInfo.scenarioId);
+
+  if (!character || !scenario) {
+    return null;
+  }
+
+  return {
+    threadId,
+    characterId: threadInfo.characterId,
+    characterName: character.name,
+    scenarioId: threadInfo.scenarioId,
+    messages: [], // Would retrieve from storage in full implementation
+    status: threadInfo.status,
+    unreadCount: 0, // Reset unread count when switching
+    createdAt: threadInfo.createdAt,
+    lastMessageAt: threadInfo.lastMessageAt,
+    characterInfo: {
+      name: character.name,
+      age: character.age,
+      occupation: character.occupation,
+    },
+  };
+}
+
+/**
+ * Get thread by ID
+ */
+export function getThread(
+  threadId: string,
+  advisorState: AdvisorState,
+): ConversationThread | null {
+  return switchThread(threadId, advisorState);
 }
