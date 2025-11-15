@@ -25,8 +25,16 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   // User profile data
   const [userName, setUserName] = useState("");
   const [userAvatar, setUserAvatar] = useState("");
+  const [userLanguage, setUserLanguage] = useState("en"); // Default to English
 
   const totalScreens = 3;
+
+  // Language options
+  const languageOptions = [
+    { id: "en", label: "English", flag: "🇬🇧" },
+    { id: "fi", label: "Finnish", flag: "🇫🇮" },
+    { id: "sv", label: "Swedish", flag: "🇸🇪" },
+  ];
   const progressPercentage = ((currentScreen + 1) / totalScreens) * 100;
 
   // Add keyboard navigation (but not for the profile screen)
@@ -51,7 +59,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     // Validate profile screen
     if (currentScreen === 0) {
       if (!userName.trim() || !userAvatar) {
-        return; // Don't proceed if fields are empty
+        return; // Don't proceed if required fields are empty
       }
       // Save profile to localStorage
       localStorage.setItem(
@@ -59,6 +67,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         JSON.stringify({
           name: userName,
           avatar: userAvatar,
+          language: userLanguage,
         }),
       );
     }
@@ -341,6 +350,50 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                               {option.label[0]}
                             </AvatarFallback>
                           </Avatar>
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <Label
+                      className="text-sm font-medium leading-none"
+                      style={{
+                        color: "var(--foreground)",
+                      }}
+                    >
+                      Preferred Language
+                    </Label>
+                    <div className="flex gap-3">
+                      {languageOptions.map((lang) => (
+                        <motion.button
+                          key={lang.id}
+                          type="button"
+                          onClick={() => setUserLanguage(lang.id)}
+                          className="flex-1 flex flex-col items-center gap-2 p-4 rounded-lg transition-all duration-200 cursor-pointer"
+                          style={{
+                            border: `2px solid ${userLanguage === lang.id ? "var(--primary)" : "var(--border)"}`,
+                            backgroundColor:
+                              userLanguage === lang.id
+                                ? "rgba(127, 86, 217, 0.1)"
+                                : "var(--muted)",
+                          }}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <span style={{ fontSize: "2rem" }}>{lang.flag}</span>
+                          <span
+                            style={{
+                              fontFamily: "Inter, sans-serif",
+                              fontSize: "var(--text-sm)",
+                              fontWeight: "var(--font-weight-medium)",
+                              color:
+                                userLanguage === lang.id
+                                  ? "var(--primary)"
+                                  : "var(--foreground)",
+                            }}
+                          >
+                            {lang.label}
+                          </span>
                         </motion.button>
                       ))}
                     </div>
