@@ -15,6 +15,10 @@ export interface SavedSession {
     string,
     Array<{ role: "user" | "assistant"; content: string }>
   >;
+  characterInfo: Map<
+    string,
+    { name: string; age: number; occupation: string }
+  >;
   savedAt: string;
 }
 
@@ -35,6 +39,10 @@ export async function saveSession(
     string,
     Array<{ role: "user" | "assistant"; content: string }>
   >,
+  characterInfo?: Map<
+    string,
+    { name: string; age: number; occupation: string }
+  >,
 ): Promise<void> {
   // Prepare metadata for quick lookups
   const metadata: Record<string, unknown> = {
@@ -48,6 +56,7 @@ export async function saveSession(
   const sessionData = {
     advisorState,
     threadHistories: threadHistories ? Object.fromEntries(threadHistories) : {},
+    characterInfo: characterInfo ? Object.fromEntries(characterInfo) : {},
     savedAt: metadata.lastActive,
   };
 
@@ -99,10 +108,17 @@ export async function loadSession(
       Array<{ role: "user" | "assistant"; content: string }>
     >(Object.entries(sessionData.threadHistories || {}));
 
+    // Convert character info back to Map
+    const characterInfo = new Map<
+      string,
+      { name: string; age: number; occupation: string }
+    >(Object.entries(sessionData.characterInfo || {}));
+
     return {
       sessionId,
       advisorState: sessionData.advisorState,
       threadHistories,
+      characterInfo,
       savedAt: sessionData.savedAt,
     };
   } catch (error) {
