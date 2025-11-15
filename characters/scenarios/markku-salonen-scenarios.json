@@ -1,0 +1,62 @@
+[
+  {
+    "scenarioId": "scenario_markku_life_insurance_001",
+    "characterId": "char_markku_031",
+    "scenarioType": "life_insurance_for_children",
+    "difficulty": 0.5,
+    "topic": "insurance",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 2, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I've been thinking about what would happen to my kids if something happened to me. I pay child support and try to be involved, but I don't have much saved. If I died, they'd get nothing. I looked into life insurance (henkivakuutus) but it's expensive - like 35€/month for 100,000€ coverage. Is it worth it? Or should I just try to save more? My ex would probably say I should have insurance but we don't really talk about this stuff.",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Divorced father concerned about providing for children if he dies, weighing life insurance costs",
+      "emotionalState": "worried, guilt, wanting to do right thing for kids, financial pressure",
+      "urgency": "medium",
+      "specificDetails": {
+        "hasTwoChildren": true,
+        "payingChildSupport": true,
+        "divorcedRelationship": "tense",
+        "limitedSavings": true,
+        "insuranceQuote": "35€/month for 100k",
+        "feelingGuilty": true
+      }
+    },
+    "idealAdvice": [
+      "This shows you're thinking responsibly about your children's future",
+      "Life insurance most valuable when you have dependents and limited savings - exactly your situation",
+      "35€/month for 100k coverage is reasonable for your age and situation",
+      "Term life insurance (määräaikainen henkivakuutus) is cheapest option for pure protection",
+      "Coverage should roughly equal: child support × years until kids are 18 + some buffer",
+      "100k for two kids until adulthood is reasonable baseline",
+      "Make sure beneficiaries are listed as your children directly (not ex-spouse)",
+      "This is more reliable than trying to save - you can't predict when something might happen",
+      "Can reduce coverage as kids get older and you build savings",
+      "Employer may offer group life insurance - check if you have this benefit",
+      "This is actually one of the most loving financial decisions a parent can make"
+    ],
+    "commonMistakes": [
+      "Dismissing life insurance as unnecessary expense",
+      "Not acknowledging the emotional complexity of divorced parent situation",
+      "Suggesting he should just save instead (can't save fast enough for unexpected death)",
+      "Not mentioning beneficiary designation importance",
+      "Recommending whole life insurance (much more expensive, unnecessary complexity)",
+      "Not validating his concern for his children's welfare"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_markku_insurance_peace_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 4
+      }
+    ]
+  }
+]

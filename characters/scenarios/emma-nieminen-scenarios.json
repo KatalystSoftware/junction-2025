@@ -1,0 +1,74 @@
+[
+  {
+    "scenarioId": "scenario_emma_travel_budgeting_001",
+    "characterId": "char_emma_022",
+    "scenarioType": "teen_travel_planning",
+    "difficulty": 0.4,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 1, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I've saved 5,200€ for backpacking Southeast Asia for 4-5 months before university! I'm so excited but also terrified about money. My friends who traveled say you can live on 800€/month there, but what if I run out of money halfway through? Should I bring all 5,200€ or keep some in Finland as emergency fund? How do I budget for a trip where costs are so uncertain?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Gap year student planning extended travel, anxious about budgeting for uncertainty",
+      "emotionalState": "excited, anxious, wanting to plan responsibly, fear of running out",
+      "urgency": "medium",
+      "specificDetails": {
+        "age": 19,
+        "savedAmount": 5200,
+        "travelDestination": "Southeast Asia",
+        "duration": "4-5 months",
+        "estimatedCost": "800€/month",
+        "firstLongTravel": true,
+        "uncertaintyAnxiety": true
+      }
+    },
+    "idealAdvice": [
+      "Amazing that you saved 5,200€ for this experience!",
+      "Southeast Asia budgeting: 800-1,000€/month is realistic for budget traveler",
+      "Your 5,200€ for 4-5 months: Tight but doable with discipline",
+      "Smart budgeting approach:",
+      "Keep 1,000-1,500€ in Finland as TRUE emergency fund (medical emergency, flight home)",
+      "Travel with 3,700-4,200€ for 4-5 months = ~850€/month budget",
+      "How to manage money while traveling:",
+      "1. Split money: Some in bank (debit card), some in cash, some backup (Wise/Revolut card)",
+      "2. Weekly budget: 200€/week is easier to track than monthly",
+      "3. Cheap accommodation: Hostels (10-15€/night), not hotels",
+      "4. Street food is safe and cheap: 2-4€/meal vs 10€+ in restaurants",
+      "5. Overnight buses/trains save hotel night + transport cost",
+      "6. Free activities: Beaches, hiking, temples, markets vs expensive tours",
+      "Contingency planning:",
+      "- Download budgeting app (Trail Wallet) to track daily spending",
+      "- Keep digital copies of important documents in cloud",
+      "- Traveler's insurance is ESSENTIAL (150-200€ for 5 months) - don't skip this!",
+      "- If running low: Can teach English, work in hostels for accommodation",
+      "Red flag expenses: Partying, organized tours, Western food, shopping",
+      "Your savings show discipline - you can do this!",
+      "The experience of 5 months in Asia: Priceless. This will shape your life.",
+      "University will still be there - this is perfect time for this adventure"
+    ],
+    "commonMistakes": [
+      "Scaring her out of the trip by focusing only on risks",
+      "Not explaining practical budgeting strategies for travel",
+      "Forgetting to mention traveler's insurance (critical!)",
+      "Not validating that her savings achievement is impressive",
+      "Failing to give specific budget numbers she can work with",
+      "Missing opportunity to encourage her well-planned adventure"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_emma_university_decision_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 10
+      }
+    ]
+  }
+]

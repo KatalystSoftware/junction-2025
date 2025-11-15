@@ -1,0 +1,222 @@
+[
+  {
+    "scenarioId": "scenario_aleksi_irregular_income_001",
+    "characterId": "char_aleksi_026",
+    "scenarioType": "freelancer_budgeting",
+    "difficulty": 0.7,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 3, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Freelance life is killing me financially. Some months I make 4,000€, other months 1,500€. I never know what's coming. How do I budget when income is so unpredictable? Last month was great, spent freely, now this month is slow and I'm stressed. My rent doesn't care that I had a bad month. How do freelancers actually manage this? I'm constantly either flush or panicking.",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Freelance designer struggling with irregular income creating budget chaos",
+      "emotionalState": "stressed, boom-bust cycle anxiety, lacking system",
+      "urgency": "high",
+      "specificDetails": {
+        "occupation": "freelance graphic designer",
+        "incomeRange": "1500-4000€",
+        "averageIncome": 2600,
+        "noBudgetingSystem": true,
+        "spendingBasedOnLastMonth": true,
+        "constantStress": true
+      }
+    },
+    "idealAdvice": [
+      "Irregular income is one of hardest budgeting challenges - but totally solvable!",
+      "The problem: You're budgeting month-to-month when income varies - this causes stress",
+      "The solution: 'Paycheck to yourself' system",
+      "How it works:",
+      "1. Calculate your lowest reliable monthly income (let's say 2,200€ based on your average minus 15%)",
+      "2. This becomes your 'salary' - pay yourself 2,200€ every month",
+      "3. Good months (4,000€): Extra 1,800€ goes to business buffer account",
+      "4. Bad months (1,500€): Withdraw 700€ from buffer to reach 2,200€",
+      "5. Budget your life on 2,200€ only - ignore the good months",
+      "Building the buffer:",
+      "First goal: Save 1 month income (2,600€) in business buffer",
+      "Long-term goal: 3-6 months (8,000-16,000€) - this is your freelance emergency fund",
+      "With your current 3,200€ saved: You're halfway to 1-month buffer already!",
+      "Your specific numbers:",
+      "Monthly 'salary': 2,200€",
+      "Fixed costs: Rent 650€, utilities 55€, subscriptions 103€, transport 30€ = 838€",
+      "Variable: Groceries 280€, other 200€ = 480€",
+      "Left over: ~900€ for business expenses, savings, investing",
+      "Additional tips:",
+      "- Send invoices immediately - don't delay cash flow",
+      "- Follow up on late payments after 7 days",
+      "- YEL insurance: Required but expensive - factor into budget",
+      "- Tax prepayments: Set aside 30% of each payment for taxes",
+      "- Track business vs personal rigorously",
+      "This system: Turns chaos into stability - within 3 months you'll feel completely different",
+      "You have creative freedom of freelance without financial whiplash"
+    ],
+    "commonMistakes": [
+      "Telling him to 'just save more' without systematic approach",
+      "Not explaining paycheck-to-yourself method clearly",
+      "Failing to give specific numbers for his situation",
+      "Missing YEL and tax prepayment requirements",
+      "Not validating that irregular income IS genuinely hard to manage",
+      "Suggesting he get regular job (he chose freelance for reasons)"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_aleksi_yel_insurance_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 5
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_aleksi_yel_insurance_002",
+    "characterId": "char_aleksi_026",
+    "scenarioType": "entrepreneur_insurance_requirements",
+    "difficulty": 0.6,
+    "topic": "insurance",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 3, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I got a letter from YEL insurance company saying I need entrepreneur pension insurance. The cost is like 280€/month based on my estimated income! That's insane - I can't afford that. Can I just not have it? What happens if I ignore this? I'm 29 and pension is 40 years away - why am I paying for this now when I need money to live?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Freelancer shocked by YEL insurance requirement and cost, considering not getting it",
+      "emotionalState": "frustrated, feeling ripped off, considering ignoring requirement",
+      "urgency": "high",
+      "specificDetails": {
+        "age": 29,
+        "yelCost": 280,
+        "cannotAfford": true,
+        "consideringIgnoring": true,
+        "doesNotUnderstandPurpose": true,
+        "pensionSeemsFarAway": true
+      }
+    },
+    "idealAdvice": [
+      "YEL sticker shock is real - every freelancer feels this way at first!",
+      "Unfortunately: YEL (entrepreneur pension insurance) is LEGALLY REQUIRED if self-employed",
+      "You cannot skip it - ignoring leads to penalties and serious problems",
+      "Why it exists:",
+      "YEL is not just pension - it's your entire social security as entrepreneur:",
+      "1. Pension accrual (eläke) - yes, far away but you're building it",
+      "2. Unemployment benefits if business fails",
+      "3. Parental leave benefits if you have kids",
+      "4. Disability benefits if you can't work",
+      "5. Sickness allowance if you get sick",
+      "Without YEL: You get NONE of these benefits - you're on your own",
+      "The cost: ~24.1% of your 'work income' (työtuloarvio)",
+      "If they quoted 280€/month, your assessed income is ~14,000€/year",
+      "This seems high if you're making 2,600€/month (31,000€/year)",
+      "CRITICAL: You can negotiate your work income assessment!",
+      "If you estimate you'll make 25,000€ from work (after expenses): YEL should be ~500€/month",
+      "But you can set lower assessment (even 14,000€) to reduce payments now",
+      "Trade-off: Lower assessment = lower payments BUT also lower pension/benefits accrual",
+      "Smart strategy for young entrepreneur:",
+      "Start with minimum allowed assessment (~14,000€/year = 280€/month)",
+      "As business grows and stabilizes, increase assessment",
+      "Don't set too low: Affects unemployment benefits if business fails",
+      "Don't set too high: Can't afford payments on uncertain income",
+      "280€/month on 2,600€ income = ~11% of income for complete social security",
+      "Employees pay ~8% pension + employer pays ~17% - you're paying both sides",
+      "Yes it sucks. Yes it's expensive. Yes it's required. But it's also protecting you.",
+      "Factor YEL into your freelance rates - raise prices 15% to cover it",
+      "This is cost of being your own boss with freedom and flexibility"
+    ],
+    "commonMistakes": [
+      "Not explaining YEL is legally required (he cannot skip it)",
+      "Failing to explain YEL covers more than just pension",
+      "Not mentioning he can negotiate work income assessment",
+      "Missing that YEL should be factored into freelance pricing",
+      "Not validating that cost is genuinely shocking",
+      "Encouraging him to set assessment too low (hurts future benefits)"
+    ]
+  },
+  {
+    "scenarioId": "scenario_aleksi_tax_prepayments_003",
+    "characterId": "char_aleksi_026",
+    "scenarioType": "freelancer_tax_shock",
+    "difficulty": 0.7,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 4, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "call",
+      "message": "Tax office sent me a bill for 8,500€ in back taxes from last year! I made 31,000€ as freelancer but I didn't know I had to pay taxes during the year - I thought it was just at tax time! How am I supposed to pay 8,500€ right now? I don't have that kind of money sitting around. Plus they want me to start prepaying 600€/month this year. I feel like I'm drowning. Did I mess up really badly?",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "urgent"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Freelancer facing massive unexpected tax bill, didn't understand prepayment system",
+      "emotionalState": "panicked, feeling stupid, overwhelmed, financial crisis",
+      "urgency": "high",
+      "specificDetails": {
+        "taxBill": 8500,
+        "lastYearIncome": 31000,
+        "didNotKnowAboutPrepayments": true,
+        "monthlyPrepayment": 600,
+        "cannotPayImmediately": true,
+        "feelingDumb": true
+      }
+    },
+    "idealAdvice": [
+      "First: You didn't mess up 'really badly' - this happens to many first-time freelancers",
+      "The system: Finland expects you to prepay taxes during the year you earn",
+      "What happened: You earned 31k€ in year 1, paid no taxes that year",
+      "Now: Tax return shows you owe ~8,500€ (27-30% of 31k€) all at once",
+      "This IS fixable - let's address it:",
+      "IMMEDIATE: Contact Vero.fi about payment plan",
+      "- They allow installment payments over 12-24 months",
+      "- 8,500€ over 18 months = ~470€/month",
+      "- Small interest charge (~2-3%) but much better than not paying",
+      "- Call 029 497 024 and ask for 'maksusuunnitelma' (payment plan)",
+      "PLUS: New prepayments 600€/month starting this year",
+      "Total: ~470€ back taxes + 600€ current = 1,070€/month for taxes",
+      "On 2,600€/month income: This is brutal but manageable",
+      "Why 600€/month prepayment?",
+      "If expecting similar income (31k€): Tax ~9,000€/year = 750€/month",
+      "They're estimating 600€/month - actually slightly conservative",
+      "Going forward system:",
+      "1. Set aside 30% of every payment immediately for taxes",
+      "2. Client pays 1,000€ → transfer 300€ to tax savings account",
+      "3. Pay prepayments monthly from this account",
+      "4. At year end: Adjustment will be small (couple hundred euros)",
+      "Silver lining:",
+      "- Last year you had use of 8,500€ all year (interest-free loan)",
+      "- Now you know the system - won't happen again",
+      "- Payment plan means you won't go bankrupt",
+      "Action steps THIS WEEK:",
+      "1. Call Vero.fi for payment plan (don't ignore this!)",
+      "2. Set up separate account for tax savings",
+      "3. Start transferring 30% of all new income to tax account",
+      "4. Review business expenses - might have deductions you missed",
+      "You're not the first freelancer this happened to, won't be the last",
+      "This is expensive lesson but you'll never make this mistake again"
+    ],
+    "commonMistakes": [
+      "Making him feel stupid for not knowing (system is confusing!)",
+      "Not immediately mentioning payment plan option",
+      "Failing to explain ongoing prepayment system",
+      "Not giving specific action steps for this week",
+      "Missing opportunity to review if expenses could reduce tax",
+      "Not validating this IS genuinely overwhelming"
+    ]
+  }
+]

@@ -1,0 +1,106 @@
+[
+  {
+    "scenarioId": "scenario_tiina_business_insurance_001",
+    "characterId": "char_tiina_032",
+    "scenarioType": "business_insurance_confusion",
+    "difficulty": 0.6,
+    "topic": "insurance",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 3, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "call",
+      "message": "Hei, I'm really stressed about business insurance for my café. The insurance agent is pushing me to get property insurance, liability insurance, business interruption insurance, and something called 'yrittäjävakuutus'. It's going to cost over 400€ per month! That's a huge expense for a small business. But I'm also terrified something could happen and I'd lose everything. What do I actually need? What's absolutely essential versus nice-to-have?",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "concerned"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Small business owner overwhelmed by insurance options and costs, unsure what's essential versus excessive",
+      "emotionalState": "stressed, overwhelmed, fearful of making wrong decision",
+      "urgency": "medium",
+      "specificDetails": {
+        "businessType": "café",
+        "insuranceMonthlyQuote": 400,
+        "currentlyUninsured": true,
+        "hasBusinessLoan": true,
+        "employeesCount": 2,
+        "concernsAboutCosts": true
+      }
+    },
+    "idealAdvice": [
+      "Validate concern about costs - insurance is expensive but necessary for business protection",
+      "Property insurance: ESSENTIAL - protects café equipment, furniture, inventory. Lender likely requires it for business loan",
+      "Liability insurance (vastuuvakuutus): ESSENTIAL - protects if customer gets injured or property damaged. Critical for food service",
+      "Business interruption insurance (keskeytyvakuutus): IMPORTANT - covers lost income if café must close temporarily (fire, water damage)",
+      "YEL insurance: LEGALLY REQUIRED for entrepreneurs - provides pension and social security benefits",
+      "Employee accident insurance (tapaturmavakuutus): LEGALLY REQUIRED if you have employees",
+      "Start with legally required + liability + property. Business interruption can be added once more stable",
+      "Shop around - prices vary significantly between providers (IF, Pohjola, LähiTapiola, Fennia)",
+      "Consider higher deductibles to lower premiums if cash flow allows covering small claims",
+      "Budget 2-4% of revenue for insurance as normal business expense"
+    ],
+    "commonMistakes": [
+      "Telling her to skip insurance to save money - extremely risky",
+      "Not explaining legal requirements (YEL, employee insurance)",
+      "Recommending she get ALL insurance without prioritizing essentials",
+      "Not explaining what each insurance actually covers",
+      "Failing to mention shopping around for better rates",
+      "Not validating that €400/month is indeed significant for small business"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_tiina_insurance_claim_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 6
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_tiina_insurance_claim_002",
+    "characterId": "char_tiina_032",
+    "scenarioType": "insurance_validation",
+    "difficulty": 0.3,
+    "topic": "insurance",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_tiina_business_insurance_001"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Quick update - remember when you helped me figure out business insurance? Last month we had a small kitchen fire. Nothing major but had to close for 2 weeks for repairs. My business interruption insurance is covering the lost revenue! I'm so relieved I listened to your advice about getting it. The insurance company has been helpful and professional. Thank you for pushing me to get proper coverage!",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Successfully used business interruption insurance after kitchen fire, validating the advice to get proper coverage",
+      "emotionalState": "relieved, grateful, validated",
+      "urgency": "low",
+      "specificDetails": {
+        "hadSmallFire": true,
+        "closedForTwoWeeks": true,
+        "insuranceCoveredLoss": true,
+        "positiveInsuranceExperience": true
+      }
+    },
+    "idealAdvice": [
+      "Celebrate that she had proper coverage when needed!",
+      "This is exactly why business interruption insurance exists",
+      "Ask about the claim process - document it for future reference",
+      "Remind her to keep all receipts and documentation",
+      "Consider if any safety upgrades needed to prevent future incidents",
+      "Review insurance coverage annually as business grows",
+      "This experience shows value of proper risk management"
+    ],
+    "commonMistakes": [
+      "Not celebrating the success and validation",
+      "Overcomplicating a simple positive update",
+      "Missing opportunity to reinforce importance of insurance"
+    ]
+  }
+]

@@ -1,0 +1,75 @@
+{
+  "characterId": "char_leena_039",
+  "name": "Leena Mäkinen",
+  "age": 58,
+  "occupation": "Early Retiree (Health Reasons)",
+  "background": "Took early retirement at 56 due to chronic health condition (diabetes and heart issues). Former office manager in Jyväskylä. Receiving disability pension which is less than regular pension would be. Managing on reduced income. Worried about healthcare costs not covered by Kela - medications, private appointments, medical devices. Wants to understand what health insurance options are available for someone already with health conditions. Also managing investments carefully to supplement pension income.",
+  "personality": {
+    "impulsiveness": 0.3,
+    "trustingness": 0.6,
+    "financial_literacy": 0.45,
+    "stubbornness": 0.4,
+    "emotionality": 0.6
+  },
+  "financialProfile": {
+    "incomeLevel": "low",
+    "typicalMonthlyIncome": 1650,
+    "hasDebt": false,
+    "hasSavings": "moderate",
+    "bankAccounts": [
+      {
+        "accountId": "acc_leena_001",
+        "bankName": "Danske Bank",
+        "accountType": "checking",
+        "balance": 890.0,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_leena_002",
+        "bankName": "Danske Bank",
+        "accountType": "savings",
+        "balance": 18500.0,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [],
+    "debts": [],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_leena_001",
+        "name": "Netflix Basic",
+        "monthlyCost": 7.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2022-01-01"
+      },
+      {
+        "subscriptionId": "sub_leena_002",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 14.9,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2020-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "rent": 580,
+      "groceries": 280,
+      "transportation": 35,
+      "utilities": 85,
+      "other": 200
+    }
+  },
+  "communicationStyle": {
+    "formality": "semi-formal",
+    "language": "casual_adult_finnish",
+    "prefersVoice": 0.3,
+    "callsWhenEmotional": true
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

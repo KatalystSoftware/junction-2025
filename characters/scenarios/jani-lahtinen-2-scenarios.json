@@ -1,0 +1,90 @@
+[
+  {
+    "scenarioId": "scenario_jani_disability_assessment_002",
+    "characterId": "char_jani_029",
+    "scenarioType": "disability_pension_application",
+    "difficulty": 0.6,
+    "topic": "retirement",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 4, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "call",
+      "message": "I talked to occupational health doctor like you suggested. She says my back issues are serious and I should apply for disability pension. But I'm scared - what if they reject me and then I have a mark on my record? What if my employer finds out I applied and fires me before I get approved? And even if approved, how much would I even get? My current salary is 2,900€ - would disability pension be like 1,000€ and I'd lose my house?",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "concerned"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Factory worker with doctor recommendation to apply for disability pension, multiple fears and unknowns",
+      "emotionalState": "scared of application process, fear of employer retaliation, financial anxiety",
+      "urgency": "high",
+      "specificDetails": {
+        "age": 42,
+        "doctorRecommended": true,
+        "currentSalary": 2900,
+        "fearOfRejection": true,
+        "fearOfEmployerFinding": true,
+        "fearOfInsufficientPension": true,
+        "has52kMortgage": true
+      }
+    },
+    "idealAdvice": [
+      "Your fears are completely understandable - let's address each one:",
+      "Fear 1: 'Mark on my record if rejected'",
+      "- Reality: Applications are confidential, no 'permanent mark'",
+      "- Many people apply multiple times before approval",
+      "- Rejection just means 'not yet' not 'never'",
+      "Fear 2: 'Employer will find out and fire me'",
+      "- Application is CONFIDENTIAL - employer is NOT notified",
+      "- Firing someone for applying would be illegal discrimination",
+      "- However: If approved and you accept, you'd leave job - employer can't prevent this",
+      "Fear 3: 'Disability pension too low to survive'",
+      "How much would you get:",
+      "Full disability pension (täysi työkyvyttömyyseläke): ~60% of salary",
+      "Your salary 2,900€ → Pension ~1,700-1,800€/month",
+      "Partial disability (osittainen): ~50% of salary = ~1,450€ + can work part-time",
+      "This is SIGNIFICANTLY more than 1,000€ you feared!",
+      "Budget on 1,700€/month:",
+      "- Mortgage: 480€",
+      "- Other fixed: ~400€",
+      "- Groceries/living: 550€",
+      "- Remaining: ~270€ buffer",
+      "Tight compared to 2,900€, but you would NOT lose house",
+      "Wife's income: Still contributing to household",
+      "Application process:",
+      "1. Get all medical documentation (back X-rays, doctor notes, specialist visits)",
+      "2. Apply through Kela (not employer)",
+      "3. Kela reviews medical evidence + work capacity assessment",
+      "4. Decision in 3-6 months typically",
+      "5. If approved: Can choose start date (gives time to prepare)",
+      "Important options:",
+      "- Kuntoutustuki (rehabilitation support): Temporary while retraining for new work",
+      "- Osittainen työkyvyttömyyseläke: Part-time work + partial pension",
+      "- These might be better than full disability if you can do lighter work",
+      "Strategic approach:",
+      "Don't think 'all or nothing' (full-time factory OR full disability)",
+      "Consider: Could you do part-time factory work? Office role? Training supervisor?",
+      "Partial disability + part-time work might give you 2,200-2,400€ total",
+      "Next steps:",
+      "1. Get comprehensive medical evaluation (not just occupational health)",
+      "2. Explore if employer has lighter roles available",
+      "3. If no alternative work: Apply for disability with doctor support",
+      "4. You have 52k€ mortgage left, not 200k€ - this is manageable on disability pension",
+      "You're 42, worked 20 years - you've PAID INTO this system",
+      "Disability pension exists for exactly situations like yours",
+      "This is not giving up - this is adapting to protect your health and family"
+    ],
+    "commonMistakes": [
+      "Not addressing each specific fear directly",
+      "Underestimating disability pension amount (he'd get ~60% not tiny amount)",
+      "Missing partial disability option",
+      "Not explaining confidentiality from employer",
+      "Failing to validate that his fears are reasonable",
+      "Pushing disability without exploring alternative work options"
+    ]
+  }
+]

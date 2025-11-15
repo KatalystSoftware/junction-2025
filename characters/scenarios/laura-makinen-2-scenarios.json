@@ -1,0 +1,75 @@
+[
+  {
+    "scenarioId": "scenario_laura_kids_activities_003",
+    "characterId": "char_laura_028",
+    "scenarioType": "family_kids_expenses",
+    "difficulty": 0.5,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 2, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "My kids (7 and 9) want to do activities like their friends - dance class, football, music lessons. Each activity is 40-60€/month. Their friends all do 2-3 activities each. I can maybe afford ONE activity for each kid but I feel guilty saying no. How do I balance giving them opportunities without breaking our tight budget? I don't want them to feel poor or left out.",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Single mother wanting to provide kids with activities but budget extremely tight",
+      "emotionalState": "guilty, comparing to other families, wanting best for kids, financially stressed",
+      "urgency": "medium",
+      "specificDetails": {
+        "children": [7, 9],
+        "activityCost": "40-60€ each",
+        "friendsDo": "2-3 activities",
+        "canAfford": "1 activity per child",
+        "feelingGuilty": true,
+        "worriedAboutKidsFeelingPoor": true
+      }
+    },
+    "idealAdvice": [
+      "Parent guilt around money is so hard - but you're thinking about this the right way",
+      "Reality check: ONE quality activity per child is completely reasonable and good!",
+      "Your friends' kids doing 2-3 activities: Their parents might have different finances OR going into debt for it",
+      "Quality vs quantity in kids' activities:",
+      "Research shows: Kids benefit MORE from depth (getting good at one thing) than breadth (trying everything)",
+      "One activity done consistently for years: Builds skill, confidence, friendships",
+      "Three activities rushed through: Superficial, exhausting, expensive",
+      "Budget for activities:",
+      "2 kids × 1 activity × 50€ = 100€/month",
+      "On 2,400€ income with tight budget: This is meaningful but doable sacrifice",
+      "Where to cut for activities: Reduce groceries by 50€, 'other' spending by 50€",
+      "Alternative/supplementary options (cheaper/free):",
+      "- City-run sports programs: Often 10-20€/month vs private 50-60€",
+      "- Library programs: Free music, art, STEM activities",
+      "- School clubs: Many schools have free after-school activities",
+      "- Community centers: Subsidized activities for low-income families",
+      "- YouTube/online: Supplement paid dance class with free tutorials at home",
+      "The conversation with kids:",
+      "Don't hide financial reality, but frame positively:",
+      "'We're choosing ONE special activity each that you love and will do really well at'",
+      "NOT 'We can't afford more' (creates shame)",
+      "BUT 'We're focusing on what matters most' (creates pride in choice)",
+      "Let them choose their ONE activity - gives them control and investment",
+      "Addressing 'feeling poor':",
+      "Kids feel poor when parents feel guilty and ashamed",
+      "Kids feel secure when parents are confident in their choices",
+      "You're providing: Stable home, food, love, AND meaningful activity",
+      "That's MORE than many kids have, regardless of how many activities",
+      "Important: You're a single parent working full-time while raising 2 kids",
+      "The fact you're even considering this shows you're a great parent",
+      "One activity each is not deprivation - it's responsible parenting on your budget"
+    ],
+    "commonMistakes": [
+      "Telling her to skip activities entirely to save money",
+      "Not validating the parent guilt",
+      "Missing cheaper community alternatives",
+      "Failing to address the emotional 'feeling poor' concern",
+      "Not explaining quality vs quantity research",
+      "Suggesting she go into debt for kids' activities"
+    ]
+  }
+]

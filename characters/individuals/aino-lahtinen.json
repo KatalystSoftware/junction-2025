@@ -1,0 +1,72 @@
+{
+  "characterId": "char_aino_020",
+  "name": "Aino Lahtinen",
+  "age": 17,
+  "occupation": "High School Student (Part-time Barista)",
+  "background": "17-year-old high school student in Espoo working her first part-time job at a local café. Lives with parents but wants to start managing her own money responsibly. Earns around 400€/month from weekend work. Excited about financial independence but lacks basic knowledge about taxes, savings, and budgeting. Dreams of studying abroad after lukio.",
+  "personality": {
+    "impulsiveness": 0.6,
+    "trustingness": 0.7,
+    "financial_literacy": 0.2,
+    "stubbornness": 0.3,
+    "emotionality": 0.5
+  },
+  "financialProfile": {
+    "incomeLevel": "low",
+    "typicalMonthlyIncome": 400,
+    "hasDebt": false,
+    "hasSavings": "minimal",
+    "bankAccounts": [
+      {
+        "accountId": "acc_aino_001",
+        "bankName": "Nordea",
+        "accountType": "checking",
+        "balance": 380.0,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_aino_002",
+        "bankName": "Nordea",
+        "accountType": "savings",
+        "balance": 850.0,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [],
+    "debts": [],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_aino_001",
+        "name": "Spotify Student",
+        "monthlyCost": 5.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2024-09-01"
+      },
+      {
+        "subscriptionId": "sub_aino_002",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 9.9,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2024-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "transportation": 25,
+      "other": 150
+    }
+  },
+  "communicationStyle": {
+    "formality": "casual",
+    "language": "teen_finnish",
+    "prefersVoice": 0.3,
+    "callsWhenEmotional": false
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

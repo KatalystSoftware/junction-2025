@@ -1,0 +1,77 @@
+[
+  {
+    "scenarioId": "scenario_risto_disability_insurance_001",
+    "characterId": "char_risto_033",
+    "scenarioType": "disability_insurance_need",
+    "difficulty": 0.7,
+    "topic": "insurance",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 4, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "call",
+      "message": "My back is getting worse. Doctor says if I don't take it easier, I might need surgery or have to stop working altogether. I'm only 50 - I can't afford to stop working for another 15 years. Someone told me about disability insurance (työkyvyttömyysvakuutus) but I think it's too late - they won't insure me now that I already have problems, right? And even if they would, I bet it's really expensive. What are my options here?",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "concerned"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Construction worker with worsening health conditions worried about ability to work, uncertain about disability insurance options",
+      "emotionalState": "worried, fearful about future, feeling trapped",
+      "urgency": "high",
+      "specificDetails": {
+        "age": 50,
+        "physicallyDemandingJob": true,
+        "existingHealthIssues": true,
+        "yearsUntilRetirement": 15,
+        "limitedSavings": true,
+        "familyDependents": true
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Construction worker with worsening health conditions worried about ability to work, uncertain about disability insurance options",
+      "emotionalState": "worried, fearful about future, feeling trapped",
+      "urgency": "high",
+      "specificDetails": {
+        "age": 50,
+        "physicallyDemandingJob": true,
+        "existingHealthIssues": true,
+        "yearsUntilRetirement": 15,
+        "limitedSavings": true,
+        "familyDependents": true
+      }
+    },
+    "idealAdvice": [
+      "This is a serious concern and you're right to think about it now",
+      "Unfortunately, you're correct - private disability insurance often excludes pre-existing conditions",
+      "BUT - Finland has strong public disability support you may not know about:",
+      "Työkyvyttömyyseläke (disability pension) through Kela if you can't work - you've paid into this system",
+      "Kuntoutustuki (rehabilitation benefit) if you need retraining for less physical work",
+      "Sairauspäiväraha (sickness allowance) for temporary inability to work",
+      "Talk to occupational health about work modifications or alternative positions",
+      "Document all medical visits and doctor's assessments - crucial for disability pension application",
+      "Consider if retraining for supervisory or planning role in construction is possible",
+      "Your employer may have group disability insurance through työeläke you already have",
+      "Don't wait until completely unable to work - apply for support when doctor recommends",
+      "You've worked 30 years - you're entitled to these benefits, not charity"
+    ],
+    "commonMistakes": [
+      "Giving false hope about private disability insurance with pre-existing conditions",
+      "Not explaining Finnish public disability support system",
+      "Suggesting he just needs to push through the pain",
+      "Not acknowledging the real fear and difficulty of his situation",
+      "Failing to mention importance of medical documentation",
+      "Not discussing retraining or career transition options"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_risto_disability_application_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 7
+      }
+    ]
+  }
+]

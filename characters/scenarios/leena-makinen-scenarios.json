@@ -1,0 +1,79 @@
+[
+  {
+    "scenarioId": "scenario_leena_health_insurance_001",
+    "characterId": "char_leena_039",
+    "scenarioType": "senior_health_insurance_preexisting",
+    "difficulty": 0.6,
+    "topic": "insurance",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 3, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I took early retirement at 56 due to diabetes and heart condition. My disability pension is only 1,650€/month. My medications cost 150€/month even after Kela reimbursement, doctor visits another 50-80€/month. That's 200€+ for healthcare! I looked into private health insurance but they exclude pre-existing conditions. How do people with health issues afford healthcare on small pension? Am I missing benefits I could get?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Early retiree with chronic health conditions facing high healthcare costs on low pension",
+      "emotionalState": "stressed about money, health anxiety, feeling system isn't working",
+      "urgency": "high",
+      "specificDetails": {
+        "age": 58,
+        "earlyRetirement": true,
+        "disabilityPension": 1650,
+        "chronicConditions": ["diabetes", "heart disease"],
+        "monthlyCareyCosts": 150,
+        "monthlyDoctorCosts": 70,
+        "privateInsuranceExclusions": true,
+        "feelingSystemFailure": true
+      }
+    },
+    "idealAdvice": [
+      "Your frustration is completely valid - healthcare costs on small pension are crushing",
+      "Good news: Finnish system has more support than you might know:",
+      "Medication costs:",
+      "1. You're getting basic Kela reimbursement, but have you applied for SPECIAL reimbursement (erityiskorvattavuus)?",
+      "   - Diabetes qualifies for 65-100% reimbursement instead of 40%",
+      "   - Heart disease may also qualify",
+      "   - Could reduce 150€/month to 30-50€/month",
+      "2. Annual out-of-pocket maximum (omavastuuosuus): After ~600€/year, rest is free",
+      "   - Your 200€/month = 2,400€/year, way over limit",
+      "   - After 3 months you should hit cap and rest of year is free/minimal",
+      "3. Kela medical expense deduction on taxes: Medical costs over 300€/year are tax-deductible",
+      "Doctor visits:",
+      "- Public healthcare (terveyskeskus): Much cheaper than private (20€ vs 80€)",
+      "- For chronic conditions, public system is appropriate and much more affordable",
+      "- Waiting times longer but for ongoing management (not emergencies), worth it",
+      "Private health insurance:",
+      "- You're correct: They exclude pre-existing conditions",
+      "- At your stage, NOT worth pursuing - focus on maximizing public system benefits",
+      "Action steps:",
+      "1. Contact Kela about special reimbursement status for diabetes/heart - PRIORITY",
+      "2. Track all medical expenses for annual cap and tax deduction",
+      "3. Switch to public healthcare for routine appointments",
+      "4. Check if you qualify for toimeentulotuki for high medical costs",
+      "Potential savings: 150€/month down to 50-70€/month = 1,000€/year extra in budget",
+      "You're not missing something obvious - system requires advocacy and knowledge",
+      "This is exactly what these benefits exist for - use them without guilt"
+    ],
+    "commonMistakes": [
+      "Not explaining special Kela reimbursement for chronic conditions",
+      "Failing to mention annual out-of-pocket maximum (crucial!)",
+      "Suggesting private insurance when it's not viable option",
+      "Not validating the financial stress of healthcare on small pension",
+      "Missing tax deduction opportunity",
+      "Not giving actionable first steps"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_leena_kela_success_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 4
+      }
+    ]
+  }
+]

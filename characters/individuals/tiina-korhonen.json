@@ -1,0 +1,86 @@
+{
+  "characterId": "char_tiina_032",
+  "name": "Tiina Korhonen",
+  "age": 40,
+  "occupation": "Small Business Owner (Café)",
+  "background": "Owns small café in Porvoo. Fulfilling dream of running own business but financially stressful. Revenue varies seasonally with tourism. Confused about proper business insurance - what does she really need? Property insurance, liability insurance, business interruption insurance all recommended but expensive. Also managing YEL payments and trying to balance business growth with personal financial security. Married but business is her responsibility.",
+  "personality": {
+    "impulsiveness": 0.4,
+    "trustingness": 0.5,
+    "financial_literacy": 0.45,
+    "stubbornness": 0.6,
+    "emotionality": 0.5
+  },
+  "financialProfile": {
+    "incomeLevel": "medium",
+    "typicalMonthlyIncome": 2800,
+    "hasDebt": true,
+    "hasSavings": "minimal",
+    "bankAccounts": [
+      {
+        "accountId": "acc_tiina_001",
+        "bankName": "OP",
+        "accountType": "checking",
+        "balance": 2100.0,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_tiina_002",
+        "bankName": "OP",
+        "accountType": "savings",
+        "balance": 5500.0,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [],
+    "debts": [
+      {
+        "debtId": "debt_tiina_001",
+        "type": "other",
+        "creditor": "OP Business Loan",
+        "totalAmount": 45000.0,
+        "remainingAmount": 38000.0,
+        "monthlyPayment": 520.0,
+        "interestRate": 4.5,
+        "currency": "EUR",
+        "startDate": "2022-03-01"
+      }
+    ],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_tiina_001",
+        "name": "Accounting Software",
+        "monthlyCost": 39.0,
+        "category": "software",
+        "currency": "EUR",
+        "startDate": "2022-03-01"
+      },
+      {
+        "subscriptionId": "sub_tiina_002",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 24.9,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2021-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "groceries": 350,
+      "transportation": 80,
+      "utilities": 45,
+      "other": 250
+    }
+  },
+  "communicationStyle": {
+    "formality": "semi-formal",
+    "language": "casual_adult_finnish",
+    "prefersVoice": 0.4,
+    "callsWhenEmotional": true
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

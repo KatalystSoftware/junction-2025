@@ -1,0 +1,76 @@
+[
+  {
+    "scenarioId": "scenario_matias_car_insurance_001",
+    "characterId": "char_matias_021",
+    "scenarioType": "teen_car_insurance",
+    "difficulty": 0.4,
+    "topic": "insurance",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 1, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I'm getting my driver's license next month and my dad is giving me his old car (2010 Toyota worth maybe 3,000€). I looked at car insurance and it's insanely expensive for 18-year-old! Quotes are 1,200-1,800€/year! I only make 650€/month. Do I really need full insurance or can I just get the minimum legal requirement? What even is the difference?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Vocational student getting first car, shocked by young driver insurance costs",
+      "emotionalState": "excited about car, shocked by insurance cost, confused about options",
+      "urgency": "medium",
+      "specificDetails": {
+        "age": 18,
+        "gettingFirstCar": true,
+        "carValue": 3000,
+        "insuranceQuotes": "1200-1800€/year",
+        "monthlyIncome": 650,
+        "confusedAboutCoverage": true
+      }
+    },
+    "idealAdvice": [
+      "Young driver insurance shock is real - everyone goes through this!",
+      "Finnish car insurance requirements:",
+      "LEGALLY REQUIRED: Liikennevakuutus (traffic insurance / third-party liability)",
+      "- Covers damage you cause to OTHER people/cars",
+      "- Cost for 18-year-old: ~800-1,000€/year minimum",
+      "- Cannot drive without this - illegal and huge fines",
+      "OPTIONAL: Kaskovakuutus (comprehensive insurance)",
+      "- Covers damage to YOUR car (theft, vandalism, accidents you cause)",
+      "- Cost: Additional 400-800€/year",
+      "- Total: 1,200-1,800€/year (what you were quoted)",
+      "For your situation (2010 Toyota worth 3,000€):",
+      "Full kasko insurance: Costs 400-800€/year to insure car worth 3,000€",
+      "If you total the car: Insurance pays maybe 2,500€ (after deductible)",
+      "Math: Paying 600€/year to insure 3,000€ asset",
+      "In 5 years: You've paid 3,000€ in kasko premiums = value of car",
+      "Recommendation for old car + young driver:",
+      "Get liikennevakuutus ONLY (legally required ~800-1,000€/year)",
+      "Skip kasko insurance (car too old to justify cost)",
+      "If you crash and total YOUR car: It's a loss, but you're out 3,000€ not 15,000€",
+      "Your dad gave you car for free - if it's destroyed, painful but not financial crisis",
+      "Budget impact:",
+      "800€/year = ~67€/month for required insurance",
+      "Plus fuel: ~150€/month if driving to school/work",
+      "Plus maintenance: ~50€/month average",
+      "Total car ownership: ~270€/month on 650€ income = tight but doable",
+      "Tips to lower cost:",
+      "- Add yourself to parent's insurance if possible (cheaper as 'additional driver')",
+      "- Higher deductible = lower premium",
+      "- Limited mileage option if not driving much",
+      "- Shop around: IF, Pohjola, LähiTapiola have very different young driver rates",
+      "As you get older: Insurance drops dramatically (22, 25, 30 year marks)",
+      "Drive safely first years: No accidents = no claims = lower rates later"
+    ],
+    "commonMistakes": [
+      "Not clearly explaining difference between required vs optional insurance",
+      "Recommending full kasko for old car (waste of money)",
+      "Not acknowledging young driver rates ARE genuinely expensive",
+      "Failing to break down total monthly car ownership costs",
+      "Missing parent's insurance addition option",
+      "Not explaining insurance costs drop as he gets older"
+    ]
+  }
+]

@@ -1,0 +1,86 @@
+{
+  "characterId": "char_risto_033",
+  "name": "Risto Mäkelä",
+  "age": 50,
+  "occupation": "Construction Worker",
+  "background": "Construction worker in Kuopio with 30 years in the industry. Back and knee problems getting worse - doctor says he might not be able to continue physical work much longer. Worried about disability pension and whether he'd qualify. Also concerned about health insurance coverage if he can't work. Wife works as cashier. Three adult children, one still at home studying. Modest savings but not enough to retire early. Stressed about future.",
+  "personality": {
+    "impulsiveness": 0.3,
+    "trustingness": 0.6,
+    "financial_literacy": 0.3,
+    "stubbornness": 0.7,
+    "emotionality": 0.6
+  },
+  "financialProfile": {
+    "incomeLevel": "medium",
+    "typicalMonthlyIncome": 2700,
+    "hasDebt": true,
+    "hasSavings": "minimal",
+    "bankAccounts": [
+      {
+        "accountId": "acc_risto_001",
+        "bankName": "OP",
+        "accountType": "checking",
+        "balance": 680.0,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_risto_002",
+        "bankName": "OP",
+        "accountType": "savings",
+        "balance": 6200.0,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [],
+    "debts": [
+      {
+        "debtId": "debt_risto_001",
+        "type": "car_loan",
+        "creditor": "Santander Consumer Finance",
+        "totalAmount": 12000.0,
+        "remainingAmount": 5400.0,
+        "monthlyPayment": 245.0,
+        "interestRate": 5.9,
+        "currency": "EUR",
+        "startDate": "2022-08-01"
+      }
+    ],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_risto_001",
+        "name": "Viaplay",
+        "monthlyCost": 14.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2023-01-01"
+      },
+      {
+        "subscriptionId": "sub_risto_002",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 19.9,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2020-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "groceries": 480,
+      "transportation": 200,
+      "utilities": 120,
+      "other": 200
+    }
+  },
+  "communicationStyle": {
+    "formality": "casual",
+    "language": "casual_adult_finnish",
+    "prefersVoice": 0.2,
+    "callsWhenEmotional": false
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

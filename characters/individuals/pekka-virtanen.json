@@ -1,0 +1,74 @@
+{
+  "characterId": "char_pekka_036",
+  "name": "Pekka Virtanen",
+  "age": 62,
+  "occupation": "Bank Manager (Approaching Retirement)",
+  "background": "Bank manager in Tampere approaching retirement in 3 years. Worked in banking for 35 years so understands financial products but now needs to make decisions for himself. Considering whether to retire at 65 or work longer for higher pension. Has good occupational pension but wants to understand all retirement options. Also concerned about healthcare costs in retirement and whether to get private health insurance. Wife already retired as teacher.",
+  "personality": {
+    "impulsiveness": 0.2,
+    "trustingness": 0.4,
+    "financial_literacy": 0.8,
+    "stubbornness": 0.5,
+    "emotionality": 0.4
+  },
+  "financialProfile": {
+    "incomeLevel": "high",
+    "typicalMonthlyIncome": 5800,
+    "hasDebt": false,
+    "hasSavings": "good",
+    "bankAccounts": [
+      {
+        "accountId": "acc_pekka_001",
+        "bankName": "Nordea",
+        "accountType": "checking",
+        "balance": 5400.0,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_pekka_002",
+        "bankName": "Nordea",
+        "accountType": "savings",
+        "balance": 85000.0,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [],
+    "debts": [],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_pekka_001",
+        "name": "Newspaper Digital",
+        "monthlyCost": 29.9,
+        "category": "other",
+        "currency": "EUR",
+        "startDate": "2020-01-01"
+      },
+      {
+        "subscriptionId": "sub_pekka_002",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 24.9,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2019-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "groceries": 480,
+      "transportation": 120,
+      "utilities": 85,
+      "other": 400
+    }
+  },
+  "communicationStyle": {
+    "formality": "formal",
+    "language": "formal_finnish",
+    "prefersVoice": 0.2,
+    "callsWhenEmotional": false
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

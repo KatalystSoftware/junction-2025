@@ -1,0 +1,95 @@
+{
+  "characterId": "char_noora_023",
+  "name": "Noora Koskinen",
+  "age": 22,
+  "occupation": "University Student (Business School)",
+  "background": "Third-year business student at Aalto University in Espoo. Receiving full KELA student grant, housing supplement, and has taken out student loans each year. Works part-time as a tutor to supplement income. Stressed about accumulating student debt but everyone says it's normal. Parents live in small town and can't provide much financial support. Wants to understand if student loans are really 'good debt' and how to manage them.",
+  "personality": {
+    "impulsiveness": 0.4,
+    "trustingness": 0.5,
+    "financial_literacy": 0.45,
+    "stubbornness": 0.3,
+    "emotionality": 0.6
+  },
+  "financialProfile": {
+    "incomeLevel": "low",
+    "typicalMonthlyIncome": 900,
+    "hasDebt": true,
+    "hasSavings": "minimal",
+    "bankAccounts": [
+      {
+        "accountId": "acc_noora_001",
+        "bankName": "Nordea",
+        "accountType": "checking",
+        "balance": 680.0,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_noora_002",
+        "bankName": "Nordea",
+        "accountType": "savings",
+        "balance": 1200.0,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [],
+    "debts": [
+      {
+        "debtId": "debt_noora_001",
+        "type": "student_loan",
+        "creditor": "KELA Student Loan",
+        "totalAmount": 12000.0,
+        "remainingAmount": 12000.0,
+        "monthlyPayment": 0,
+        "interestRate": 0.5,
+        "currency": "EUR",
+        "startDate": "2022-09-01"
+      }
+    ],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_noora_001",
+        "name": "Spotify Student",
+        "monthlyCost": 5.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2022-09-01"
+      },
+      {
+        "subscriptionId": "sub_noora_002",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 16.9,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2022-01-01"
+      },
+      {
+        "subscriptionId": "sub_noora_003",
+        "name": "LinkedIn Premium Student",
+        "monthlyCost": 4.99,
+        "category": "software",
+        "currency": "EUR",
+        "startDate": "2024-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "rent": 420,
+      "groceries": 220,
+      "transportation": 33,
+      "utilities": 30,
+      "other": 150
+    }
+  },
+  "communicationStyle": {
+    "formality": "semi-formal",
+    "language": "casual_adult_finnish",
+    "prefersVoice": 0.2,
+    "callsWhenEmotional": false
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

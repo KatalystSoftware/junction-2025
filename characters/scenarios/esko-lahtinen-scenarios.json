@@ -1,0 +1,80 @@
+[
+  {
+    "scenarioId": "scenario_esko_estate_planning_001",
+    "characterId": "char_esko_038",
+    "scenarioType": "senior_estate_planning",
+    "difficulty": 0.7,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 5, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "call",
+      "message": "My wife passed away 8 months ago and I've been avoiding dealing with estate planning. I have three children and five grandchildren. I own our house (worth maybe 250k€) and have 58,000€ in savings. I want to make sure when I die, my children inherit smoothly without fighting or huge tax bills. Should I give money to grandchildren now for education? Make a will? I don't know where to start and it's emotional to think about.",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "concerned"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Widowed senior needing to plan estate distribution, emotionally difficult, avoiding it",
+      "emotionalState": "grieving, overwhelmed, wanting to do right thing, procrastinating",
+      "urgency": "medium",
+      "specificDetails": {
+        "age": 70,
+        "recentlyWidowed": true,
+        "monthsSinceWifeDied": 8,
+        "children": 3,
+        "grandchildren": 5,
+        "houseValue": 250000,
+        "savings": 58000,
+        "wantsToAvoidConflict": true,
+        "emotionallyDifficult": true
+      }
+    },
+    "idealAdvice": [
+      "First: I'm sorry for your loss. Estate planning after losing spouse is emotionally hard.",
+      "Taking 8 months to grieve before handling this is completely normal and healthy",
+      "Finnish inheritance system basics:",
+      "Without will: Estate divided equally among children (Finnish law)",
+      "House (250k) + savings (58k) = 308k€ estate ÷ 3 children = ~103k€ each",
+      "Inheritance tax in Finland: First 20k€ tax-free, then 7-19% depending on amount",
+      "Each child would owe ~8-10k€ in inheritance tax (manageable from 103k€ inheritance)",
+      "Important: Your estate is modest enough that taxes won't devastate heirs",
+      "Will (testamentti) - should you make one?",
+      "Yes IF: You want different distribution than equal three-way split",
+      "Yes IF: You have specific items for specific children (sentimental value)",
+      "Not urgent IF: You're happy with equal division, children get along",
+      "Lifetime gifts to grandchildren:",
+      "Pro: See them enjoy money while you're alive, reduce taxable estate",
+      "Con: You might need money for care in coming years (you're 70, could live to 90)",
+      "Tax: Gifts over 5,000€ per person subject to gift tax (similar to inheritance tax)",
+      "Recommendation: Keep 40k€ for your own security (care costs, housing, life)",
+      "Could gift 3,000€ to each grandchild now (15k€ total) - under tax limit, meaningful for education",
+      "Remaining 43k€ stays with you for next 10-20 years of life",
+      "Practical steps:",
+      "1. Have family conversation: Tell children your intentions, reduces future conflict",
+      "2. Write simple will if you have specific wishes (lawyer 500-800€)",
+      "3. Consider modest gifts to grandchildren if you want to see them benefit",
+      "4. Keep majority of assets for YOUR remaining years - you earned this security",
+      "You're being thoughtful parent even in grief - your children are lucky"
+    ],
+    "commonMistakes": [
+      "Not acknowledging grief and emotional difficulty",
+      "Overcomplicating Finnish inheritance system (it's fairly straightforward)",
+      "Encouraging large gifts without considering his own longevity and care needs",
+      "Not mentioning family communication to prevent conflict",
+      "Failing to validate that 8 months is normal timeframe to address this",
+      "Pushing expensive estate planning when his situation is relatively simple"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_esko_loneliness_spending_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 6
+      }
+    ]
+  }
+]

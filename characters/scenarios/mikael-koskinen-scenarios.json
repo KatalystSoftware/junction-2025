@@ -1,0 +1,121 @@
+[
+  {
+    "scenarioId": "scenario_mikael_company_car_tax_001",
+    "characterId": "char_mikael_035",
+    "scenarioType": "company_car_taxation",
+    "difficulty": 0.6,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 4, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I'm confused about my company car taxation. I have a BMW 5-series as a company benefit. The car is worth about 60k€. According to my pay slip, the taxable value (luontoisetu) is 850€/month and I'm paying like 300€/month in taxes on it. So I'm effectively paying 300€/month for a BMW - sounds good! But my colleague says I should negotiate for cash instead because the taxation is inefficient. Who's right? Should I keep the car or ask for salary increase instead?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Sales manager unsure if company car benefit is actually good value given taxation",
+      "emotionalState": "confused, analytical, wanting to optimize",
+      "urgency": "low",
+      "specificDetails": {
+        "companyCarValue": 60000,
+        "taxableValuePerMonth": 850,
+        "taxesPaidOnBenefit": 300,
+        "uncertainIfGoodDeal": true,
+        "colleagueAdvice": "negotiate for cash",
+        "needsClarAnalysis": true
+      }
+    },
+    "idealAdvice": [
+      "Company car taxation is confusing - let's break it down",
+      "Your situation: 850€/month taxable value, paying ~300€ tax (assuming ~35% tax rate)",
+      "Real cost to you: 300€/month in extra taxes",
+      "What you get: BMW 5-series with insurance, maintenance, fuel (usually) covered",
+      "To have same car privately: ~800€/month lease + 150€ insurance + maintenance + fuel = ~1,200€+",
+      "So you're getting ~1,200€ value for 300€ cost - that's actually a good deal!",
+      "HOWEVER: If you don't need a BMW and would be fine with older Toyota...",
+      "Company could give you 850€/month extra salary instead",
+      "850€ gross = ~550€ net after taxes in your bracket",
+      "Question: Would you rather have 550€/month cash or the BMW?",
+      "If you drive a lot for work: Car is good value",
+      "If car is mainly prestige/personal use: Cash might be better",
+      "Also consider: Company car limits flexibility (can't choose your car, usually must return when leave job)",
+      "Stock options vesting soon - might want cash flexibility more than car soon?",
+      "Calculate: Do you drive enough to justify premium car, or would cheaper car + more cash be better?"
+    ],
+    "commonMistakes": [
+      "Just saying company car is always bad without doing the math",
+      "Not comparing actual costs and benefits clearly",
+      "Failing to consider his personal situation (high mileage for sales?)",
+      "Not mentioning that it depends on his priorities and needs",
+      "Forgetting about upcoming stock options that might change his financial picture"
+    ]
+  },
+  {
+    "scenarioId": "scenario_mikael_stock_options_tax_002",
+    "characterId": "char_mikael_035",
+    "scenarioType": "stock_options_taxation",
+    "difficulty": 0.8,
+    "topic": "investing",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 6, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "call",
+      "message": "My company stock options vest next month - 500 options at 50€ strike price. Company share price is currently 120€ so on paper I'm making 35,000€! But I have no idea how this is taxed in Finland. Is it income tax? Capital gains tax? Do I pay tax when they vest or when I sell? Should I exercise immediately or wait? I'm completely lost and company HR just points to some complex tax documents.",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "concerned"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Sales manager with vesting stock options completely confused about Finnish stock option taxation",
+      "emotionalState": "excited about gain, anxious about tax implications, confused",
+      "urgency": "high",
+      "specificDetails": {
+        "stockOptions": 500,
+        "strikePrice": 50,
+        "currentSharePrice": 120,
+        "paperGain": 35000,
+        "vestingNextMonth": true,
+        "confusedAboutTaxation": true,
+        "hrNotHelpful": true
+      }
+    },
+    "idealAdvice": [
+      "Stock options taxation in Finland is complex - let's break it down clearly",
+      "Two tax events to understand:",
+      "1. VESTING/EXERCISE: When you buy shares at strike price (50€) while market price is 120€",
+      "   - 70€/share benefit (120€-50€) = 35,000€ total benefit",
+      "   - This is taxed as EARNED INCOME (palkkatulo) at your marginal rate (~35-40%)",
+      "   - Expect to owe ~12,000-14,000€ in taxes on this benefit",
+      "   - Tax is due even if you don't sell shares!",
+      "2. SELLING: When you later sell shares at market price",
+      "   - Any gain above 120€ taxed as capital gains (pääomatulo-vero) at 30% (up to 30k) or 34% (above 30k)",
+      "   - This happens in future when you sell",
+      "Critical planning needed:",
+      "- You'll owe ~12-14k€ in taxes when you exercise, even if you hold the shares",
+      "- Options: (a) Sell some shares immediately to cover taxes, (b) Pay taxes from savings, (c) 'Cashless exercise' if available",
+      "- Many people sell enough shares to cover taxes + keep rest as investment",
+      "- Consider: Share price is 120€ now but could go up OR down - don't assume it stays same",
+      "Timing: No rush to exercise on vesting day unless options expire soon",
+      "WARNING: If share price drops below 50€, options become worthless",
+      "Recommendation: Consult tax advisor before exercising - this is complex enough to warrant professional help",
+      "This is a GOOD problem to have - 35k benefit is significant! Just needs careful planning"
+    ],
+    "commonMistakes": [
+      "Not explaining the two separate tax events clearly",
+      "Failing to warn about owing taxes even if don't sell shares",
+      "Not mentioning cashless exercise option",
+      "Forgetting to warn that share price could drop",
+      "Not recommending professional tax advisor for this complex situation",
+      "Missing opportunity to validate this is a positive situation despite complexity"
+    ]
+  }
+]

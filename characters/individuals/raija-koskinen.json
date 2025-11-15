@@ -1,0 +1,74 @@
+{
+  "characterId": "char_raija_037",
+  "name": "Raija Koskinen",
+  "age": 67,
+  "occupation": "Retired Teacher",
+  "background": "Retired elementary school teacher in Oulu living on teacher's pension. Pension is decent but less than salary was. Owns apartment outright (no mortgage). Widowed 5 years ago, living alone. Adult children live in other cities. Wants to enjoy retirement and travel but worried about making pension last. Also concerned about inflation eating into fixed income. Considering whether to downsize apartment and invest the proceeds or keep current home.",
+  "personality": {
+    "impulsiveness": 0.3,
+    "trustingness": 0.6,
+    "financial_literacy": 0.4,
+    "stubbornness": 0.4,
+    "emotionality": 0.5
+  },
+  "financialProfile": {
+    "incomeLevel": "medium",
+    "typicalMonthlyIncome": 2100,
+    "hasDebt": false,
+    "hasSavings": "moderate",
+    "bankAccounts": [
+      {
+        "accountId": "acc_raija_001",
+        "bankName": "OP",
+        "accountType": "checking",
+        "balance": 1680.0,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_raija_002",
+        "bankName": "OP",
+        "accountType": "savings",
+        "balance": 22000.0,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [],
+    "debts": [],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_raija_001",
+        "name": "Newspaper Subscription",
+        "monthlyCost": 24.9,
+        "category": "other",
+        "currency": "EUR",
+        "startDate": "2015-01-01"
+      },
+      {
+        "subscriptionId": "sub_raija_002",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 14.9,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2018-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "groceries": 320,
+      "transportation": 45,
+      "utilities": 95,
+      "other": 250
+    }
+  },
+  "communicationStyle": {
+    "formality": "semi-formal",
+    "language": "formal_finnish",
+    "prefersVoice": 0.4,
+    "callsWhenEmotional": true
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

@@ -1,0 +1,131 @@
+[
+  {
+    "scenarioId": "scenario_laura_single_parent_budget_001",
+    "characterId": "char_laura_028",
+    "scenarioType": "single_parent_tight_budget",
+    "difficulty": 0.6,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 2, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "call",
+      "message": "I don't know how to make this work anymore. I'm a single mom with two kids, working full-time but living paycheck to paycheck. After rent, groceries, daycare, there's nothing left. I have exactly 380€ in checking account and it's the 20th of the month. I'm exhausted from working and worrying about money. The kids need winter boots and my car needs repairs. I feel like I'm failing as a parent. What do I do?",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "urgent"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Single mother in financial crisis, living paycheck to paycheck with children's needs exceeding budget",
+      "emotionalState": "stressed, exhausted, feeling like failure, desperate",
+      "urgency": "high",
+      "specificDetails": {
+        "singleMother": true,
+        "childrenAges": [7, 9],
+        "workingFullTime": true,
+        "monthlyIncome": 2400,
+        "checkingBalance": 380,
+        "dayOfMonth": 20,
+        "kidsNeedBoots": true,
+        "carNeedsRepair": true,
+        "emotionallyOverwhelmed": true
+      }
+    },
+    "idealAdvice": [
+      "First: You are NOT failing - you're working full-time and caring for two kids. That's incredibly hard.",
+      "Let's address immediate crisis then build long-term plan:",
+      "IMMEDIATE (winter boots + car):",
+      "Kids' winter boots: Check if you qualify for toimeentulotuki (social assistance) for one-time expense",
+      "Alternative: Second-hand boots (Kierrätyskeskus, FB Marketplace) - 20€ vs 60€ new",
+      "Car repair: Get quote - is it essential now or can wait until next month?",
+      "Benefits you may not be getting:",
+      "1. Lapsilisä (child allowance): 105€/month for 2 kids - are you receiving this?",
+      "2. Elatustuki (child support from Kela if ex doesn't pay): Up to 180€/month per child",
+      "3. Toimeentulotuki (last resort assistance) if income insufficient - don't be ashamed to apply",
+      "4. Asumistuki (housing benefit) if rent is high portion of income",
+      "Budget review (monthly):",
+      "Income: 2,400€",
+      "Fixed: Rent 850€, groceries 450€, utilities 75€, transport 80€, other 300€ = 1,755€",
+      "Daycare: Subsidized based on income - are you paying full price or sliding scale?",
+      "Where savings possible:",
+      "- Groceries: 450€ for 3 people is high - Lidl/Prisma brands can cut to 350€",
+      "- Subscriptions: Netflix (8€) is fine, anything else can pause",
+      "- Kids activities: Many cities have subsidized options for low-income families",
+      "Long-term:",
+      "Your 1,200€ savings is actually good emergency fund! Don't feel bad using it for true emergency",
+      "Call Kela to review all benefits you're entitled to - they have advisors who help",
+      "You're working full-time as admin assistant - is there room for advancement/raise?",
+      "This is temporary stage - kids get older, expenses change",
+      "You're doing everything right - sometimes the system is just hard on single parents"
+    ],
+    "commonMistakes": [
+      "Not addressing emotional overwhelm first",
+      "Giving only budget advice without mentioning benefit programs",
+      "Making her feel guilty about small 'luxuries' like Netflix",
+      "Not acknowledging structural difficulties of single parenting",
+      "Failing to validate she's doing well in impossible situation",
+      "Missing that irregular child support is huge stressor"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_laura_benefits_success_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 4
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_laura_benefits_success_002",
+    "characterId": "char_laura_028",
+    "scenarioType": "family_benefits_help",
+    "difficulty": 0.3,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_laura_single_parent_budget_001"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I called Kela like you suggested and found out I wasn't getting elatustuki (child support supplement) even though my ex is behind on payments! They approved it - I'll get 360€/month total for both kids. That's huge! I also applied for housing benefit and might get 150€/month. I can breathe a little easier. Got the kids' boots at Kierrätyskeskus for 15€ each. Thank you for reminding me I'm not failing - I was just missing benefits I'm entitled to.",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Single mother successfully accessed benefits she was entitled to, financial pressure reduced",
+      "emotionalState": "relieved, grateful, more hopeful, validated",
+      "urgency": "low",
+      "specificDetails": {
+        "gotElatustuki": true,
+        "additionalIncome": 360,
+        "appliedHousingBenefit": true,
+        "potential150More": true,
+        "foundAffordableBoots": true,
+        "feelingBetter": true
+      }
+    },
+    "idealAdvice": [
+      "This is wonderful news! So glad you called Kela",
+      "360€/month extra = 4,320€/year - that's life-changing for your budget",
+      "Elatustuki: Exactly what it's for - protecting kids when parent doesn't pay",
+      "If housing benefit approved: Total 510€/month more = huge breathing room",
+      "Now you can start building small emergency fund for car repairs, unexpected costs",
+      "Second-hand boots: 15€ vs 60€ each = saved 90€ for same function",
+      "You advocated for yourself and your kids - that's great parenting",
+      "With extra income: Don't let lifestyle inflate - keep saving mindset",
+      "Suggested use: 300€ for breathing room in monthly budget, 60€/month to savings",
+      "You were NEVER failing - system just makes it hard to know what you're entitled to",
+      "Keep all documentation of ex's missed payments - important for elatustuki continuation"
+    ],
+    "commonMistakes": [
+      "Not celebrating the huge success",
+      "Immediately pushing more optimization without acknowledging relief",
+      "Missing opportunity to validate her self-advocacy",
+      "Not mentioning importance of documentation for continued benefits"
+    ]
+  }
+]

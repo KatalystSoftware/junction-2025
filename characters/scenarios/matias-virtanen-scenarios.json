@@ -1,0 +1,65 @@
+[
+  {
+    "scenarioId": "scenario_matias_student_benefits_001",
+    "characterId": "char_matias_021",
+    "scenarioType": "vocational_student_benefits",
+    "difficulty": 0.3,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Moi! I just started vocational school and I'm living on my own for first time. I get like 650€ total from KELA (student grant + housing support) and my rent is 280€. I took out 2,500€ student loan to have some buffer. Is this enough to live on? My roommate says I should get a part-time job but I'm worried about school being hard. How do students actually manage money? I don't want to end up broke or have to move back with parents.",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Vocational student on his own for first time, anxious about making money last",
+      "emotionalState": "anxious, inexperienced with budgeting, wanting independence, concerned",
+      "urgency": "medium",
+      "specificDetails": {
+        "age": 18,
+        "firstTimeIndependent": true,
+        "monthlyKELA": 650,
+        "rent": 280,
+        "studentLoan": 2500,
+        "uncertainAboutBudgeting": true,
+        "concernAboutPartTimeWork": true,
+        "prideAboutIndependence": true
+      }
+    },
+    "idealAdvice": [
+      "Big step living on your own - good for you!",
+      "Let's build a realistic budget for your situation:",
+      "Income: 650€ KELA",
+      "Fixed costs: 280€ rent, 25€ utilities (shared), 30€ transport, 15€ phone = 350€",
+      "Remaining: 300€ for groceries and everything else",
+      "Groceries as student: 200€/month realistic (8€/day)",
+      "Left over: 100€ for other stuff (clothes, social, emergencies)",
+      "Tight? Yes. Impossible? No - many students do it!",
+      "That 2,500€ student loan is smart buffer - gives you 4-6 months breathing room",
+      "Tips to make it work:",
+      "1. Student discounts: transport (50% off), restaurants (Aalto, Frank), groceries (student portions)",
+      "2. Cook at home: Lidl, S-market student prices - huge savings vs restaurants",
+      "3. Free stuff: Student union events, libraries, campus gym often included",
+      "4. Track spending first month to see where money actually goes",
+      "Part-time work question: First semester focus on adjusting to school - can add work later if needed",
+      "Electrician training has hands-on work - better to do well in school than work for 8€/hour now",
+      "Your loan buffer means you DON'T need to rush into part-time job yet",
+      "This is exactly what student loan is for - giving you space to focus on studies",
+      "Many vocational students work summers when school is lighter - good compromise"
+    ],
+    "commonMistakes": [
+      "Telling him 650€ is plenty without realistic budget breakdown",
+      "Pushing him to get part-time job without considering school demands",
+      "Not acknowledging the anxiety of first independent living",
+      "Missing student-specific money-saving opportunities",
+      "Not validating that having student loan buffer was smart planning",
+      "Failing to encourage him that this is achievable"
+    ]
+  }
+]

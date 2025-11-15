@@ -1,0 +1,90 @@
+{
+  "characterId": "char_hannu_040",
+  "name": "Hannu Nieminen",
+  "age": 65,
+  "occupation": "Recently Retired IT Manager",
+  "background": "Just retired IT manager in Helsinki after 40 years of work. Worked through tech boom and made good money but also lost some in dot-com bubble. Owns apartment and has decent pension plus some investments. Nervous about market volatility in retirement - should he move investments to safer options or stay in stocks? Also interested in cryptocurrency but wife thinks he's too old to start investing in 'internet money'. Wants to enjoy retirement traveling but worried about running out of money.",
+  "personality": {
+    "impulsiveness": 0.4,
+    "trustingness": 0.5,
+    "financial_literacy": 0.6,
+    "stubbornness": 0.5,
+    "emotionality": 0.4
+  },
+  "financialProfile": {
+    "incomeLevel": "medium",
+    "typicalMonthlyIncome": 3200,
+    "hasDebt": false,
+    "hasSavings": "good",
+    "bankAccounts": [
+      {
+        "accountId": "acc_hannu_001",
+        "bankName": "OP",
+        "accountType": "checking",
+        "balance": 3800.0,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_hannu_002",
+        "bankName": "OP",
+        "accountType": "savings",
+        "balance": 42000.0,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [],
+    "debts": [],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_hannu_001",
+        "name": "Netflix Premium",
+        "monthlyCost": 17.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2019-01-01"
+      },
+      {
+        "subscriptionId": "sub_hannu_002",
+        "name": "Spotify Premium",
+        "monthlyCost": 10.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2020-01-01"
+      },
+      {
+        "subscriptionId": "sub_hannu_003",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 29.9,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2021-01-01"
+      },
+      {
+        "subscriptionId": "sub_hannu_004",
+        "name": "Newspaper Digital",
+        "monthlyCost": 24.9,
+        "category": "other",
+        "currency": "EUR",
+        "startDate": "2018-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "groceries": 520,
+      "transportation": 100,
+      "utilities": 110,
+      "other": 450
+    }
+  },
+  "communicationStyle": {
+    "formality": "semi-formal",
+    "language": "casual_adult_finnish",
+    "prefersVoice": 0.2,
+    "callsWhenEmotional": false
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

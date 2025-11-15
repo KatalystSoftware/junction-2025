@@ -1,0 +1,80 @@
+{
+  "characterId": "char_matias_021",
+  "name": "Matias Virtanen",
+  "age": 18,
+  "occupation": "Vocational School Student (Electrician Training)",
+  "background": "Just started at vocational school in Tampere studying to become an electrician. Receiving KELA student benefits and living in a shared student apartment. First time managing money independently. Parents are blue-collar workers who taught him to value hard work but didn't teach much about finances. Has a small student loan and confused about student benefits system.",
+  "personality": {
+    "impulsiveness": 0.5,
+    "trustingness": 0.6,
+    "financial_literacy": 0.25,
+    "stubbornness": 0.5,
+    "emotionality": 0.4
+  },
+  "financialProfile": {
+    "incomeLevel": "low",
+    "typicalMonthlyIncome": 650,
+    "hasDebt": true,
+    "hasSavings": "minimal",
+    "bankAccounts": [
+      {
+        "accountId": "acc_matias_001",
+        "bankName": "OP",
+        "accountType": "checking",
+        "balance": 420.0,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [],
+    "debts": [
+      {
+        "debtId": "debt_matias_001",
+        "type": "student_loan",
+        "creditor": "KELA/Student Loan",
+        "totalAmount": 2500.0,
+        "remainingAmount": 2500.0,
+        "monthlyPayment": 0,
+        "interestRate": 0.5,
+        "currency": "EUR",
+        "startDate": "2024-09-01"
+      }
+    ],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_matias_001",
+        "name": "Netflix",
+        "monthlyCost": 7.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2024-09-01"
+      },
+      {
+        "subscriptionId": "sub_matias_002",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 14.9,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2024-08-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "rent": 280,
+      "groceries": 200,
+      "transportation": 30,
+      "utilities": 25,
+      "other": 100
+    }
+  },
+  "communicationStyle": {
+    "formality": "casual",
+    "language": "teen_finnish",
+    "prefersVoice": 0.2,
+    "callsWhenEmotional": false
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}

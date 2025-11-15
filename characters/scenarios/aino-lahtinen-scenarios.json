@@ -1,0 +1,198 @@
+[
+  {
+    "scenarioId": "scenario_aino_first_job_taxes_001",
+    "characterId": "char_aino_020",
+    "scenarioType": "teen_first_job_taxes",
+    "difficulty": 0.2,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Hei! I got my first paycheck from the café and I'm confused. I worked 40 hours at 10€/hour so I expected 400€ but I only got 328€? They took out like 72€ for taxes! That's almost 20%! I'm only 17 and make like 400€/month - why am I paying so much in taxes? Did they mess up my paycheck?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Teen receiving first paycheck confused about tax withholding",
+      "emotionalState": "confused, slightly frustrated, feeling cheated",
+      "urgency": "low",
+      "specificDetails": {
+        "age": 17,
+        "firstJob": true,
+        "hourlyWage": 10,
+        "hoursWorked": 40,
+        "expectedPay": 400,
+        "actualPay": 328,
+        "taxWithheld": 72,
+        "confused": true
+      }
+    },
+    "idealAdvice": [
+      "Welcome to working life! This is super common confusion with first job",
+      "Your employer didn't mess up - this is how Finland's tax system works",
+      "They withheld 18% based on your tax card (verokortti)",
+      "Good news: You'll likely get most of this back!",
+      "Here's why: Annual tax-free amount in Finland is ~14,000€",
+      "At 400€/month, you'll earn ~4,800€/year - well under the limit",
+      "But employer doesn't know you're only working part-time, so they withhold 'just in case'",
+      "Next year (after you file tax return in spring), you'll get refund of most taxes withheld",
+      "What to do:",
+      "1. Get proper tax card from vero.fi showing you're under yearly limit",
+      "2. Give updated tax card to employer - they'll withhold less going forward",
+      "3. Keep all payslips for next year's tax return",
+      "With part-time work, you should have tax card showing 0-5% withholding, not 18%",
+      "This is actually good problem - means you're earning money and learning the system!",
+      "Many Finnish teens get nice tax refund in spring from part-time work - might be €500-1000 back!"
+    ],
+    "commonMistakes": [
+      "Not explaining tax refund system clearly",
+      "Making tax system sound more complicated than necessary",
+      "Not giving actionable advice (get updated tax card)",
+      "Failing to reassure that employer didn't make mistake",
+      "Missing opportunity to teach about annual vs monthly taxation",
+      "Not validating this is confusing for first-time workers"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_aino_saving_goals_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 3
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_aino_saving_goals_002",
+    "characterId": "char_aino_020",
+    "scenarioType": "teen_savings_goals",
+    "difficulty": 0.3,
+    "topic": "saving",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_aino_first_job_taxes_001"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I fixed my tax card and now I'm getting almost all my paycheck! I want to save money for studying abroad after lukio (maybe 6 months in Spain or somewhere). I have 850€ saved and earn 400€/month from café. How much should I save vs spend? My friends spend everything on clothes and going out but I want to travel. Am I being too boring? How do I save without missing out on being a teenager?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Teen wanting to save for future goal but feeling social pressure to spend",
+      "emotionalState": "motivated but conflicted, peer pressure, wanting validation",
+      "urgency": "low",
+      "specificDetails": {
+        "age": 17,
+        "savingsGoal": "study abroad",
+        "currentSavings": 850,
+        "monthlyIncome": 400,
+        "peerPressureToSpend": true,
+        "wantsBalance": true,
+        "concernAboutMissingOut": true
+      }
+    },
+    "idealAdvice": [
+      "Having savings goal at 17 = you're already ahead of most people!",
+      "Let's build a realistic plan that lets you save AND enjoy life:",
+      "Income: 400€/month",
+      "Living at home (no rent/food): Huge advantage - use it!",
+      "Suggested split: 60% save (240€), 40% spend (160€) = 2,880€ saved per year",
+      "In 18 months until lukio graduation: 4,320€ + current 850€ = ~5,200€",
+      "That's solid for 6 months abroad! (Spain budget: 800-1000€/month)",
+      "160€/month to spend = 40€/week for going out, clothes, fun",
+      "Is this 'boring'? Absolutely not:",
+      "You're making a choice: Short-term stuff vs life-changing experience abroad",
+      "Your friends spending everything: Will they have 5k€ for Spain trip? Probably not",
+      "You can still go out, just more intentionally - host movie nights instead of expensive bars",
+      "Being 17: Should involve some fun spending! 40€/week is reasonable",
+      "Tips to make it work:",
+      "1. Automatic transfer 240€ to savings on payday - 'pay yourself first'",
+      "2. Track where your 160€ goes - see what actually makes you happy",
+      "3. Free/cheap fun: Parks, beaches, friend hangouts at home, student events",
+      "4. Tell close friends about Spain goal - real friends will support you",
+      "Future you at 19 in Spain: Will thank 17-year-old you SO much for saving",
+      "This isn't boring - this is having goals and making them happen!"
+    ],
+    "commonMistakes": [
+      "Telling her to save 100% and never have fun",
+      "Dismissing peer pressure and social needs as unimportant",
+      "Not giving specific number recommendations",
+      "Failing to validate that her goal is ambitious and mature",
+      "Missing opportunity to teach 'pay yourself first' principle",
+      "Not addressing the FOMO directly"
+    ]
+  },
+  {
+    "scenarioId": "scenario_aino_first_credit_card_003",
+    "characterId": "char_aino_020",
+    "scenarioType": "teen_credit_card_question",
+    "difficulty": 0.4,
+    "topic": "credit_score",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 1, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "My bank sent me an offer for a credit card (I turn 18 next month). It has a 1,000€ limit and they say I can build credit history. But my mom freaked out when I mentioned it and said credit cards ruined my aunt's life in the 90s. Are credit cards dangerous? Should a student even have one? Or is my mom just being overprotective?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Teen approaching 18 offered first credit card, torn between bank offer and parent fear",
+      "emotionalState": "curious, cautious, respect for parent's view, wanting independence",
+      "urgency": "low",
+      "specificDetails": {
+        "age": 17,
+        "turning18Soon": true,
+        "creditCardOffer": true,
+        "creditLimit": 1000,
+        "parentFear": true,
+        "familyHistoryWithDebt": true,
+        "uncertainWhatToDo": true
+      }
+    },
+    "idealAdvice": [
+      "Both you and your mom have valid points - let's break this down",
+      "Your mom's concern is REAL: Credit cards can be dangerous if misused",
+      "Your aunt's experience in 90s: High interest rates (15-20%), easy to spiral into debt",
+      "But credit cards can also be safe tools IF used correctly",
+      "Critical question: Can you treat credit card exactly like debit card?",
+      "Safe credit card use: Only spend money you already have, pay full balance monthly",
+      "Dangerous use: Spending money you don't have, carrying balance, paying interest",
+      "For your situation (18, part-time work, living at home, good saver):",
+      "Pros of having credit card:",
+      "- Builds payment history (helpful for future apartment rental, not loans in Finland)",
+      "- Better fraud protection than debit card",
+      "- Useful for online purchases and travel",
+      "Cons/risks:",
+      "- Temptation to spend more than you have",
+      "- If you carry balance: 15-20% interest is devastating",
+      "- Can damage credit score if you miss payments",
+      "Honest assessment: You seem responsible (saving for Spain, asking for advice)",
+      "IF you get credit card:",
+      "1. Set limit to 500€ maximum (not 1,000€) - less risk",
+      "2. Set up automatic full payment from checking account",
+      "3. Use for specific things only (gas, online purchases) not daily spending",
+      "4. NEVER carry a balance - if you can't pay full amount, you've overspent",
+      "Alternative: Wait until you're in university and have more stable income",
+      "Respect your mom's concern - she's protecting you from real danger she witnessed"
+    ],
+    "commonMistakes": [
+      "Dismissing mom's concerns as old-fashioned",
+      "Encouraging credit card without serious warnings",
+      "Not explaining difference between safe and dangerous use clearly",
+      "Failing to validate family's painful history with debt",
+      "Not suggesting lower credit limit",
+      "Missing that waiting is also a valid choice"
+    ]
+  }
+]

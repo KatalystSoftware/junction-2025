@@ -1,0 +1,87 @@
+[
+  {
+    "scenarioId": "scenario_sara_teacher_pension_002",
+    "characterId": "char_sara_027",
+    "scenarioType": "public_sector_pension",
+    "difficulty": 0.4,
+    "topic": "retirement",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 2, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I'm 24 and just started as a teacher. My older colleague was talking about teacher pensions and how we have 'good pension compared to private sector.' But I don't really understand how pension even works. I won't retire for like 40+ years - do I need to think about this now? Or does my employer pension mean I'm automatically set for retirement and don't need to save extra?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Young teacher who doesn't understand pension system or if she needs additional retirement savings",
+      "emotionalState": "confused about pensions, retirement feels far away, seeking basic education",
+      "urgency": "low",
+      "specificDetails": {
+        "age": 24,
+        "newTeacher": true,
+        "heardPensionIsGood": true,
+        "doesNotUnderstandPension": true,
+        "retirementFeelsFarAway": true,
+        "uncertainIfNeedsExtraSavings": true
+      }
+    },
+    "idealAdvice": [
+      "Great question - most 24-year-olds don't think about this at all!",
+      "Finnish pension basics (simplified):",
+      "Every year you work, you earn pension credits:",
+      "- Age 17-52: Earn 1.5% of your salary per year toward pension",
+      "- Age 53-62: Earn 1.7% per year",
+      "- Age 63-retirement: Earn 1.5% per year",
+      "Teacher's situation (your case):",
+      "Salary: 2,800€/month = 33,600€/year",
+      "Pension accrual: 1.5% × 33,600€ = ~504€/year added to future pension",
+      "After 40 years of teaching (assuming same salary for simplicity):",
+      "Total pension: 504€ × 40 years = ~20,160€/year = 1,680€/month",
+      "That's about 60% of your current salary",
+      "Is this 'good'?",
+      "Compared to private sector: Same system actually (työeläke for everyone in Finland)",
+      "What makes teaching 'good': Stable employment, predictable salary growth, rarely laid off",
+      "Real talk: Will 1,680€/month be enough in 2065?",
+      "Unknown - depends on inflation, lifestyle, housing situation",
+      "But: Your salary will grow over 40 years (not stuck at 2,800€)",
+      "Realistic teacher salary trajectory:",
+      "Age 24: 2,800€",
+      "Age 35: 3,500€",
+      "Age 45: 4,000€",
+      "Age 55: 4,500€",
+      "Actual pension after 40 years with salary growth: Likely 2,500-3,000€/month",
+      "Should you save extra for retirement?",
+      "At 24: Focus on building life foundation first",
+      "Priorities: Pay off student loans, emergency fund, maybe first apartment",
+      "THEN: Consider retirement savings (late 20s/early 30s)",
+      "If you start saving 200€/month at age 30:",
+      "By age 65: ~200,000€ extra (at 5% return)",
+      "Combined with pension 3,000€ + investment income ~700€ = 3,700€/month in retirement",
+      "That's comfortable retirement!",
+      "Your action items NOW (age 24):",
+      "1. Pay off 8,500€ student loan first",
+      "2. Build 3-6 month emergency fund",
+      "3. After loan paid + emergency fund: Start investing 150-300€/month",
+      "4. Don't stress about pension specifically yet - building general wealth helps retirement",
+      "Teacher advantage:",
+      "Stable income means you CAN plan and save systematically",
+      "Unlike freelancer/entrepreneur, you know income next year",
+      "Bottom line: You're NOT automatically 'set' but you have solid foundation",
+      "Start thinking about retirement in late 20s, not urgent at 24",
+      "Your older colleague is right - stable job + Finnish pension system is good starting point"
+    ],
+    "commonMistakes": [
+      "Making pensions sound more complicated than necessary",
+      "Not explaining how accrual percentage works",
+      "Scaring her that pension won't be enough (she's 24, has time!)",
+      "Pushing retirement savings before student loans paid",
+      "Not acknowledging retirement feels far away at 24 (normal!)",
+      "Missing that salary growth significantly affects pension amount"
+    ]
+  }
+]

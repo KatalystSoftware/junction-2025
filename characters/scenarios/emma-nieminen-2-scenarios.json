@@ -1,0 +1,75 @@
+[
+  {
+    "scenarioId": "scenario_emma_university_decision_002",
+    "characterId": "char_emma_022",
+    "scenarioType": "career_vs_university",
+    "difficulty": 0.5,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 2, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I just got back from my Asia trip and now I have to decide: Start university or keep working? If I start university, I'll make maybe 900€/month (KELA + part-time work) vs 1,800€ now working full-time. That's half the income! But everyone says I need education for good career. Financially, should I keep working and saving, or 'invest in myself' with education? I'm so confused.",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Gap year student deciding between continuing work vs starting university, weighing income loss",
+      "emotionalState": "torn, uncertain about future, pressure to decide",
+      "urgency": "medium",
+      "specificDetails": {
+        "age": 19,
+        "currentIncome": 1800,
+        "potentialStudentIncome": 900,
+        "socialPressureForUniversity": true,
+        "enjoysWorkingAndEarning": true,
+        "uncertainAboutMajor": true
+      }
+    },
+    "idealAdvice": [
+      "This is genuinely tough decision - both paths have merit",
+      "Financial comparison:",
+      "Option A: Keep working",
+      "- Income: 1,800€/month = 21,600€/year",
+      "- Living at home: Can save ~1,000€/month = 12k€/year",
+      "- In 3 years: Could have 36k€ saved",
+      "- Career: Retail management, decent but limited upside",
+      "Option B: University",
+      "- Income: 900€/month = 10,800€/year",
+      "- Student loans: Likely 12-16k€ over 3 years",
+      "- In 3 years: Have degree but 16k€ debt",
+      "- Career: Higher earning potential (2,500-4,000€ depending on field)",
+      "Break-even analysis:",
+      "If university degree adds 700€/month to career earnings:",
+      "- 700€ × 12 months × 40 years = 336,000€ lifetime difference",
+      "- Cost: 3 years lower income + 16k€ debt = ~50k€ total cost",
+      "- Return on investment: Massive (336k€ gain vs 50k€ cost)",
+      "BUT: This assumes you pick right field and complete degree",
+      "Critical questions:",
+      "- Do you know what you want to study? (If no: Gap year 2 might be better)",
+      "- What career appeals to you? (Determines if degree necessary)",
+      "- Are you ready for student lifestyle after earning good money?",
+      "- Could you work part-time through university? (Many do)",
+      "Alternative path:",
+      "Work one more year (save another 12k€), then start university with buffer",
+      "This gives you: Clarity on goals + financial cushion + maturity",
+      "Age 19-20: Having another gap year is completely fine",
+      "Most important: Don't go to university 'because everyone says' without clear goal",
+      "But also don't avoid it just because student budget seems tight",
+      "The right question: What do you want your life at 30 to look like?",
+      "Work backwards from that vision"
+    ],
+    "commonMistakes": [
+      "Automatically saying 'go to university' without considering her situation",
+      "Only looking at short-term income loss, not long-term gain",
+      "Not validating that both choices are legitimate",
+      "Failing to mention another gap year is option",
+      "Missing that uncertainty about major is red flag",
+      "Not helping her think about long-term career vision"
+    ]
+  }
+]

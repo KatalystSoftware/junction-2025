@@ -1,0 +1,111 @@
+[
+  {
+    "scenarioId": "scenario_pekka_retirement_timing_001",
+    "characterId": "char_pekka_036",
+    "scenarioType": "retirement_timing_decision",
+    "difficulty": 0.6,
+    "topic": "retirement",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 4, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I can retire at 65 in three years, but I could also work until 68 or even 70. Each year I work increases my pension by about 4.5%. If I retire at 65, my työeläke would be around 2,800€/month. At 68 it would be 3,200€. That's 400€ difference for the rest of my life. But I'm also tired after 40 years of work. My wife wants to travel while we're still healthy. How do I decide? Is it worth working three more years?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Bank manager approaching retirement weighing financial benefits of working longer vs quality of life",
+      "emotionalState": "torn between financial optimization and life enjoyment, fatigue from long career",
+      "urgency": "medium",
+      "specificDetails": {
+        "yearsUntilMinimumRetirement": 3,
+        "currentAge": 62,
+        "pensionAt65": 2800,
+        "pensionAt68": 3200,
+        "wifeAlreadyRetired": true,
+        "wantsToTravel": true,
+        "financiallySecure": true
+      }
+    },
+    "idealAdvice": [
+      "This is as much a life decision as a financial one",
+      "Financial analysis: 400€/month extra = 4,800€/year. If you live to 85, that's ~80k€ more total",
+      "BUT: Working 3 more years means earning ~17,500€/month total in salary vs pension difference",
+      "The financial math: Working longer is financially optimal if you live long enough",
+      "Break-even point: roughly 15-17 years into retirement to make up foregone pension growth",
+      "Non-financial factors that matter MORE in your situation:",
+      "You have good savings (85k€) - not dependent on maximizing pension",
+      "Health and energy for travel better at 65 than 68",
+      "Wife already retired and wants to enjoy time together",
+      "You're tired - burnout affects health and retirement enjoyment",
+      "Consider hybrid: work part-time 65-68 (osittainen varhennettu vanhuuseläke)?",
+      "You've planned well financially - retirement at 65 is completely viable",
+      "Don't optimize for maximum money at expense of maximum life satisfaction",
+      "Some of best retirement years are the active early years"
+    ],
+    "commonMistakes": [
+      "Only focusing on financial optimization without considering life quality",
+      "Telling him to definitely work longer because more money is always better",
+      "Not acknowledging the fatigue and life stage considerations",
+      "Failing to mention part-time retirement option",
+      "Not considering wife's perspective and relationship",
+      "Missing that he's already financially secure"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_pekka_retirement_success_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 8
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_pekka_retirement_success_002",
+    "characterId": "char_pekka_036",
+    "scenarioType": "retirement_satisfaction",
+    "difficulty": 0.2,
+    "topic": "retirement",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_pekka_retirement_timing_001"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I retired last month at 65. I thought I'd miss work more, but honestly, I'm loving it. My wife and I just booked a 3-week trip to Japan in spring. I never could have taken that much time off while working. My pension is comfortable, and we're not worrying about money. You were right that some things are more valuable than optimizing every euro. Thank you for helping me see that it wasn't just about the numbers. I feel lighter and happier than I have in years.",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Recently retired and enjoying life, validating decision to prioritize life quality over maximum pension",
+      "emotionalState": "happy, relieved, satisfied, grateful",
+      "urgency": "low",
+      "specificDetails": {
+        "retiredAt65": true,
+        "enjoyingRetirement": true,
+        "planningTravel": true,
+        "financiallyComfortable": true,
+        "noRegrets": true
+      }
+    },
+    "idealAdvice": [
+      "Wonderful to hear you're thriving in retirement!",
+      "This is exactly why financial planning includes life planning",
+      "Three-week trip to Japan - perfect example of what early active retirement enables",
+      "Your financial preparation means you can enjoy without worry",
+      "Keep engaged: hobbies, volunteering, social connections important for retirement satisfaction",
+      "Monitor spending first year to establish retirement budget baseline",
+      "Enjoy this well-earned phase of life!"
+    ],
+    "commonMistakes": [
+      "Not celebrating the successful decision",
+      "Overcomplicating a positive update",
+      "Trying to give unnecessary additional advice"
+    ]
+  }
+]

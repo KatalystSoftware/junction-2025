@@ -1,0 +1,126 @@
+[
+  {
+    "scenarioId": "scenario_noora_student_loan_001",
+    "characterId": "char_noora_023",
+    "scenarioType": "student_loan_accumulation_concern",
+    "difficulty": 0.4,
+    "topic": "loans",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 0, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I'm in my third year at Aalto and I've taken out the maximum student loan each year (around 4,000€/year). I now have 12,000€ in student loans and I'll probably graduate with 16,000€. Everyone says student loans are 'good debt' because the interest rate is so low (like 0.5%) but I'm still going to owe 16,000€! That feels like a lot. Should I be taking out less? Or should I take the max and invest the difference?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "University student with growing student loan debt questioning if she's borrowing too much",
+      "emotionalState": "anxious about debt, uncertain if strategy is right, seeking validation",
+      "urgency": "low",
+      "specificDetails": {
+        "currentStudentLoan": 12000,
+        "expectedGraduationDebt": 16000,
+        "interestRate": 0.5,
+        "yearInSchool": 3,
+        "receivingKELAgrant": true,
+        "heardDebtIsGood": true,
+        "uncertainIfTooMuch": true
+      }
+    },
+    "idealAdvice": [
+      "Great that you're thinking about this strategically!",
+      "Finnish student loan context: Among world's best loan terms - 0.5% interest, government guarantee, flexible repayment",
+      "16,000€ debt for bachelor's degree is very manageable in Finnish system",
+      "Repayment: Doesn't start until 2 years after graduation, ~100-150€/month for 10-15 years",
+      "On business degree salary (3,000-4,000€/month), 100-150€ payment is 3-5% of income - very manageable",
+      "Is it 'good debt'? Yes in sense that education increases earnings more than loan costs",
+      "HOWEVER: Still real debt that limits future flexibility",
+      "Strategic approach:",
+      "Take loan IF you need it for living expenses - focus on studies, not working too much",
+      "DON'T take loan to fund lifestyle inflation - Netflix, restaurants, travel",
+      "The 'invest the difference' strategy: Mathematically can work but psychologically risky for students",
+      "Your 1,200€ savings: Good! Shows you're managing money reasonably",
+      "Recommendation: Continue current approach - take loan you need, keep building small savings buffer",
+      "After graduation: Pay off aggressively if you want debt-free life, or minimum payments if you prefer investing",
+      "16k€ debt for Aalto business degree: Very normal and completely manageable",
+      "Focus energy on excellent grades and internships - that has bigger impact than loan amount"
+    ],
+    "commonMistakes": [
+      "Scaring her about debt without context of Finnish student loan terms",
+      "Encouraging maximum borrowing for investing (too risky for students)",
+      "Not acknowledging that 16k€ feels significant even if objectively manageable",
+      "Failing to explain post-graduation repayment terms clearly",
+      "Not mentioning opportunity cost of working too much vs studying",
+      "Missing chance to validate her reasonable money management (having savings while in school)"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_noora_graduation_planning_002",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 8
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_noora_kela_benefits_002",
+    "characterId": "char_noora_023",
+    "scenarioType": "kela_benefits_optimization",
+    "difficulty": 0.5,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 2, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I get KELA student grant (250€), housing supplement (250€ for my 420€ rent), and student loan government guarantee. But I'm doing some tutoring work now (400€/month) and I'm worried it might affect my benefits. How much can I earn before KELA cuts my support? Also, is the student loan guarantee still worth it if I'm earning money? The whole system is confusing!",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Student with KELA benefits starting to earn money, worried about losing benefits",
+      "emotionalState": "confused by system, worried about mistakes, wanting clarity",
+      "urgency": "medium",
+      "specificDetails": {
+        "studentGrant": 250,
+        "housingSupport": 250,
+        "rent": 420,
+        "tutoringIncome": 400,
+        "concernsAboutBenefitLoss": true,
+        "hasLoanGuarantee": true,
+        "systemConfusing": true
+      }
+    },
+    "idealAdvice": [
+      "KELA student benefit system is complex - let's break it down clearly",
+      "Good news: You can earn quite a bit before losing benefits!",
+      "Annual income limit for FULL benefits (2024): ~14,000€/year from work",
+      "That's about 1,150€/month on average - your 400€ tutoring is well below this",
+      "If you exceed limit: Benefits reduced proportionally, not cut completely",
+      "Housing supplement (asumistuki): Based on rent and income - you're fine at 400€/month",
+      "Student grant (opintotuki): Monthly grant is 250€ - unaffected by your current income level",
+      "Student loan guarantee: Only matters if you actually TAKE the loan - free to have, use if you need it",
+      "Your specific situation (400€/month = 4,800€/year): Well under limit, all benefits continue",
+      "Important: KELA needs to know about your income - report it or risk having to pay back later!",
+      "Summer work: Income during summer months (June-August) doesn't affect benefits during study months",
+      "Tax consideration: You'll pay taxes on tutoring income but likely under annual tax-free amount (~14,000€)",
+      "Strategic: 400€/month tutoring + KELA benefits + student loan (if needed) = solid student budget",
+      "Track your annual income carefully - KELA reviews yearly, not monthly",
+      "Use KELA's online calculator (opintotukitestaa.fi) to see exact limits for your situation"
+    ],
+    "commonMistakes": [
+      "Scaring her that any income will cut benefits (not true)",
+      "Not explaining the annual limit clearly",
+      "Failing to mention summer work exception",
+      "Not emphasizing importance of reporting income to KELA",
+      "Missing opportunity to validate that tutoring is smart way to supplement income",
+      "Not pointing to KELA's own calculator tool"
+    ]
+  }
+]

@@ -1,0 +1,149 @@
+[
+  {
+    "scenarioId": "scenario_olivia_mortgage_planning_002",
+    "characterId": "char_olivia_025",
+    "scenarioType": "first_mortgage_planning",
+    "difficulty": 0.6,
+    "topic": "loans",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 3, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "The bank pre-approved me for 180,000€ mortgage! But I'm nervous about borrowing that much. The apartments I like are 160-180k€. Should I go for maximum budget or stay more conservative? Also, fixed vs variable interest rate - bank is pushing variable (currently 3.2%) but my parents say fixed is safer. What's actually smarter for someone like me buying first apartment?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Nurse approved for first mortgage, uncertain about loan amount and interest rate type",
+      "emotionalState": "excited but nervous, risk-averse, wanting validation",
+      "urgency": "high",
+      "specificDetails": {
+        "age": 28,
+        "mortgageApproval": 180000,
+        "apartmentsConsidering": "160-180k€",
+        "variableRate": 3.2,
+        "parentAdviceFixed": true,
+        "bankPushingVariable": true,
+        "uncertainWhatToDo": true
+      }
+    },
+    "idealAdvice": [
+      "Congratulations on mortgage approval! Let's think through this carefully:",
+      "Loan amount question:",
+      "Pre-approved for 180k€ doesn't mean you SHOULD borrow 180k€",
+      "Your income: 3,200€/month",
+      "Conservative rule: Monthly payment should be max 30-35% of income = 960-1,120€/month",
+      "180k€ loan at 3.2% over 25 years = ~850€/month + ~100€ maintenance fee = 950€ total",
+      "This is at high end but manageable on your salary",
+      "HOWEVER: Consider if income might decrease (reduce hours, have children, change jobs?)",
+      "Recommendation: Target 160-170k€ apartment, save 10-20k€ as buffer",
+      "This gives breathing room for unexpected expenses, furnishing, repairs",
+      "Fixed vs Variable interest rate:",
+      "Variable rate (currently 3.2%):",
+      "Pro: Usually lower rate initially, can refinance anytime",
+      "Con: Can increase if Euribor rises - payment could go to 1,200€+ if rates hit 6%",
+      "Risk: Unpredictable monthly payment",
+      "Fixed rate (probably 3.5-3.8% now):",
+      "Pro: Guaranteed payment for 5-10 years, predictable budgeting",
+      "Con: Slightly higher rate, expensive to break if you want to refinance",
+      "For YOUR situation (nurse, stable job, first home, risk-averse):",
+      "Recommendation: Fixed rate for 5 years",
+      "Why: As shift worker, income already varies monthly - fixed mortgage adds stability",
+      "You can handle 0.3-0.5% higher rate for peace of mind",
+      "In 5 years: You'll have equity, income likely higher, can reassess",
+      "Alternative: Hybrid approach",
+      "- Fix 70% of loan (predictability)",
+      "- Keep 30% variable (flexibility)",
+      "- Many Finnish banks offer this",
+      "Your parents aren't wrong: Fixed is safer for first-time buyer",
+      "Bank pushes variable: It's easier for them (can raise rates)",
+      "Bottom line:",
+      "Borrow: 160-170k€ (not max)",
+      "Rate: Fixed for 5 years or 70/30 hybrid",
+      "Timeline: Don't rush - right apartment at right price matters more than speed"
+    ],
+    "commonMistakes": [
+      "Encouraging maximum borrowing because she's approved",
+      "Not explaining monthly payment calculations clearly",
+      "Dismissing parent's fixed-rate advice (it's actually good for her)",
+      "Not considering her irregular shift income in risk assessment",
+      "Failing to mention hybrid option",
+      "Not warning about bank's conflict of interest pushing variable"
+    ]
+  },
+  {
+    "scenarioId": "scenario_olivia_shift_work_budget_003",
+    "characterId": "char_olivia_025",
+    "scenarioType": "irregular_income_budgeting",
+    "difficulty": 0.5,
+    "topic": "budgeting",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 2, "max": 10 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "My income as a nurse varies so much month to month! Base salary is 2,800€ but with night shifts, weekend shifts, and holiday pay, some months I make 3,600€, other months just 2,900€. How do I budget when I don't know exactly what I'll make? I want to save for apartment down payment but the variability stresses me out.",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Nurse with shift-based income bonuses struggling to budget variable income",
+      "emotionalState": "stressed by unpredictability, goal-focused on saving",
+      "urgency": "low",
+      "specificDetails": {
+        "baseSalary": 2800,
+        "withBonusesRange": "2900-3600€",
+        "variabilityStress": true,
+        "savingForDownPayment": true,
+        "needsBudgetingSystem": true
+      }
+    },
+    "idealAdvice": [
+      "Shift work income variability is common healthcare challenge - you need a system!",
+      "Your situation: Base 2,800€, actual 2,900-3,600€ (average ~3,200€)",
+      "Strategy: Budget on BASE salary only, treat bonuses as 'extra'",
+      "Monthly budget on 2,800€ base:",
+      "- Rent: 820€",
+      "- Groceries: 320€",
+      "- Transport: 54€",
+      "- Utilities: 40€",
+      "- Subscriptions: 117€",
+      "- Other: 250€",
+      "- Savings: 200€",
+      "Total: 1,801€ spent, ~999€ to savings/extra",
+      "Then: All shift bonuses (400-800€/month) go straight to savings",
+      "Result: Save 1,000-1,800€/month depending on shifts worked",
+      "Average: 1,400€/month = 16,800€/year for down payment",
+      "This system:",
+      "✓ Budgets on guaranteed minimum (no risk of overspending)",
+      "✓ Bonuses accelerate savings (psychological win)",
+      "✓ Bad month (few shifts): Still works on base salary",
+      "✓ Good month (lots of shifts): Massive savings boost",
+      "For apartment down payment:",
+      "Target: 10-20k€ (5-10% down payment on 180k€ apartment)",
+      "Timeline: 1 year at 1,400€/month savings = 16,800€ - perfect!",
+      "Additional tips:",
+      "- Track which shifts pay best (night/weekend/holiday) - prioritize those",
+      "- Automatic transfer to savings account on payday (before you see money)",
+      "- Separate accounts: Checking (spending) and Savings (untouchable)",
+      "- Consider: Extra shifts now for down payment, reduce after buying apartment",
+      "Healthcare advantage: You can always pick up extra shifts if needed - unlike fixed salary jobs",
+      "Your variability is actually an asset - control how hard you work to hit savings goals"
+    ],
+    "commonMistakes": [
+      "Recommending she budget on average income (risky if bad month)",
+      "Not explaining base-only budgeting strategy",
+      "Failing to show how fast she can save with this system",
+      "Missing that shift variability is actually advantage with right approach",
+      "Not giving specific down payment timeline",
+      "Forgetting automatic transfers are crucial for this to work"
+    ]
+  }
+]

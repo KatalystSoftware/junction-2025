@@ -1,0 +1,97 @@
+{
+  "characterId": "char_markku_031",
+  "name": "Markku Salonen",
+  "age": 45,
+  "occupation": "Sales Manager (Divorced)",
+  "background": "Divorced sales manager in Helsinki with two children who live with ex-wife. Paying child support which takes significant portion of income. Recently moved to smaller apartment to save money. Relationship with ex is tense around money. Wants to maintain good relationship with kids and provide for them but struggling to save for own future. Also concerned about life insurance and making sure kids are provided for if something happens to him.",
+  "personality": {
+    "impulsiveness": 0.4,
+    "trustingness": 0.4,
+    "financial_literacy": 0.5,
+    "stubbornness": 0.5,
+    "emotionality": 0.6
+  },
+  "financialProfile": {
+    "incomeLevel": "medium",
+    "typicalMonthlyIncome": 4200,
+    "hasDebt": true,
+    "hasSavings": "minimal",
+    "bankAccounts": [
+      {
+        "accountId": "acc_markku_001",
+        "bankName": "Danske Bank",
+        "accountType": "checking",
+        "balance": 950.0,
+        "currency": "EUR"
+      },
+      {
+        "accountId": "acc_markku_002",
+        "bankName": "Danske Bank",
+        "accountType": "savings",
+        "balance": 3400.0,
+        "currency": "EUR"
+      }
+    ],
+    "creditCards": [
+      {
+        "cardId": "card_markku_001",
+        "issuer": "Danske Visa",
+        "balance": 1200.0,
+        "creditLimit": 5000.0,
+        "interestRate": 13.9,
+        "minimumPayment": 35.0,
+        "currency": "EUR"
+      }
+    ],
+    "debts": [
+      {
+        "debtId": "debt_markku_001",
+        "type": "personal_loan",
+        "creditor": "Ferratum",
+        "totalAmount": 6000.0,
+        "remainingAmount": 4200.0,
+        "monthlyPayment": 180.0,
+        "interestRate": 8.5,
+        "currency": "EUR",
+        "startDate": "2023-06-01"
+      }
+    ],
+    "subscriptions": [
+      {
+        "subscriptionId": "sub_markku_001",
+        "name": "Spotify Premium",
+        "monthlyCost": 10.99,
+        "category": "entertainment",
+        "currency": "EUR",
+        "startDate": "2020-01-01"
+      },
+      {
+        "subscriptionId": "sub_markku_002",
+        "name": "Mobile Phone Plan",
+        "monthlyCost": 29.9,
+        "category": "utilities",
+        "currency": "EUR",
+        "startDate": "2022-01-01"
+      }
+    ],
+    "monthlyExpenses": {
+      "rent": 780,
+      "groceries": 250,
+      "transportation": 150,
+      "utilities": 55,
+      "other": 600
+    }
+  },
+  "communicationStyle": {
+    "formality": "semi-formal",
+    "language": "casual_adult_finnish",
+    "prefersVoice": 0.3,
+    "callsWhenEmotional": true
+  },
+  "relationshipState": {
+    "trustLevel": 0.5,
+    "visitCount": 0,
+    "lastVisit": null,
+    "adviceFollowedHistory": []
+  }
+}
