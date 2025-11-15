@@ -11,11 +11,15 @@ Instead of managing your own money (which can create pressure), you act as a **p
 ### Key Features
 
 - **AI Characters**: Each character has unique personality traits, financial situations, and communication styles
+- **Dynamic Language Support**: Characters and boss automatically match your language (Finnish/English)
 - **Real Financial Problems**: Budgeting, debt management, saving, investing, scam awareness, etc.
 - **Consequence System**: Characters return later to show results of your advice (good or bad)
 - **Boss Reviews**: Your boss reviews your performance every 3-5 sessions, provides feedback and learning materials
 - **Progression**: Build reputation (0-100), skill level (0-10), and topic expertise
-- **Finnish Context**: All characters speak Finnish, scenarios use Finnish financial context
+- **Beginner-Friendly**: Easier scenarios and gentler evaluation for first 10 sessions
+- **RAG-Powered Evaluation**: Research-backed Finnish financial literacy standards for advice assessment
+- **Thread History**: View past conversations, track completed and active consultations
+- **Finnish Context**: Scenarios use Finnish financial context (ASP-tili, Takuu-Säätiö, etc.)
 
 ### Inspirations
 
@@ -444,98 +448,84 @@ We use **n8n workflows** to generate new characters and scenarios using AI.
 
 ## ✅ TODO List
 
-### Priority: Missing Features
+### ✨ Recently Completed
 
-#### 1. AI-Based Evaluation System ⭐⭐⭐
+- [x] **AI-Based Evaluation System** - Using evaluatorAgent with RAG knowledge base
+- [x] **Dynamic Language Matching** - Characters/boss respond in advisor's language
+- [x] **Thread History System** - View past conversations (active/completed)
+- [x] **Difficulty Progression** - Beginner-friendly scenario selection
+- [x] **Gentler Evaluation** - Scaled penalties/rewards for skill levels
+- [x] **Knowledge Base** - Pre-generated Finnish financial literacy RAG database
 
-**Current**: Heuristic keyword matching
-**Goal**: Use evaluatorAgent for comprehensive AI evaluation
+### Priority: High-Value Improvements
 
-**Tasks**:
+#### 1. Tutorial Scenarios ⭐⭐⭐
 
-- [ ] Rewrite `src/mastra/tools/evaluate-advice-tool.ts` to call evaluatorAgent
-- [ ] Parse 4-dimension evaluation (quality, communication, learning, character progression)
-- [ ] Update `src/mastra/game/orchestrator.ts` to use new evaluation format
-- [ ] Store detailed evaluation in session history
-- [ ] Use evaluation insights for skill progression
+**Goal**: Create 3-5 guaranteed-success scenarios for onboarding
 
-**Files**:
-
-- `src/mastra/tools/evaluate-advice-tool.ts`
-- `src/mastra/game/orchestrator.ts`
-- `src/mastra/agents/evaluator-agent.ts`
-
-#### 2. Multi-Character Sessions ⭐⭐⭐
-
-**Goal**: Enable group consultations (couples, families, friends)
+**Why**: Give players early wins to build confidence and understand mechanics
 
 **Tasks**:
 
-- [ ] Design group scenario structure in JSON
-- [ ] Create `characters/group-scenarios.json`
-- [ ] Update `src/mastra/agents/character-agent-factory.ts` for group dynamics
-- [ ] Modify `src/mastra/game/orchestrator.ts` to handle multiple characters
-- [ ] Update `src/play-interactive.ts` to display group conversations
-- [ ] Implement character-to-character interactions (not just advisor)
-- [ ] Add relationship dynamics between characters
+- [ ] Create `characters/tutorial-scenarios.json` with 3 easy scenarios
+- [ ] Topics: basic budgeting, simple saving advice, empathetic communication
+- [ ] Set difficulty < 0.2, generous evaluation
+- [ ] Mark as "completed" after first playthrough
+- [ ] Add tutorial mode flag to advisor state
 
 **Files**:
 
-- `characters/group-scenarios.json` (new)
-- `src/mastra/agents/character-agent-factory.ts`
-- `src/mastra/game/orchestrator.ts`
-- `src/play-interactive.ts`
-- `src/mastra/types/game-types.ts`
-
-#### 3. Character Memory & Context Awareness ⭐⭐
-
-**Goal**: Characters remember previous sessions and reference past advice
-
-**Tasks**:
-
-- [ ] Add conversation history storage to CharacterPoolManager
-- [ ] Update `Character` type with memory fields
-- [ ] Inject previous session context into character agent prompts
-- [ ] Characters reference past advice when returning
-- [ ] Build trust/relationship metric over multiple sessions
-- [ ] Display relationship level in stats
-
-**Files**:
-
+- `characters/tutorial-scenarios.json` (new)
 - `src/mastra/game/character-pool-manager.ts`
-- `src/mastra/agents/character-agent-factory.ts`
 - `src/mastra/types/game-types.ts`
 
----
+#### 2. More Characters & Scenarios ⭐⭐⭐
 
-### Enhancement Tasks
+**Goal**: Expand content variety and replayability
 
-#### 4. Boss Review Improvements ⭐
-
-**Goal**: More impactful and interactive boss reviews
+**Why**: Current pool of 4 characters x 10 scenarios gets repetitive
 
 **Tasks**:
 
-- [ ] Implement interactive quiz system during reviews
-- [ ] Add quiz questions to boss review output
-- [ ] Player answers quizzes to prove learning
-- [ ] Quiz performance affects skill progression
-- [ ] Unlock new character difficulty tiers based on boss relationship
-- [ ] More nuanced feedback based on consultation patterns
+- [ ] Generate 8+ new characters covering diverse demographics
+- [ ] Create 20+ scenarios across all topics (budgeting, debt, saving, investing, insurance, retirement, credit, scams)
+- [ ] Include edge cases: unemployment, divorce, inheritance, medical debt, student loans
+- [ ] Range of difficulties (0.2 - 0.8)
+- [ ] Multi-part scenario chains with branching outcomes
 
 **Files**:
 
-- `src/mastra/agents/god-boss-agent.ts`
-- `src/play-interactive.ts`
-- `src/mastra/types/game-types.ts` (Quiz types already defined)
+- `characters/individuals/*.json`
+- `characters/scenarios/*.json`
 
-#### 5. Character Relationship System ⭐
+#### 3. Progress Visualization ⭐⭐
+
+**Goal**: Show clear progress and growth to motivate players
+
+**Why**: Hard to see improvement between boss reviews
+
+**Tasks**:
+
+- [ ] Add mini-feedback after each conversation (1-line hint on what went well/wrong)
+- [ ] Show skill trend graph in stats (last 10 sessions)
+- [ ] Display "Next boss review in X sessions" counter
+- [ ] Celebrate milestones (first success, skill level up, reputation thresholds)
+- [ ] Add achievements system (help 10 clients, master budgeting topic, etc.)
+
+**Files**:
+
+- `src/play-tui.tsx`
+- `src/mastra/game/orchestrator.ts`
+
+#### 4. Character Relationship System ⭐⭐
 
 **Goal**: Track and visualize relationships with each character
 
+**Why**: Returning characters should show trust/relationship progression
+
 **Tasks**:
 
-- [ ] Implement relationship tracking per character
+- [ ] Implement per-character trust tracking (already in code, needs UI)
 - [ ] Display trust levels in stats view
 - [ ] Relationship affects character openness/honesty
 - [ ] High-trust characters unlock deeper scenarios
@@ -545,132 +535,120 @@ We use **n8n workflows** to generate new characters and scenarios using AI.
 **Files**:
 
 - `src/mastra/game/character-pool-manager.ts`
-- `src/play-interactive.ts`
+- `src/play-tui.tsx`
 - `src/mastra/types/game-types.ts`
 
-#### 6. Voice Message Simulation ⭐
+---
 
-**Goal**: Differentiate voice messages from text messages
+### Enhancement Tasks
+
+#### 5. Interactive Boss Review Quizzes ⭐
+
+**Goal**: Make boss reviews more engaging with interactive learning
 
 **Tasks**:
 
-- [ ] Different CLI display for voice vs text messages
-- [ ] Show urgency/emotion indicators (🔊 calm, 😰 urgent, 😊 excited)
-- [ ] Format voice transcriptions differently
-- [ ] Characters use voice based on `communicationStyle.prefersVoice`
-- [ ] Emotional situations trigger voice messages
+- [ ] Implement quiz UI in TUI (already generated in review JSON)
+- [ ] Player answers quizzes to prove learning
+- [ ] Quiz performance affects skill progression multiplier
+- [ ] Track quiz completion and scores
+- [ ] Unlock advanced topics after passing quizzes
 
 **Files**:
 
-- `src/play-interactive.ts`
+- `src/play-tui.tsx`
+- `src/mastra/game/orchestrator.ts`
+- `src/mastra/types/game-types.ts` (Quiz types already defined)
+
+#### 6. Multi-Character Group Sessions ⭐
+
+**Goal**: Enable couple/family consultations
+
+**Tasks**:
+
+- [ ] Design group scenario structure (couple with disagreement, parent-child, etc.)
+- [ ] Handle multiple character agents in same consultation
+- [ ] Characters can respond to each other, not just advisor
+- [ ] Track relationship dynamics between group members
+- [ ] More complex evaluation (mediator skills, balance, fairness)
+
+**Files**:
+
+- `characters/group-scenarios.json` (new)
 - `src/mastra/agents/character-agent-factory.ts`
+- `src/mastra/game/orchestrator.ts`
 
-#### 7. Progress Dashboard ⭐
+#### 7. Voice Message Indicators ⭐
 
-**Goal**: Comprehensive stats tracking and visualization
-
-**Tasks**:
-
-- [ ] Create `src/play-dashboard.ts` for stats view
-- [ ] Create `src/mastra/game/stats-tracker.ts`
-- [ ] Show all characters helped with outcomes
-- [ ] Topic expertise visualization
-- [ ] Success rate by character type
-- [ ] Session history timeline
-- [ ] Export stats to JSON
-
-**Files**:
-
-- `src/play-dashboard.ts` (new)
-- `src/mastra/game/stats-tracker.ts` (new)
-
-#### 8. Learning Materials Integration
-
-**Goal**: Provide real Finnish financial literacy resources
+**Goal**: Better visual distinction for voice vs text
 
 **Tasks**:
 
-- [ ] Create `learning-materials/` directory
-- [ ] Curate Finnish financial literacy links (OP, Nordea, Talous.fi, etc.)
-- [ ] Create `src/mastra/game/learning-system.ts`
-- [ ] Track which materials advisor has "completed"
-- [ ] Implement quiz system for materials
-- [ ] Material completion boosts topic expertise
-- [ ] Boss assigns relevant materials based on weaknesses
+- [ ] Show voice indicator (🔊) for voice messages in TUI
+- [ ] Display urgency/emotion: 🔊 calm, 😰 urgent, 😊 excited
+- [ ] Format voice transcriptions with "(Voice message)" prefix
+- [ ] Characters use voice based on `communicationStyle.prefersVoice`
 
 **Files**:
 
-- `learning-materials/` (new)
-- `src/mastra/game/learning-system.ts` (new)
-- `src/mastra/agents/god-boss-agent.ts`
+- `src/play-tui.tsx`
 
-#### 9. Difficulty Scaling
+#### 8. Learning Materials Tracking
 
-**Goal**: Dynamic difficulty based on performance
+**Goal**: Make boss-assigned learning materials actionable
 
 **Tasks**:
 
-- [ ] Implement difficulty filtering in CharacterPoolManager
-- [ ] Game Master considers advisor skill when selecting characters
-- [ ] Bad performance = more practice scenarios (easier)
-- [ ] Good performance = complex multi-issue cases
-- [ ] Difficulty affects reputation gains/losses
-- [ ] Unlock "expert" characters at high skill levels
+- [ ] Track which materials advisor has "viewed"
+- [ ] Show materials in stats view
+- [ ] Boss reviews reference previous materials if not followed
+- [ ] Material completion gives small topic expertise boost
 
 **Files**:
 
-- `src/mastra/agents/game-master.ts`
-- `src/mastra/game/character-pool-manager.ts`
+- `src/mastra/game/orchestrator.ts`
+- `src/mastra/types/game-types.ts`
+- `src/play-tui.tsx`
 
 ---
 
 ### Quick Wins
 
-#### 10. Better Error Handling
+#### 9. Save/Load Game ⭐
 
-**Tasks**:
-
-- [ ] Add try/catch blocks to all agent invocations
-- [ ] Graceful error recovery in interactive CLI
-- [ ] User-friendly error messages
-- [ ] Log errors to file for debugging
-
-**Files**:
-
-- All agent files
-- `src/play-interactive.ts`
-- `src/mastra/game/orchestrator.ts`
-
-#### 11. Save/Load Game
+**Goal**: Persist game progress between sessions
 
 **Tasks**:
 
 - [ ] Create `src/mastra/game/save-manager.ts`
-- [ ] Save advisor state to JSON after each session
-- [ ] Load previous game on startup
-- [ ] Multiple save slots
-- [ ] Auto-save functionality
+- [ ] Auto-save advisor state after each consultation
+- [ ] Load previous game on startup (or offer "New Game")
+- [ ] Show save timestamp and stats preview
+- [ ] Multiple save slots (optional)
 
 **Files**:
 
 - `src/mastra/game/save-manager.ts` (new)
-- `src/play-interactive.ts`
+- `src/play-tui.tsx`
 - `saves/` directory (new)
 
-#### 12. More Characters & Scenarios
+#### 10. Better Error Recovery ⭐
+
+**Goal**: Handle AI failures gracefully without crashing
 
 **Tasks**:
 
-- [ ] Use n8n to generate 10+ more characters
-- [ ] Cover all financial topics (loans, insurance, retirement, credit score, etc.)
-- [ ] Include diverse age groups (teens, young adults, middle-aged, seniors)
-- [ ] Include diverse financial situations (student, unemployed, entrepreneur, etc.)
-- [ ] Create complex multi-topic scenarios
+- [ ] Add retry logic for failed agent calls (3 attempts)
+- [ ] Fallback to simpler prompts if complex ones fail
+- [ ] User-friendly error messages ("Character is thinking... please wait")
+- [ ] Log detailed errors to file for debugging
+- [ ] Never lose progress on error
 
 **Files**:
 
-- `characters/characters.json`
-- `characters/scenarios.json`
+- `src/mastra/game/orchestrator.ts`
+- `src/mastra/tools/*.ts`
+- `src/play-tui.tsx`
 
 ---
 
