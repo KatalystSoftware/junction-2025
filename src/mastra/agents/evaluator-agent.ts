@@ -13,12 +13,13 @@
  */
 
 import { Agent } from "@mastra/core/agent";
+import { queryFinnishKnowledgeTool } from "../tools/query-finnish-knowledge-tool.ts";
 
 export const evaluatorAgent = new Agent({
   name: "evaluatorAgent",
   model: "google/gemini-2.5-flash",
   tools: {
-    queryFinnishKnowledge: true, // Access to Finnish financial literacy knowledge base
+    queryFinnishKnowledge: queryFinnishKnowledgeTool,
   },
   instructions: `
 ═══════════════════════════════════════════════════════════════════════
