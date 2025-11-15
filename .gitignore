@@ -11,3 +11,4 @@ dist
 !knowledge-base.db
 !knowledge-base.db-shm
 !knowledge-base.db-wal
+logs/

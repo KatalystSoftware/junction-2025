@@ -48,14 +48,12 @@ async function testRetryLogic() {
   assert.equal(attempts, 3);
 }
 
-async function run() {
-  await testConcurrencyLimit();
-  await testRetryLogic();
-  console.log("agent-execution.test.ts passed");
-}
+describe("agent-execution", () => {
+  test("enforces concurrency limit", async () => {
+    await testConcurrencyLimit();
+  });
 
-run().catch((err) => {
-  console.error(err);
-  process.exit(1);
+  test("retries transient failures", async () => {
+    await testRetryLogic();
+  });
 });
-

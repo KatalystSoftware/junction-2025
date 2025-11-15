@@ -21,6 +21,38 @@ const CACHE_FILE = path.join(CACHE_DIR, "ai-test-cache.json");
 
 let cache: CacheFile | null = null;
 
+async function logAgentTiming(params: {
+  scope: string;
+  name: string;
+  prompt: string;
+  durationMs: number;
+  mode: CacheMode;
+  logFilePath?: string;
+}) {
+  const logPath =
+    params.logFilePath ||
+    process.env.AGENT_TIMING_LOG_FILE ||
+    path.join(process.cwd(), "logs", "agent-timings.log");
+
+  const entry = {
+    timestamp: new Date().toISOString(),
+    scope: params.scope,
+    name: params.name,
+    durationMs: params.durationMs,
+    cacheMode: params.mode,
+    promptLength: params.prompt.length,
+  };
+
+  const line = JSON.stringify(entry) + "\n";
+
+  try {
+    await fs.mkdir(path.dirname(logPath), { recursive: true });
+    await fs.appendFile(logPath, line, "utf8");
+  } catch {
+    // Ignore logging errors in production and tests
+  }
+}
+
 async function loadCache(): Promise<CacheFile> {
   if (cache) return cache;
   try {
@@ -56,10 +88,22 @@ export async function cachedGenerate<T>(
   name: string,
   prompt: string,
   generate: () => Promise<{ text: string } & T>,
+  options?: { timingLogFile?: string },
 ): Promise<{ text: string } & T> {
   const mode = getMode();
   if (mode === "off") {
-    return runAgentOperation(generate);
+    const start = Date.now();
+    const result = await runAgentOperation(generate);
+    const durationMs = Date.now() - start;
+    await logAgentTiming({
+      scope,
+      name,
+      prompt,
+      durationMs,
+      mode,
+      logFilePath: options?.timingLogFile,
+    });
+    return result;
   }
 
   const cacheFile = await loadCache();
@@ -76,7 +120,17 @@ export async function cachedGenerate<T>(
     return { text: existing.text } as { text: string } & T;
   }
 
+  const start = Date.now();
   const result = await runAgentOperation(generate);
+  const durationMs = Date.now() - start;
+  await logAgentTiming({
+    scope,
+    name,
+    prompt,
+    durationMs,
+    mode,
+    logFilePath: options?.timingLogFile,
+  });
   const text = result.text ?? "";
 
   if (existing) {
