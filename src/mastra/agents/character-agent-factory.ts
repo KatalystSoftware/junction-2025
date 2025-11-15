@@ -116,11 +116,7 @@ async function buildTransactionContext(character: Character): Promise<string> {
       "../simulation/simulation-engine.ts"
     );
 
-    // Get database path from a hypothetical advisor state
-    // In practice, this should be passed down from the orchestrator
-    const dbPath = `saves/advisor_default.db`;
-
-    const engine = new SimulationEngine(dbPath);
+    const engine = new SimulationEngine();
     const state = engine.getCharacterState(character.characterId);
 
     if (!state) {

@@ -9,8 +9,6 @@
 import { SimulationEngine } from "./mastra/simulation/simulation-engine.ts";
 import { characterPool } from "./mastra/game/character-pool-manager.ts";
 
-const DB_PATH = "saves/advisor_default.db";
-
 async function main() {
   // Load character pool
   await characterPool.loadFromFiles(
@@ -50,7 +48,7 @@ async function main() {
   console.log(`\n📊 Transactions for ${character.name}\n`);
   console.log("=".repeat(100));
 
-  const engine = new SimulationEngine(DB_PATH);
+  const engine = new SimulationEngine();
 
   // Get character state
   const state = engine.getCharacterState(characterId);

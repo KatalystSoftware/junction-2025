@@ -39,7 +39,7 @@ src/mastra/simulation/
 import { SimulationEngine } from "./simulation/simulation-engine.ts";
 
 // Create engine with database path
-const engine = new SimulationEngine("saves/advisor_123.db");
+const engine = new SimulationEngine();
 ```
 
 ### 2. Initialize Character
@@ -369,7 +369,7 @@ expect(txns.filter((t) => t.category === "coffee").length).toBeGreaterThan(10);
 ### Integration Tests
 
 ```typescript
-const engine = new SimulationEngine(":memory:"); // In-memory DB for tests
+const engine = new SimulationEngine();
 
 // Initialize character
 engine.initializeCharacter(character);
