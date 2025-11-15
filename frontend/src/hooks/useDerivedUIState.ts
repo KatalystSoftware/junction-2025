@@ -25,7 +25,13 @@ interface AdvisorState {
 }
 
 interface ThreadHistories {
-  [threadId: string]: Array<{ role: "user" | "assistant"; content: string }>;
+  [threadId: string]: Array<{
+    role: "user" | "assistant";
+    content: string;
+    isVoice?: boolean;
+    audioUrl?: string;
+    voiceUrgency?: string;
+  }>;
 }
 
 interface CharacterInfo {
@@ -92,13 +98,26 @@ export function useDerivedUIState(
     const result: Record<string, Message[]> = {};
 
     for (const [threadId, history] of Object.entries(threadHistories)) {
-      result[threadId] = history.map((msg, idx) => ({
-        id: `${threadId}-${idx}`,
-        contactId: threadId,
-        role: msg.role === "user" ? ("user" as const) : ("contact" as const),
-        content: msg.content,
-        timestamp: new Date(), // Server doesn't persist timestamps
-      }));
+      result[threadId] = history.map((msg, idx) => {
+        const message: Message = {
+          id: `${threadId}-${idx}`,
+          contactId: threadId,
+          role: msg.role === "user" ? ("user" as const) : ("contact" as const),
+          content: msg.content,
+          timestamp: new Date(), // Server doesn't persist timestamps
+        };
+
+        // Add voice data if present
+        if (msg.isVoice && msg.audioUrl) {
+          message.type = "voice";
+          message.audioUrl = msg.audioUrl;
+          message.voiceUrgency = msg.voiceUrgency as any;
+          // Estimate duration from audio (or default to 0)
+          message.duration = 0; // TODO: Could parse audio to get actual duration
+        }
+
+        return message;
+      });
     }
 
     return result;

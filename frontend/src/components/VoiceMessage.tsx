@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Play, Pause } from "lucide-react";
-import type { Message } from "./WhatsAppInterface";
+import type { Message } from "../types/ui";
 
 interface VoiceMessageProps {
   message: Message;
@@ -9,23 +9,79 @@ interface VoiceMessageProps {
 export function VoiceMessage({ message }: VoiceMessageProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Initialize audio element
+  useEffect(() => {
+    if (message.audioUrl) {
+      audioRef.current = new Audio(message.audioUrl);
+
+      // Set up event listeners
+      audioRef.current.addEventListener("ended", () => {
+        setIsPlaying(false);
+        setProgress(0);
+        if (progressIntervalRef.current) {
+          clearInterval(progressIntervalRef.current);
+        }
+      });
+
+      audioRef.current.addEventListener("error", (e) => {
+        console.error("Audio playback error:", e);
+        setIsPlaying(false);
+      });
+    }
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
+    };
+  }, [message.audioUrl]);
 
   const handlePlayPause = () => {
+    if (!audioRef.current) {
+      // Fallback to simulation if no audio URL
+      if (isPlaying) {
+        setIsPlaying(false);
+      } else {
+        setIsPlaying(true);
+        const duration = message.duration || 0;
+        const interval = setInterval(() => {
+          setProgress((prev) => {
+            if (prev >= 100) {
+              clearInterval(interval);
+              setIsPlaying(false);
+              return 0;
+            }
+            return prev + (100 / duration) * 0.1;
+          });
+        }, 100);
+      }
+      return;
+    }
+
     if (isPlaying) {
+      audioRef.current.pause();
       setIsPlaying(false);
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
     } else {
+      audioRef.current.play();
       setIsPlaying(true);
-      // Simulate playback
-      const duration = message.duration || 0;
-      const interval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 100) {
-            clearInterval(interval);
-            setIsPlaying(false);
-            return 0;
-          }
-          return prev + (100 / duration) * 0.1;
-        });
+
+      // Update progress bar
+      progressIntervalRef.current = setInterval(() => {
+        if (audioRef.current) {
+          const current = audioRef.current.currentTime;
+          const duration = audioRef.current.duration;
+          setProgress((current / duration) * 100);
+        }
       }, 100);
     }
   };

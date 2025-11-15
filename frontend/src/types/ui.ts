@@ -24,4 +24,6 @@ export interface Message {
   timestamp: Date;
   type?: "text" | "voice";
   duration?: number; // duration in seconds for voice messages
+  audioUrl?: string; // base64 data URL for voice messages
+  voiceUrgency?: "calm" | "concerned" | "urgent" | "excited";
 }

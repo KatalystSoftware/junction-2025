@@ -135,7 +135,7 @@ interface InitResponse {
   isNewSession: boolean;
   threadHistories?: Record<
     string,
-    Array<{ role: "user" | "assistant"; content: string }>
+    Array<{ role: "user" | "assistant"; content: string; isVoice?: boolean; audioUrl?: string; voiceUrgency?: string }>
   >;
   threadMetadata?: Record<string, ThreadMetadata>;
 }
@@ -148,7 +148,7 @@ app.post("/init", async (c) => {
     let isNewSession = false;
     let threadHistories: Record<
       string,
-      Array<{ role: "user" | "assistant"; content: string }>
+      Array<{ role: "user" | "assistant"; content: string; isVoice?: boolean; audioUrl?: string; voiceUrgency?: string }>
     > = {};
     let threadMetadata: Record<string, ThreadMetadata> = {};
 
@@ -217,7 +217,7 @@ interface StartConsultationRequest {
   advisorState: AdvisorState;
   threadHistories?: Record<
     string,
-    Array<{ role: "user" | "assistant"; content: string }>
+    Array<{ role: "user" | "assistant"; content: string; isVoice?: boolean; audioUrl?: string; voiceUrgency?: string }>
   >;
   threadMetadata?: Record<string, ThreadMetadata>;
 }
@@ -277,7 +277,19 @@ app.post("/start-consultation", async (c) => {
 
       // Add character's initial messages
       for (const msg of gameResponse.messages) {
-        existingHistory.push({ role: "assistant" as const, content: msg });
+        const messageEntry: { role: "assistant"; content: string; isVoice?: boolean; audioUrl?: string; voiceUrgency?: string } = {
+          role: "assistant" as const,
+          content: msg,
+        };
+
+        // Include voice data if present
+        if (gameResponse.voiceNeeded && gameResponse.voiceConfig) {
+          messageEntry.isVoice = true;
+          messageEntry.audioUrl = gameResponse.voiceConfig.audioUrl;
+          messageEntry.voiceUrgency = gameResponse.voiceConfig.urgency;
+        }
+
+        existingHistory.push(messageEntry);
       }
 
       historiesMap.set(threadId, existingHistory);
@@ -346,10 +358,10 @@ interface SendMessageRequest {
   threadId: string;
   message: string;
   advisorState: AdvisorState;
-  conversationHistory?: Array<{ role: "user" | "assistant"; content: string }>;
+  conversationHistory?: Array<{ role: "user" | "assistant"; content: string; isVoice?: boolean; audioUrl?: string; voiceUrgency?: string }>;
   threadHistories?: Record<
     string,
-    Array<{ role: "user" | "assistant"; content: string }>
+    Array<{ role: "user" | "assistant"; content: string; isVoice?: boolean; audioUrl?: string; voiceUrgency?: string }>
   >;
   threadMetadata?: Record<string, ThreadMetadata>;
 }
@@ -425,7 +437,19 @@ app.post("/send-message", async (c) => {
       // Add character's response messages
       if (gameResponse.messages) {
         for (const msg of gameResponse.messages) {
-          threadHistory.push({ role: "assistant" as const, content: msg });
+          const messageEntry: { role: "assistant"; content: string; isVoice?: boolean; audioUrl?: string; voiceUrgency?: string } = {
+            role: "assistant" as const,
+            content: msg,
+          };
+
+          // Include voice data if present
+          if (gameResponse.voiceNeeded && gameResponse.voiceConfig) {
+            messageEntry.isVoice = true;
+            messageEntry.audioUrl = gameResponse.voiceConfig.audioUrl;
+            messageEntry.voiceUrgency = gameResponse.voiceConfig.urgency;
+          }
+
+          threadHistory.push(messageEntry);
         }
       }
 
