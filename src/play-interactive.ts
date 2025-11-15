@@ -564,48 +564,92 @@ function displayFinancialResults(
     print("\n💰 FINANCIAL IMPACT", colors.bright + colors.yellow);
     print("─".repeat(70), colors.dim);
 
+    let hasAnyImpact = false;
+
     // Show primary outcomes
-    if (proj.totalSaved > 0) {
-      print(
-        `📈 Client will save: ${Math.round(proj.totalSaved)}€ over ${proj.projectionPeriodMonths} months`,
-        colors.green,
-      );
-      if (proj.monthlySavings > 0) {
+    if (proj.totalSaved !== undefined && proj.totalSaved !== 0) {
+      hasAnyImpact = true;
+      if (proj.totalSaved > 0) {
         print(
-          `   (${Math.round(proj.monthlySavings)}€/month average)`,
-          colors.cyan,
+          `📈 Client will save: ${Math.round(proj.totalSaved)}€ over ${proj.projectionPeriodMonths} months`,
+          colors.green,
         );
+        if (proj.monthlySavings > 0) {
+          print(
+            `   (${Math.round(proj.monthlySavings)}€/month average)`,
+            colors.cyan,
+          );
+        }
+      } else {
+        // Negative savings = spending more than income
+        print(
+          `⚠️  WARNING: Client will lose ${Math.abs(Math.round(proj.totalSaved))}€ over ${proj.projectionPeriodMonths} months`,
+          colors.red + colors.bright,
+        );
+        if (proj.monthlySavings < 0) {
+          print(
+            `   Deficit: ${Math.abs(Math.round(proj.monthlySavings))}€/month`,
+            colors.red,
+          );
+        }
       }
     }
 
-    if (proj.totalDebtReduced > 0) {
-      print(
-        `💳 Debt reduced by: ${Math.round(proj.totalDebtReduced)}€`,
-        colors.green,
-      );
-      if (proj.totalInterestSaved > 0) {
+    if (proj.totalDebtReduced !== undefined && proj.totalDebtReduced !== 0) {
+      hasAnyImpact = true;
+      if (proj.totalDebtReduced > 0) {
         print(
-          `   Interest saved: ${Math.round(proj.totalInterestSaved)}€`,
+          `💳 Debt reduced by: ${Math.round(proj.totalDebtReduced)}€`,
           colors.green,
         );
-      }
-      if (proj.monthsToGoal > 0 && proj.monthsToGoal < 999) {
+        if (proj.totalInterestSaved > 0) {
+          print(
+            `   Interest saved: ${Math.round(proj.totalInterestSaved)}€`,
+            colors.green,
+          );
+        }
+        if (proj.monthsToGoal > 0 && proj.monthsToGoal < 999) {
+          print(
+            `   Debt-free in: ${Math.round(proj.monthsToGoal)} months`,
+            colors.cyan,
+          );
+        }
+      } else {
+        // Negative debt reduction = taking on more debt
         print(
-          `   Debt-free in: ${Math.round(proj.monthsToGoal)} months`,
-          colors.cyan,
+          `⚠️  WARNING: Debt will INCREASE by ${Math.abs(Math.round(proj.totalDebtReduced))}€`,
+          colors.red + colors.bright,
+        );
+        print(
+          `   This advice will make the problem WORSE!`,
+          colors.red + colors.bright,
         );
       }
     }
 
     // Emergency fund progress
     if (proj.emergencyFundProgress > 0 && proj.emergencyFundProgress < 1) {
+      hasAnyImpact = true;
       const progressPercent = Math.round(proj.emergencyFundProgress * 100);
       print(
         `🛡️  Emergency Fund: ${progressPercent}% toward 3-month goal`,
         colors.cyan,
       );
     } else if (proj.emergencyFundProgress >= 1) {
+      hasAnyImpact = true;
       print(`🛡️  Emergency Fund: GOAL REACHED! ✅`, colors.green);
+    }
+
+    // If no financial impact at all, show a message
+    if (!hasAnyImpact) {
+      print(
+        `ℹ️  No measurable financial impact in the short term`,
+        colors.yellow,
+      );
+      print(
+        `   This advice may have other benefits (emotional, behavioral, etc.)`,
+        colors.dim,
+      );
     }
   }
 
