@@ -27,17 +27,26 @@ const __dirname = path.dirname(__filename);
 const KNOWLEDGE_BASES = [
   {
     language: "fi",
-    path: path.join(__dirname, "../../../knowledge-base/finnish-financial-literacy.md"),
+    path: path.join(
+      __dirname,
+      "../../../knowledge-base/finnish-financial-literacy.md",
+    ),
     indexName: "finnish_financial_literacy",
   },
   {
     language: "sv",
-    path: path.join(__dirname, "../../../knowledge-base/swedish-financial-literacy.md"),
+    path: path.join(
+      __dirname,
+      "../../../knowledge-base/swedish-financial-literacy.md",
+    ),
     indexName: "swedish_financial_literacy",
   },
   {
     language: "en",
-    path: path.join(__dirname, "../../../knowledge-base/english-financial-literacy.md"),
+    path: path.join(
+      __dirname,
+      "../../../knowledge-base/english-financial-literacy.md",
+    ),
     indexName: "english_financial_literacy",
   },
 ];
@@ -142,7 +151,9 @@ function chunkMarkdown(content: string, language: string): Chunk[] {
   while ((match = sectionRegex.exec(content)) !== null) {
     if (lastIndex > 0) {
       const prevMatch = sections[sections.length - 1];
-      prevMatch.content = content.substring(prevMatch.start, match.index).trim();
+      prevMatch.content = content
+        .substring(prevMatch.start, match.index)
+        .trim();
     }
 
     sections.push({
@@ -413,7 +424,9 @@ export async function initializeEnhancedKnowledgeBase() {
     results.reduce((sum, r) => sum + r.embeddingCount, 0) +
     newsResult.embeddingCount;
 
-  console.log(`   \n   Total: ${totalChunks} chunks, ${totalEmbeddings} embeddings`);
+  console.log(
+    `   \n   Total: ${totalChunks} chunks, ${totalEmbeddings} embeddings`,
+  );
 
   return {
     languages: results,

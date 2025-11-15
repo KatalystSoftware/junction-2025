@@ -56,7 +56,8 @@ export async function fetchFinnishFinancialNews(
 
   const mockArticles: NewsArticle[] = [
     {
-      title: "Suomen Pankki julkaisi uudet taloudelliset lukutaitoohjeet vuodelle 2025",
+      title:
+        "Suomen Pankki julkaisi uudet taloudelliset lukutaitoohjeet vuodelle 2025",
       summary:
         "Bank of Finland releases new financial literacy guidelines focusing on digital economy and sustainable investing.",
       content: `Suomen Pankki on julkaissut päivitetyt taloudelliset lukutaitoohjeet, jotka korostavat digitaalisen talouden osaamista ja vastuullista sijoittamista.
@@ -74,7 +75,8 @@ export async function fetchFinnishFinancialNews(
     },
     {
       title: "Nuorten velkaantuminen kasvussa - asiantuntijat huolissaan",
-      summary: "Youth debt levels rising - experts concerned about quick loan services.",
+      summary:
+        "Youth debt levels rising - experts concerned about quick loan services.",
       content: `Tuoreen tutkimuksen mukaan 18-25-vuotiaiden velkaantuminen on kasvanut 15% viimeisen vuoden aikana. Asiantuntijat syyttävät pikavipalveluita ja kulutusluottojen helppoa saatavuutta.
 
       Konsumentverket suosittelee:
@@ -106,7 +108,8 @@ export async function fetchFinnishFinancialNews(
     },
     {
       title: "New tax benefits for pension savings in 2026",
-      summary: "Finnish government announces enhanced tax benefits for private pension savings.",
+      summary:
+        "Finnish government announces enhanced tax benefits for private pension savings.",
       content: `The Finnish government has announced new tax incentives for private pension savings starting in 2026. The changes aim to encourage long-term savings and reduce dependency on public pensions.
 
       Key changes:
@@ -141,7 +144,9 @@ export async function fetchFinnishFinancialNews(
   // Filter by language if specified
   let filteredArticles = mockArticles;
   if (language !== "all") {
-    filteredArticles = mockArticles.filter((article) => article.language === language);
+    filteredArticles = mockArticles.filter(
+      (article) => article.language === language,
+    );
   }
 
   // Simple keyword matching for demonstration
@@ -249,9 +254,7 @@ export async function summarizeFinancialNews(
       .describe(
         "A concise summary of the key financial news and their implications for personal finance",
       ),
-    keyPoints: z
-      .array(z.string())
-      .describe("3-5 key takeaways from the news"),
+    keyPoints: z.array(z.string()).describe("3-5 key takeaways from the news"),
     actionableAdvice: z
       .string()
       .describe("Practical advice based on the current news"),

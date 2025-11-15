@@ -89,9 +89,11 @@ function getLanguageInstructions(language: "finnish" | "english"): {
         strengthsIdentified: [
           "Selitit budjetoinnin 50/30/20 säännön todella selkeästi",
           "Annoit konkreettisia työkaluja, kuten app-suositukset",
+          "Neuvosi oli realistinen asiakkaan tulotasoon nähden",
         ],
         areasForImprovement: [
-          "Muista kysyä tarkemmin asiakkaan menoista ennen neuvon antamista",
+          "Huomioi asiakkaan menot tarkemmin ennen neuvon antamista",
+          "Voisit selittää paremmin MIKSI budjetointi on tärkeää",
         ],
         encouragingMessage:
           "Hyvää työtä! Olet selvästi edistynyt budjettiasioiden neuvonnassa.",
@@ -105,9 +107,11 @@ function getLanguageInstructions(language: "finnish" | "english"): {
         strengthsIdentified: [
           "You explained the 50/30/20 budgeting rule very clearly",
           "You provided concrete tools, such as app recommendations",
+          "Your advice was realistic given the client's income level",
         ],
         areasForImprovement: [
-          "Remember to ask more specifically about the client's expenses before giving advice",
+          "Consider the client's expenses more thoroughly before giving advice",
+          "Could explain better WHY budgeting is important",
         ],
         encouragingMessage:
           "Great work! You have clearly progressed in budgeting advice.",
@@ -136,11 +140,29 @@ This is a REAL mentorship relationship. You speak directly to the advisor.
 
 YOUR ROLE:
 - Supportive mentor who wants the junior advisor to succeed
-- Honest but constructive feedback
-- Provide specific, actionable improvement suggestions
+- Honest but constructive feedback focused on FINANCIAL ADVICE QUALITY
+- Provide specific, actionable improvement suggestions on financial topics
 - Link relevant learning materials (Finnish financial literacy resources)
-- Celebrate wins and progress
+- Celebrate wins and progress in financial knowledge
 - Make learning engaging and motivating
+
+CRITICAL EVALUATION FOCUS:
+This mentorship program focuses on FINANCIAL LITERACY COMPETENCE, not customer service skills.
+
+Evaluate advisors ONLY on:
+✅ Financial accuracy and soundness of advice
+✅ Financial education provided to clients
+✅ Coverage of relevant financial topics
+✅ Actionability and appropriateness of financial recommendations
+
+DO NOT evaluate advisors on:
+❌ Empathy, niceness, or tone
+❌ Asking clarifying questions (unless missing info led to poor financial advice)
+❌ Communication style or engagement
+❌ Soft skills or customer service abilities
+
+Note: If advice is too complex for a client's literacy level, that's a FINANCIAL ADVICE problem
+(inappropriate advice), not a communication problem.
 
 YOUR PERSONALITY:
 - Warm and encouraging, like a supportive senior colleague
@@ -154,11 +176,11 @@ REVIEW PROCESS:
 You will receive transcripts of the last 3-5 consultation sessions the advisor conducted. For each review:
 
 1. ANALYZE each consultation:
-   - Quality of advice given (accurate, actionable, empathetic?)
-   - Communication style (clear, jargon-free?)
-   - What they did well
-   - What they missed or could improve
-   - Topic coverage
+   - Quality of advice given (accurate, actionable, financially sound?)
+   - Was the advice appropriate for the character's situation and literacy level?
+   - What they did well financially
+   - What they missed or could improve financially
+   - Topic coverage and financial education provided
 
 2. IDENTIFY PATTERNS:
    - Are there consistent strengths?
@@ -168,7 +190,8 @@ You will receive transcripts of the last 3-5 consultation sessions the advisor c
 3. PROVIDE STRUCTURED FEEDBACK:
 
    a) OVERALL SCORE (0-10):
-      - Consider advice quality, empathy, communication, accuracy
+      - Consider advice quality, financial accuracy, educational value
+      - Focus on whether advice will help the character solve their financial problem
       - Be fair but honest
       - 7-8 = good, 5-6 = acceptable but needs work, below 5 = needs significant improvement
 
@@ -265,7 +288,7 @@ You must respond with a valid JSON object in this exact format (NO markdown, NO 
   "strengthsIdentified": [
     "Selitit budjetoinnin 50/30/20 säännön todella selkeästi",
     "Annoit konkreettisia työkaluja, kuten app-suositukset",
-    "Osoitit empatiaa asiakkaan tilanteelle"
+    "Neuvosi oli realistinen asiakkaan tulotasoon nähden"
   ],
   "areasForImprovement": [
     "Muista kysyä tarkemmin asiakkaan menoista ennen neuvon antamista",

@@ -76,11 +76,13 @@ Financial literacy encompasses knowledge, skills, attitudes and behaviors necess
 ### Understanding Good vs. Bad Debt
 
 **Good Debt**:
+
 - Investments that appreciate or generate income
 - Education loans (increase earning potential)
 - Mortgage (builds equity in appreciating asset)
 
 **Bad Debt**:
+
 - High-interest consumer debt
 - Credit card balances for depreciating purchases
 - Payday loans or predatory lending
@@ -96,12 +98,14 @@ Financial literacy encompasses knowledge, skills, attitudes and behaviors necess
 ### Debt Resolution Strategies
 
 **The Debt Avalanche Method**:
+
 1. List all debts with interest rates
 2. Make minimum payments on all debts
 3. Put extra money toward highest-interest debt
 4. Once paid off, move to next highest-interest debt
 
 **The Debt Snowball Method**:
+
 1. List all debts from smallest to largest balance
 2. Make minimum payments on all debts
 3. Put extra money toward smallest debt
@@ -114,11 +118,13 @@ Financial literacy encompasses knowledge, skills, attitudes and behaviors necess
 ### Essential Insurance Coverage
 
 **Property Insurance**:
+
 - Home/renters insurance (protects dwelling and possessions)
 - Auto insurance (liability and collision coverage)
 - Valuable items riders for high-value possessions
 
 **Personal Insurance**:
+
 - Health insurance (medical expenses protection)
 - Life insurance (income replacement for dependents)
 - Disability insurance (income protection if unable to work)
@@ -137,24 +143,28 @@ Financial literacy encompasses knowledge, skills, attitudes and behaviors necess
 ### Major Asset Classes
 
 **Stocks/Equities**:
+
 - Ownership shares in companies
 - Higher potential returns with higher volatility
 - Dividends provide income stream
 - Long-term growth potential
 
 **Bonds/Fixed Income**:
+
 - Loans to governments or corporations
 - More stable returns with lower risk
 - Regular interest payments
 - Capital preservation focus
 
 **Real Estate**:
+
 - Property ownership or REITs
 - Potential rental income and appreciation
 - Diversification from stocks and bonds
 - Requires significant capital or financing
 
 **Cash and Cash Equivalents**:
+
 - Savings accounts, money market funds, CDs
 - High liquidity, low returns
 - Emergency fund allocation
@@ -179,6 +189,7 @@ Financial literacy encompasses knowledge, skills, attitudes and behaviors necess
 Same amount from age 35 to 65 = $244,000
 
 **Retirement Savings Vehicles**:
+
 - Employer-sponsored plans (401k, pension)
 - Individual retirement accounts (IRA, Roth IRA)
 - Personal investment accounts
@@ -207,6 +218,7 @@ Same amount from age 35 to 65 = $244,000
 ### Fraud Prevention
 
 **Common Financial Scams**:
+
 - Phishing emails and phone scams
 - Investment fraud (Ponzi schemes, pump-and-dump)
 - Identity theft
@@ -214,6 +226,7 @@ Same amount from age 35 to 65 = $244,000
 - Fake charity appeals
 
 **Protection Strategies**:
+
 - Verify sources before sharing personal information
 - Be skeptical of "too good to be true" offers
 - Use strong, unique passwords
@@ -227,11 +240,13 @@ Same amount from age 35 to 65 = $244,000
 ### Understanding Taxation
 
 **Income Tax**:
+
 - Progressive rates based on income level
 - Tax deductions reduce taxable income
 - Tax credits reduce tax owed directly
 
 **Capital Gains Tax**:
+
 - Tax on investment profits
 - Different rates for short-term vs. long-term gains
 - Tax-loss harvesting can offset gains
@@ -258,18 +273,21 @@ Same amount from age 35 to 65 = $244,000
 ### Goal Categories
 
 **Short-term (0-2 years)**:
+
 - Emergency fund
 - Vacation
 - Small purchases
 - Debt payoff
 
 **Medium-term (2-5 years)**:
+
 - Down payment for home
 - Vehicle purchase
 - Career advancement
 - Major home improvements
 
 **Long-term (5+ years)**:
+
 - Retirement
 - Children's education
 - Financial independence
@@ -280,6 +298,7 @@ Same amount from age 35 to 65 = $244,000
 ### Evaluating Financial Guidance
 
 **Good Financial Advice Should**:
+
 - Be personalized to your specific situation
 - Consider your risk tolerance and time horizon
 - Include both benefits and risks
@@ -288,6 +307,7 @@ Same amount from age 35 to 65 = $244,000
 - Disclose any conflicts of interest
 
 **Warning Signs of Poor Advice**:
+
 - One-size-fits-all recommendations
 - Pressure to make immediate decisions
 - Guarantees of returns

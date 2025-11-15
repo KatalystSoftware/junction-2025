@@ -26,6 +26,7 @@ Instead of relying solely on vector similarity scores, the enhanced system uses 
 - **Fallback Options**: Includes keyword-based and diversity-aware reranking methods
 
 **Methods available**:
+
 - `rerankResults()`: AI-powered semantic reranking
 - `keywordRerank()`: Fast keyword-based reranking
 - `diversityRerank()`: Ensures diverse results from different sections
@@ -40,6 +41,7 @@ Stay current with the latest Finnish financial news:
 - **Actionable insights**: Provides practical advice based on current news
 
 **News sources** (in production):
+
 - YLE News (Finnish public broadcaster)
 - Kauppalehti (Finnish business news)
 - Helsingin Sanomat (Finland's largest newspaper)
@@ -61,6 +63,7 @@ The `queryKnowledgeEnhancedTool` provides comprehensive search capabilities:
 ```
 
 **Returns**:
+
 - Knowledge base results with relevance scores
 - Recent news articles and summaries
 - Language breakdown of results
@@ -106,6 +109,7 @@ npm run init:knowledge-base:enhanced
 ```
 
 This will:
+
 - Load and chunk all three language knowledge bases
 - Generate embeddings for each language (Google text-embedding-004)
 - Create separate vector indices for each language
@@ -113,6 +117,7 @@ This will:
 - Create a news index with current articles
 
 **Expected output**:
+
 ```
 🚀 Initializing Enhanced Multi-language Knowledge Base...
 
@@ -166,7 +171,7 @@ const result = await queryKnowledgeEnhancedTool.execute({
   language: "all",
   includeNews: true,
   useSemanticReranking: true,
-  topK: 5
+  topK: 5,
 });
 
 console.log(result.summary);
@@ -196,7 +201,11 @@ const evaluatorAgent = new Agent({
 ### Semantic Reranking
 
 ```typescript
-import { rerankResults, keywordRerank, diversityRerank } from "./rag/semantic-reranker.ts";
+import {
+  rerankResults,
+  keywordRerank,
+  diversityRerank,
+} from "./rag/semantic-reranker.ts";
 
 // AI-powered semantic reranking
 const reranked = await rerankResults(query, candidates, topK);
@@ -214,7 +223,7 @@ const diverseResults = diversityRerank(candidates, topK);
 import {
   fetchFinnishFinancialNews,
   summarizeFinancialNews,
-  getNewsEnhancedContext
+  getNewsEnhancedContext,
 } from "./rag/news-integration.ts";
 
 // Fetch recent news
@@ -234,21 +243,21 @@ const context = await getNewsEnhancedContext("market trends", "all");
 const finnishResults = await queryKnowledgeEnhancedTool.execute({
   query: "velkaantuminen",
   language: "fi",
-  topK: 3
+  topK: 3,
 });
 
 // Query only Swedish sources
 const swedishResults = await queryKnowledgeEnhancedTool.execute({
   query: "skuldsättning",
   language: "sv",
-  topK: 3
+  topK: 3,
 });
 
 // Query only English sources
 const englishResults = await queryKnowledgeEnhancedTool.execute({
   query: "debt management",
   language: "en",
-  topK: 3
+  topK: 3,
 });
 ```
 
@@ -282,9 +291,9 @@ Replace the mock implementation in `news-integration.ts` with real API calls:
 // YLE News API
 const yleNews = await fetch("https://external.api.yle.fi/v1/...", {
   headers: {
-    "app_id": process.env.YLE_APP_ID,
-    "app_key": process.env.YLE_APP_KEY
-  }
+    app_id: process.env.YLE_APP_ID,
+    app_key: process.env.YLE_APP_KEY,
+  },
 });
 
 // NewsAPI.org for Finnish sources
@@ -293,8 +302,8 @@ const newsApi = await fetch("https://newsapi.org/v2/everything", {
     q: query,
     language: "fi",
     sources: "kauppalehti,hs-fi",
-    apiKey: process.env.NEWS_API_KEY
-  }
+    apiKey: process.env.NEWS_API_KEY,
+  },
 });
 ```
 
@@ -348,17 +357,21 @@ describe("Enhanced RAG System", () => {
     const result = await queryKnowledgeEnhancedTool.execute({
       query: "budgeting",
       language: "all",
-      topK: 5
+      topK: 5,
     });
 
     expect(result.knowledgeBaseResults.length).toBeGreaterThan(0);
-    expect(result.languageBreakdown.fi + result.languageBreakdown.sv + result.languageBreakdown.en).toBe(5);
+    expect(
+      result.languageBreakdown.fi +
+        result.languageBreakdown.sv +
+        result.languageBreakdown.en,
+    ).toBe(5);
   });
 
   test("should include news when requested", async () => {
     const result = await queryKnowledgeEnhancedTool.execute({
       query: "interest rates",
-      includeNews: true
+      includeNews: true,
     });
 
     expect(result.newsResults).toBeDefined();
@@ -369,10 +382,10 @@ describe("Enhanced RAG System", () => {
     const result = await queryKnowledgeEnhancedTool.execute({
       query: "pension planning",
       useSemanticReranking: true,
-      topK: 5
+      topK: 5,
     });
 
-    result.knowledgeBaseResults.forEach(r => {
+    result.knowledgeBaseResults.forEach((r) => {
       expect(r.rerankScore).toBeDefined();
       expect(r.relevanceExplanation).toBeDefined();
     });
@@ -393,6 +406,7 @@ describe("Enhanced RAG System", () => {
 **Error**: Semantic reranking times out
 
 **Solution**:
+
 1. Reduce topK to query fewer results
 2. Disable reranking: `useSemanticReranking: false`
 3. Use `keywordRerank` instead of `rerankResults`
@@ -402,6 +416,7 @@ describe("Enhanced RAG System", () => {
 **Error**: No results for a specific language
 
 **Solution**:
+
 1. Check that the language knowledge base file exists
 2. Verify the index was created: `sqlite3 knowledge-base.db ".tables"`
 3. Re-run initialization: `npm run init:knowledge-base:enhanced`

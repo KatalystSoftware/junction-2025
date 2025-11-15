@@ -45,7 +45,9 @@ async function updateNewsIndex() {
         5,
       );
       allArticles.push(...newsResults.articles);
-      console.log(`   ✓ Found ${newsResults.articles.length} ${lang.toUpperCase()} articles`);
+      console.log(
+        `   ✓ Found ${newsResults.articles.length} ${lang.toUpperCase()} articles`,
+      );
     } catch (error: any) {
       console.error(`   ⚠️  Error fetching ${lang} news:`, error.message);
     }
