@@ -164,6 +164,17 @@ export interface CompletedMaterial {
   quizScore?: number;
 }
 
+export interface ThreadInfo {
+  threadId: string;
+  characterId: string;
+  scenarioId: string;
+  status: ThreadStatus;
+  createdAt: string;
+  lastMessageAt: string;
+}
+
+export type ThreadStatus = "active" | "awaiting_response" | "resolved";
+
 export interface AdvisorState {
   advisorId: string;
   reputation: number; // 0-100
@@ -172,8 +183,8 @@ export interface AdvisorState {
   topicsExpertise: TopicExpertise;
   sessionHistory: ConsultationSession[];
   totalClientsHelped: number;
-  currentClient: string | null; // characterId
-  currentScenario: string | null; // scenarioId
+  activeClients: string[]; // Array of characterIds currently in consultation
+  activeThreads: Record<string, ThreadInfo>; // Map of threadId to thread info
   godBossRelationship: number; // 0-10: how pleased your boss is
   learningMaterials: CompletedMaterial[];
   totalSessions: number;
@@ -199,10 +210,15 @@ export interface ConversationThread {
   characterName: string;
   scenarioId: string;
   messages: ConversationMessage[];
-  status: "active" | "awaiting_response" | "resolved";
+  status: ThreadStatus;
   unreadCount: number;
   createdAt: string;
   lastMessageAt: string;
+  characterInfo?: {
+    name: string;
+    age: number;
+    occupation: string;
+  };
 }
 
 // ============================================================================
