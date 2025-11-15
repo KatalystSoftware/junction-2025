@@ -5,15 +5,12 @@
  * Interactive terminal UI with multi-thread support using Ink (React for CLIs)
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { render, Box, Text, useInput, useApp } from "ink";
 import { writeFileSync, mkdirSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
-import {
-  characterPool,
-  getTrustTierInfo,
-} from "./mastra/index.ts";
+import { characterPool, getTrustTierInfo } from "./mastra/index.ts";
 import {
   startNewConsultation,
   handleAdvisorResponse,
@@ -52,7 +49,10 @@ import { Modal } from "./components/Modal.tsx";
  * Save voice audio from base64 data URL to a temporary file
  * Returns the file path for playback
  */
-function saveVoiceAudio(audioDataUrl: string, characterName: string): string | null {
+function saveVoiceAudio(
+  audioDataUrl: string,
+  characterName: string,
+): string | null {
   try {
     // Extract base64 data from data URL
     const base64Match = audioDataUrl.match(/^data:audio\/([^;]+);base64,(.+)$/);
@@ -62,10 +62,10 @@ function saveVoiceAudio(audioDataUrl: string, characterName: string): string | n
     }
 
     const [, extension, base64Data] = base64Match;
-    const audioBuffer = Buffer.from(base64Data, 'base64');
+    const audioBuffer = Buffer.from(base64Data, "base64");
 
     // Create temp directory for voice files
-    const voiceDir = join(tmpdir(), 'junction-voice-messages');
+    const voiceDir = join(tmpdir(), "junction-voice-messages");
     try {
       mkdirSync(voiceDir, { recursive: true });
     } catch (err) {
@@ -74,8 +74,8 @@ function saveVoiceAudio(audioDataUrl: string, characterName: string): string | n
 
     // Generate filename with timestamp
     const timestamp = Date.now();
-    const sanitizedName = characterName.replace(/[^a-z0-9]/gi, '_');
-    const filename = `voice_${sanitizedName}_${timestamp}.${extension || 'mp3'}`;
+    const sanitizedName = characterName.replace(/[^a-z0-9]/gi, "_");
+    const filename = `voice_${sanitizedName}_${timestamp}.${extension || "mp3"}`;
     const filepath = join(voiceDir, filename);
 
     // Write audio file
@@ -111,6 +111,25 @@ interface ThreadData {
 }
 
 // ============================================================================
+// Loading Spinner Component
+// ============================================================================
+
+function LoadingSpinner() {
+  const [frame, setFrame] = useState(0);
+  const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFrame((prev) => (prev + 1) % frames.length);
+    }, 80);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return <Text color="yellow">{frames[frame]}</Text>;
+}
+
+// ============================================================================
 // Main App Component
 // ============================================================================
 
@@ -123,7 +142,7 @@ function App() {
   const [inputValue, setInputValue] = useState("");
   const [statusMessage, setStatusMessage] = useState("Initializing...");
   const [activePanel, setActivePanel] = useState<
-    "stats" | "relationships" | "progress" | "achievements" | null
+    "stats" | "relationships" | "progress" | "achievements" | "help" | null
   >(null);
   const [showAllThreads, setShowAllThreads] = useState(false); // Toggle active/all threads
   const [isLoading, setIsLoading] = useState(false);
@@ -247,21 +266,22 @@ function App() {
   useInput((input, key) => {
     if (isLoading) return;
 
-    // Quit
-    if (input === "q") {
+    // Quit (only when not typing in input box)
+    if (input === "q" && !inputValue) {
       exit();
       return;
     }
 
-    // Toggle panels (s=stats, r=relationships, p=progress, a=achievements)
+    // Toggle panels (s=stats, r=relationships, p=progress, a=achievements, ?=help)
     const panelKeys: Record<
       string,
-      "stats" | "relationships" | "progress" | "achievements"
+      "stats" | "relationships" | "progress" | "achievements" | "help"
     > = {
       s: "stats",
       r: "relationships",
       p: "progress",
       a: "achievements",
+      "?": "help",
     };
 
     if (panelKeys[input] && !inputValue) {
@@ -529,12 +549,13 @@ function App() {
       return;
     }
 
-    // Text input handling (only if no choices available)
+    // Text input handling (only if no choices available and thread not completed)
     const currentThread = currentThreadId ? threads.get(currentThreadId) : null;
     const hasChoices =
       currentThread?.adviceChoices && currentThread.adviceChoices.length > 0;
+    const isCompleted = currentThread?.status === "completed";
 
-    if (!hasChoices) {
+    if (!hasChoices && !isCompleted) {
       if (key.return && inputValue.trim()) {
         handleSendMessage(inputValue.trim());
         setInputValue("");
@@ -634,7 +655,9 @@ function App() {
         // Save voice audio if present
         let audioFilePath: string | undefined;
         if (consultation.voiceNeeded && consultation.voiceConfig?.audioUrl) {
-          audioFilePath = saveVoiceAudio(consultation.voiceConfig.audioUrl, characterName) || undefined;
+          audioFilePath =
+            saveVoiceAudio(consultation.voiceConfig.audioUrl, characterName) ||
+            undefined;
         }
 
         // Create new thread
@@ -669,7 +692,9 @@ function App() {
 
         // Show status with voice playback instructions if voice message
         if (consultation.voiceNeeded && audioFilePath) {
-          setStatusMessage(`New client: ${characterName} | 🎧 Voice message saved! Play: open "${audioFilePath}"`);
+          setStatusMessage(
+            `New client: ${characterName} | 🎧 Voice message saved! Play: open "${audioFilePath}"`,
+          );
         } else {
           setStatusMessage(`New client: ${characterName}`);
         }
@@ -810,7 +835,9 @@ function App() {
       // Save voice audio if present
       let audioFilePath: string | undefined;
       if (response.voiceNeeded && response.voiceConfig?.audioUrl) {
-        audioFilePath = saveVoiceAudio(response.voiceConfig.audioUrl, thread.characterName) || undefined;
+        audioFilePath =
+          saveVoiceAudio(response.voiceConfig.audioUrl, thread.characterName) ||
+          undefined;
       }
 
       // Add messages to thread
@@ -901,7 +928,9 @@ function App() {
           );
         } else if (response.voiceNeeded && audioFilePath) {
           // Voice message received
-          setStatusMessage(`🎧 Voice message received! Play: open "${audioFilePath}"`);
+          setStatusMessage(
+            `🎧 Voice message received! Play: open "${audioFilePath}"`,
+          );
         } else {
           setStatusMessage("Type your response");
         }
@@ -1054,17 +1083,20 @@ function App() {
             <ProgressPanel advisorState={advisorState} />
           ) : activePanel === "achievements" ? (
             <AchievementsPanel advisorState={advisorState} />
+          ) : activePanel === "help" ? (
+            <HelpPanel />
           ) : (
             <>
-              <Text dimColor>Commands:</Text>
-              <Text dimColor>1-9 Switch</Text>
-              <Text dimColor>n New</Text>
-              <Text dimColor>h History</Text>
-              <Text dimColor>s Stats</Text>
-              <Text dimColor>r Relationships</Text>
-              <Text dimColor>p Progress</Text>
-              <Text dimColor>a Achievements</Text>
-              <Text dimColor>q Quit</Text>
+              <Text dimColor color="cyan">
+                💡 Quick Tips:
+              </Text>
+              <Text dimColor> </Text>
+              <Text dimColor>Press ? for help</Text>
+              <Text dimColor> </Text>
+              <Text dimColor>View your stats,</Text>
+              <Text dimColor>relationships, and</Text>
+              <Text dimColor>progress using the</Text>
+              <Text dimColor>hotkeys below!</Text>
             </>
           )}
         </Box>
@@ -1089,7 +1121,15 @@ function App() {
         paddingX={1}
         justifyContent="space-between"
       >
-        <Text color={isLoading ? "yellow" : "cyan"}>{statusMessage}</Text>
+        <Box>
+          {isLoading && (
+            <>
+              <LoadingSpinner />
+              <Text> </Text>
+            </>
+          )}
+          <Text color={isLoading ? "yellow" : "cyan"}>{statusMessage}</Text>
+        </Box>
         <Box>
           <Text dimColor>
             Rep: {advisorState.reputation} | Skill:{" "}
@@ -1099,22 +1139,66 @@ function App() {
         </Box>
       </Box>
 
+      {/* Persistent hotkey footer */}
+      <Box borderStyle="single" borderColor="gray" paddingX={1}>
+        <Text dimColor>
+          {(() => {
+            const currentThread = currentThreadId
+              ? threads.get(currentThreadId)
+              : null;
+            const hasChoices =
+              currentThread?.adviceChoices &&
+              currentThread.adviceChoices.length > 0;
+
+            if (activePanel) {
+              return `[${activePanel === "help" ? "?" : activePanel[0]}] Close • [?] Help • [q] Quit`;
+            }
+
+            if (hasChoices) {
+              return `🎯 [1-${currentThread!.adviceChoices!.length}] Select advice • [n] New • [h] History • [?] Help • [q] Quit`;
+            }
+
+            return `[n] New${currentThreadId ? " • [1-9] Switch thread" : ""} • [h] History • [s] Stats • [r] Relationships • [p] Progress • [a] Achievements • [?] Help • [q] Quit`;
+          })()}
+        </Text>
+      </Box>
+
       {/* Input box */}
       <Box borderStyle="single" borderColor="green" paddingX={1}>
-        {currentThreadId &&
-        threads.get(currentThreadId)?.adviceChoices &&
-        threads.get(currentThreadId)!.adviceChoices!.length > 0 ? (
-          <Text dimColor>
-            Select an option above (1-
-            {threads.get(currentThreadId)!.adviceChoices!.length})
-          </Text>
-        ) : (
-          <>
-            <Text color="green">💼 You: </Text>
-            <Text>{inputValue}</Text>
-            <Text color="gray">█</Text>
-          </>
-        )}
+        {(() => {
+          const currentThread = currentThreadId
+            ? threads.get(currentThreadId)
+            : null;
+          const hasChoices =
+            currentThread?.adviceChoices &&
+            currentThread.adviceChoices.length > 0;
+          const isCompleted = currentThread?.status === "completed";
+
+          if (isCompleted) {
+            return (
+              <Text dimColor color="red">
+                ⚠️ This consultation is complete - cannot send messages
+              </Text>
+            );
+          }
+
+          if (hasChoices) {
+            return (
+              <Text dimColor>
+                Select an option above (1-{currentThread!.adviceChoices!.length}
+                )
+              </Text>
+            );
+          }
+
+          return (
+            <>
+              <Text color="green">💼 You: </Text>
+              <Text>{inputValue}</Text>
+              <Text color="gray">█</Text>
+            </>
+          );
+        })()}
       </Box>
     </Box>
   );
@@ -1140,10 +1224,14 @@ function ConversationPanel({ thread }: { thread: ThreadData }) {
         // Get voice icon based on urgency
         const getVoiceIcon = (urgency?: string) => {
           switch (urgency) {
-            case "urgent": return "🎤❗";
-            case "concerned": return "🎤⚠️";
-            case "excited": return "🎤✨";
-            default: return "🎤";
+            case "urgent":
+              return "🎤❗";
+            case "concerned":
+              return "🎤⚠️";
+            case "excited":
+              return "🎤✨";
+            default:
+              return "🎤";
           }
         };
 
@@ -1156,7 +1244,8 @@ function ConversationPanel({ thread }: { thread: ThreadData }) {
             ) : (
               <>
                 <Text color="blue">
-                  {msg.isVoice ? getVoiceIcon(msg.voiceUrgency) : "💬"} {thread.characterName}: "{msg.content}"
+                  {msg.isVoice ? getVoiceIcon(msg.voiceUrgency) : "💬"}{" "}
+                  {thread.characterName}: "{msg.content}"
                 </Text>
                 {msg.isVoice && msg.audioFilePath && (
                   <Text dimColor color="cyan">
@@ -1189,6 +1278,21 @@ function ConversationPanel({ thread }: { thread: ThreadData }) {
           <Text dimColor>Press 1-{thread.adviceChoices.length} to select</Text>
         </Box>
       )}
+
+      {/* Warning for completed threads */}
+      {thread.status === "completed" && (
+        <Box flexDirection="column" paddingTop={1}>
+          <Box borderStyle="single" borderColor="red" paddingX={1}>
+            <Text bold color="red">
+              ✓ CONSULTATION COMPLETE
+            </Text>
+          </Box>
+          <Text dimColor color="yellow">
+            This conversation has ended. Press 'n' for a new client or [1-9] to
+            switch threads.
+          </Text>
+        </Box>
+      )}
     </Box>
   );
 }
@@ -1201,7 +1305,7 @@ function StatsPanel({ advisorState }: { advisorState: AdvisorState }) {
   return (
     <Box flexDirection="column">
       <Text bold color="yellow">
-        📊 Stats
+        📊 Stats [Press s to close]
       </Text>
       <Text dimColor>Rep: {advisorState.reputation}/100</Text>
       <Text dimColor>Skill: {advisorState.skillLevel.toFixed(1)}/10</Text>
@@ -1271,7 +1375,7 @@ function RelationshipsPanel({ advisorState }: { advisorState: AdvisorState }) {
     return (
       <Box flexDirection="column">
         <Text bold color="yellow">
-          💝 Relationships
+          💝 Relationships [Press r to close]
         </Text>
         <Text dimColor>No characters met yet</Text>
         <Text dimColor> </Text>
@@ -1284,7 +1388,7 @@ function RelationshipsPanel({ advisorState }: { advisorState: AdvisorState }) {
   return (
     <Box flexDirection="column">
       <Text bold color="yellow">
-        💝 Relationships ({relationships.length})
+        💝 Relationships ({relationships.length}) [Press r to close]
       </Text>
       <Text dimColor> </Text>
       {relationships.slice(0, 4).map((rel, index) => {
@@ -1351,7 +1455,7 @@ function ProgressPanel({ advisorState }: { advisorState: AdvisorState }) {
   return (
     <Box flexDirection="column">
       <Text bold color="yellow">
-        📈 Progress
+        📈 Progress [Press p to close]
       </Text>
       <Text dimColor> </Text>
       <Text dimColor>Skill Trend:</Text>
@@ -1380,7 +1484,7 @@ function AchievementsPanel({ advisorState }: { advisorState: AdvisorState }) {
   return (
     <Box flexDirection="column">
       <Text bold color="yellow">
-        🏆 Achievements
+        🏆 Achievements [Press a to close]
       </Text>
       <Text dimColor> </Text>
       <Text color="green">
@@ -1407,6 +1511,55 @@ function AchievementsPanel({ advisorState }: { advisorState: AdvisorState }) {
           <Text dimColor>{achievement.description}</Text>
         </Box>
       ))}
+    </Box>
+  );
+}
+
+// ============================================================================
+// Help Panel Component
+// ============================================================================
+
+function HelpPanel() {
+  return (
+    <Box flexDirection="column">
+      <Text bold color="yellow">
+        ❓ Help [Press ? to close]
+      </Text>
+      <Text dimColor> </Text>
+      <Text bold color="cyan">
+        Thread Management:
+      </Text>
+      <Text dimColor>1-9 Switch thread</Text>
+      <Text dimColor>n New consultation</Text>
+      <Text dimColor>h Toggle history</Text>
+      <Text dimColor> </Text>
+      <Text bold color="cyan">
+        Information Panels:
+      </Text>
+      <Text dimColor>s Stats panel</Text>
+      <Text dimColor>r Relationships</Text>
+      <Text dimColor>p Progress</Text>
+      <Text dimColor>a Achievements</Text>
+      <Text dimColor>? Help (this panel)</Text>
+      <Text dimColor> </Text>
+      <Text bold color="cyan">
+        During Conversation:
+      </Text>
+      <Text dimColor>Type Send message</Text>
+      <Text dimColor>Enter Send</Text>
+      <Text dimColor>1-N Select advice option</Text>
+      <Text dimColor> </Text>
+      <Text bold color="cyan">
+        General:
+      </Text>
+      <Text dimColor>q Quit (not while typing)</Text>
+      <Text dimColor> </Text>
+      <Text dimColor color="green">
+        💡 Tip: Press any panel key
+      </Text>
+      <Text dimColor color="green">
+        again to close that panel!
+      </Text>
     </Box>
   );
 }
@@ -1884,11 +2037,9 @@ function FinalResultsModal({
       <Text dimColor>─────────────────────────</Text>
       <Text
         bold
-        color={coinsEarned >= 8 ? "green" : coinsEarned > 0 ? "yellow" : "red"}
+        color={coinsEarned > 10 ? "green" : coinsEarned > 0 ? "yellow" : "red"}
       >
-        💎 YOU {coinsEarned >= 0 ? "EARNED" : "LOST"}:{" "}
-        {coinsEarned >= 0 ? "+" : ""}
-        {coinsEarned} coins
+        💎 YOU EARNED: +{coinsEarned} coins
       </Text>
 
       {coinsEarned >= 15 && (
