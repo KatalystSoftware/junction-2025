@@ -28,7 +28,7 @@ import type {
 export function createNewAdvisor(advisorId: string): AdvisorState {
   return {
     advisorId,
-    reputation: 65, // Start above middle to give buffer for early mistakes
+    reputation: 70, // Start higher to give more buffer for early mistakes
     skillLevel: 1, // Beginner
     specializations: [],
     topicsExpertise: {
