@@ -265,7 +265,10 @@ export function enhanceTextWithVoiceTags(
     }
     // Occasional whispers for anxiety
     if (personality.emotionality > 0.7 && Math.random() < 0.3) {
-      enhancedText = enhancedText.replace(/\.$/, "... [whispers] En tiedä mitä tehdä.");
+      enhancedText = enhancedText.replace(
+        /\.$/,
+        "... [whispers] En tiedä mitä tehdä.",
+      );
     }
   }
 
@@ -294,7 +297,10 @@ export function enhanceTextWithVoiceTags(
       enhancedText = `[exhales] ${enhancedText}`;
     }
     // Make sarcastic comments more sarcastic
-    if ((lowerText.includes("joo") || lowerText.includes("yeah")) && Math.random() < 0.3) {
+    if (
+      (lowerText.includes("joo") || lowerText.includes("yeah")) &&
+      Math.random() < 0.3
+    ) {
       enhancedText = enhancedText.replace(/(joo|yeah)/i, "[sarcastic] $1");
     }
   }
@@ -308,7 +314,9 @@ export function enhanceTextWithVoiceTags(
   ) {
     // Add laughs to happy messages
     if (
-      (lowerText.includes("kiitos") || lowerText.includes("thanks") || lowerText.includes("great")) &&
+      (lowerText.includes("kiitos") ||
+        lowerText.includes("thanks") ||
+        lowerText.includes("great")) &&
       Math.random() < 0.4
     ) {
       enhancedText = enhancedText.replace(/!/, "! [laughs]");
@@ -321,7 +329,9 @@ export function enhanceTextWithVoiceTags(
 
   // Curious/questioning - add curious tone
   if (
-    (lowerText.includes("?") || lowerText.includes("mitä") || lowerText.includes("miten")) &&
+    (lowerText.includes("?") ||
+      lowerText.includes("mitä") ||
+      lowerText.includes("miten")) &&
     lowerEmotion.includes("uncertain")
   ) {
     if (Math.random() < 0.3) {

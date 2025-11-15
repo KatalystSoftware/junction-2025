@@ -1,0 +1,473 @@
+import { Input } from "./ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { ScrollArea } from "./ui/scroll-area";
+import { Search, Pin } from "lucide-react";
+import type { Contact } from "./WhatsAppInterface";
+import { useState, useEffect } from "react";
+import logoImage from "figma:asset/28e39d27183eb9dbb848b6be8a7c7b00e841cd40.png";
+import { PlayerStatsModal } from "./PlayerStatsModal";
+
+interface AdvisorState {
+  advisorCoins: number;
+  lifetimeSavingsGenerated: number;
+  lifetimeDebtCleared: number;
+  reputation: number;
+  skillLevel: number;
+  totalClientsHelped: number;
+  totalSessions: number;
+  achievementsUnlocked: string[];
+  sessionHistory: any[];
+  currentStreak: number;
+  careerTier: number;
+}
+
+interface ChatSidebarProps {
+  contacts: Contact[];
+  selectedContactId: string | null;
+  onSelectContact: (contactId: string) => void;
+  showChat: boolean;
+  bossContact: Contact;
+  onLogoClick: () => void;
+  advisorState?: AdvisorState;
+}
+
+export function ChatSidebar({
+  contacts,
+  selectedContactId,
+  onSelectContact,
+  showChat,
+  bossContact,
+  onLogoClick,
+  advisorState,
+}: ChatSidebarProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showStatsModal, setShowStatsModal] = useState(false);
+  const [playerName, setPlayerName] = useState("Player");
+
+  // Load player name from localStorage
+  useEffect(() => {
+    const userProfileStr = localStorage.getItem("userProfile");
+    if (userProfileStr) {
+      try {
+        const userProfile = JSON.parse(userProfileStr);
+        if (userProfile.name) {
+          setPlayerName(userProfile.name);
+        }
+      } catch (e) {
+        console.error("Failed to parse userProfile:", e);
+      }
+    }
+  }, []);
+
+  // Calculate level and XP from advisorState
+  const skillLevel = advisorState?.skillLevel || 0;
+  const level = Math.floor(skillLevel) + 1; // Convert 0-10 to 1-11
+  const xpProgress = Math.round((skillLevel % 1) * 100); // Get decimal part as percentage
+  const xpForNextLevel = 100;
+
+  const filteredContacts = contacts.filter((contact) =>
+    contact.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  return (
+    <div
+      className={`w-full md:w-96 md:border-r border-border flex flex-col h-screen ${
+        showChat ? "hidden md:flex" : "flex"
+      }`}
+      style={{ backgroundColor: "var(--card)" }}
+    >
+      {/* Sidebar Header */}
+      <div className="px-4 py-5 border-b border-border">
+        <div className="flex justify-center mb-3">
+          <img
+            src={logoImage}
+            alt="BROKE No more! Logo"
+            className="cursor-pointer transition-transform duration-200 hover:scale-105"
+            style={{
+              height: "48px",
+              width: "auto",
+              objectFit: "contain",
+            }}
+            onClick={onLogoClick}
+          />
+        </div>
+
+        {/* User Profile & Level System */}
+        <div
+          className="flex items-center gap-3 mt-4 cursor-pointer rounded-lg p-2 transition-all duration-200 hover:scale-[1.02] border"
+          onClick={() => setShowStatsModal(true)}
+          style={{
+            backgroundColor: "transparent",
+            borderColor: "transparent",
+            borderRadius: "var(--radius-card)",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "var(--muted)";
+            e.currentTarget.style.borderColor = "var(--border)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "transparent";
+            e.currentTarget.style.borderColor = "transparent";
+          }}
+        >
+          <div className="relative">
+            <Avatar className="w-14 h-14">
+              <AvatarImage
+                src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"
+                alt="Player Avatar"
+              />
+              <AvatarFallback
+                style={{
+                  backgroundColor: "var(--primary)",
+                  color: "var(--primary-foreground)",
+                  fontFamily: "Inter, sans-serif",
+                  fontWeight: "var(--font-weight-medium)",
+                }}
+              >
+                ME
+              </AvatarFallback>
+            </Avatar>
+            <div
+              className="absolute -bottom-1 -right-1 flex items-center justify-center w-6 h-6 rounded-full border-2"
+              style={{
+                backgroundColor: "var(--primary)",
+                borderColor: "var(--card)",
+              }}
+            >
+              <span
+                style={{
+                  fontFamily: "Inter, sans-serif",
+                  fontSize: "var(--text-xs)",
+                  fontWeight: "var(--font-weight-semibold)",
+                  color: "var(--primary-foreground)",
+                }}
+              >
+                {level}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex flex-col">
+                <span
+                  style={{
+                    fontFamily: "Inter, sans-serif",
+                    fontSize: "var(--text-sm)",
+                    fontWeight: "var(--font-weight-semibold)",
+                    color: "var(--card-foreground)",
+                  }}
+                >
+                  {playerName}
+                </span>
+                <span
+                  style={{
+                    fontFamily: "Inter, sans-serif",
+                    fontSize: "var(--text-xs)",
+                    color: "var(--muted-foreground)",
+                    fontWeight: "var(--font-weight-normal)",
+                  }}
+                >
+                  Financial Advisor
+                </span>
+              </div>
+              <span
+                style={{
+                  fontFamily: "Inter, sans-serif",
+                  fontSize: "var(--text-xs)",
+                  color: "var(--muted-foreground)",
+                }}
+              >
+                {xpProgress}/{xpForNextLevel} XP
+              </span>
+            </div>
+            {/* Progress Bar */}
+            <div
+              className="w-full h-2 rounded-full overflow-hidden"
+              style={{
+                backgroundColor: "var(--muted)",
+                filter: "brightness(0.7)",
+              }}
+            >
+              <div
+                className="h-full transition-all duration-300"
+                style={{
+                  width: `${xpProgress}%`,
+                  backgroundColor: "var(--primary)",
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Stats Modal */}
+        <PlayerStatsModal
+          open={showStatsModal}
+          onOpenChange={setShowStatsModal}
+          contacts={contacts}
+          advisorState={advisorState}
+        />
+      </div>
+
+      {/* Contacts List */}
+      <ScrollArea className="flex-1 overflow-y-auto">
+        <div className="divide-y divide-border">
+          {/* Pinned Boss Contact */}
+          <button
+            key={bossContact.id}
+            onClick={() => onSelectContact(bossContact.id)}
+            className="w-full px-4 py-3 flex items-center gap-3 transition-colors"
+            style={{
+              backgroundColor:
+                selectedContactId === bossContact.id
+                  ? "var(--muted)"
+                  : "transparent",
+            }}
+            onMouseEnter={(e) => {
+              if (selectedContactId !== bossContact.id) {
+                e.currentTarget.style.backgroundColor = "var(--muted)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (selectedContactId !== bossContact.id) {
+                e.currentTarget.style.backgroundColor = "transparent";
+              }
+            }}
+          >
+            <div className="relative">
+              <Avatar className="w-12 h-12">
+                <AvatarImage
+                  src={bossContact.avatarImage}
+                  alt={bossContact.name}
+                />
+                <AvatarFallback
+                  style={{
+                    backgroundColor: "var(--primary)",
+                    color: "var(--primary-foreground)",
+                    fontFamily: "Inter, sans-serif",
+                    fontWeight: "var(--font-weight-medium)",
+                  }}
+                >
+                  {bossContact.avatar}
+                </AvatarFallback>
+              </Avatar>
+              {bossContact.online && (
+                <div
+                  className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2"
+                  style={{
+                    backgroundColor: "var(--chart-1)",
+                    borderColor: "var(--card)",
+                  }}
+                />
+              )}
+            </div>
+
+            <div className="flex-1 min-w-0 text-left">
+              <div className="flex items-center justify-between gap-2 mb-0.5">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <Pin
+                    className="w-3.5 h-3.5 rotate-45"
+                    style={{
+                      color: "var(--primary)",
+                      fill: "var(--primary)",
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span
+                    className="truncate"
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: "var(--text-base)",
+                      fontWeight: "var(--font-weight-medium)",
+                      color: "var(--card-foreground)",
+                    }}
+                  >
+                    {bossContact.name}
+                  </span>
+                </div>
+                <span
+                  style={{
+                    fontFamily: "Inter, sans-serif",
+                    fontSize: "var(--text-xs)",
+                    color: "var(--muted-foreground)",
+                    flexShrink: 0,
+                  }}
+                >
+                  {bossContact.timestamp}
+                </span>
+              </div>
+
+              {/* Player's Boss Tag */}
+              <div className="mb-1">
+                <span
+                  className="inline-block px-2 py-0.5 rounded-full"
+                  style={{
+                    fontFamily: "Inter, sans-serif",
+                    fontSize: "var(--text-xs)",
+                    fontWeight: "var(--font-weight-medium)",
+                    color: "var(--primary-foreground)",
+                    backgroundColor: "var(--primary)",
+                  }}
+                >
+                  player's boss
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between gap-2">
+                <p
+                  className="flex-1 min-w-0 truncate"
+                  style={{
+                    fontFamily: "Inter, sans-serif",
+                    fontSize: "var(--text-sm)",
+                    color:
+                      bossContact.unreadCount > 0
+                        ? "var(--foreground)"
+                        : "var(--muted-foreground)",
+                    fontWeight:
+                      bossContact.unreadCount > 0
+                        ? "var(--font-weight-medium)"
+                        : "var(--font-weight-normal)",
+                  }}
+                >
+                  {bossContact.lastMessage}
+                </p>
+                {bossContact.unreadCount > 0 && (
+                  <div
+                    className="flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full"
+                    style={{
+                      backgroundColor: "var(--primary)",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: "var(--text-xs)",
+                        fontWeight: "var(--font-weight-semibold)",
+                        color: "var(--primary-foreground)",
+                      }}
+                    >
+                      {bossContact.unreadCount}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </button>
+
+          {filteredContacts.map((contact) => (
+            <button
+              key={contact.id}
+              onClick={() => onSelectContact(contact.id)}
+              className="w-full px-4 py-3 flex items-center gap-3 transition-colors"
+              style={{
+                backgroundColor:
+                  selectedContactId === contact.id
+                    ? "var(--muted)"
+                    : "transparent",
+              }}
+              onMouseEnter={(e) => {
+                if (selectedContactId !== contact.id) {
+                  e.currentTarget.style.backgroundColor = "var(--muted)";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (selectedContactId !== contact.id) {
+                  e.currentTarget.style.backgroundColor = "transparent";
+                }
+              }}
+            >
+              <div className="relative">
+                <Avatar className="w-12 h-12">
+                  <AvatarImage src={contact.avatarImage} alt={contact.name} />
+                  <AvatarFallback
+                    style={{
+                      backgroundColor: "var(--primary)",
+                      color: "var(--primary-foreground)",
+                      fontFamily: "Inter, sans-serif",
+                      fontWeight: "var(--font-weight-medium)",
+                    }}
+                  >
+                    {contact.avatar}
+                  </AvatarFallback>
+                </Avatar>
+                {contact.online && (
+                  <div
+                    className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2"
+                    style={{
+                      backgroundColor: "var(--chart-1)",
+                      borderColor: "var(--card)",
+                    }}
+                  />
+                )}
+              </div>
+
+              <div className="flex-1 min-w-0 text-left">
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <span
+                    className="truncate"
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: "var(--text-base)",
+                      fontWeight: "var(--font-weight-medium)",
+                      color: "var(--card-foreground)",
+                    }}
+                  >
+                    {contact.name}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: "var(--text-xs)",
+                      color: "var(--muted-foreground)",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {contact.timestamp}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <p
+                    className="flex-1 min-w-0 truncate"
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: "var(--text-sm)",
+                      color:
+                        contact.unreadCount > 0
+                          ? "var(--foreground)"
+                          : "var(--muted-foreground)",
+                      fontWeight:
+                        contact.unreadCount > 0
+                          ? "var(--font-weight-medium)"
+                          : "var(--font-weight-normal)",
+                    }}
+                  >
+                    {contact.lastMessage}
+                  </p>
+                  {contact.unreadCount > 0 && (
+                    <div
+                      className="flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full"
+                      style={{
+                        backgroundColor: "var(--primary)",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontFamily: "Inter, sans-serif",
+                          fontSize: "var(--text-xs)",
+                          fontWeight: "var(--font-weight-semibold)",
+                          color: "var(--primary-foreground)",
+                        }}
+                      >
+                        {contact.unreadCount}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </ScrollArea>
+    </div>
+  );
+}

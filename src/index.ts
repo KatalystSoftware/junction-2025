@@ -32,7 +32,7 @@ app.use(
   "/*",
   serveStatic({
     root: "./public",
-  })
+  }),
 );
 
 // SPA fallback - serve index.html for all non-API routes

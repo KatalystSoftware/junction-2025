@@ -643,6 +643,16 @@ export interface GameResponse {
 
   // Advisor's advice (what the player said)
   advisorAdvice?: string[];
+
+  // Thread histories (returned from mutations for cache updates)
+  threadHistories?: Record<
+    string,
+    Array<{ role: "user" | "assistant"; content: string }>
+  >;
+  threadMetadata?: Record<
+    string,
+    { name: string; age: number; occupation: string }
+  >;
 }
 
 // ============================================================================

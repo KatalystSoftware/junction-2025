@@ -36,4 +36,3 @@ describe("agent-model", () => {
     assert.equal(model, "openai/gpt-4.1-mini");
   });
 });
-

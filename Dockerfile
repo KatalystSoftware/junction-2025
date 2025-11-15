@@ -7,13 +7,18 @@ ENV NODE_ENV=production
 # Enable pnpm via corepack (included with Node 22)
 RUN corepack enable
 
-COPY package.json pnpm-lock.yaml ./
+# Copy workspace config and package files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY frontend/package.json ./frontend/
 
+# Install all dependencies (root + frontend workspace)
 RUN pnpm install --frozen-lockfile
 
+# Copy source code
 COPY . .
 
-RUN pnpm build
+# Build frontend only (outputs to public/ for backend to serve)
+RUN pnpm run build:frontend
 
 EXPOSE 8080
 

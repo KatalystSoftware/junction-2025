@@ -11,11 +11,13 @@ The game features AI-powered voice messages using ElevenLabs API, making charact
 ### 1. Consistent Character Voices
 
 Each of the 34 characters has a **permanent, assigned voice** that never changes:
+
 - Based on age (young 18-25, adult 26-45, mature 46+)
 - Gender-appropriate (inferred from Finnish names)
 - Personality-matched (emotional, energetic, calm, anxious)
 
 **Example assignments:**
+
 - **Minna Virtanen** (22F, energetic) → Rachel (expressive young female)
 - **Jukka Laaksonen** (28M, emotional) → Bill (upbeat adult male)
 - **Anna Lehtonen** (48F) → Dorothy (mature calm female)
@@ -24,30 +26,31 @@ Each of the 34 characters has a **permanent, assigned voice** that never changes
 
 Voice messages automatically include emotional tags based on character state:
 
-| Emotion | Tags Used | Example |
-|---------|-----------|---------|
-| Anxious/Scared | `[gulps]`, `[whispers]` | "[gulps] En tiedä mitä teen..." |
-| Crying/Sad | `[crying]`, `[sighs]` | "[crying] Mun tilanne on niin paha..." |
-| Happy/Relieved | `[laughs]`, `[excited]` | "[excited] Kiitos! [laughs]" |
-| Frustrated | `[exhales]`, `[sarcastic]` | "[exhales] [sarcastic] Joo..." |
+| Emotion        | Tags Used                  | Example                                |
+| -------------- | -------------------------- | -------------------------------------- |
+| Anxious/Scared | `[gulps]`, `[whispers]`    | "[gulps] En tiedä mitä teen..."        |
+| Crying/Sad     | `[crying]`, `[sighs]`      | "[crying] Mun tilanne on niin paha..." |
+| Happy/Relieved | `[laughs]`, `[excited]`    | "[excited] Kiitos! [laughs]"           |
+| Frustrated     | `[exhales]`, `[sarcastic]` | "[exhales] [sarcastic] Joo..."         |
 
 ### 3. Dynamic Voice Parameters
 
 While voice ID stays consistent, parameters adjust to emotional state:
 
-| Emotion | Stability | Similarity | Style | Effect |
-|---------|-----------|------------|-------|--------|
-| Scared/Anxious | 0.3 | 0.5 | 0.7 | Trembling, varied |
-| Crying/Sad | 0.2 | 0.6 | 0.8 | Maximum emotion |
-| Frustrated | 0.4 | 0.6 | 0.7 | Tense, stressed |
-| Excited/Happy | 0.5 | 0.7 | 0.6 | Energetic |
-| Calm/Neutral | 0.7 | 0.8 | 0.3 | Stable |
+| Emotion        | Stability | Similarity | Style | Effect            |
+| -------------- | --------- | ---------- | ----- | ----------------- |
+| Scared/Anxious | 0.3       | 0.5        | 0.7   | Trembling, varied |
+| Crying/Sad     | 0.2       | 0.6        | 0.8   | Maximum emotion   |
+| Frustrated     | 0.4       | 0.6        | 0.7   | Tense, stressed   |
+| Excited/Happy  | 0.5       | 0.7        | 0.6   | Energetic         |
+| Calm/Neutral   | 0.7       | 0.8        | 0.3   | Stable            |
 
 ## Voice Mapping
 
 ### Available Voices
 
 **Female Voices:**
+
 - `female_young_energetic` - Rachel (ages 18-25, high energy)
 - `female_young_calm` - Elli (ages 18-25, calmer)
 - `female_adult_warm` - Bella (ages 26-45, friendly)
@@ -55,6 +58,7 @@ While voice ID stays consistent, parameters adjust to emotional state:
 - `female_mature_calm` - Dorothy (ages 46+)
 
 **Male Voices:**
+
 - `male_young_energetic` - Liam (ages 18-25, energetic)
 - `male_young_anxious` - Antoni (ages 18-25, anxious)
 - `male_adult_calm` - Adam (ages 26-45, calm)
@@ -75,6 +79,7 @@ Voice messages are generated based on:
 ### Architecture
 
 **Files:**
+
 - `src/mastra/services/voice-service.ts` - Core voice generation logic
 - `src/mastra/types/game-types.ts` - Type definitions
 - `characters/individuals/*.json` - Character voice assignments
@@ -83,42 +88,48 @@ Voice messages are generated based on:
 ### Key Functions
 
 #### `enhanceTextWithVoiceTags()`
+
 ```typescript
 export function enhanceTextWithVoiceTags(
   text: string,
   emotionalState: string,
   personality: Character["personality"],
-): string
+): string;
 ```
 
 Automatically adds ElevenLabs emotional tags based on:
+
 - Emotional state (scared, happy, sad, etc.)
 - Personality traits (emotionality, impulsiveness)
 - Message content analysis
 
 #### `getVoiceForEmotion()`
+
 ```typescript
 function getVoiceForEmotion(
   character: Character,
   emotionalState: string,
-): EmotionalVoiceMapping
+): EmotionalVoiceMapping;
 ```
 
 Returns voice configuration:
+
 - Uses character's assigned `voiceId` if available
 - Adjusts stability, similarity, and style for emotion
 - Falls back to personality-based selection
 
 #### `generateVoiceMessage()`
+
 ```typescript
 export async function generateVoiceMessage(
   character: Character,
   messageText: string,
   emotionalState: string,
-): Promise<VoiceMessageConfig>
+): Promise<VoiceMessageConfig>;
 ```
 
 Complete voice generation pipeline:
+
 1. Enhances text with emotional tags
 2. Gets appropriate voice configuration
 3. Calls ElevenLabs API
@@ -170,6 +181,7 @@ npx tsx scripts/assign-voice-ids.ts
 ```
 
 The script automatically:
+
 - Infers gender from Finnish name
 - Categorizes age (young/adult/mature)
 - Analyzes personality traits
@@ -183,7 +195,7 @@ Edit character JSON file:
 ```json
 {
   "communicationStyle": {
-    "voiceId": "21m00Tcm4TlvDq8ikWAM"  // Choose from voice mapping
+    "voiceId": "21m00Tcm4TlvDq8ikWAM" // Choose from voice mapping
   }
 }
 ```
@@ -193,6 +205,7 @@ Edit character JSON file:
 Voice messages appear in the terminal with:
 
 **Visual indicator:**
+
 ```
 🔊 [Voice Message] Jukka Laaksonen (Urgent):
    "..." (transcription shown)
@@ -200,6 +213,7 @@ Voice messages appear in the terminal with:
 ```
 
 **Features:**
+
 - Audio auto-plays in terminal (if supported)
 - Transcription always shown as fallback
 - Urgency indicator (calm/concerned/urgent/excited)
@@ -208,6 +222,7 @@ Voice messages appear in the terminal with:
 **Implementation:** `src/play-tui.tsx`
 
 The TUI component:
+
 1. Detects voice messages via `voiceConfig.enabled`
 2. Displays transcription with 🔊 indicator
 3. Plays audio if `audioUrl` is provided
@@ -218,6 +233,7 @@ The TUI component:
 ### No Voice Messages Appearing
 
 **Check:**
+
 1. `ELEVENLABS_API_KEY` is set in `.env`
 2. Character has `voiceId` assigned
 3. Emotional state triggers voice (high emotionality)
@@ -226,6 +242,7 @@ The TUI component:
 ### Voice Sounds Wrong
 
 **Solutions:**
+
 - Verify character's `voiceId` matches their personality
 - Check emotional state is being detected correctly
 - Adjust stability/similarity/style parameters if needed
@@ -233,12 +250,12 @@ The TUI component:
 ### Test Voice Generation:
 
 ```typescript
-import { generateVoiceMessage } from './services/voice-service';
+import { generateVoiceMessage } from "./services/voice-service";
 
 const voiceConfig = await generateVoiceMessage(
   character,
   "Hei, mun rahat loppuu aina kesken kuun!",
-  "stressed and worried"
+  "stressed and worried",
 );
 
 console.log(voiceConfig.audioUrl); // base64 audio data
@@ -247,10 +264,12 @@ console.log(voiceConfig.audioUrl); // base64 audio data
 ## Cost Considerations
 
 **ElevenLabs Pricing (as of 2025):**
+
 - Free tier: 10,000 characters/month
 - Paid: Starting at $5/month
 
 **Optimization:**
+
 - Voice messages trigger ~10-20% of the time
 - Average message: 50-100 characters
 - 100 sessions ≈ 1,000-2,000 characters
@@ -273,6 +292,7 @@ Potential improvements:
 ### Scared Character (High Emotionality)
 
 **Input:**
+
 ```
 Character: Petri (19, anxious)
 Message: "En tiedä mitä teen."
@@ -280,6 +300,7 @@ Emotion: "very anxious and scared"
 ```
 
 **Output:**
+
 ```
 Enhanced: "[gulps] En tiedä mitä teen... [whispers] En tiedä mitä tehdä."
 Voice: Antoni (male_young_anxious)
@@ -289,6 +310,7 @@ Params: stability=0.3, style=0.7
 ### Happy Character (Relieved)
 
 **Input:**
+
 ```
 Character: Minna (22, energetic)
 Message: "Kiitos! Se auttoi paljon!"
@@ -296,6 +318,7 @@ Emotion: "relieved and happy"
 ```
 
 **Output:**
+
 ```
 Enhanced: "[excited] Kiitos! Se auttoi paljon! [laughs]"
 Voice: Rachel (female_young_energetic)

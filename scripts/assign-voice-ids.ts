@@ -157,11 +157,7 @@ function selectVoiceId(character: Character): string {
  * Process all character files and assign voice IDs
  */
 async function assignVoiceIds() {
-  const charactersDir = path.join(
-    process.cwd(),
-    "characters",
-    "individuals",
-  );
+  const charactersDir = path.join(process.cwd(), "characters", "individuals");
 
   try {
     const files = await fs.readdir(charactersDir);

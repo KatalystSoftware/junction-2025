@@ -13,6 +13,7 @@ The RAG system enables the evaluator agent to assess financial advice quality ag
 Three comprehensive knowledge bases covering the Nordic region:
 
 **Finnish (fi)** - Primary focus:
+
 - Bank of Finland Financial Literacy Centre
 - Finnish National Agency for Education (OPH)
 - Yrityskylä Program (85% of 6th graders, 70,000+ students/year)
@@ -22,11 +23,13 @@ Three comprehensive knowledge bases covering the Nordic region:
 - Helsinki Deaconess Foundation (Taloustaito project)
 
 **Swedish (sv)** - Nordic expansion:
+
 - Konsumentverket (Swedish Consumer Agency)
 - Finansinspektionen (Swedish Financial Supervisory Authority)
 - Swedish financial education frameworks
 
 **English (en)** - International standards:
+
 - OECD financial literacy frameworks
 - INFE (International Network on Financial Education)
 - Global financial literacy best practices
@@ -58,12 +61,14 @@ AI-powered relevance scoring improves search quality beyond vector similarity:
 Stay current with latest Finnish financial developments:
 
 **News Sources** (production):
+
 - YLE News (Finnish public broadcaster)
 - Kauppalehti (Finnish business news)
 - Helsingin Sanomat (Finland's largest newspaper)
 - Konsumentverket (Swedish Consumer Agency)
 
 **Features:**
+
 - Topic filtering
 - AI summarization
 - Actionable insights
@@ -72,6 +77,7 @@ Stay current with latest Finnish financial developments:
 ### 4. Research-Backed Evaluation
 
 The evaluator agent uses RAG to:
+
 - Query relevant financial literacy standards
 - Cross-reference advice against best practices
 - Cite specific sources in feedback
@@ -82,21 +88,25 @@ The evaluator agent uses RAG to:
 ### Technology Stack
 
 **Vector Database:** LibSQL (SQLite with vector extensions)
+
 - Lightweight, file-based
 - No external dependencies
 - Fast local queries
 
 **Embedding Model:** Google `text-embedding-004`
+
 - 768 dimensions
 - Multilingual support
 - High accuracy
 
 **Reranking AI:** Gemini 2.0 Flash
+
 - Fast semantic evaluation
 - Cost-effective
 - Good reasoning quality
 
 **Storage:**
+
 ```
 knowledge-base.db (LibSQL database)
 ├── finnish_financial_literacy (primary)
@@ -146,6 +156,7 @@ This creates `knowledge-base.db` with all content embedded.
 Agents can query the knowledge base using the tool:
 
 **Input Schema:**
+
 ```typescript
 {
   query: string,              // "budgeting best practices"
@@ -158,6 +169,7 @@ Agents can query the knowledge base using the tool:
 ```
 
 **Output Schema:**
+
 ```typescript
 {
   results: Array<{
@@ -200,10 +212,11 @@ Use the queryKnowledgeEnhanced tool with appropriate topic and query.
 STEP 2: Cross-reference the advisor's advice against the retrieved standards.
 
 STEP 3: Provide a research-backed evaluation with specific citations.
-`
+`;
 ```
 
 **Example query by evaluator:**
+
 ```json
 {
   "query": "best practices for helping someone create their first budget",
@@ -215,6 +228,7 @@ STEP 3: Provide a research-backed evaluation with specific citations.
 ```
 
 **Results include:**
+
 - Finnish budgeting principles from OP Group
 - Bank of Finland guidelines on expense tracking
 - OPH curriculum standards for financial planning
@@ -244,21 +258,25 @@ Each section follows this format:
 ## Topic Title
 
 ### Principles
+
 - Core concepts
 - Best practices
 - Key guidelines
 
 ### Common Mistakes
+
 - What to avoid
 - Pitfalls
 - Warning signs
 
 ### Quality Criteria
+
 - How to evaluate advice
 - Good advice characteristics
 - Red flags
 
 ### Source
+
 Citation and reference
 ```
 
@@ -299,11 +317,13 @@ Reranking can be disabled for faster queries:
 Currently uses a mock news system for development:
 
 **Mock sources:**
+
 - YLE News: Financial literacy articles
 - Kauppalehti: Business and investment news
 - HS: Personal finance coverage
 
 **Features:**
+
 - Topic-based filtering
 - AI summarization
 - Relevance scoring
@@ -314,16 +334,18 @@ Currently uses a mock news system for development:
 To connect real news APIs:
 
 1. **Add API keys** to `.env`:
+
    ```bash
    YLE_NEWS_API_KEY=your_key
    KAUPPALEHTI_API_KEY=your_key
    ```
 
 2. **Update** `src/mastra/rag/news-integration.ts`:
+
    ```typescript
    // Replace mock fetching with real API calls
    const news = await fetch(YLE_NEWS_API_URL, {
-     headers: { Authorization: `Bearer ${process.env.YLE_NEWS_API_KEY}` }
+     headers: { Authorization: `Bearer ${process.env.YLE_NEWS_API_KEY}` },
    });
    ```
 
@@ -339,13 +361,14 @@ To connect real news APIs:
    - Scenario topic
 
 2. **Query knowledge base:**
+
    ```typescript
    const knowledge = await queryKnowledgeEnhanced({
      query: `best practices for ${topic} advice`,
      topic: scenario.topic,
      language: "fi",
      topK: 5,
-     useSemanticReranking: true
+     useSemanticReranking: true,
    });
    ```
 
@@ -359,9 +382,7 @@ To connect real news APIs:
    ```json
    {
      "qualityScore": 8.2,
-     "strengths": [
-       "Recommended expense tracking (Bank of Finland guideline)"
-     ],
+     "strengths": ["Recommended expense tracking (Bank of Finland guideline)"],
      "weaknesses": [
        "Didn't emphasize emergency fund importance (OECD standard)"
      ],
@@ -377,6 +398,7 @@ To connect real news APIs:
 ### Adding New Content
 
 1. **Edit knowledge base files:**
+
    ```bash
    # Add new sections to:
    knowledge-base/finnish-financial-literacy.md
@@ -385,6 +407,7 @@ To connect real news APIs:
    ```
 
 2. **Re-initialize database:**
+
    ```bash
    pnpm init:knowledge-base
    ```
@@ -406,6 +429,7 @@ When updating the embedding model:
 ### Monitoring Query Quality
 
 Check relevance scores in evaluator outputs:
+
 - Scores > 0.7: Highly relevant
 - Scores 0.5-0.7: Moderately relevant
 - Scores < 0.5: May need better content or query
@@ -429,9 +453,11 @@ Check relevance scores in evaluator outputs:
 ### Costs
 
 **One-time initialization:**
+
 - Embeddings: ~$0.01 (Google text-embedding-004)
 
 **Per query:**
+
 - Vector search: Free (local)
 - Reranking: ~$0.001 (Gemini Flash)
 - News integration: ~$0.001
@@ -463,14 +489,14 @@ pnpm init:knowledge-base
 ### Test RAG system:
 
 ```typescript
-import { queryKnowledgeEnhanced } from './tools/query-knowledge-enhanced-tool';
+import { queryKnowledgeEnhanced } from "./tools/query-knowledge-enhanced-tool";
 
 const results = await queryKnowledgeEnhanced.execute({
   query: "budgeting best practices for youth",
   language: "fi",
   topic: "budgeting",
   useSemanticReranking: true,
-  topK: 5
+  topK: 5,
 });
 
 console.log(results);

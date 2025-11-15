@@ -13,6 +13,12 @@ dist
 !knowledge-base.db-wal
 logs/
 
+# Frontend build artifacts
+frontend/dist
+frontend/.vite
+frontend/node_modules
+public/
+
 # Terraform local state and config
 infra/.terraform/
 infra/terraform.tfstate

@@ -24,10 +24,13 @@ import type { AdvisorState, GameResponse } from "../types/game-types.ts";
 const app = new Hono();
 
 // Enable CORS for frontend requests
-app.use("/*", cors({
-  origin: ["http://localhost:3000", "http://localhost:5173"], // Vite dev servers
-  credentials: true,
-}));
+app.use(
+  "/*",
+  cors({
+    origin: ["http://localhost:3000", "http://localhost:5173"], // Vite dev servers
+    credentials: true,
+  }),
+);
 
 // ============================================================================
 // ROUTE 1: Initialize or Load Session
@@ -41,7 +44,10 @@ interface InitResponse {
   sessionId: string;
   advisorState: AdvisorState;
   isNewSession: boolean;
-  threadHistories?: Record<string, Array<{ role: "user" | "assistant"; content: string }>>;
+  threadHistories?: Record<
+    string,
+    Array<{ role: "user" | "assistant"; content: string }>
+  >;
   threadMetadata?: Record<string, ThreadMetadata>;
 }
 
@@ -51,14 +57,19 @@ app.post("/init", async (c) => {
     let sessionId = body.sessionId;
     let advisorState: AdvisorState;
     let isNewSession = false;
-    let threadHistories: Record<string, Array<{ role: "user" | "assistant"; content: string }>> = {};
+    let threadHistories: Record<
+      string,
+      Array<{ role: "user" | "assistant"; content: string }>
+    > = {};
     let threadMetadata: Record<string, ThreadMetadata> = {};
 
     // Try to load existing session
     if (sessionId) {
       const savedSession = await loadSession(sessionId);
       if (savedSession) {
-        console.log(`📂 Loaded existing session: ${sessionId.substring(0, 8)}...`);
+        console.log(
+          `📂 Loaded existing session: ${sessionId.substring(0, 8)}...`,
+        );
         advisorState = savedSession.advisorState;
 
         // Convert Maps to plain objects for JSON
@@ -66,12 +77,23 @@ app.post("/init", async (c) => {
         if (savedSession.threadMetadata) {
           threadMetadata = Object.fromEntries(savedSession.threadMetadata);
         }
-        console.log(`💬 Loaded ${Object.keys(threadHistories).length} thread histories`);
-        console.log(`📊 Loaded ${Object.keys(threadMetadata).length} thread metadata`);
+        console.log(
+          `💬 Loaded ${Object.keys(threadHistories).length} thread histories`,
+        );
+        console.log(
+          `📊 Loaded ${Object.keys(threadMetadata).length} thread metadata`,
+        );
+
+        // Don't save - we just loaded this data, don't overwrite it
       } else {
-        console.log(`⚠️ Session ${sessionId.substring(0, 8)}... not found, creating new`);
+        console.log(
+          `⚠️ Session ${sessionId.substring(0, 8)}... not found, creating new`,
+        );
         advisorState = createNewAdvisor(sessionId);
         isNewSession = true;
+
+        // Save initial state for new session
+        await saveSession(sessionId, advisorState);
       }
     } else {
       // Create brand new session
@@ -79,10 +101,10 @@ app.post("/init", async (c) => {
       advisorState = createNewAdvisor(sessionId);
       isNewSession = true;
       console.log(`✨ Created new session: ${sessionId.substring(0, 8)}...`);
-    }
 
-    // Save initial state
-    await saveSession(sessionId, advisorState);
+      // Save initial state for new session
+      await saveSession(sessionId, advisorState);
+    }
 
     return c.json<InitResponse>({
       sessionId,
@@ -104,7 +126,10 @@ app.post("/init", async (c) => {
 interface StartConsultationRequest {
   sessionId: string;
   advisorState: AdvisorState;
-  threadHistories?: Record<string, Array<{ role: "user" | "assistant"; content: string }>>;
+  threadHistories?: Record<
+    string,
+    Array<{ role: "user" | "assistant"; content: string }>
+  >;
   threadMetadata?: Record<string, ThreadMetadata>;
 }
 
@@ -114,14 +139,17 @@ interface StartConsultationResponse extends GameResponse {
 
 app.post("/start-consultation", async (c) => {
   try {
-    const { sessionId, advisorState, threadHistories, threadMetadata } = await c.req.json<StartConsultationRequest>();
+    const { sessionId, advisorState, threadHistories, threadMetadata } =
+      await c.req.json<StartConsultationRequest>();
 
-    console.log(`🎬 Starting consultation for session: ${sessionId.substring(0, 8)}...`);
+    console.log(
+      `🎬 Starting consultation for session: ${sessionId.substring(0, 8)}...`,
+    );
 
     // Call orchestrator to get next character/scenario
     const gameResponse = await startNewConsultation(
       advisorState.advisorId,
-      advisorState
+      advisorState,
     );
 
     // Convert threadHistories and threadMetadata to Maps
@@ -132,12 +160,73 @@ app.post("/start-consultation", async (c) => {
       ? new Map(Object.entries(threadMetadata))
       : new Map();
 
+    // If this is onboarding, save the boss message to threadHistories
+    if (gameResponse.type === "onboarding" && gameResponse.onboardingMessage) {
+      const msg = gameResponse.onboardingMessage;
+      const bossMessageContent = `${msg.welcomeTitle}\n\n${msg.introduction}\n\n${msg.roleExplanation}\n\n${msg.howItWorks}\n\n${msg.expectations}\n\n${msg.encouragement}`;
+
+      historiesMap.set("boss-pinned", [
+        { role: "assistant" as const, content: bossMessageContent },
+      ]);
+
+      console.log("👔 Saved boss onboarding message to historiesMap");
+      console.log("👔 historiesMap size:", historiesMap.size);
+      console.log(
+        "👔 historiesMap has boss-pinned:",
+        historiesMap.has("boss-pinned"),
+      );
+    }
+
+    // If this is a new character message, save it to threadHistories
+    if (
+      gameResponse.type === "character_message" &&
+      gameResponse.threadId &&
+      gameResponse.messages
+    ) {
+      const threadId = gameResponse.threadId;
+      const existingHistory = historiesMap.get(threadId) || [];
+
+      // Add character's initial messages
+      for (const msg of gameResponse.messages) {
+        existingHistory.push({ role: "assistant" as const, content: msg });
+      }
+
+      historiesMap.set(threadId, existingHistory);
+      console.log(
+        `💬 Saved ${gameResponse.messages.length} initial message(s) to thread ${threadId.substring(0, 8)}...`,
+      );
+
+      // Save character metadata if provided
+      if (gameResponse.characterInfo) {
+        metadataMap.set(threadId, gameResponse.characterInfo);
+        console.log(
+          `👤 Saved character metadata for thread ${threadId.substring(0, 8)}...`,
+        );
+      }
+    }
+
     // Save updated state with histories and metadata
-    await saveSession(sessionId, gameResponse.stateUpdate, historiesMap, metadataMap);
+    await saveSession(
+      sessionId,
+      gameResponse.stateUpdate,
+      historiesMap,
+      metadataMap,
+    );
+
+    // Convert Maps back to objects for response
+    const threadHistoriesObject = Object.fromEntries(historiesMap);
+    const threadMetadataObject = Object.fromEntries(metadataMap);
+
+    console.log(
+      "📤 Returning threadHistories:",
+      JSON.stringify(threadHistoriesObject, null, 2),
+    );
 
     return c.json<StartConsultationResponse>({
       ...gameResponse,
       sessionId,
+      threadHistories: threadHistoriesObject,
+      threadMetadata: threadMetadataObject,
     });
   } catch (error) {
     console.error("❌ Error in /start-consultation:", error);
@@ -155,7 +244,10 @@ interface SendMessageRequest {
   message: string;
   advisorState: AdvisorState;
   conversationHistory?: Array<{ role: "user" | "assistant"; content: string }>;
-  threadHistories?: Record<string, Array<{ role: "user" | "assistant"; content: string }>>;
+  threadHistories?: Record<
+    string,
+    Array<{ role: "user" | "assistant"; content: string }>
+  >;
   threadMetadata?: Record<string, ThreadMetadata>;
 }
 
@@ -175,15 +267,11 @@ app.post("/send-message", async (c) => {
       threadMetadata,
     } = await c.req.json<SendMessageRequest>();
 
-    console.log(`💬 Message in thread ${threadId.substring(0, 8)}... from session ${sessionId.substring(0, 8)}...`);
-
-    // Process advisor's response
-    const gameResponse = await handleAdvisorResponse(
-      threadId,
-      message,
-      advisorState,
-      conversationHistory
+    console.log(
+      `💬 Message in thread ${threadId.substring(0, 8)}... from session ${sessionId.substring(0, 8)}...`,
     );
+
+    let gameResponse;
 
     // Convert threadHistories and threadMetadata to Maps
     const historiesMap = threadHistories
@@ -193,12 +281,74 @@ app.post("/send-message", async (c) => {
       ? new Map(Object.entries(threadMetadata))
       : new Map();
 
+    // Special handling for boss messages (RAG-powered help)
+    if (threadId === "boss-pinned") {
+      console.log("👔 Boss message - using RAG help system");
+
+      // For now, simple acknowledgment (TODO: Add RAG agent)
+      const bossResponse =
+        "Thanks for reaching out! I'm here to help. In the future, I'll be able to answer your questions using our learning materials. For now, keep helping those clients!";
+
+      gameResponse = {
+        type: "character_message" as const,
+        threadId: "boss-pinned",
+        messages: [bossResponse],
+        stateUpdate: advisorState,
+      };
+
+      // Add user message and boss response to threadHistories
+      const bossHistory = historiesMap.get("boss-pinned") || [];
+      bossHistory.push(
+        { role: "user" as const, content: message },
+        { role: "assistant" as const, content: bossResponse },
+      );
+      historiesMap.set("boss-pinned", bossHistory);
+      console.log("👔 Saved boss conversation to threadHistories");
+    } else {
+      // Process regular advisor response
+      gameResponse = await handleAdvisorResponse(
+        threadId,
+        message,
+        advisorState,
+        conversationHistory,
+      );
+
+      // Add user message and character response to threadHistories
+      const threadHistory = historiesMap.get(threadId) || [];
+
+      // Add user's message
+      threadHistory.push({ role: "user" as const, content: message });
+
+      // Add character's response messages
+      if (gameResponse.messages) {
+        for (const msg of gameResponse.messages) {
+          threadHistory.push({ role: "assistant" as const, content: msg });
+        }
+      }
+
+      historiesMap.set(threadId, threadHistory);
+      console.log(
+        `💬 Saved conversation to thread ${threadId.substring(0, 8)}... (now ${threadHistory.length} messages)`,
+      );
+    }
+
     // Save updated state with message histories and metadata
-    await saveSession(sessionId, gameResponse.stateUpdate, historiesMap, metadataMap);
+    await saveSession(
+      sessionId,
+      gameResponse.stateUpdate,
+      historiesMap,
+      metadataMap,
+    );
+
+    // Convert Maps back to objects for response
+    const threadHistoriesObject = Object.fromEntries(historiesMap);
+    const threadMetadataObject = Object.fromEntries(metadataMap);
 
     return c.json<SendMessageResponse>({
       ...gameResponse,
       sessionId,
+      threadHistories: threadHistoriesObject,
+      threadMetadata: threadMetadataObject,
     });
   } catch (error) {
     console.error("❌ Error in /send-message:", error);
@@ -244,7 +394,9 @@ app.get("/financial-overview/:characterId", async (c) => {
     console.log(`📊 Getting financial overview for character: ${characterId}`);
 
     // Dynamically import SimulationEngine to avoid circular dependencies
-    const { SimulationEngine } = await import("../simulation/simulation-engine.ts");
+    const { SimulationEngine } = await import(
+      "../simulation/simulation-engine.ts"
+    );
     const engine = new SimulationEngine(databasePath);
 
     const state = engine.getCharacterState(characterId);
@@ -348,7 +500,9 @@ app.get("/transactions/:characterId", async (c) => {
     console.log(`💰 Getting transactions for character: ${characterId}`);
 
     // Dynamically import SimulationEngine
-    const { SimulationEngine } = await import("../simulation/simulation-engine.ts");
+    const { SimulationEngine } = await import(
+      "../simulation/simulation-engine.ts"
+    );
     const engine = new SimulationEngine(databasePath);
 
     const state = engine.getCharacterState(characterId);
@@ -362,7 +516,7 @@ app.get("/transactions/:characterId", async (c) => {
 
     return c.json({
       characterId,
-      transactions: transactions.map(txn => ({
+      transactions: transactions.map((txn) => ({
         date: txn.date,
         description: txn.description,
         amount: txn.amount,

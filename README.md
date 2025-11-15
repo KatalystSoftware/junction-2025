@@ -21,7 +21,7 @@
 
 ### Core Hook
 
-*"Learn financial literacy the hard way—without the hard consequences. Give advice, see results, and build your expertise through practice."*
+_"Learn financial literacy the hard way—without the hard consequences. Give advice, see results, and build your expertise through practice."_
 
 ---
 
@@ -73,12 +73,14 @@ pnpm play
 ### Gameplay Flow
 
 1. **Character arrives** with a financial problem
+
    ```
    💬 Minna Virtanen (22, University Student):
    "Hei! Mun rahat tuppaa loppuu aina ennen kuun loppua..."
    ```
 
 2. **You give advice** by typing your response
+
    ```
    💼 You: Hei Minna! Let's start by tracking your expenses for a week...
    ```
@@ -101,15 +103,18 @@ pnpm play
 ### Special Features
 
 **Choice Mode (Fast):**
+
 - Select from 3 AI-generated advice options
 - Quick gameplay for testing
 
 **Free-Text Mode (Deep):**
+
 - Type your own advice
 - More engaging, better learning
 - Full evaluation feedback
 
 **Voice Messages:**
+
 - Characters send emotional voice messages
 - ~10% of the time, guaranteed by scenario 3
 - Consistent voices per character
@@ -130,16 +135,19 @@ pnpm format        # Format code
 ## 👥 Meet the Characters
 
 ### Minna Virtanen (22, Student)
+
 - **Problem:** Money runs out before month ends
 - **Personality:** Impulsive (0.7), trusting (0.6), low financial literacy (0.3)
 - **Voice:** Rachel (energetic young female)
 
 ### Jukka Laaksonen (28, Retail Clerk)
+
 - **Problem:** €8,000 debt, feeling overwhelmed
 - **Personality:** Emotional (0.8), trusting (0.7), moderate literacy (0.4)
 - **Voice:** Bill (upbeat adult male)
 
 ### Sari Mäkinen (35, Nurse)
+
 - **Problem:** Wants to save for kids & retirement
 - **Personality:** Cautious, flexible, moderate literacy
 - **Voice:** Bella (warm adult female)
@@ -170,12 +178,14 @@ Game Master (Orchestrator)
 ### RAG System
 
 Research-backed evaluation using:
+
 - Bank of Finland financial literacy standards
 - Finnish National Agency for Education (OPH) curriculum
 - Yrityskylä program (85% of Finnish 6th graders)
 - OECD-INFE international frameworks
 
 **Features:**
+
 - Multi-language support (Finnish, Swedish, English)
 - Semantic reranking for better relevance
 - Real-time news integration (mock for now)
@@ -185,6 +195,7 @@ See [docs/features/rag-system.md](docs/features/rag-system.md) for details.
 ### Voice Integration
 
 Each character has a consistent, personality-matched voice:
+
 - 10 unique ElevenLabs voices
 - Expressive emotional tags (`[laughs]`, `[sighs]`, `[crying]`)
 - Dynamic parameters adjust to emotional state
@@ -194,6 +205,7 @@ See [docs/features/voice-integration.md](docs/features/voice-integration.md) for
 ### Relationship System
 
 Characters build (or lose) trust with you:
+
 - **5 trust tiers:** Stranger → Acquaintance → Trusted → Close → Best Friend
 - **Trust decay:** Ignored characters lose trust over time
 - **Viral unlocks:** High-trust characters recommend you to friends
@@ -206,21 +218,25 @@ See [docs/features/relationship-system.md](docs/features/relationship-system.md)
 ## 📊 Progression System
 
 ### Reputation (0-100)
+
 - Starts at 50
 - +10 for good advice, -10 for poor advice
 - Unlocks harder cases as it grows
 
 ### Skill Level (0-10)
+
 - Starts at 1
 - Grows with quality consultations
 - Boss reviews accelerate growth
 
 ### Topic Expertise (0-10 per topic)
+
 - Budgeting, Saving, Debt Management
 - Investing, Scam Awareness, Emergency Fund
 - Credit Score, Loans, Insurance, Retirement
 
 ### Advisor Coins
+
 - Earn based on financial impact of advice
 - €X saved/debt cleared = Y coins
 - Future: Unlock features with coins
@@ -230,21 +246,25 @@ See [docs/features/relationship-system.md](docs/features/relationship-system.md)
 ## 🧠 Key Features
 
 ### Dynamic Language Support
+
 - Characters automatically match your language (Finnish/English)
 - Real-time translation for character messages
 - Maintains authentic Finnish context
 
 ### Beginner-Friendly Evaluation
+
 - First 10 sessions use gentler evaluation
 - 80% chance of easier scenarios early on
 - Progressive difficulty scaling
 
 ### Memory & Consequences
+
 - Characters remember past interactions
 - Advice outcomes shown in follow-up scenarios
 - Trust levels evolve based on advice quality
 
 ### Research-Backed Content
+
 - 800+ lines of Finnish financial literacy content
 - Sourced from Bank of Finland, OPH, OECD
 - Citations included in evaluations

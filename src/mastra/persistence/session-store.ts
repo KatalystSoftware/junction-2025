@@ -74,10 +74,26 @@ export async function saveSession(
   };
 
   // Prepare session data
+  const threadHistoriesObject = threadHistories
+    ? Object.fromEntries(threadHistories)
+    : {};
+  const threadMetadataObject = threadMetadata
+    ? Object.fromEntries(threadMetadata)
+    : {};
+
+  console.log(
+    `💾 Saving threadHistories:`,
+    JSON.stringify(threadHistoriesObject, null, 2),
+  );
+  console.log(
+    `💾 Saving threadMetadata:`,
+    JSON.stringify(threadMetadataObject, null, 2),
+  );
+
   const sessionData = {
     advisorState,
-    threadHistories: threadHistories ? Object.fromEntries(threadHistories) : {},
-    threadMetadata: threadMetadata ? Object.fromEntries(threadMetadata) : {},
+    threadHistories: threadHistoriesObject,
+    threadMetadata: threadMetadataObject,
     savedAt: metadata.lastActive,
   };
 
@@ -123,6 +139,15 @@ export async function loadSession(
     // Parse saved data
     const sessionData = JSON.parse(resource.workingMemory);
 
+    console.log(
+      `📖 Raw sessionData.threadHistories:`,
+      sessionData.threadHistories,
+    );
+    console.log(
+      `📖 Raw sessionData.threadMetadata:`,
+      sessionData.threadMetadata,
+    );
+
     // Convert thread histories back to Map
     const threadHistories = new Map<
       string,
@@ -133,6 +158,9 @@ export async function loadSession(
     const threadMetadata = new Map<string, ThreadMetadata>(
       Object.entries(sessionData.threadMetadata || {}),
     );
+
+    console.log(`📖 Converted threadHistories Map size:`, threadHistories.size);
+    console.log(`📖 Converted threadMetadata Map size:`, threadMetadata.size);
 
     return {
       sessionId,
