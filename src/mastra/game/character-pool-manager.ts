@@ -40,9 +40,8 @@ export class CharacterPoolManager {
   ): Promise<void> {
     try {
       // Load characters - support both single file and directory
-      const charactersData = await this.loadJsonFromPathOrDirectory(
-        charactersPath,
-      );
+      const charactersData =
+        await this.loadJsonFromPathOrDirectory(charactersPath);
       const characterArray: Character[] = charactersData;
 
       this.characters.clear();
@@ -51,9 +50,8 @@ export class CharacterPoolManager {
       }
 
       // Load scenarios - support both single file and directory
-      const scenariosData = await this.loadJsonFromPathOrDirectory(
-        scenariosPath,
-      );
+      const scenariosData =
+        await this.loadJsonFromPathOrDirectory(scenariosPath);
       const scenarioArray: Scenario[] = scenariosData.flat(); // Flatten in case of multiple files
 
       this.scenarios.clear();

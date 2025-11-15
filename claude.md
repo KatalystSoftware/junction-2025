@@ -25,6 +25,61 @@ Instead of managing your own money (which can create pressure), you act as a **p
 
 ---
 
+## ⚙️ Development Workflow - READ THIS FIRST
+
+### Critical Commands
+
+**WE USE `pnpm`, NOT `npm`!**
+
+```bash
+# Play the game (interactive CLI)
+pnpm play
+
+# Run tests/demo
+pnpm test:game
+
+# Start Mastra dev server
+pnpm dev
+
+# BEFORE EVERY COMMIT - MANDATORY
+pnpm format      # Format code with Prettier
+pnpm check       # TypeScript type checking
+```
+
+### Important Technical Notes
+
+✅ **Node.js Version**: We use Node.js 22.13.0+ which can run `.ts` files directly (no build step needed)
+
+✅ **Import Extensions**: ALWAYS use `.ts` extensions in imports for Node/ESM support
+
+```typescript
+// ✅ Correct
+import { characterPool } from "./mastra/index.ts";
+
+// ❌ Wrong
+import { characterPool } from "./mastra/index";
+```
+
+✅ **Package Manager**: Use `pnpm` exclusively (NOT npm or yarn)
+
+✅ **Pre-Commit Checklist**:
+
+1. Run `pnpm format` (auto-formats all files)
+2. Run `pnpm check` (verify TypeScript compiles)
+3. Fix any errors before committing
+4. Commit with descriptive message
+
+### Running Files Directly
+
+```bash
+# Node can run .ts files directly
+node --env-file=.env src/play-interactive.ts
+
+# This is what pnpm scripts do internally
+```
+
+---
+
 ## 🏗️ Architecture
 
 ### Multi-Agent System (Mastra Framework)
@@ -155,7 +210,7 @@ puppet-master/
 // Load character pool
 await characterPool.loadFromFiles(
   "characters/characters.json",
-  "characters/scenarios.json"
+  "characters/scenarios.json",
 );
 
 // Create new advisor
@@ -183,7 +238,7 @@ if (consultation.type === "character_message") {
     threadId,
     "Hei Minna! Aloitetaan seuraamalla menojasi viikon ajan...",
     advisorState,
-    conversationHistory
+    conversationHistory,
   );
 
   // Character reacts based on:

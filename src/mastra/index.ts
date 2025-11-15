@@ -47,10 +47,7 @@ export const mastra = new Mastra({
 
 // Initialize character pool on startup
 async function initializeCharacterPool() {
-  const charactersPath = path.join(
-    __dirname,
-    "../../characters/individuals",
-  );
+  const charactersPath = path.join(__dirname, "../../characters/individuals");
   const scenariosPath = path.join(__dirname, "../../characters/scenarios");
 
   try {

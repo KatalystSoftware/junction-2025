@@ -41,23 +41,23 @@ function printBanner() {
   print("═".repeat(70) + "\n", colors.cyan);
   print(
     "You are a financial advisor. AI characters will come to you",
-    colors.cyan
+    colors.cyan,
   );
   print(
     "with real financial problems. Give them your best advice!\n",
-    colors.cyan
+    colors.cyan,
   );
 }
 
 function printCharacterMessage(
   name: string,
   message: string,
-  isVoice: boolean
+  isVoice: boolean,
 ) {
   print("\n" + "─".repeat(70), colors.blue);
   print(
     `💬 ${name}${isVoice ? " (🔊 voice message)" : ""}:`,
-    colors.blue + colors.bright
+    colors.blue + colors.bright,
   );
   print(`   "${message}"`, colors.blue);
   print("─".repeat(70), colors.blue);
@@ -71,7 +71,7 @@ function printStats(advisorState: AdvisorState) {
   print(`   Sessions: ${summary.progress.totalSessions}`, colors.yellow);
   print(
     `   Clients Helped: ${summary.progress.totalClientsHelped}`,
-    colors.yellow
+    colors.yellow,
   );
 }
 
@@ -83,12 +83,12 @@ function printBossReview(review: any) {
 
   print("✅ Strengths:", colors.green);
   review.strengthsIdentified.forEach((s: string) =>
-    print(`   • ${s}`, colors.green)
+    print(`   • ${s}`, colors.green),
   );
 
   print("\n⚠️  Areas for Improvement:", colors.yellow);
   review.areasForImprovement.forEach((a: string) =>
-    print(`   • ${a}`, colors.yellow)
+    print(`   • ${a}`, colors.yellow),
   );
 
   print("\n📚 Learning Materials:", colors.cyan);
@@ -164,21 +164,21 @@ async function playGame() {
       print("\n\n" + "═".repeat(70), colors.bright);
       print(
         `   ${consultation.isNewThread ? "🆕 NEW CLIENT" : "🔄 RETURNING CLIENT"}`,
-        colors.bright + colors.green
+        colors.bright + colors.green,
       );
       print("═".repeat(70), colors.bright);
       print(`Name: ${consultation.characterInfo.name}`, colors.cyan);
       print(`Age: ${consultation.characterInfo.age}`, colors.cyan);
       print(
         `Occupation: ${consultation.characterInfo.occupation}`,
-        colors.cyan
+        colors.cyan,
       );
 
       const initialMessage = consultation.messages?.[0] || "Hello...";
       printCharacterMessage(
         consultation.characterInfo.name,
         initialMessage,
-        consultation.voiceNeeded || false
+        consultation.voiceNeeded || false,
       );
 
       // Conversation loop
@@ -214,7 +214,7 @@ async function playGame() {
           currentThreadId || "thread_1",
           yourAdvice,
           advisorState,
-          conversationHistory
+          conversationHistory,
         );
 
         advisorState = response.stateUpdate;
@@ -233,7 +233,7 @@ async function playGame() {
           printCharacterMessage(
             consultation.characterInfo?.name || "Client",
             response.messages.join("\n\n"),
-            response.voiceNeeded || false
+            response.voiceNeeded || false,
           );
         }
 
@@ -242,24 +242,24 @@ async function playGame() {
           print("\n✅ Client has left the consultation.", colors.green);
           print(
             `📊 Your reputation: ${advisorState.reputation}/100`,
-            colors.yellow
+            colors.yellow,
           );
           print(
             `🎓 Skill level: ${advisorState.skillLevel.toFixed(1)}/10`,
-            colors.yellow
+            colors.yellow,
           );
 
           const poolStats = characterPool.getPoolStats();
           if (poolStats.pendingFollowUps > 0) {
             print(
               `\n📅 ${poolStats.pendingFollowUps} follow-up(s) scheduled for later!`,
-              colors.cyan
+              colors.cyan,
             );
           }
 
           print(
             '\n\nPress ENTER for next client (or type "quit" to exit)...',
-            colors.yellow
+            colors.yellow,
           );
           const next = await askQuestion("");
 
