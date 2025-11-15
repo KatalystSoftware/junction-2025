@@ -157,6 +157,13 @@ export async function startNewConsultation(
     advisorState.totalSessions - advisorState.lastReviewSession;
   const shouldReview = sessionsSinceReview >= 3 && sessionsSinceReview <= 5;
 
+  console.log(`📊 Review timing check:`, {
+    totalSessions: advisorState.totalSessions,
+    lastReviewSession: advisorState.lastReviewSession,
+    sessionsSinceReview,
+    shouldReview,
+  });
+
   // Get pool stats
   const poolStats = characterPool.getPoolStats();
 
@@ -176,6 +183,10 @@ ADVISOR STATE:
     .slice(-5)
     .map((s) => s.topicsCovered.join(", "))
     .join("; ")}
+
+REVIEW TIMING:
+- Should trigger review now: ${shouldReview ? "YES - It's time for a performance review (3-5 sessions have passed)" : "NO - Too soon for another review"}
+- IMPORTANT: You must respect this timing. Only trigger god_boss_review if shouldReview is YES.
 
 AVAILABLE CHARACTERS:
 - Total Characters: ${poolStats.totalCharacters}
@@ -198,6 +209,7 @@ Session ${idx + 1}:
 
 DECISION NEEDED:
 Should you: send a new character, send a returning character (follow-up), or trigger God/Boss review?
+Remember: ONLY trigger god_boss_review if "Should trigger review now" is YES above.
 
 Respond with ONLY valid JSON (NO markdown):
 `;
@@ -242,7 +254,28 @@ Respond with ONLY valid JSON (NO markdown):
 
   // Handle decision
   if (decision.action === "god_boss_review") {
-    return await triggerGodBossReview(advisorState);
+    // Hard enforcement: Only allow review if it's actually time
+    if (!shouldReview) {
+      console.warn(
+        `🚫 Game Master tried to trigger review too early (sessionsSinceReview=${sessionsSinceReview}). Forcing character send instead.`,
+      );
+      // Override decision to send a character instead
+      const newCharResult = characterPool.getNewCharacter(advisorState);
+      if (!newCharResult) {
+        throw new Error("No characters available");
+      }
+      decision = {
+        action: "send_character",
+        reasoning: "Overridden: Review too soon, sending character instead",
+        characterId: newCharResult.character.characterId,
+        scenarioId: newCharResult.scenario.scenarioId,
+        isNewCharacter: true,
+        difficulty: newCharResult.scenario.difficulty,
+      };
+      // Fall through to character handling below
+    } else {
+      return await triggerGodBossReview(advisorState);
+    }
   }
 
   if (decision.action === "send_character") {

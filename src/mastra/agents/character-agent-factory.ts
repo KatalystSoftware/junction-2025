@@ -550,16 +550,19 @@ export async function getCharacterInitialMessage(
   // Generate voice message if it's a voice method and character is provided
   if (isVoiceMethod && character && !voiceConfig?.audioUrl) {
     // Import voice service
-    const { shouldGenerateVoiceMessage, generateVoiceMessage, inferEmotionalStateFromContext } = await import(
-      "../services/voice-service.ts"
-    );
+    const {
+      shouldGenerateVoiceMessage,
+      generateVoiceMessage,
+      inferEmotionalStateFromContext,
+    } = await import("../services/voice-service.ts");
 
     const emotionalState = inferEmotionalStateFromContext(
       character,
       scenario.problemContext.emotionalState,
     );
 
-    const scenarioNumber = character.relationshipState.visitCount || 1;
+    // Determine scenario number (visitCount + 1, since first visit is visitCount=0)
+    const scenarioNumber = (character.relationshipState.visitCount ?? 0) + 1;
     const shouldGenerateVoice = shouldGenerateVoiceMessage(
       character,
       emotionalState,
@@ -572,6 +575,11 @@ export async function getCharacterInitialMessage(
         message,
         emotionalState,
       );
+
+      // Mark that this character has received a voice message
+      if (voiceConfig?.enabled) {
+        character.relationshipState.hasReceivedVoiceMessage = true;
+      }
     }
   }
 
