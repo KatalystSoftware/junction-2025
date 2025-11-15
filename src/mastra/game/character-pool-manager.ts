@@ -14,7 +14,68 @@ import type {
   ConsultationSession,
   FinancialTopic,
   CharacterConversationMemory,
+  TrustTier,
+  RelationshipProgression,
 } from "../types/game-types.ts";
+
+/**
+ * Calculate trust tier from trust level
+ */
+export function calculateTrustTier(trustLevel: number): TrustTier {
+  if (trustLevel >= 0.8) return "best_friend";
+  if (trustLevel >= 0.6) return "close";
+  if (trustLevel >= 0.4) return "trusted";
+  if (trustLevel >= 0.2) return "acquaintance";
+  return "stranger";
+}
+
+/**
+ * Get trust tier display info
+ */
+export function getTrustTierInfo(tier: TrustTier): {
+  name: string;
+  icon: string;
+  color: string;
+  description: string;
+} {
+  switch (tier) {
+    case "best_friend":
+      return {
+        name: "Best Friend",
+        icon: "💎",
+        color: "magenta",
+        description: "Deep trust - unlocks special scenarios",
+      };
+    case "close":
+      return {
+        name: "Close Friend",
+        icon: "💚",
+        color: "green",
+        description: "Strong relationship - recommends you to others",
+      };
+    case "trusted":
+      return {
+        name: "Trusted",
+        icon: "💙",
+        color: "cyan",
+        description: "Building trust - follows your advice",
+      };
+    case "acquaintance":
+      return {
+        name: "Acquaintance",
+        icon: "💛",
+        color: "yellow",
+        description: "Getting to know you - still testing the waters",
+      };
+    case "stranger":
+      return {
+        name: "Stranger",
+        icon: "🤝",
+        color: "gray",
+        description: "Just met - needs to build trust",
+      };
+  }
+}
 
 export interface PendingFollowUp {
   characterId: string;
@@ -48,10 +109,20 @@ export class CharacterPoolManager {
       this.characters.clear();
       for (const char of characterArray) {
         // Ensure new memory fields are initialized
+        const trustLevel = char.relationshipState.trustLevel || 0.5;
         this.characters.set(char.characterId, {
           ...char,
           conversationHistory: char.conversationHistory || [],
           advisorNotes: char.advisorNotes || "",
+          relationshipState: {
+            ...char.relationshipState,
+            trustLevel,
+            trustTier: calculateTrustTier(trustLevel),
+            progressionHistory:
+              char.relationshipState.progressionHistory || [],
+            decayApplied: char.relationshipState.decayApplied || 0,
+            wasRecommended: char.relationshipState.wasRecommended || false,
+          },
         });
       }
 
@@ -159,17 +230,26 @@ export class CharacterPoolManager {
         followed: boolean;
         outcome: "positive" | "negative" | "neutral";
       };
+      progressionEvent?: {
+        event: "advice_positive" | "advice_negative" | "decay" | "recommendation";
+        trustChange: number;
+      };
     },
   ): void {
     const char = this.characters.get(characterId);
     if (!char) return;
 
     const updatedChar = { ...char };
+    const oldTrustLevel = updatedChar.relationshipState.trustLevel;
 
     if (updates.trustLevel !== undefined) {
       updatedChar.relationshipState.trustLevel = Math.max(
         0,
         Math.min(1, updates.trustLevel),
+      );
+      // Update trust tier
+      updatedChar.relationshipState.trustTier = calculateTrustTier(
+        updatedChar.relationshipState.trustLevel,
       );
     }
 
@@ -185,6 +265,35 @@ export class CharacterPoolManager {
         outcome: updates.adviceFollowed.outcome,
         timestamp: new Date().toISOString(),
       });
+    }
+
+    // Track progression history
+    if (updates.progressionEvent || updates.trustLevel !== undefined) {
+      const trustChange = updates.progressionEvent
+        ? updates.progressionEvent.trustChange
+        : (updates.trustLevel || oldTrustLevel) - oldTrustLevel;
+
+      if (Math.abs(trustChange) > 0.001) {
+        // Only track if there's meaningful change
+        const event = updates.progressionEvent
+          ? updates.progressionEvent.event
+          : trustChange > 0
+            ? "advice_positive"
+            : "advice_negative";
+
+        updatedChar.relationshipState.progressionHistory.push({
+          timestamp: new Date().toISOString(),
+          trustLevel: updatedChar.relationshipState.trustLevel,
+          event,
+          trustChange,
+        });
+
+        // Keep only last 20 progression events
+        if (updatedChar.relationshipState.progressionHistory.length > 20) {
+          updatedChar.relationshipState.progressionHistory =
+            updatedChar.relationshipState.progressionHistory.slice(-20);
+        }
+      }
     }
 
     updatedChar.relationshipState.lastVisit = new Date().toISOString();
@@ -477,15 +586,27 @@ export class CharacterPoolManager {
     characterId: string;
     name: string;
     trustLevel: number;
+    trustTier: TrustTier;
     visitCount: number;
     lastOutcome: "helped" | "struggling" | "pending" | "unknown";
+    lastVisit: string | null;
+    progressionHistory: RelationshipProgression[];
+    decayApplied: number;
+    wasRecommended: boolean;
+    recentTrend: "improving" | "declining" | "stable";
   }> {
     const relationships: Array<{
       characterId: string;
       name: string;
       trustLevel: number;
+      trustTier: TrustTier;
       visitCount: number;
       lastOutcome: "helped" | "struggling" | "pending" | "unknown";
+      lastVisit: string | null;
+      progressionHistory: RelationshipProgression[];
+      decayApplied: number;
+      wasRecommended: boolean;
+      recentTrend: "improving" | "declining" | "stable";
     }> = [];
 
     for (const char of this.characters.values()) {
@@ -512,18 +633,45 @@ export class CharacterPoolManager {
           lastOutcome = "pending";
         }
 
+        // Calculate recent trend from last 3 progression events
+        let recentTrend: "improving" | "declining" | "stable" = "stable";
+        const recentProgression =
+          char.relationshipState.progressionHistory.slice(-3);
+        if (recentProgression.length >= 2) {
+          const totalChange = recentProgression.reduce(
+            (sum, p) => sum + p.trustChange,
+            0,
+          );
+          if (totalChange > 0.05) {
+            recentTrend = "improving";
+          } else if (totalChange < -0.05) {
+            recentTrend = "declining";
+          }
+        }
+
         relationships.push({
           characterId: char.characterId,
           name: char.name,
           trustLevel: char.relationshipState.trustLevel,
+          trustTier: char.relationshipState.trustTier,
           visitCount: char.relationshipState.visitCount,
           lastOutcome,
+          lastVisit: char.relationshipState.lastVisit,
+          progressionHistory: char.relationshipState.progressionHistory,
+          decayApplied: char.relationshipState.decayApplied,
+          wasRecommended: char.relationshipState.wasRecommended,
+          recentTrend,
         });
       }
     }
 
-    // Sort by visit count (most visits first)
-    relationships.sort((a, b) => b.visitCount - a.visitCount);
+    // Sort by trust level (highest first), then visit count
+    relationships.sort((a, b) => {
+      if (Math.abs(a.trustLevel - b.trustLevel) > 0.01) {
+        return b.trustLevel - a.trustLevel;
+      }
+      return b.visitCount - a.visitCount;
+    });
 
     return relationships;
   }
@@ -540,12 +688,19 @@ export class CharacterPoolManager {
       followed: boolean;
       outcome: "positive" | "negative" | "neutral";
     },
-  ): { willRecommend: boolean; newTrustLevel: number } {
+  ): { willRecommend: boolean; newTrustLevel: number; tierChanged: boolean; oldTier: TrustTier; newTier: TrustTier } {
     const char = this.characters.get(characterId);
     if (!char) {
-      return { willRecommend: false, newTrustLevel: 0 };
+      return {
+        willRecommend: false,
+        newTrustLevel: 0,
+        tierChanged: false,
+        oldTier: "stranger",
+        newTier: "stranger",
+      };
     }
 
+    const oldTier = char.relationshipState.trustTier;
     let trustChange = 0;
 
     // Calculate trust level change
@@ -570,16 +725,28 @@ export class CharacterPoolManager {
       trustLevel: newTrustLevel,
       visitCount: char.relationshipState.visitCount + 1,
       adviceFollowed: adviceOutcome,
+      progressionEvent: {
+        event:
+          adviceOutcome.outcome === "positive" && adviceOutcome.followed
+            ? "advice_positive"
+            : "advice_negative",
+        trustChange,
+      },
     });
+
+    // Get updated character to check tier change
+    const updatedChar = this.characters.get(characterId);
+    const newTier = updatedChar?.relationshipState.trustTier || oldTier;
+    const tierChanged = oldTier !== newTier;
 
     // Check if character will recommend (high trust + good outcome)
     const willRecommend =
-      newTrustLevel > 0.8 &&
+      newTrustLevel >= 0.6 && // Close or Best Friend tier
       adviceOutcome.outcome === "positive" &&
       adviceOutcome.followed &&
       Math.random() < 0.3; // 30% chance
 
-    return { willRecommend, newTrustLevel };
+    return { willRecommend, newTrustLevel, tierChanged, oldTier, newTier };
   }
 
   /**
@@ -612,7 +779,18 @@ export class CharacterPoolManager {
 
     // Mark character as "recommended" by setting initial trust slightly higher
     const updatedNewChar = { ...newChar };
-    updatedNewChar.relationshipState.trustLevel = 0.6; // Start with slightly higher trust
+    updatedNewChar.relationshipState.trustLevel = 0.6; // Start with higher trust (Trusted tier)
+    updatedNewChar.relationshipState.trustTier = calculateTrustTier(0.6);
+    updatedNewChar.relationshipState.wasRecommended = true;
+
+    // Track this as a recommendation event
+    updatedNewChar.relationshipState.progressionHistory.push({
+      timestamp: new Date().toISOString(),
+      trustLevel: 0.6,
+      event: "recommendation",
+      trustChange: 0.1, // Bonus from recommendation
+    });
+
     this.characters.set(newChar.characterId, updatedNewChar);
 
     return {
@@ -624,8 +802,23 @@ export class CharacterPoolManager {
 
   /**
    * Apply trust decay for characters ignored too long
+   * Returns list of characters who had decay applied
    */
-  applyTrustDecay(currentSessionNumber: number): void {
+  applyTrustDecay(currentSessionNumber: number): Array<{
+    characterId: string;
+    name: string;
+    decayAmount: number;
+    oldTrustLevel: number;
+    newTrustLevel: number;
+  }> {
+    const decayedCharacters: Array<{
+      characterId: string;
+      name: string;
+      decayAmount: number;
+      oldTrustLevel: number;
+      newTrustLevel: number;
+    }> = [];
+
     for (const char of this.characters.values()) {
       if (char.relationshipState.visitCount === 0) continue;
 
@@ -641,16 +834,37 @@ export class CharacterPoolManager {
       if (sessionsSinceVisit > 10) {
         // Apply decay: -0.02 per session over 10
         const decayAmount = (sessionsSinceVisit - 10) * 0.02;
-        const newTrustLevel = Math.max(
-          0,
-          char.relationshipState.trustLevel - decayAmount,
-        );
+        const oldTrustLevel = char.relationshipState.trustLevel;
+        const newTrustLevel = Math.max(0, oldTrustLevel - decayAmount);
 
-        this.updateCharacterRelationship(char.characterId, {
-          trustLevel: newTrustLevel,
-        });
+        if (decayAmount > 0) {
+          this.updateCharacterRelationship(char.characterId, {
+            trustLevel: newTrustLevel,
+            progressionEvent: {
+              event: "decay",
+              trustChange: -decayAmount,
+            },
+          });
+
+          // Update decay tracker
+          const updatedChar = this.characters.get(char.characterId);
+          if (updatedChar) {
+            updatedChar.relationshipState.decayApplied += decayAmount;
+            this.characters.set(char.characterId, updatedChar);
+          }
+
+          decayedCharacters.push({
+            characterId: char.characterId,
+            name: char.name,
+            decayAmount,
+            oldTrustLevel,
+            newTrustLevel,
+          });
+        }
       }
     }
+
+    return decayedCharacters;
   }
 
   /**
@@ -689,9 +903,13 @@ export class CharacterPoolManager {
         ...char,
         relationshipState: {
           trustLevel: 0.5,
+          trustTier: "trusted",
           visitCount: 0,
           lastVisit: null,
           adviceFollowedHistory: [],
+          progressionHistory: [],
+          decayApplied: 0,
+          wasRecommended: false,
         },
         conversationHistory: [],
         advisorNotes: "",

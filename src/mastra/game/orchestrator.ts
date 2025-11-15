@@ -297,6 +297,14 @@ export async function handleAdvisorResponse(
 ): Promise<GameResponse> {
   let advisorState = { ...currentState };
   let recommendationMessage: string | undefined;
+  let tierChangeNotification:
+    | {
+        characterName: string;
+        oldTier: any;
+        newTier: any;
+        trustLevel: number;
+      }
+    | undefined;
 
   // Get thread info
   const threadInfo = advisorState.activeThreads[threadId];
@@ -427,6 +435,16 @@ export async function handleAdvisorResponse(
         outcome: adviceEvaluation.outcome,
       },
     );
+
+    // Check for tier change
+    if (relationshipUpdate.tierChanged) {
+      tierChangeNotification = {
+        characterName: character.name,
+        oldTier: relationshipUpdate.oldTier,
+        newTier: relationshipUpdate.newTier,
+        trustLevel: relationshipUpdate.newTrustLevel,
+      };
+    }
 
     // Handle character recommendation
     if (relationshipUpdate.willRecommend) {
@@ -676,6 +694,7 @@ export async function handleAdvisorResponse(
     stateUpdate: advisorState,
     activeThreads,
     recommendationMessage,
+    tierChangeNotification,
     financialResults,
   };
 }

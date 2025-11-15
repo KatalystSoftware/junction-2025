@@ -7,7 +7,10 @@
 
 import React, { useState, useEffect } from "react";
 import { render, Box, Text, useInput, useApp } from "ink";
-import { characterPool } from "./mastra/index.ts";
+import {
+  characterPool,
+  getTrustTierInfo,
+} from "./mastra/index.ts";
 import {
   startNewConsultation,
   handleAdvisorResponse,
@@ -20,6 +23,7 @@ import type {
   ConversationThread,
   GameResponse,
   AdviceChoice,
+  TrustTier,
 } from "./mastra/types/game-types.ts";
 
 // ============================================================================
@@ -536,14 +540,39 @@ function App() {
 
       // Check if conversation ended
       if (response.type === "conversation_end") {
-        // Show final results modal
+        // Show final results modal with relationship changes
+        let statusMsg = "Consultation complete!";
+
+        // Add tier change to status message
+        if (response.tierChangeNotification) {
+          const tierInfo = getTrustTierInfo(
+            response.tierChangeNotification.newTier,
+          );
+          statusMsg = `${tierInfo.icon} ${response.tierChangeNotification.characterName} is now ${tierInfo.name}! ${statusMsg}`;
+        }
+
+        // Add recommendation to status message
+        if (response.recommendationMessage) {
+          statusMsg = `${response.recommendationMessage} | ${statusMsg}`;
+        }
+
         setFinalResults({
           characterName: thread.characterName,
           response: response,
         });
-        setStatusMessage("Consultation complete! Press SPACE to continue");
+        setStatusMessage(statusMsg + " Press SPACE to continue");
       } else {
-        setStatusMessage("Type your response");
+        // Show tier change notification even during conversation
+        if (response.tierChangeNotification) {
+          const tierInfo = getTrustTierInfo(
+            response.tierChangeNotification.newTier,
+          );
+          setStatusMessage(
+            `${tierInfo.icon} ${response.tierChangeNotification.characterName} trusts you more! (${tierInfo.name})`,
+          );
+        } else {
+          setStatusMessage("Type your response");
+        }
       }
     } catch (error) {
       setStatusMessage(`Error: ${error}`);
@@ -806,7 +835,7 @@ function StatsPanel({ advisorState }: { advisorState: AdvisorState }) {
 function getTrustHearts(trustLevel: number): string {
   const fullHearts = Math.floor(trustLevel * 5);
   const emptyHearts = 5 - fullHearts;
-  return "❤️".repeat(fullHearts) + "🖤".repeat(emptyHearts);
+  return "❤️".repeat(fullHearts) + "🤍".repeat(emptyHearts);
 }
 
 function getOutcomeIcon(
@@ -824,10 +853,30 @@ function getOutcomeIcon(
   }
 }
 
+function getTrendIcon(trend: "improving" | "declining" | "stable"): string {
+  switch (trend) {
+    case "improving":
+      return "📈";
+    case "declining":
+      return "📉";
+    case "stable":
+      return "➡️";
+  }
+}
+
 function getTrustColor(trustLevel: number): string {
-  if (trustLevel > 0.7) return "green";
-  if (trustLevel > 0.4) return "yellow";
-  return "red";
+  if (trustLevel >= 0.8) return "magenta";
+  if (trustLevel >= 0.6) return "green";
+  if (trustLevel >= 0.4) return "cyan";
+  if (trustLevel >= 0.2) return "yellow";
+  return "gray";
+}
+
+function getTrustProgressBar(trustLevel: number): string {
+  const barLength = 10;
+  const filled = Math.floor(trustLevel * barLength);
+  const empty = barLength - filled;
+  return "█".repeat(filled) + "░".repeat(empty);
 }
 
 function RelationshipsPanel({ advisorState }: { advisorState: AdvisorState }) {
@@ -839,9 +888,12 @@ function RelationshipsPanel({ advisorState }: { advisorState: AdvisorState }) {
     return (
       <Box flexDirection="column">
         <Text bold color="yellow">
-          📊 Relationships
+          💝 Relationships
         </Text>
         <Text dimColor>No characters met yet</Text>
+        <Text dimColor> </Text>
+        <Text dimColor>Build relationships by</Text>
+        <Text dimColor>giving good advice!</Text>
       </Box>
     );
   }
@@ -849,19 +901,58 @@ function RelationshipsPanel({ advisorState }: { advisorState: AdvisorState }) {
   return (
     <Box flexDirection="column">
       <Text bold color="yellow">
-        📊 Relationships
+        💝 Relationships ({relationships.length})
       </Text>
       <Text dimColor> </Text>
-      {relationships.slice(0, 5).map((rel, index) => (
-        <Box key={index} flexDirection="column">
-          <Text color={getTrustColor(rel.trustLevel)}>
-            {rel.name.substring(0, 20)}
-          </Text>
-          <Text dimColor>
-            {getTrustHearts(rel.trustLevel)} {getOutcomeIcon(rel.lastOutcome)}
-          </Text>
-        </Box>
-      ))}
+      {relationships.slice(0, 4).map((rel, index) => {
+        const tierInfo = getTrustTierInfo(rel.trustTier);
+        const trustPercent = Math.round(rel.trustLevel * 100);
+
+        return (
+          <Box key={index} flexDirection="column" paddingBottom={1}>
+            {/* Character Name and Tier */}
+            <Box>
+              <Text color={getTrustColor(rel.trustLevel)}>
+                {tierInfo.icon} {rel.name.substring(0, 16)}
+              </Text>
+            </Box>
+
+            {/* Trust Progress Bar */}
+            <Box>
+              <Text dimColor>
+                {getTrustProgressBar(rel.trustLevel)} {trustPercent}%
+              </Text>
+            </Box>
+
+            {/* Status Icons */}
+            <Box>
+              <Text dimColor>
+                {getTrendIcon(rel.recentTrend)}{" "}
+                {rel.wasRecommended ? "🤝 " : ""}
+                {getOutcomeIcon(rel.lastOutcome)} v{rel.visitCount}
+              </Text>
+            </Box>
+
+            {/* Decay Warning */}
+            {rel.decayApplied > 0.1 && (
+              <Box>
+                <Text color="red" dimColor>
+                  ⚠️ Trust decayed
+                </Text>
+              </Box>
+            )}
+          </Box>
+        );
+      })}
+
+      {relationships.length > 4 && (
+        <Text dimColor>...and {relationships.length - 4} more</Text>
+      )}
+
+      <Text dimColor> </Text>
+      <Text dimColor>Legend:</Text>
+      <Text dimColor>📈=improving 🤝=referred</Text>
+      <Text dimColor>v=visits ✅=helped</Text>
     </Box>
   );
 }
@@ -1248,11 +1339,60 @@ function FinalResultsModal({
         <Text color="red">❌ Poor advice - caused harm to client</Text>
       )}
 
+      {/* Relationship Changes */}
+      {(response.tierChangeNotification || response.recommendationMessage) && (
+        <>
+          <Text> </Text>
+          <Text dimColor>─────────────────────────</Text>
+          <Text bold color="magenta">
+            💝 RELATIONSHIP UPDATE
+          </Text>
+        </>
+      )}
+
+      {/* Tier change notification */}
+      {response.tierChangeNotification && (
+        <>
+          <Text> </Text>
+          <Box
+            borderStyle="single"
+            borderColor="magenta"
+            paddingX={1}
+            flexDirection="column"
+          >
+            <Text color="magenta">
+              {getTrustTierInfo(response.tierChangeNotification.newTier).icon}{" "}
+              {response.tierChangeNotification.characterName} now considers you a{" "}
+              <Text bold>
+                {getTrustTierInfo(response.tierChangeNotification.newTier).name}
+              </Text>
+              !
+            </Text>
+            <Text dimColor>
+              Trust Level: {Math.round(response.tierChangeNotification.trustLevel * 100)}%
+            </Text>
+            <Text dimColor>
+              {getTrustTierInfo(response.tierChangeNotification.newTier).description}
+            </Text>
+          </Box>
+        </>
+      )}
+
       {/* Recommendation message */}
       {response.recommendationMessage && (
         <>
           <Text> </Text>
-          <Text color="cyan">{response.recommendationMessage}</Text>
+          <Box
+            borderStyle="single"
+            borderColor="cyan"
+            paddingX={1}
+            flexDirection="column"
+          >
+            <Text color="cyan" bold>
+              🎉 NEW CLIENT UNLOCKED!
+            </Text>
+            <Text color="cyan">{response.recommendationMessage}</Text>
+          </Box>
         </>
       )}
 
