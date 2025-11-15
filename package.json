@@ -15,7 +15,9 @@
     "start": "mastra start",
     "format": "prettier --write .",
     "check": "tsc --noEmit",
-    "init:knowledge-base": "node --env-file=.env src/mastra/rag/init-knowledge-base.ts"
+    "init:knowledge-base": "node --env-file=.env src/mastra/rag/init-knowledge-base.ts",
+    "init:knowledge-base:enhanced": "node --env-file=.env src/mastra/rag/init-knowledge-base-enhanced.ts",
+    "update:news": "node --env-file=.env src/mastra/rag/update-news-index.ts"
   },
   "keywords": [],
   "author": "",

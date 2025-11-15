@@ -15,6 +15,7 @@ import { invokeCharacterTool } from "./tools/invoke-character-tool.ts";
 import { invokeGodBossTool } from "./tools/invoke-god-boss-tool.ts";
 import { evaluateAdviceTool } from "./tools/evaluate-advice-tool.ts";
 import { queryFinnishKnowledgeTool } from "./tools/query-finnish-knowledge-tool.ts";
+import { queryKnowledgeEnhancedTool } from "./tools/query-knowledge-enhanced-tool.ts";
 
 // Character Pool Manager
 import {
@@ -46,6 +47,7 @@ export const mastra = new Mastra({
     invokeGodBossTool,
     evaluateAdviceTool,
     queryFinnishKnowledgeTool,
+    queryKnowledgeEnhancedTool,
   },
   storage,
   logger: new PinoLogger({
