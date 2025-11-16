@@ -11,6 +11,7 @@ import {
   startNewConsultation,
   handleAdvisorResponse,
   handleInterventionResponse,
+  checkAndSendFollowUps,
 } from "../game/orchestrator.ts";
 import {
   saveSession,
@@ -1359,6 +1360,56 @@ app.get("/session/:sessionId/character-progressions", async (c) => {
     return c.json(
       {
         error: "Failed to get character progressions",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      500,
+    );
+  }
+});
+
+/**
+ * Check for and send follow-up messages to waiting characters
+ * Should be called periodically by the frontend (e.g., every minute)
+ */
+app.post("/check-followups", async (c) => {
+  try {
+    const body = await c.req.json<{ sessionId: string }>();
+    const { sessionId } = body;
+
+    if (!sessionId) {
+      return c.json({ error: "sessionId is required" }, 400);
+    }
+
+    // Load session
+    const savedSession = await loadSession(sessionId);
+    if (!savedSession) {
+      return c.json({ error: "Session not found" }, 404);
+    }
+
+    const advisorState = savedSession.advisorState;
+
+    // Check for follow-ups
+    const result = await checkAndSendFollowUps(advisorState);
+
+    // Save updated state if any follow-ups were sent
+    if (result.followUpsSent.length > 0) {
+      await saveSession(
+        sessionId,
+        result.stateUpdate,
+        savedSession.threadHistories,
+        savedSession.threadMetadata,
+      );
+    }
+
+    return c.json({
+      followUpsSent: result.followUpsSent,
+      stateUpdate: toClientSafeAdvisorState(result.stateUpdate),
+    });
+  } catch (error) {
+    console.error("❌ Error in /check-followups:", error);
+    return c.json(
+      {
+        error: "Failed to check for follow-ups",
         details: error instanceof Error ? error.message : "Unknown error",
       },
       500,

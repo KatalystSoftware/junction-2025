@@ -154,6 +154,95 @@ function getSafeAverageDimensionScore(
 }
 
 /**
+ * Calculate frustration level based on wait time
+ * @param createdAt - When the thread was created
+ * @param lastMessageAt - When the last message was sent
+ * @param lastFollowUpAt - When the last follow-up was sent (optional)
+ * @returns Frustration level from 0 (calm) to 1 (very frustrated)
+ */
+function calculateFrustrationLevel(
+  createdAt: string,
+  lastMessageAt: string,
+  lastFollowUpAt?: string,
+): number {
+  const now = Date.now();
+  const lastActivity = new Date(lastMessageAt).getTime();
+  const minutesWaiting = (now - lastActivity) / 1000 / 60;
+
+  // Frustration thresholds (in minutes)
+  // 0-2 minutes: calm (0.0)
+  // 2-5 minutes: slightly impatient (0.0-0.3)
+  // 5-10 minutes: frustrated (0.3-0.6)
+  // 10-15 minutes: very frustrated (0.6-0.9)
+  // 15+ minutes: extremely frustrated (0.9-1.0)
+
+  if (minutesWaiting < 2) return 0.0;
+  if (minutesWaiting < 5) return (minutesWaiting - 2) / 3 * 0.3; // 0.0 to 0.3
+  if (minutesWaiting < 10) return 0.3 + (minutesWaiting - 5) / 5 * 0.3; // 0.3 to 0.6
+  if (minutesWaiting < 15) return 0.6 + (minutesWaiting - 10) / 5 * 0.3; // 0.6 to 0.9
+  return Math.min(1.0, 0.9 + (minutesWaiting - 15) / 15 * 0.1); // 0.9 to 1.0
+}
+
+/**
+ * Determine if a follow-up message should be sent
+ * @param frustrationLevel - Current frustration level
+ * @param followUpMessagesSent - Number of follow-ups already sent
+ * @param lastFollowUpAt - When the last follow-up was sent
+ * @returns Whether to send a follow-up
+ */
+function shouldSendFollowUp(
+  frustrationLevel: number,
+  followUpMessagesSent: number,
+  lastFollowUpAt?: string,
+): boolean {
+  // Don't send more than 3 follow-ups
+  if (followUpMessagesSent >= 3) return false;
+
+  // If no follow-up sent yet, send at frustration 0.3 (around 5 minutes)
+  if (followUpMessagesSent === 0 && frustrationLevel >= 0.3) return true;
+
+  // For subsequent follow-ups, check if enough time has passed since last follow-up
+  if (lastFollowUpAt) {
+    const minutesSinceLastFollowUp =
+      (Date.now() - new Date(lastFollowUpAt).getTime()) / 1000 / 60;
+
+    // Send 2nd follow-up after 5 more minutes (frustration ~0.6)
+    if (followUpMessagesSent === 1 && minutesSinceLastFollowUp >= 5 && frustrationLevel >= 0.6) {
+      return true;
+    }
+
+    // Send 3rd follow-up after 5 more minutes (frustration ~0.8)
+    if (followUpMessagesSent === 2 && minutesSinceLastFollowUp >= 5 && frustrationLevel >= 0.8) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Map frustration level to emotional state
+ */
+function getEmotionalStateFromFrustration(frustrationLevel: number): string {
+  if (frustrationLevel < 0.2) return "calm";
+  if (frustrationLevel < 0.4) return "slightly impatient";
+  if (frustrationLevel < 0.6) return "frustrated";
+  if (frustrationLevel < 0.8) return "very frustrated";
+  return "extremely frustrated and considering leaving";
+}
+
+/**
+ * Map frustration level to voice urgency
+ */
+function getVoiceUrgencyFromFrustration(
+  frustrationLevel: number,
+): "calm" | "concerned" | "urgent" | "excited" {
+  if (frustrationLevel < 0.3) return "calm";
+  if (frustrationLevel < 0.6) return "concerned";
+  return "urgent";
+}
+
+/**
  * Initialize a new advisor with default state
  */
 export function createNewAdvisor(advisorId: string): AdvisorState {
@@ -552,6 +641,9 @@ Respond with ONLY valid JSON (NO markdown):
       status: "awaiting_response",
       createdAt: now,
       lastMessageAt: now,
+      frustrationLevel: 0, // Start calm
+      followUpMessagesSent: 0,
+      lastFollowUpAt: undefined,
     };
 
     // Add to active clients if not already there
@@ -667,6 +759,16 @@ export async function handleAdvisorResponse(
   // Get character memory (conversation history from previous sessions)
   const characterMemory = character.conversationHistory || [];
 
+  // Calculate current frustration level based on wait time
+  const frustrationLevel = calculateFrustrationLevel(
+    threadInfo.createdAt,
+    threadInfo.lastMessageAt,
+    threadInfo.lastFollowUpAt,
+  );
+
+  // Update thread frustration level
+  threadInfo.frustrationLevel = frustrationLevel;
+
   // CHECK FOR INTERVENTION: Boss evaluates advice (but doesn't block character response)
   const interventionCheck = checkForIntervention(
     advisorMessage,
@@ -730,6 +832,8 @@ export async function handleAdvisorResponse(
       conversationHistory: conversationHistory || [],
       characterMemory,
       userLanguage,
+      frustrationLevel,
+      followUpMessagesSent: threadInfo.followUpMessagesSent,
     });
   } catch (error) {
     console.error("Character tool failed:", error);
@@ -2096,6 +2200,117 @@ async function runMonthlySimulation(advisorState: AdvisorState): Promise<void> {
   } catch (error) {
     console.error("Error running monthly simulation:", error);
   }
+}
+
+/**
+ * Check all active threads for frustration and send follow-up messages if needed
+ * This should be called periodically (e.g., every minute) from the frontend
+ */
+export async function checkAndSendFollowUps(
+  advisorState: AdvisorState,
+): Promise<{
+  followUpsSent: Array<{
+    threadId: string;
+    characterName: string;
+    messages: string[];
+    frustrationLevel: number;
+  }>;
+  stateUpdate: AdvisorState;
+}> {
+  const followUpsSent: Array<{
+    threadId: string;
+    characterName: string;
+    messages: string[];
+    frustrationLevel: number;
+  }> = [];
+
+  // Check each active thread
+  for (const [threadId, threadInfo] of Object.entries(
+    advisorState.activeThreads,
+  )) {
+    // Skip resolved threads
+    if (threadInfo.status === "resolved") continue;
+
+    // Calculate current frustration
+    const frustrationLevel = calculateFrustrationLevel(
+      threadInfo.createdAt,
+      threadInfo.lastMessageAt,
+      threadInfo.lastFollowUpAt,
+    );
+
+    // Update frustration level
+    threadInfo.frustrationLevel = frustrationLevel;
+
+    // Check if we should send a follow-up
+    if (
+      shouldSendFollowUp(
+        frustrationLevel,
+        threadInfo.followUpMessagesSent,
+        threadInfo.lastFollowUpAt,
+      )
+    ) {
+      // Get character
+      const character = characterPool.getCharacter(threadInfo.characterId);
+      if (!character) continue;
+
+      // Generate follow-up message based on frustration level
+      const followUpMessages = generateFollowUpMessage(
+        character,
+        frustrationLevel,
+        threadInfo.followUpMessagesSent,
+      );
+
+      // Update thread
+      threadInfo.followUpMessagesSent++;
+      threadInfo.lastFollowUpAt = new Date().toISOString();
+      threadInfo.lastMessageAt = new Date().toISOString();
+
+      followUpsSent.push({
+        threadId,
+        characterName: character.name,
+        messages: followUpMessages,
+        frustrationLevel,
+      });
+    }
+  }
+
+  return {
+    followUpsSent,
+    stateUpdate: advisorState,
+  };
+}
+
+/**
+ * Generate follow-up message based on character frustration level
+ */
+function generateFollowUpMessage(
+  character: Character,
+  frustrationLevel: number,
+  followUpCount: number,
+): string[] {
+  const name = character.name;
+
+  // First follow-up (around 5 minutes, frustration ~0.3-0.5)
+  if (followUpCount === 0) {
+    return [
+      `Hei, oletko siellä? Tarvitsisin kyllä apua tässä... 🤔`,
+      `Hei...? Voisitko vastata? Olen vähän huolissani tästä tilanteesta.`,
+    ];
+  }
+
+  // Second follow-up (around 10 minutes, frustration ~0.6-0.7)
+  if (followUpCount === 1) {
+    return [
+      `Okei, nyt alkaa oikeasti tuntua siltä että et ota tätä tosissaan... 😕`,
+      `Hei nyt oikeasti. Minulla on oikea ongelma tässä ja odotan apua. Missä olet?`,
+    ];
+  }
+
+  // Third and final follow-up (around 15 minutes, frustration ~0.8-0.9)
+  return [
+    `Tiedätkö mitä, ehkä menen etsimään apua muualta. Et selvästikään ole kiinnostunut auttamaan. 😤`,
+    `Tämä on jo naurettavaa. Odotan vastausta HETI tai lähden etsimään toista neuvonantajaa.`,
+  ];
 }
 
 /**

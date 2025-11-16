@@ -484,10 +484,12 @@ export async function generateVoiceMessage(
   character: Character,
   messageText: string,
   emotionalState: string,
+  urgency?: "calm" | "concerned" | "urgent" | "excited",
 ): Promise<VoiceMessageConfig> {
   console.log(`🎙️ Generating voice message for ${character.name}:`, {
     messageLength: messageText.length,
     emotionalState,
+    urgency,
   });
 
   try {

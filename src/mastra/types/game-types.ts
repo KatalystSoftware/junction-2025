@@ -355,6 +355,10 @@ export interface ThreadInfo {
   status: ThreadStatus;
   createdAt: string;
   lastMessageAt: string;
+  // Urgency & frustration tracking
+  frustrationLevel: number; // 0-1: How frustrated the character is (increases with wait time)
+  followUpMessagesSent: number; // Count of reminder messages sent
+  lastFollowUpAt?: string; // Timestamp of last follow-up message
 }
 
 export type ThreadStatus = "active" | "awaiting_response" | "resolved";
