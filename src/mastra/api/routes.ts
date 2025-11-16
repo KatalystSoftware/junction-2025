@@ -1278,6 +1278,226 @@ app.post("/transcribe-audio", async (c) => {
 });
 
 // ============================================================================
+// ROUTE: Get Real Portfolio Impact (Based on Actual Transactions)
+// ============================================================================
+app.get("/real-portfolio-impact/:sessionId", async (c) => {
+  try {
+    const sessionId = c.req.param("sessionId");
+
+    console.log(
+      `💰 Calculating real portfolio impact for session: ${sessionId.substring(0, 8)}...`,
+    );
+
+    const savedSession = await loadSession(sessionId);
+    if (!savedSession) {
+      return c.json({ error: "Session not found" }, 404);
+    }
+
+    const { SimulationEngine } = await import(
+      "../simulation/simulation-engine.ts"
+    );
+    const { characterPool } = await import("../index.ts");
+    const engine = new SimulationEngine();
+
+    // Get all characters this advisor has helped
+    const allRelationships = characterPool.getCharacterRelationships(
+      savedSession.advisorState.advisorId,
+    );
+
+    let totalRealSavings = 0;
+    let totalRealDebtReduced = 0;
+    const clientImpacts: Array<{
+      characterId: string;
+      characterName: string;
+      savingsGenerated: number;
+      debtReduced: number;
+      balanceImprovement: number;
+      sessionsCount: number;
+    }> = [];
+
+    for (const rel of allRelationships) {
+      const character = characterPool.getCharacter(rel.characterId);
+      if (!character) continue;
+
+      // Get monthly summaries to calculate improvement
+      const summaries = await engine.getMonthlySummaries(rel.characterId, 12);
+
+      if (summaries.length >= 2) {
+        // Compare first month (baseline) vs latest month
+        const firstMonth = summaries[summaries.length - 1]; // oldest
+        const latestMonth = summaries[0]; // most recent
+
+        // Calculate balance improvement
+        const balanceImprovement = latestMonth.endBalance - firstMonth.endBalance;
+
+        // Calculate savings improvement (net income trend)
+        const firstNetIncome = firstMonth.totalIncome - firstMonth.totalExpenses;
+        const latestNetIncome = latestMonth.totalIncome - latestMonth.totalExpenses;
+        const savingsImprovement = latestNetIncome - firstNetIncome;
+
+        // Calculate debt reduction from debt_payment transactions
+        const db = engine.getDatabase();
+        if (db) {
+          const allTransactions = await engine.getRecentTransactions(
+            rel.characterId,
+            1000,
+          );
+          const debtPayments = allTransactions
+            .filter((txn) => txn.type === "debt_payment")
+            .reduce((sum, txn) => sum + Math.abs(txn.amount), 0);
+
+          totalRealDebtReduced += debtPayments;
+        }
+
+        totalRealSavings += Math.max(0, balanceImprovement);
+
+        clientImpacts.push({
+          characterId: rel.characterId,
+          characterName: character.name,
+          savingsGenerated: Math.max(0, balanceImprovement),
+          debtReduced: 0, // Will calculate separately if needed
+          balanceImprovement,
+          sessionsCount: rel.totalSessions,
+        });
+      }
+    }
+
+    await engine.close();
+
+    return c.json({
+      totalRealSavings: Math.round(totalRealSavings),
+      totalRealDebtReduced: Math.round(totalRealDebtReduced),
+      totalClientsHelped: allRelationships.length,
+      avgImpactPerClient:
+        allRelationships.length > 0
+          ? Math.round(totalRealSavings / allRelationships.length)
+          : 0,
+      clientImpacts: clientImpacts.sort(
+        (a, b) => b.savingsGenerated - a.savingsGenerated,
+      ),
+      // Also include projected numbers for comparison
+      projectedSavings: savedSession.advisorState.lifetimeSavingsGenerated,
+      projectedDebtCleared: savedSession.advisorState.lifetimeDebtCleared,
+    });
+  } catch (error) {
+    console.error("❌ Error in /real-portfolio-impact/:sessionId:", error);
+    return c.json({ error: "Failed to calculate real portfolio impact" }, 500);
+  }
+});
+
+// ============================================================================
+// ROUTE: Get Client Financial Details (Full Dashboard Data)
+// ============================================================================
+app.get("/client-financial-details/:characterId", async (c) => {
+  try {
+    const characterId = c.req.param("characterId");
+    const monthsBack = parseInt(c.req.query("months") || "6");
+
+    console.log(
+      `📊 Getting detailed financial data for character: ${characterId}`,
+    );
+
+    const { SimulationEngine } = await import(
+      "../simulation/simulation-engine.ts"
+    );
+    const { characterPool } = await import("../index.ts");
+    const engine = new SimulationEngine();
+
+    const character = characterPool.getCharacter(characterId);
+    if (!character) {
+      await engine.close();
+      return c.json({ error: "Character not found" }, 404);
+    }
+
+    const state = await engine.getCharacterState(characterId);
+    if (!state) {
+      await engine.close();
+      return c.json({ error: "Character state not found" }, 404);
+    }
+
+    // Get monthly summaries for trend
+    const monthlySummaries = await engine.getMonthlySummaries(
+      characterId,
+      monthsBack,
+    );
+
+    // Get recent transactions
+    const recentTransactions = await engine.getRecentTransactions(
+      characterId,
+      50,
+    );
+
+    // Get spending by category for current month
+    const db = engine.getDatabase();
+    let categorySpending = {};
+
+    if (db && monthlySummaries.length > 0) {
+      const currentMonth = monthlySummaries[0];
+      categorySpending = await db.getSpendingByCategory(
+        characterId,
+        currentMonth.month + "-01",
+        currentMonth.month + "-31",
+      );
+    }
+
+    // Calculate income vs expenses trend
+    const monthlyTrend = monthlySummaries.reverse().map((month) => ({
+      month: month.month,
+      income: month.totalIncome,
+      expenses: month.totalExpenses,
+      netSavings: month.totalIncome - month.totalExpenses,
+      balance: month.endBalance,
+    }));
+
+    // Get advice-influenced transactions
+    const adviceInfluencedTransactions = recentTransactions.filter(
+      (txn) => txn.adviceInfluenced,
+    );
+
+    // Calculate total impact from advice
+    const adviceImpact = adviceInfluencedTransactions.reduce((sum, txn) => {
+      // For expenses, positive impact = reduced spending (saved money)
+      if (txn.amount < 0) return sum + Math.abs(txn.amount);
+      return sum;
+    }, 0);
+
+    await engine.close();
+
+    return c.json({
+      characterId,
+      characterName: character.name,
+      currentBalance: state.currentBalance,
+      financialProfile: character.financialProfile,
+      monthlySummaries,
+      monthlyTrend,
+      recentTransactions: recentTransactions.slice(0, 30).map((txn) => ({
+        id: txn.id,
+        date: txn.date,
+        type: txn.type,
+        category: txn.category,
+        amount: txn.amount,
+        balanceAfter: txn.balanceAfter,
+        description: txn.description,
+        merchantName: txn.merchantName,
+        adviceInfluenced: txn.adviceInfluenced,
+      })),
+      categorySpending,
+      adviceInfluencedTransactions: adviceInfluencedTransactions.length,
+      totalAdviceImpact: Math.round(adviceImpact),
+    });
+  } catch (error) {
+    console.error("❌ Error in /client-financial-details/:characterId:", error);
+    return c.json(
+      {
+        error: "Failed to get client financial details",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      500,
+    );
+  }
+});
+
+// ============================================================================
 // ROUTE: Get Character Progression Data
 // ============================================================================
 app.get("/character-progression/:characterId", async (c) => {

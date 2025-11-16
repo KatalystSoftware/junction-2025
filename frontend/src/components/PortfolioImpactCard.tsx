@@ -4,11 +4,22 @@ import {
   TrendingDown,
   PiggyBank,
   ChevronRight,
+  Target,
 } from "lucide-react";
+
+interface RealPortfolioImpact {
+  totalRealSavings: number;
+  totalRealDebtReduced: number;
+  totalClientsHelped: number;
+  avgImpactPerClient: number;
+  projectedSavings: number;
+  projectedDebtCleared: number;
+}
 
 interface PortfolioImpactCardProps {
   lifetimeSavings: number;
   lifetimeDebtCleared: number;
+  sessionId?: string;
   recentImpact?: {
     savings: number;
     debtReduction: number;
@@ -21,6 +32,7 @@ interface PortfolioImpactCardProps {
 export function PortfolioImpactCard({
   lifetimeSavings,
   lifetimeDebtCleared,
+  sessionId,
   recentImpact,
   animate,
   onClick,
@@ -28,6 +40,31 @@ export function PortfolioImpactCard({
   const [displaySavings, setDisplaySavings] = useState(lifetimeSavings);
   const [displayDebt, setDisplayDebt] = useState(lifetimeDebtCleared);
   const [showRecentInline, setShowRecentInline] = useState(false);
+  const [realImpact, setRealImpact] = useState<RealPortfolioImpact | null>(null);
+  const [showRealData, setShowRealData] = useState(false);
+
+  // Fetch real portfolio impact data
+  useEffect(() => {
+    if (sessionId) {
+      const fetchRealImpact = async () => {
+        try {
+          const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+          const response = await fetch(`${API_URL}/real-portfolio-impact/${sessionId}`);
+          if (response.ok) {
+            const data = await response.json();
+            setRealImpact(data);
+          }
+        } catch (error) {
+          console.error("Failed to fetch real portfolio impact:", error);
+        }
+      };
+
+      fetchRealImpact();
+      // Refresh every 30 seconds
+      const interval = setInterval(fetchRealImpact, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [sessionId]);
 
   // Animate numbers when they change
   useEffect(() => {
@@ -86,7 +123,10 @@ export function PortfolioImpactCard({
     }).format(Math.round(amount));
   };
 
-  const totalImpact = displaySavings + displayDebt;
+  // Use real data if available and toggled on, otherwise use projected
+  const activeSavings = showRealData && realImpact ? realImpact.totalRealSavings : displaySavings;
+  const activeDebt = showRealData && realImpact ? realImpact.totalRealDebtReduced : displayDebt;
+  const totalImpact = activeSavings + activeDebt;
   const isPositive = totalImpact > 0;
   const isNegative = totalImpact < 0;
 
@@ -109,14 +149,32 @@ export function PortfolioImpactCard({
             Portfolio Impact
           </span>
         </div>
-        {isPositive ? (
-          <TrendingUp className="w-4 h-4" style={{ color: "var(--chart-1)" }} />
-        ) : isNegative ? (
-          <TrendingDown
-            className="w-4 h-4"
-            style={{ color: "var(--chart-2)" }}
-          />
-        ) : null}
+        <div className="flex items-center gap-2">
+          {realImpact && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowRealData(!showRealData);
+              }}
+              className="text-xs px-2 py-1 rounded transition-colors"
+              style={{
+                backgroundColor: showRealData ? "var(--primary)" : "var(--muted)",
+                color: showRealData ? "white" : "var(--muted-foreground)",
+              }}
+              title="Toggle between projected and actual impact"
+            >
+              {showRealData ? "Actual" : "Projected"}
+            </button>
+          )}
+          {isPositive ? (
+            <TrendingUp className="w-4 h-4" style={{ color: "var(--chart-1)" }} />
+          ) : isNegative ? (
+            <TrendingDown
+              className="w-4 h-4"
+              style={{ color: "var(--chart-2)" }}
+            />
+          ) : null}
+        </div>
       </div>
 
       {/* Recent Impact Notification (Inline) */}
@@ -158,7 +216,7 @@ export function PortfolioImpactCard({
 
       {/* Breakdown */}
       <div className="space-y-2 text-sm mb-3">
-        {displaySavings > 0 && (
+        {activeSavings > 0 && (
           <div className="flex items-center justify-between">
             <div
               className="flex items-center gap-1"
@@ -168,11 +226,11 @@ export function PortfolioImpactCard({
               <span>Saved</span>
             </div>
             <span className="font-semibold" style={{ color: "var(--chart-1)" }}>
-              +{formatCurrency(displaySavings)}
+              +{formatCurrency(activeSavings)}
             </span>
           </div>
         )}
-        {displayDebt > 0 && (
+        {activeDebt > 0 && (
           <div className="flex items-center justify-between">
             <div
               className="flex items-center gap-1"
@@ -182,11 +240,32 @@ export function PortfolioImpactCard({
               <span>Debt cleared</span>
             </div>
             <span className="font-semibold" style={{ color: "var(--chart-1)" }}>
-              -{formatCurrency(displayDebt)}
+              -{formatCurrency(activeDebt)}
             </span>
           </div>
         )}
       </div>
+
+      {/* Accuracy Indicator - Show when real data exists */}
+      {realImpact && !showRealData && (
+        <div
+          className="mb-3 p-2 rounded text-xs"
+          style={{
+            backgroundColor: "var(--muted)",
+            borderLeft: "3px solid var(--primary)",
+          }}
+        >
+          <div className="flex items-center justify-between">
+            <span style={{ color: "var(--muted-foreground)" }}>
+              <Target className="w-3 h-3 inline mr-1" />
+              Actual impact:
+            </span>
+            <span className="font-semibold" style={{ color: "var(--foreground)" }}>
+              {formatCurrency(realImpact.totalRealSavings + realImpact.totalRealDebtReduced)}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Click hint */}
       <div

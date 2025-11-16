@@ -23,10 +23,12 @@ import {
   Target,
   Briefcase,
   Users,
+  BarChart3,
 } from "lucide-react";
 import type { Contact, Message } from "./WhatsAppInterface";
 import { TrustMeter } from "./TrustMeter";
 import { VoiceMessage } from "./VoiceMessage";
+import { ClientFinancialDashboard } from "./ClientFinancialDashboard";
 import logoImage from "figma:asset/601ef144d16bf6e001c5324689cdddb5a7ea7f74.png";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -142,6 +144,7 @@ export function ChatWindow({
   const [showCallDialog, setShowCallDialog] = useState(false);
   const [showVideoDialog, setShowVideoDialog] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showFinancialDashboard, setShowFinancialDashboard] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
   const [videoDuration, setVideoDuration] = useState(0);
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -684,6 +687,25 @@ export function ChatWindow({
           </div>
 
           <div className="flex items-center gap-2">
+            {contact.id !== "boss-pinned" && contact.financialProfile && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setShowFinancialDashboard(true)}
+                      style={{ borderRadius: "var(--radius-button)" }}
+                    >
+                      <BarChart3 className="w-5 h-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>View Financial Details</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
             <Button
               variant="ghost"
               size="icon"
@@ -2166,6 +2188,15 @@ export function ChatWindow({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Financial Dashboard Modal */}
+      {showFinancialDashboard && contact && contact.id !== "boss-pinned" && (
+        <ClientFinancialDashboard
+          characterId={contact.id}
+          characterName={contact.name}
+          onClose={() => setShowFinancialDashboard(false)}
+        />
       )}
     </div>
   );

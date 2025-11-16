@@ -12,6 +12,7 @@ import { getPlayerAvatarUrl } from "../utils/avatarUtils";
 import { useTranslation } from "../utils/translations";
 import { FollowingEyes } from "./ui/FollowingEyes";
 import { PortfolioImpactCard } from "./PortfolioImpactCard";
+import { getSessionId } from "../services/sessionManager";
 
 interface AdvisorState {
   advisorId: string;
@@ -337,6 +338,7 @@ export function ChatSidebar({
           <PortfolioImpactCard
             lifetimeSavings={advisorState.lifetimeSavingsGenerated}
             lifetimeDebtCleared={advisorState.lifetimeDebtCleared}
+            sessionId={getSessionId() || undefined}
             recentImpact={recentImpact}
             animate={shouldAnimateImpact}
             onClick={onOpenImpactDashboard}
