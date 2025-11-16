@@ -377,8 +377,9 @@ export function LandingPage({ onStartGame }: LandingPageProps) {
                   transition={{ delay: 0.8, duration: 0.6 }}
                   className="mt-6 flex items-center justify-center gap-2 px-4 py-2 rounded-full"
                   style={{
-                    backgroundColor: "rgba(255, 255, 255, 0.2)",
+                    backgroundColor: "rgba(0, 0, 0, 0.4)",
                     backdropFilter: "blur(10px)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
                   }}
                 >
                   <span style={{ fontSize: "1rem" }}>📚</span>
@@ -386,7 +387,7 @@ export function LandingPage({ onStartGame }: LandingPageProps) {
                     style={{
                       fontFamily: "Inter, sans-serif",
                       fontSize: "var(--text-sm)",
-                      color: "rgba(255, 255, 255, 0.9)",
+                      color: "rgba(255, 255, 255, 1)",
                       fontWeight: "var(--font-weight-medium)",
                     }}
                   >
@@ -399,10 +400,17 @@ export function LandingPage({ onStartGame }: LandingPageProps) {
                     style={{
                       fontFamily: "Inter, sans-serif",
                       fontSize: "var(--text-sm)",
-                      color: "white",
+                      color: "rgba(255, 255, 255, 1)",
                       fontWeight: "var(--font-weight-semibold)",
                       textDecoration: "underline",
                       textUnderlineOffset: "2px",
+                      textDecorationThickness: "2px",
+                    }}
+                    onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => {
+                      e.currentTarget.style.color = "rgba(255, 218, 166, 1)";
+                    }}
+                    onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => {
+                      e.currentTarget.style.color = "rgba(255, 255, 255, 1)";
                     }}
                   >
                     Bank of Finland
@@ -411,7 +419,7 @@ export function LandingPage({ onStartGame }: LandingPageProps) {
                     style={{
                       fontFamily: "Inter, sans-serif",
                       fontSize: "var(--text-sm)",
-                      color: "rgba(255, 255, 255, 0.9)",
+                      color: "rgba(255, 255, 255, 1)",
                       fontWeight: "var(--font-weight-medium)",
                     }}
                   >

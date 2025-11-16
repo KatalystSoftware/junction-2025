@@ -439,7 +439,7 @@ const translations: Record<Language, Translations> = {
     },
 
     consultationEnd: {
-      title: "Consultation Complete!",
+      title: "Congratulations! You completed this step!",
       coinsEarned: "Coins Earned",
       quality: "Quality:",
       startingNext: "Starting next consultation in a moment...",

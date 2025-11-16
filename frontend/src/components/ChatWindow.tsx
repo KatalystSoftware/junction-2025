@@ -515,7 +515,7 @@ export function ChatWindow({
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex flex-col md:flex-row md:items-baseline gap-0.5 md:gap-2 md:flex-wrap">
+            <div className="flex flex-col md:flex-row md:items-baseline md:flex-nowrap gap-0.5 md:gap-2">
               <h4
                 style={{
                   fontFamily: "Inter, sans-serif",
@@ -538,7 +538,7 @@ export function ChatWindow({
               </span>
               {/* Financial Status Indicators */}
               {contact.id !== "boss-pinned" && contact.financialProfile && (
-                <>
+                <div className="hidden md:flex items-center gap-1.5 flex-nowrap whitespace-nowrap">
                   <span
                     style={{
                       color: "var(--border)",
@@ -547,7 +547,6 @@ export function ChatWindow({
                   >
                     •
                   </span>
-                  <div className="hidden md:flex items-center gap-2">
                     <span
                       style={{
                         fontFamily: "Inter, sans-serif",
@@ -620,8 +619,7 @@ export function ChatWindow({
                       </span>
                       /mo
                     </span>
-                  </div>
-                </>
+                </div>
               )}
             </div>
           </div>
@@ -1068,24 +1066,21 @@ export function ChatWindow({
           className="absolute bottom-4 left-4 right-4 px-6 py-4 space-y-4"
           style={{
             backgroundColor: "var(--card)",
-            boxShadow: "0px 4px 16px 0px rgba(10, 13, 18, 0.2)",
+            boxShadow: "0px 8px 32px 0px rgba(127, 86, 217, 0.3), 0px 4px 16px 0px rgba(10, 13, 18, 0.2)",
             borderRadius: "var(--radius-card)",
-            border: "1px solid var(--border)",
-            maxHeight: "40vh",
+            border: "2px solid var(--primary)",
+            maxHeight: "80%",
             overflowY: "auto",
             zIndex: 40,
           }}
         >
-          <div
-            className="text-center pb-3 border-b"
-            style={{ borderColor: "var(--border)" }}
-          >
+          <div className="text-center pb-3">
             <h3
               style={{
                 fontFamily: "Inter, sans-serif",
-                fontSize: "var(--text-lg)",
+                fontSize: "var(--text-xl)",
                 fontWeight: "var(--font-weight-semibold)",
-                color: "var(--card-foreground)",
+                color: "var(--primary)",
               }}
             >
               🎉 {t.consultationEnd.title}

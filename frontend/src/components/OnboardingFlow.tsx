@@ -276,7 +276,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 }}
-                  className="space-y-5 mb-6"
+                  className="mb-2"
                 >
                   <div className="space-y-2">
                     <Label
@@ -310,7 +310,10 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                       }}
                     />
                   </div>
-                  <div className="space-y-3">
+                  <div 
+                    className="space-y-3"
+                    style={{ marginTop: "2rem" }}
+                  >
                     <Label
                       className="text-sm font-medium leading-none"
                       style={{
@@ -352,7 +355,10 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                       ))}
                     </div>
                   </div>
-                  <div className="space-y-3">
+                  <div 
+                    className="space-y-3"
+                    style={{ marginTop: "2rem" }}
+                  >
                     <Label
                       className="text-sm font-medium leading-none"
                       style={{
@@ -444,6 +450,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 }}
                 className="flex justify-center"
+                style={{ marginTop: "2rem" }}
               >
                 <Button
                   onClick={handleNext}

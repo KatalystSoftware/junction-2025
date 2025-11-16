@@ -726,12 +726,10 @@ export function ConsultationResultsModal({
                       </p>
                     </div>
                     <div
-                      className="px-4 py-2 rounded-lg"
+                      className="px-4 py-2 rounded-full"
                       style={{
-                        backgroundColor: getQualityColor(
-                          evaluation.qualityScore,
-                        ),
-                        color: "white",
+                        border: "2px solid var(--primary)",
+                        color: "var(--foreground)",
                       }}
                     >
                       <span
@@ -948,6 +946,7 @@ export function ConsultationResultsModal({
                   backgroundColor: "var(--muted)",
                   borderColor: getCoinsColor(coinsEarned),
                   borderWidth: "2px",
+                  marginTop: "2rem",
                 }}
               >
                 <div className="flex items-center justify-between mb-3">

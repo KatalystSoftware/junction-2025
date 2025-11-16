@@ -312,9 +312,24 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
         "👋 Onboarding message received - boss message is in threadHistories",
       );
 
+      // Clear any existing timeout
+      if (bossTypingTimeoutRef.current) {
+        clearTimeout(bossTypingTimeoutRef.current);
+      }
+
+      // Show typing indicator first, then reveal message after delay
+      setBossIsTypingOnboarding(true);
+      
       // Select boss chat (acknowledgment choices will be derived from state)
       setSelectedContactId("boss-pinned");
       setShowChat(true); // Show the chat window
+
+      // Hide typing indicator after a delay (simulating typing time)
+      // The message will appear from threadHistories after this
+      bossTypingTimeoutRef.current = setTimeout(() => {
+        setBossIsTypingOnboarding(false);
+        bossTypingTimeoutRef.current = null;
+      }, 2500); // 2.5 second typing delay for more natural feel
     }
 
     // Handle game over - show firing modal
@@ -360,6 +375,10 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
 
   // Input state (lifted from ChatWindow for intervention revision support)
   const [currentInputValue, setCurrentInputValue] = useState("");
+
+  // Track boss typing state for onboarding message
+  const [bossIsTypingOnboarding, setBossIsTypingOnboarding] = useState(false);
+  const bossTypingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Track which responses we've already processed to avoid duplicate processing
   const processedStartResponse = useRef<any>(null);
@@ -474,9 +493,24 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       : contacts.find((c) => c.id === selectedContactId);
 
   // Boss messages now come from server threadHistories like everything else
-  const messages: Message[] = selectedContactId
-    ? messagesByThread[selectedContactId] || []
-    : [];
+  // Filter out the first boss message if we're showing typing indicator
+  const messages: Message[] = (() => {
+    const allMessages = selectedContactId
+      ? messagesByThread[selectedContactId] || []
+      : [];
+    
+    // If showing typing indicator for boss onboarding, hide the first message temporarily
+    if (
+      selectedContactId === "boss-pinned" &&
+      bossIsTypingOnboarding &&
+      allMessages.length > 0 &&
+      allMessages[0].role === "contact"
+    ) {
+      return [];
+    }
+    
+    return allMessages;
+  })();
 
   const currentAdviceChoices = selectedContactId
     ? adviceChoicesByThread[selectedContactId] || []
@@ -628,7 +662,11 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
         onSendMessage={handleSendMessage}
         onBack={handleBackToContacts}
         showChat={showChat}
-        contactIsTyping={game.isSending}
+        contactIsTyping={
+          selectedContactId === "boss-pinned" && bossIsTypingOnboarding
+            ? true
+            : game.isSending
+        }
         adviceChoices={currentAdviceChoices}
         isThreadResolved={isThreadResolved}
         conversationEndData={conversationEndData}

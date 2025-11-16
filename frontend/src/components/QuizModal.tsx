@@ -337,6 +337,7 @@ export function QuizModal({
               <div className="flex gap-3">
                 <button
                   onClick={resetQuiz}
+                  className="transition-all duration-200"
                   style={{
                     fontFamily: "Inter, sans-serif",
                     fontSize: "var(--text-sm)",
@@ -348,11 +349,24 @@ export function QuizModal({
                     border: "1px solid var(--border)",
                     cursor: "pointer",
                   }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "var(--card)";
+                    e.currentTarget.style.borderColor = "var(--primary)";
+                    e.currentTarget.style.transform = "translateY(-1px)";
+                    e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.1)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "var(--muted)";
+                    e.currentTarget.style.borderColor = "var(--border)";
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
                 >
                   Retake Quiz
                 </button>
                 <button
                   onClick={() => onOpenChange(false)}
+                  className="transition-all duration-200"
                   style={{
                     fontFamily: "Inter, sans-serif",
                     fontSize: "var(--text-sm)",
@@ -363,6 +377,16 @@ export function QuizModal({
                     color: "var(--primary-foreground)",
                     border: "none",
                     cursor: "pointer",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = "0.9";
+                    e.currentTarget.style.transform = "translateY(-1px)";
+                    e.currentTarget.style.boxShadow = "0 4px 12px rgba(127, 86, 217, 0.3)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = "1";
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "none";
                   }}
                 >
                   Close
@@ -388,27 +412,16 @@ export function QuizModal({
           className="px-6 py-5 border-b flex-shrink-0"
           style={{ borderColor: "var(--border)" }}
         >
-          <div className="flex items-center justify-between">
-            <DialogTitle
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "var(--text-xl)",
-                fontWeight: "var(--font-weight-semibold)",
-                color: "var(--card-foreground)",
-              }}
-            >
-              Quiz: {quiz.topic}
-            </DialogTitle>
-            <span
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "var(--text-sm)",
-                color: "var(--muted-foreground)",
-              }}
-            >
-              {currentQuestionIndex + 1} / {quiz.questions.length}
-            </span>
-          </div>
+          <DialogTitle
+            style={{
+              fontFamily: "Inter, sans-serif",
+              fontSize: "var(--text-xl)",
+              fontWeight: "var(--font-weight-semibold)",
+              color: "var(--card-foreground)",
+            }}
+          >
+            Quiz: {quiz.topic}
+          </DialogTitle>
           <DialogDescription style={{ display: "none" }}>
             Test your knowledge on {quiz.topic}
           </DialogDescription>
@@ -440,7 +453,7 @@ export function QuizModal({
                   fontSize: "var(--text-lg)",
                   fontWeight: "var(--font-weight-semibold)",
                   color: "var(--card-foreground)",
-                  marginBottom: "var(--spacing-4)",
+                  marginBottom: "2rem",
                   lineHeight: "1.6",
                 }}
               >
@@ -460,14 +473,14 @@ export function QuizModal({
 
                   if (showResult) {
                     if (isSelected && isCorrect) {
-                      borderColor = "var(--chart-1)";
-                      backgroundColor = "var(--muted)";
+                      borderColor = "#22c55e"; // Green for correct
+                      backgroundColor = "rgba(34, 197, 94, 0.1)";
                     } else if (isSelected && !isCorrect) {
-                      borderColor = "var(--chart-2)";
-                      backgroundColor = "var(--muted)";
+                      borderColor = "#ef4444"; // Red for wrong
+                      backgroundColor = "rgba(239, 68, 68, 0.1)";
                     } else if (isCorrect) {
-                      borderColor = "var(--chart-1)";
-                      backgroundColor = "var(--muted)";
+                      borderColor = "#22c55e"; // Green for correct answer
+                      backgroundColor = "rgba(34, 197, 94, 0.1)";
                     }
                   } else if (isSelected) {
                     borderColor = "var(--primary)";
@@ -479,7 +492,7 @@ export function QuizModal({
                       key={idx}
                       onClick={() => handleSelectAnswer(idx)}
                       disabled={hasAnswered}
-                      className="w-full p-4 rounded-lg border text-left"
+                      className="w-full p-4 rounded-lg border text-left transition-all duration-200"
                       style={{
                         backgroundColor,
                         borderColor,
@@ -488,6 +501,22 @@ export function QuizModal({
                         opacity:
                           hasAnswered && !isSelected && !isCorrect ? 0.5 : 1,
                       }}
+                      onMouseEnter={(e) => {
+                        if (!hasAnswered) {
+                          e.currentTarget.style.backgroundColor = "var(--muted)";
+                          e.currentTarget.style.borderColor = "var(--primary)";
+                          e.currentTarget.style.transform = "translateY(-1px)";
+                          e.currentTarget.style.boxShadow = "0 4px 12px rgba(127, 86, 217, 0.15)";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!hasAnswered) {
+                          e.currentTarget.style.backgroundColor = backgroundColor;
+                          e.currentTarget.style.borderColor = borderColor;
+                          e.currentTarget.style.transform = "translateY(0)";
+                          e.currentTarget.style.boxShadow = "none";
+                        }
+                      }}
                     >
                       <div className="flex items-center gap-3">
                         {showResult && (isSelected || isCorrect) && (
@@ -495,17 +524,17 @@ export function QuizModal({
                             {isSelected && isCorrect ? (
                               <CheckCircle2
                                 className="w-5 h-5"
-                                style={{ color: "var(--chart-1)" }}
+                                style={{ color: "#22c55e" }}
                               />
                             ) : isSelected && !isCorrect ? (
                               <XCircle
                                 className="w-5 h-5"
-                                style={{ color: "var(--chart-2)" }}
+                                style={{ color: "#ef4444" }}
                               />
                             ) : isCorrect ? (
                               <CheckCircle2
                                 className="w-5 h-5"
-                                style={{ color: "var(--chart-1)" }}
+                                style={{ color: "#22c55e" }}
                               />
                             ) : null}
                           </div>
@@ -531,12 +560,8 @@ export function QuizModal({
               <div
                 className="p-4 rounded-lg border"
                 style={{
-                  backgroundColor: "var(--muted)",
-                  borderColor:
-                    selectedAnswers[currentQuestionIndex] ===
-                    currentQuestion.correctAnswer
-                      ? "var(--chart-1)"
-                      : "var(--chart-2)",
+                  backgroundColor: "rgba(127, 86, 217, 0.1)",
+                  borderColor: "var(--primary)",
                   borderWidth: "2px",
                 }}
               >
@@ -555,7 +580,7 @@ export function QuizModal({
                   style={{
                     fontFamily: "Inter, sans-serif",
                     fontSize: "var(--text-sm)",
-                    color: "var(--muted-foreground)",
+                    color: "var(--foreground)",
                     lineHeight: "1.6",
                   }}
                 >
@@ -566,23 +591,37 @@ export function QuizModal({
 
             {/* Next Button */}
             {hasAnswered && (
-              <button
-                onClick={handleNext}
-                style={{
-                  fontFamily: "Inter, sans-serif",
-                  fontSize: "var(--text-sm)",
-                  fontWeight: "var(--font-weight-medium)",
-                  padding: "var(--spacing-3) var(--spacing-6)",
-                  borderRadius: "var(--radius)",
-                  backgroundColor: "var(--primary)",
-                  color: "var(--primary-foreground)",
-                  border: "none",
-                  cursor: "pointer",
-                  width: "100%",
+              <div className="flex justify-end mt-6">
+                <button
+                  onClick={handleNext}
+                  className="transition-all duration-200"
+                  style={{
+                    fontFamily: "Inter, sans-serif",
+                    fontSize: "var(--text-sm)",
+                    fontWeight: "var(--font-weight-medium)",
+                    padding: "0.75rem 2rem",
+                    borderRadius: "var(--radius)",
+                    backgroundColor: "var(--primary)",
+                    color: "var(--primary-foreground)",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = "var(--primary)";
+                  e.currentTarget.style.opacity = "0.9";
+                  e.currentTarget.style.transform = "translateY(-1px)";
+                  e.currentTarget.style.boxShadow = "0 4px 12px rgba(127, 86, 217, 0.3)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "var(--primary)";
+                  e.currentTarget.style.opacity = "1";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               >
                 {isLastQuestion ? "See Results" : "Next Question →"}
-              </button>
+                </button>
+              </div>
             )}
           </div>
         </ScrollArea>
