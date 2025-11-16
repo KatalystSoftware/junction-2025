@@ -23,7 +23,7 @@ import { shouldPollForUpdates } from "@backend/gamePolling";
 import { LiveCallDialog } from "./LiveCallDialog";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Phone, PhoneOff } from "lucide-react";
+import { Phone, PhoneOff, RotateCcw } from "lucide-react";
 
 interface WhatsAppInterfaceProps {
   onLogoClick: () => void;
@@ -728,6 +728,23 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
     conversationEndDataByThread,
   ]);
 
+  // Track loading time to show reset button after timeout
+  const [loadingStartTime] = useState(() => Date.now());
+  const [showResetButton, setShowResetButton] = useState(false);
+
+  // Show reset button after 10 seconds of loading
+  useEffect(() => {
+    if (game.isLoading) {
+      const timer = setTimeout(() => {
+        setShowResetButton(true);
+      }, 10000); // 10 seconds
+
+      return () => clearTimeout(timer);
+    } else {
+      setShowResetButton(false);
+    }
+  }, [game.isLoading]);
+
   // Loading state
   if (game.isLoading) {
     return (
@@ -742,6 +759,34 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
           >
             Loading game session...
           </p>
+          {showResetButton && (
+            <div className="mt-6 space-y-3">
+              <p
+                style={{
+                  fontFamily: "Inter, sans-serif",
+                  color: "var(--muted-foreground)",
+                  fontSize: "0.875rem",
+                }}
+              >
+                Taking longer than expected?
+              </p>
+              <Button
+                onClick={() => {
+                  console.log("🔄 User triggered game data reset from loading screen");
+                  localStorage.clear();
+                  window.location.reload();
+                }}
+                variant="outline"
+                style={{
+                  borderColor: "var(--border)",
+                  color: "var(--foreground)",
+                }}
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Reset Game Data
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     );

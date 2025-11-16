@@ -8,6 +8,8 @@
 import { useState, useEffect } from "react";
 import { WhatsAppInterface, type Message } from "./WhatsAppInterface";
 import { useGame } from "../hooks/useGame";
+import { Button } from "./ui/button";
+import { RotateCcw } from "lucide-react";
 
 // Inferred Contact type from WhatsAppInterface
 interface Contact {
@@ -37,6 +39,7 @@ export function GameConnector() {
   const [conversationHistory, setConversationHistory] = useState<
     Array<{ role: "user" | "assistant"; content: string }>
   >([]);
+  const [showResetButton, setShowResetButton] = useState(false);
 
   // Initialize game - start first consultation when ready
   useEffect(() => {
@@ -162,6 +165,19 @@ export function GameConnector() {
     game.sendMessage(threadId, content);
   };
 
+  // Show reset button after 10 seconds of loading
+  useEffect(() => {
+    if (game.isLoading) {
+      const timer = setTimeout(() => {
+        setShowResetButton(true);
+      }, 10000); // 10 seconds
+
+      return () => clearTimeout(timer);
+    } else {
+      setShowResetButton(false);
+    }
+  }, [game.isLoading]);
+
   // Loading state
   if (game.isLoading) {
     return (
@@ -169,6 +185,24 @@ export function GameConnector() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Loading game session...</p>
+          {showResetButton && (
+            <div className="mt-6 space-y-3">
+              <p className="text-muted-foreground text-sm">
+                Taking longer than expected?
+              </p>
+              <Button
+                onClick={() => {
+                  console.log("🔄 User triggered game data reset from loading screen");
+                  localStorage.clear();
+                  window.location.reload();
+                }}
+                variant="outline"
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Reset Game Data
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     );
