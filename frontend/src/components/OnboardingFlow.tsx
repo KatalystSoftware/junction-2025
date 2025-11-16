@@ -148,7 +148,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       />
 
       {/* Main content */}
-      <div className="relative z-10 flex-1 flex items-center justify-center px-6 py-4">
+      <div className="relative z-10 flex-1 flex items-center justify-center px-6 py-4 min-h-0">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentScreen}
@@ -156,11 +156,11 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className="w-full max-w-3xl"
+            className="w-full max-w-3xl h-full flex flex-col"
           >
             {/* Screen content card */}
             <div
-              className="rounded-lg p-6"
+              className="rounded-lg p-6 flex flex-col max-h-full overflow-y-auto"
               style={{
                 backgroundColor: "var(--card)",
                 border: `1px solid var(--border)`,
@@ -330,7 +330,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                     >
                       {t.onboarding.yourAvatar}
                     </Label>
-                    <div className="flex flex-wrap gap-4">
+                    <div className="flex flex-wrap gap-4 justify-center">
                       {PLAYER_AVATAR_OPTIONS.map((option) => (
                         <motion.button
                           key={option.id}
