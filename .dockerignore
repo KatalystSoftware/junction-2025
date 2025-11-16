@@ -1,6 +1,7 @@
 infra/
 .env
 node_modules/
+.cache/
 frontend/node_modules/
 .git/
 dist/
