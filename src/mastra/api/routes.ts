@@ -1448,60 +1448,39 @@ app.get("/session/:sessionId/character-progressions", async (c) => {
   }
 });
 
+// ============================================================================
+// FOLLOW-UP SYSTEM DOCUMENTATION
+// ============================================================================
 /**
- * Check for and send follow-up messages to waiting characters
+ * SERVER-LED FOLLOW-UP SYSTEM
  *
- * NOTE: This endpoint is deprecated in favor of the server-led approach.
- * Follow-ups are now automatically included in responses from /init,
- * /start-consultation, and /send-message.
+ * Follow-ups are automatically checked and included in ALL game flow endpoints:
+ * - /init - Session initialization
+ * - /start-consultation - Starting new consultations
+ * - /send-message - Sending messages
  *
- * Kept for backwards compatibility, but not recommended for use.
+ * IDLE DETECTION (optional):
+ * If you want follow-ups to appear while the user is idle (not interacting),
+ * set up a timer in the frontend to call /init every 30-60 seconds:
+ *
+ * Example:
+ *   setInterval(async () => {
+ *     const response = await fetch('/init', {
+ *       method: 'POST',
+ *       body: JSON.stringify({ sessionId: currentSessionId })
+ *     });
+ *     const data = await response.json();
+ *     if (data.followUps && data.followUps.length > 0) {
+ *       // Display follow-up messages to user
+ *       displayFollowUps(data.followUps);
+ *     }
+ *   }, 60000); // Every 60 seconds
+ *
+ * This approach:
+ * - Refreshes the entire session state (useful for detecting changes)
+ * - Automatically includes any pending follow-ups
+ * - No need for a special-purpose polling endpoint
  */
-app.post("/check-followups", async (c) => {
-  try {
-    const body = await c.req.json<{ sessionId: string }>();
-    const { sessionId } = body;
-
-    if (!sessionId) {
-      return c.json({ error: "sessionId is required" }, 400);
-    }
-
-    // Load session
-    const savedSession = await loadSession(sessionId);
-    if (!savedSession) {
-      return c.json({ error: "Session not found" }, 404);
-    }
-
-    const advisorState = savedSession.advisorState;
-
-    // Check for follow-ups
-    const result = await checkAndSendFollowUps(advisorState);
-
-    // Save updated state if any follow-ups were sent
-    if (result.followUpsSent.length > 0) {
-      await saveSession(
-        sessionId,
-        result.stateUpdate,
-        savedSession.threadHistories,
-        savedSession.threadMetadata,
-      );
-    }
-
-    return c.json({
-      followUpsSent: result.followUpsSent,
-      stateUpdate: toClientSafeAdvisorState(result.stateUpdate),
-    });
-  } catch (error) {
-    console.error("❌ Error in /check-followups:", error);
-    return c.json(
-      {
-        error: "Failed to check for follow-ups",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
-      500,
-    );
-  }
-});
 
 // Export both the app and its type for RPC
 export { app as gameRoutes };
