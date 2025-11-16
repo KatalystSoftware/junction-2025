@@ -1038,7 +1038,7 @@ app.get("/leaderboard/rank/:advisorId", async (c) => {
     const { leaderboardService } = await import(
       "../persistence/leaderboard-service.ts"
     );
-    const rank = await leaderboardService.getAdvisorRank(advisorId);
+    const rank = await leaderboardService.getAdvisorRank(advisorId, category);
 
     if (!rank) {
       return c.json({ error: "Advisor not found in leaderboard" }, 404);
