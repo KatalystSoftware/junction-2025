@@ -44,7 +44,9 @@ export function AchievementUnlockModal({
       >
         <DialogHeader
           className="px-6 py-5 border-b flex-shrink-0"
-          style={{ borderColor: "var(--border)" }}
+          style={{ 
+            borderColor: "var(--border)",
+          }}
         >
           <div className="flex items-center gap-3">
             <Award className="w-6 h-6" style={{ color: "var(--primary)" }} />
@@ -71,17 +73,18 @@ export function AchievementUnlockModal({
                 key={achievement.id}
                 className="p-5 rounded-lg border"
                 style={{
-                  backgroundColor: "var(--muted)",
+                  backgroundColor: "rgba(127, 86, 217, 0.1)",
                   borderColor: "var(--primary)",
                   borderWidth: "2px",
                 }}
               >
                 <div className="flex items-start gap-4">
                   <div
-                    className="flex items-center justify-center w-16 h-16 rounded-full text-4xl flex-shrink-0"
+                    className="flex items-center justify-center w-16 h-16 rounded-full flex-shrink-0"
                     style={{
                       backgroundColor: "var(--primary)",
                       color: "white",
+                      fontSize: "2.5rem",
                     }}
                   >
                     {achievement.icon}
@@ -93,7 +96,7 @@ export function AchievementUnlockModal({
                           fontFamily: "Inter, sans-serif",
                           fontSize: "var(--text-lg)",
                           fontWeight: "var(--font-weight-semibold)",
-                          color: "var(--card-foreground)",
+                          color: "var(--foreground)",
                         }}
                       >
                         {achievement.name}
@@ -117,7 +120,7 @@ export function AchievementUnlockModal({
                       style={{
                         fontFamily: "Inter, sans-serif",
                         fontSize: "var(--text-sm)",
-                        color: "var(--muted-foreground)",
+                        color: "var(--foreground)",
                         lineHeight: "1.6",
                       }}
                     >
@@ -169,15 +172,16 @@ export function AchievementUnlockModal({
             <div
               className="p-4 rounded-lg text-center"
               style={{
-                backgroundColor: "var(--muted)",
+                backgroundColor: "rgba(34, 197, 94, 0.1)",
+                border: "2px solid #22c55e",
               }}
             >
               <p
                 style={{
                   fontFamily: "Inter, sans-serif",
                   fontSize: "var(--text-sm)",
-                  color: "var(--muted-foreground)",
-                  fontStyle: "italic",
+                  color: "var(--foreground)",
+                  fontWeight: "var(--font-weight-medium)",
                 }}
               >
                 Congratulations! Keep helping clients to unlock more

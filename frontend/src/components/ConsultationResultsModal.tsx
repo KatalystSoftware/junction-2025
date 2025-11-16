@@ -306,7 +306,7 @@ export function ConsultationResultsModal({
 
             {/* Character's Response */}
             {characterResponse && (
-              <div>
+              <div style={{ marginTop: "2rem" }}>
                 <h3
                   className="flex items-center gap-2 mb-3"
                   style={{
@@ -341,7 +341,7 @@ export function ConsultationResultsModal({
 
             {/* Financial Impact Section */}
             {projection && (
-              <div>
+              <div style={{ marginTop: "2rem" }}>
                 <h3
                   className="flex items-center gap-2 mb-3"
                   style={{
@@ -673,7 +673,7 @@ export function ConsultationResultsModal({
 
             {/* Advice Quality Section */}
             {evaluation && (
-              <div>
+              <div style={{ marginTop: "2rem" }}>
                 <h3
                   className="flex items-center gap-2 mb-3"
                   style={{
@@ -766,19 +766,19 @@ export function ConsultationResultsModal({
                           key={idx}
                           className="flex items-start gap-2 p-3 rounded-lg"
                           style={{
-                            backgroundColor: "var(--card)",
-                            border: "1px solid var(--border)",
+                            backgroundColor: "rgba(34, 197, 94, 0.1)",
+                            border: "1px solid #22c55e",
                           }}
                         >
                           <CheckSquare
                             className="w-4 h-4 mt-0.5 flex-shrink-0"
-                            style={{ color: "var(--chart-1)" }}
+                            style={{ color: "#22c55e" }}
                           />
                           <span
                             style={{
                               fontFamily: "Inter, sans-serif",
                               fontSize: "var(--text-sm)",
-                              color: "var(--card-foreground)",
+                              color: "var(--foreground)",
                             }}
                           >
                             {strength}
@@ -810,19 +810,19 @@ export function ConsultationResultsModal({
                           key={idx}
                           className="flex items-start gap-2 p-3 rounded-lg"
                           style={{
-                            backgroundColor: "var(--card)",
-                            border: "1px solid var(--border)",
+                            backgroundColor: "rgba(239, 68, 68, 0.1)",
+                            border: "1px solid #ef4444",
                           }}
                         >
                           <XSquare
                             className="w-4 h-4 mt-0.5 flex-shrink-0"
-                            style={{ color: "var(--chart-2)" }}
+                            style={{ color: "#ef4444" }}
                           />
                           <span
                             style={{
                               fontFamily: "Inter, sans-serif",
                               fontSize: "var(--text-sm)",
-                              color: "var(--card-foreground)",
+                              color: "var(--foreground)",
                             }}
                           >
                             {weakness}
@@ -855,19 +855,19 @@ export function ConsultationResultsModal({
                             key={idx}
                             className="flex items-start gap-2 p-3 rounded-lg"
                             style={{
-                              backgroundColor: "var(--card)",
-                              border: "1px solid var(--border)",
+                              backgroundColor: "rgba(234, 179, 8, 0.1)",
+                              border: "1px solid #eab308",
                             }}
                           >
                             <MinusSquare
                               className="w-4 h-4 mt-0.5 flex-shrink-0"
-                              style={{ color: "var(--chart-3)" }}
+                              style={{ color: "#eab308" }}
                             />
                             <span
                               style={{
                                 fontFamily: "Inter, sans-serif",
                                 fontSize: "var(--text-sm)",
-                                color: "var(--card-foreground)",
+                                color: "var(--foreground)",
                               }}
                             >
                               {opportunity}
@@ -889,6 +889,7 @@ export function ConsultationResultsModal({
                   backgroundColor: "rgba(127, 86, 217, 0.05)",
                   borderColor: "var(--primary)",
                   borderLeft: "4px solid var(--primary)",
+                  marginTop: "2rem",
                 }}
               >
                 <div className="flex items-start gap-3">

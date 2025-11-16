@@ -799,7 +799,8 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
           quiz={currentQuiz}
           onComplete={(score, correctCount) => {
             console.log("📝 Quiz completed:", { score, correctCount });
-            setShowQuizModal(false);
+            // Don't close the modal here - let the user see the results
+            // The modal will close when the user clicks the close button or outside
           }}
         />
       )}

@@ -43,6 +43,15 @@ export function QuizModal({
   const [showExplanation, setShowExplanation] = useState<boolean>(false);
   const [quizCompleted, setQuizCompleted] = useState(false);
 
+  // Format quiz topic name for display (convert underscores to spaces and capitalize)
+  const formatTopicName = (topic: string): string => {
+    return topic
+      .replace(/_/g, " ")
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  };
+
   // Don't render if quiz is null or has no questions
   if (!quiz || !quiz.questions || quiz.questions.length === 0) {
     return null;
@@ -420,10 +429,10 @@ export function QuizModal({
               color: "var(--card-foreground)",
             }}
           >
-            Quiz: {quiz.topic}
+            Quiz: {formatTopicName(quiz.topic)}
           </DialogTitle>
           <DialogDescription style={{ display: "none" }}>
-            Test your knowledge on {quiz.topic}
+            Test your knowledge on {formatTopicName(quiz.topic)}
           </DialogDescription>
         </DialogHeader>
 

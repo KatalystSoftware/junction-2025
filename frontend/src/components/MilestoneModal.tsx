@@ -79,13 +79,16 @@ export function MilestoneModal({
             {milestones.map((milestone, idx) => {
               const Icon = MILESTONE_ICONS[milestone.type] || Trophy;
               const color = MILESTONE_COLORS[milestone.type];
+              const isFirstClientHelped = milestone.title.includes("First Client Helped");
 
               return (
                 <div
                   key={idx}
                   className="p-5 rounded-lg border"
                   style={{
-                    backgroundColor: "var(--muted)",
+                    backgroundColor: isFirstClientHelped 
+                      ? "rgba(127, 86, 217, 0.1)" 
+                      : "var(--muted)",
                     borderColor: color,
                     borderWidth: "2px",
                   }}
@@ -106,7 +109,7 @@ export function MilestoneModal({
                           fontFamily: "Inter, sans-serif",
                           fontSize: "var(--text-lg)",
                           fontWeight: "var(--font-weight-semibold)",
-                          color: "var(--card-foreground)",
+                          color: isFirstClientHelped ? "var(--foreground)" : "var(--card-foreground)",
                           marginBottom: "var(--spacing-2)",
                         }}
                       >
@@ -116,7 +119,7 @@ export function MilestoneModal({
                         style={{
                           fontFamily: "Inter, sans-serif",
                           fontSize: "var(--text-sm)",
-                          color: "var(--muted-foreground)",
+                          color: isFirstClientHelped ? "var(--foreground)" : "var(--muted-foreground)",
                           lineHeight: "1.6",
                         }}
                       >
@@ -131,16 +134,16 @@ export function MilestoneModal({
             <div
               className="p-4 rounded-lg text-center"
               style={{
-                backgroundColor: "var(--muted)",
-                borderTop: "2px solid var(--border)",
+                backgroundColor: "rgba(34, 197, 94, 0.1)",
+                border: "2px solid #22c55e",
               }}
             >
               <p
                 style={{
                   fontFamily: "Inter, sans-serif",
                   fontSize: "var(--text-sm)",
-                  color: "var(--muted-foreground)",
-                  fontStyle: "italic",
+                  color: "var(--foreground)",
+                  fontWeight: "var(--font-weight-medium)",
                 }}
               >
                 Keep up the great work! Your clients are seeing real results
