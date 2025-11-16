@@ -48,6 +48,11 @@ interface ChatWindowProps {
   contact: Contact | undefined;
   messages: Message[];
   onSendMessage: (content: string) => void;
+  onSendVoiceMessage?: (voiceMessage: {
+    audioBlob: Blob;
+    transcription: string;
+    duration: number;
+  }) => void;
   onBack: () => void;
   showChat: boolean;
   contactIsTyping: boolean;
@@ -125,6 +130,7 @@ export function ChatWindow({
   contact,
   messages,
   onSendMessage,
+  onSendVoiceMessage,
   onBack,
   showChat,
   contactIsTyping,
@@ -286,12 +292,24 @@ export function ChatWindow({
       }
 
       // Transcribe audio
-      const { transcription } = await gameApi.transcribeAudio(audioBlob, userLanguage);
+      const { transcription } = await gameApi.transcribeAudio(
+        audioBlob,
+        userLanguage,
+      );
 
       console.log("Transcription:", transcription);
 
-      // Send the transcribed text
-      onSendMessage(transcription);
+      // If onSendVoiceMessage is provided, send as voice message with audio
+      if (onSendVoiceMessage) {
+        onSendVoiceMessage({
+          audioBlob,
+          transcription,
+          duration: recordingTime,
+        });
+      } else {
+        // Fallback: just send transcription as text
+        onSendMessage(transcription);
+      }
 
       // Reset state
       setAudioBlob(null);
