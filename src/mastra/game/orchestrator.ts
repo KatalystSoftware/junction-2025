@@ -38,6 +38,67 @@ import type {
   ConversationMessage,
 } from "../types/game-types.ts";
 
+/**
+ * Translate advice choices to target language
+ */
+async function translateAdviceChoices(
+  choices: AdviceChoice[],
+  targetLanguage: string,
+): Promise<AdviceChoice[]> {
+  const languageNames: Record<string, string> = {
+    fi: "Finnish",
+    sv: "Swedish",
+  };
+  const targetLangName = languageNames[targetLanguage];
+  if (!targetLangName) return choices;
+
+  const { generateText } = await import("ai");
+  const { google } = await import("@ai-sdk/google");
+
+  const translatedChoices = await Promise.all(
+    choices.map(async (choice) => {
+      try {
+        // Translate actionText
+        const actionPrompt = `Translate this financial advisor action text to ${targetLangName}. Keep it concise and professional. Only output the ${targetLangName} translation:\n\n${choice.actionText}`;
+        const actionResult = await generateText({
+          model: google("gemini-2.0-flash-exp"),
+          prompt: actionPrompt,
+        });
+
+        // Translate projectedOutcome
+        const outcomePrompt = `Translate this financial outcome description to ${targetLangName}. Keep it brief and clear. Only output the ${targetLangName} translation:\n\n${choice.projectedOutcome}`;
+        const outcomeResult = await generateText({
+          model: google("gemini-2.0-flash-exp"),
+          prompt: outcomePrompt,
+        });
+
+        // Translate fullAdviceText if present
+        let fullAdviceText = choice.fullAdviceText;
+        if (fullAdviceText) {
+          const fullPrompt = `Translate this financial advice to ${targetLangName}. Keep the tone professional and empathetic. Only output the ${targetLangName} translation:\n\n${fullAdviceText}`;
+          const fullResult = await generateText({
+            model: google("gemini-2.0-flash-exp"),
+            prompt: fullPrompt,
+          });
+          fullAdviceText = fullResult.text.trim();
+        }
+
+        return {
+          ...choice,
+          actionText: actionResult.text.trim(),
+          projectedOutcome: outcomeResult.text.trim(),
+          fullAdviceText,
+        };
+      } catch (error) {
+        console.error("Translation failed for advice choice:", error);
+        return choice; // Return original on error
+      }
+    }),
+  );
+
+  return translatedChoices;
+}
+
 function clampValue(value: number, min: number, max: number, fallback: number) {
   if (Number.isNaN(value) || !Number.isFinite(value)) {
     return fallback;
@@ -452,7 +513,7 @@ Respond with ONLY valid JSON (NO markdown):
     };
 
     // Generate advice choices for the player (first two sessions to ease into the game)
-    const adviceChoices =
+    let adviceChoices =
       advisorState.totalSessions <= 1
         ? generateAdviceChoices(
             scenario,
@@ -460,6 +521,11 @@ Respond with ONLY valid JSON (NO markdown):
             [], // No conversation history yet (first turn)
           )
         : undefined;
+
+    // Translate advice choices if user language is not English
+    if (adviceChoices && userLanguage !== "en") {
+      adviceChoices = await translateAdviceChoices(adviceChoices, userLanguage);
+    }
 
     // Return initial character message with advice choices and voice config
     return {
