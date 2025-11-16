@@ -12,7 +12,12 @@ import { getAgentModel } from "../agents/agent-model.ts";
 /**
  * Supported audio formats for Gemini
  */
-export type AudioFormat = "audio/wav" | "audio/mp3" | "audio/mpeg" | "audio/webm" | "audio/ogg";
+export type AudioFormat =
+  | "audio/wav"
+  | "audio/mp3"
+  | "audio/mpeg"
+  | "audio/webm"
+  | "audio/ogg";
 
 /**
  * Result from transcribing audio
@@ -40,10 +45,6 @@ export async function transcribeAudio(
   }
 ): Promise<TranscriptionResult> {
   try {
-    // Convert buffer to base64 for Gemini API
-    const base64Audio = audioBuffer.toString("base64");
-    const dataUrl = `data:${mimeType};base64,${base64Audio}`;
-
     // Prepare the transcription prompt
     const languageHint = options?.language
       ? `The audio is in ${options.language === "fi" ? "Finnish" : options.language === "sv" ? "Swedish" : "English"}.`
@@ -57,20 +58,26 @@ export async function transcribeAudio(
 
 Please transcribe the following audio accurately. Return ONLY the transcribed text, nothing else.`;
 
-    // Use configured Gemini model for transcription (supports audio input)
+    // Strip "google/" prefix from model name if present
+    const modelName = getAgentModel().replace(/^google\//, "");
+
+    // Use the file content type for audio with Google provider
     const result = await generateText({
-      model: google(getAgentModel()),
+      model: google(modelName),
       messages: [
         {
           role: "user",
           content: [
             { type: "text", text: transcriptionPrompt },
-            { type: "file", data: dataUrl, mimeType },
+            {
+              type: "file",
+              mediaType: mimeType,
+              data: audioBuffer,
+            },
           ],
         },
       ],
       temperature: 0.1, // Low temperature for accurate transcription
-      maxTokens: 500, // Reasonable limit for speech transcription
     });
 
     const transcribedText = result.text.trim();
@@ -97,25 +104,22 @@ export async function transcribeAudioWithLanguageDetection(
   mimeType: AudioFormat = "audio/webm"
 ): Promise<TranscriptionResult> {
   try {
+    // Convert buffer to base64 for Gemini API (requires base64 string)
     const base64Audio = audioBuffer.toString("base64");
-    const dataUrl = `data:${mimeType};base64,${base64Audio}`;
 
+    // Use experimental_attachments for audio with Google provider
     const result = await generateText({
       model: google(getAgentModel()),
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: `Please transcribe the following audio. First detect the language, then provide the transcription.
+      prompt: `Please transcribe the following audio. First detect the language, then provide the transcription.
 
 Format your response as:
 Language: [detected language]
 Transcription: [transcribed text]`,
-            },
-            { type: "file", data: dataUrl, mimeType },
-          ],
+      experimental_attachments: [
+        {
+          name: "audio",
+          contentType: mimeType,
+          data: base64Audio,
         },
       ],
       temperature: 0.1,
@@ -127,8 +131,12 @@ Transcription: [transcribed text]`,
     const languageMatch = responseText.match(/Language:\s*(\w+)/i);
     const transcriptionMatch = responseText.match(/Transcription:\s*(.+)/is);
 
-    const detectedLanguage = languageMatch ? languageMatch[1].toLowerCase() : undefined;
-    const transcription = transcriptionMatch ? transcriptionMatch[1].trim() : responseText;
+    const detectedLanguage = languageMatch
+      ? languageMatch[1].toLowerCase()
+      : undefined;
+    const transcription = transcriptionMatch
+      ? transcriptionMatch[1].trim()
+      : responseText;
 
     return {
       text: transcription,

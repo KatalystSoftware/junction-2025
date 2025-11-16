@@ -50,6 +50,11 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
     return !!window.location.hash;
   });
 
+  // Pending voice messages (optimistic UI for user voice messages)
+  const [pendingVoiceMessages, setPendingVoiceMessages] = useState<
+    Record<string, Message[]>
+  >({});
+
   // Update URL when selectedContactId changes
   useEffect(() => {
     if (selectedContactId) {
@@ -422,6 +427,42 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
   };
 
   // Handle sending messages
+  const handleSendVoiceMessage = (voiceMessage: {
+    audioBlob: Blob;
+    transcription: string;
+    duration: number;
+  }) => {
+    if (!selectedContactId) return;
+
+    // Create blob URL for the audio
+    const audioUrl = URL.createObjectURL(voiceMessage.audioBlob);
+
+    // Create optimistic voice message
+    const voiceMsg: Message = {
+      id: `temp-voice-${Date.now()}`,
+      contactId: selectedContactId,
+      role: "user",
+      content: voiceMessage.transcription,
+      timestamp: new Date(),
+      type: "voice",
+      audioUrl,
+      duration: voiceMessage.duration,
+    };
+
+    // Add to pending messages
+    setPendingVoiceMessages((prev) => ({
+      ...prev,
+      [selectedContactId]: [...(prev[selectedContactId] || []), voiceMsg],
+    }));
+
+    // Send transcription to backend
+    game.sendMessage(selectedContactId, voiceMessage.transcription);
+
+    // Note: We keep the voice message in the UI permanently
+    // The blob URL will be valid for the session
+    // If we need to persist across page reloads, we'd need to store audio in localStorage or backend
+  };
+
   const handleSendMessage = (content: string) => {
     if (!selectedContactId) return;
 
@@ -474,9 +515,39 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       : contacts.find((c) => c.id === selectedContactId);
 
   // Boss messages now come from server threadHistories like everything else
-  const messages: Message[] = selectedContactId
-    ? messagesByThread[selectedContactId] || []
-    : [];
+  // Include pending voice messages for optimistic UI
+  const messages: Message[] = useMemo(() => {
+    if (!selectedContactId) return [];
+
+    const serverMessages = messagesByThread[selectedContactId] || [];
+    const voiceMessages = pendingVoiceMessages[selectedContactId] || [];
+
+    // Create a map of transcriptions to voice messages for quick lookup
+    const voiceByContent = new Map(
+      voiceMessages.map((vm) => [vm.content, vm]),
+    );
+
+    // Replace matching text messages with voice messages to preserve order
+    const mergedMessages = serverMessages.map((msg) => {
+      // If this is a user text message that has a matching voice message, replace it
+      if (
+        msg.role === "user" &&
+        msg.type !== "voice" &&
+        voiceByContent.has(msg.content)
+      ) {
+        return voiceByContent.get(msg.content)!;
+      }
+      return msg;
+    });
+
+    // Add any voice messages that don't have a server match yet (optimistic UI)
+    const serverContents = new Set(serverMessages.map((m) => m.content));
+    const newVoiceMessages = voiceMessages.filter(
+      (vm) => !serverContents.has(vm.content),
+    );
+
+    return [...mergedMessages, ...newVoiceMessages];
+  }, [selectedContactId, messagesByThread, pendingVoiceMessages]);
 
   const currentAdviceChoices = selectedContactId
     ? adviceChoicesByThread[selectedContactId] || []
@@ -626,6 +697,7 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
         contact={displayContact}
         messages={messages}
         onSendMessage={handleSendMessage}
+        onSendVoiceMessage={handleSendVoiceMessage}
         onBack={handleBackToContacts}
         showChat={showChat}
         contactIsTyping={game.isSending}

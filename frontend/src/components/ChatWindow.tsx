@@ -48,6 +48,11 @@ interface ChatWindowProps {
   contact: Contact | undefined;
   messages: Message[];
   onSendMessage: (content: string) => void;
+  onSendVoiceMessage?: (voiceMessage: {
+    audioBlob: Blob;
+    transcription: string;
+    duration: number;
+  }) => void;
   onBack: () => void;
   showChat: boolean;
   contactIsTyping: boolean;
@@ -125,6 +130,7 @@ export function ChatWindow({
   contact,
   messages,
   onSendMessage,
+  onSendVoiceMessage,
   onBack,
   showChat,
   contactIsTyping,
@@ -286,12 +292,24 @@ export function ChatWindow({
       }
 
       // Transcribe audio
-      const { transcription } = await gameApi.transcribeAudio(audioBlob, userLanguage);
+      const { transcription } = await gameApi.transcribeAudio(
+        audioBlob,
+        userLanguage,
+      );
 
       console.log("Transcription:", transcription);
 
-      // Send the transcribed text
-      onSendMessage(transcription);
+      // If onSendVoiceMessage is provided, send as voice message with audio
+      if (onSendVoiceMessage) {
+        onSendVoiceMessage({
+          audioBlob,
+          transcription,
+          duration: recordingTime,
+        });
+      } else {
+        // Fallback: just send transcription as text
+        onSendMessage(transcription);
+      }
 
       // Reset state
       setAudioBlob(null);
@@ -310,11 +328,11 @@ export function ChatWindow({
       if (recordingTimerRef.current) {
         clearInterval(recordingTimerRef.current);
       }
-      if (mediaRecorderRef.current && isRecording) {
+      if (mediaRecorderRef.current) {
         mediaRecorderRef.current.stop();
       }
     };
-  }, [isRecording]);
+  }, []); // Empty deps - only run on mount/unmount
 
   // Get multiple choice options from backend (if provided)
   // Keep the full choice objects to display actionText + projectedOutcome
@@ -1299,8 +1317,8 @@ export function ChatWindow({
                     fontWeight: 500,
                   }}
                 >
-                  {isRecording ? "Recording..." : "Recording ready"} {Math.floor(recordingTime / 60)}:
-                  {String(recordingTime % 60).padStart(2, "0")}
+                  {isRecording ? "Recording..." : "Recording ready"}{" "}
+                  {Math.floor(recordingTime / 60)}:{String(recordingTime % 60).padStart(2, "0")}
                 </div>
 
                 {/* Actions */}
