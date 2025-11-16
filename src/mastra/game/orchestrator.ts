@@ -926,7 +926,7 @@ export async function handleAdvisorResponse(
       skillChangeMultiplier = 1.2; // 20% faster for intermediate
     }
 
-    const skillChange = (avgDimensionScore - 5) * 0.02 * skillChangeMultiplier; // Scaled: -0.1 to +0.15 for beginners
+    const skillChange = (avgDimensionScore - 5) * 0.1 * skillChangeMultiplier; // Increased from 0.02 to 0.1 for faster progression
 
     // Reputation change: beginners get reduced penalties
     let repChangeMultiplier = 1.0;
@@ -950,7 +950,7 @@ export async function handleAdvisorResponse(
 
     // Bonus/penalty for specific evaluation criteria (scaled for beginners)
     if (adviceEvaluation.wasActionable) {
-      const actionableBonus = isBeginner ? 0.02 : 0.01; // Double skill gain for beginners
+      const actionableBonus = isBeginner ? 0.1 : 0.05; // Increased from 0.02/0.01 for faster progression
       advisorState.skillLevel = clampValue(
         advisorState.skillLevel + actionableBonus,
         0,
