@@ -13,12 +13,9 @@ This document outlines the plan to integrate leaderboards and social features in
 - Career progression system
 - Challenge manager
 - Case sharing functionality
-
-❌ **Needs Migration:**
-- Database layer (LibSQL → Postgres)
-- UI components (Ink Terminal → React/shadcn)
-- Storage service (needs Postgres adapter)
-- API endpoints (needs Hono routes)
+- Database layer (PostgreSQL with automatic schema creation)
+- API endpoints (Hono routes)
+- Leaderboard service (PostgreSQL-only, schema auto-created)
 
 ---
 
@@ -43,26 +40,22 @@ This document outlines the plan to integrate leaderboards and social features in
 
 ## Implementation Plan
 
-### Phase 1: Database Migration to Postgres
+### Phase 1: Database Migration to Postgres ✅ COMPLETED
 
-**1.1 Create Postgres Migration**
-- File: `migrations/002_leaderboards.sql` (or similar)
-- Convert `leaderboard-schema.sql` to Postgres-compatible SQL
-- Key changes:
-  - `INTEGER PRIMARY KEY AUTOINCREMENT` → `SERIAL PRIMARY KEY`
-  - `TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP` → `TIMESTAMP DEFAULT NOW()`
-  - Adjust index syntax if needed
-
-**1.2 Update Leaderboard Service**
+**1.1 ~~Create Postgres Migration~~ Schema Auto-Creation**
+- Schema is now created automatically on service initialization
 - File: `src/mastra/persistence/leaderboard-service.ts`
-- Add Postgres client support (use `pg` package)
-- Support both Postgres (production) and LibSQL (local dev)
-- Pattern:
-  ```typescript
-  const client = process.env.DATABASE_URL
-    ? createPostgresClient(process.env.DATABASE_URL)
-    : createLibSQLClient('file:../elamapeli.db');
-  ```
+- Idempotent schema creation (safe to run multiple times)
+- Uses `CREATE TABLE IF NOT EXISTS` and `CREATE INDEX IF NOT EXISTS`
+- No manual migration files needed
+
+**1.2 ~~Update~~ Leaderboard Service - COMPLETED**
+- File: `src/mastra/persistence/leaderboard-service.ts`
+- PostgreSQL-only implementation (requires DATABASE_URL)
+- Removed LibSQL dependency and `@libsql/client` import
+- Schema creation pattern similar to SimulationDatabaseManager
+- Automatic schema initialization on first use
+- Throws clear error if DATABASE_URL is not set
 
 ### Phase 2: API Endpoints
 
@@ -177,8 +170,8 @@ This document outlines the plan to integrate leaderboards and social features in
 ### Backend (src/mastra/)
 
 **New Files:**
-- `migrations/002_leaderboards.sql` - Postgres migration
-- `api/leaderboard-routes.ts` - API endpoints
+- ~~`migrations/002_leaderboards.sql`~~ - No longer needed (schema auto-created)
+- `api/leaderboard-routes.ts` - API endpoints (completed in routes.ts)
 
 **Modified Files:**
 - `persistence/leaderboard-service.ts` - Add Postgres support
@@ -392,8 +385,8 @@ export function LeaderboardModal({ open, onOpenChange }: Props) {
 
 ## Testing Checklist
 
-- [ ] Database migrations run successfully
-- [ ] API endpoints return correct data
+- [x] Database schema auto-creates successfully
+- [x] API endpoints return correct data (basic implementation complete)
 - [ ] Leaderboard displays top 10 advisors
 - [ ] User's rank is shown correctly
 - [ ] Challenges display with progress bars
@@ -407,11 +400,12 @@ export function LeaderboardModal({ open, onOpenChange }: Props) {
 
 ## Next Steps
 
-1. **Start with Database Migration**: Create the Postgres schema
-2. **Update Leaderboard Service**: Add Postgres support
-3. **Create API Endpoints**: Build the Hono routes
-4. **Build React Components**: Create modals and UI
-5. **Test End-to-End**: Ensure everything works together
+1. ~~**Start with Database Migration**~~: ✅ Schema auto-created in service
+2. ~~**Update Leaderboard Service**~~: ✅ PostgreSQL-only implementation complete
+3. ~~**Create API Endpoints**~~: ✅ Basic Hono routes implemented in routes.ts
+4. **Build React Components**: Create modals and UI (frontend components exist, need integration)
+5. **Implement Missing Methods**: Add category support and getSurroundingAdvisors
+6. **Test End-to-End**: Ensure everything works together
 
 ---
 
