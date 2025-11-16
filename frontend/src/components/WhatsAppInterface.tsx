@@ -549,9 +549,7 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
     const voiceMessages = pendingVoiceMessages[selectedContactId] || [];
 
     // Create a map of transcriptions to voice messages for quick lookup
-    const voiceByContent = new Map(
-      voiceMessages.map((vm) => [vm.content, vm]),
-    );
+    const voiceByContent = new Map(voiceMessages.map((vm) => [vm.content, vm]));
 
     // Replace matching text messages with voice messages to preserve order
     const mergedMessages = serverMessages.map((msg) => {

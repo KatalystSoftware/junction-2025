@@ -60,8 +60,8 @@ echo "GOOGLE_GENERATIVE_AI_API_KEY=your_key" > .env
 # Initialize knowledge base
 pnpm init:knowledge-base
 
-# Start playing
-pnpm play
+# Start the app (backend + frontend)
+pnpm dev
 ```
 
 ---
@@ -163,8 +163,6 @@ Aligned with **Finland's 2030 Financial Literacy Strategy** ([Bank of Finland re
 ```bash
 # Development commands
 pnpm dev              # Start API + frontend dev servers
-pnpm play             # Interactive CLI game
-pnpm test             # Run demo with real AI
 pnpm check            # TypeScript type checking
 pnpm format           # Format code
 

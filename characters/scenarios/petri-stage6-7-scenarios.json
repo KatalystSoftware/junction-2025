@@ -418,7 +418,7 @@
         "currentNetWorth": 120000000,
         "fcLahtiPurchase": {
           "price": 15000000,
-          "stake": 0.80,
+          "stake": 0.8,
           "annualBurn": 3000000,
           "status": "money pit but FUN!"
         },

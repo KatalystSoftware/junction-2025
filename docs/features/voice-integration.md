@@ -167,10 +167,10 @@ ELEVENLABS_API_KEY=your_elevenlabs_api_key_here
 ### 3. Test Voice Generation
 
 ```bash
-pnpm play
+pnpm dev
 ```
 
-Voice messages will automatically appear during emotional character moments!
+Then open http://localhost:3000. Voice messages will automatically appear during emotional character moments!
 
 ## Adding New Characters
 
@@ -200,33 +200,33 @@ Edit character JSON file:
 }
 ```
 
-## Terminal UI Integration
+## Web UI Integration
 
-Voice messages appear in the terminal with:
+Voice messages appear in the WhatsApp-style interface with:
 
 **Visual indicator:**
 
 ```
 🔊 [Voice Message] Jukka Laaksonen (Urgent):
    "..." (transcription shown)
-   🎧 Audio playing...
+   🎧 Audio player
 ```
 
 **Features:**
 
-- Audio auto-plays in terminal (if supported)
+- Audio player with play/pause controls
 - Transcription always shown as fallback
 - Urgency indicator (calm/concerned/urgent/excited)
 - Emoji indicator for emotional state
 
-**Implementation:** `src/play-tui.tsx`
+**Implementation:** `frontend/src/components/`
 
-The TUI component:
+The web UI components:
 
-1. Detects voice messages via `voiceConfig.enabled`
-2. Displays transcription with 🔊 indicator
-3. Plays audio if `audioUrl` is provided
-4. Shows urgency level visually
+1. Detect voice messages via `voiceConfig.enabled`
+2. Display transcription with 🔊 indicator
+3. Show audio player if `audioUrl` is provided
+4. Show urgency level visually
 
 ## Troubleshooting
 

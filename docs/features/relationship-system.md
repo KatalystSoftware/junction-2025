@@ -4,7 +4,7 @@
 
 This implementation adds a comprehensive relationship tracking and visualization system to the Financial Advisor Simulator, making character relationships visible and meaningful to players.
 
-**Status**: ✅ Rebased with main and fully integrated with the latest TUI features including quiz feedback and final results modal.
+**Status**: ✅ Integrated with the web UI including quiz feedback and final results modal.
 
 ## Features Implemented
 
@@ -112,8 +112,8 @@ The relationship system has been intelligently merged with the main branch's new
 
 ### UI Components
 
-- `src/play-tui.tsx`
-  - Completely redesigned `RelationshipsPanel` component
+- `frontend/src/components/`
+  - Redesigned relationship display components
   - Added trust progress bars visualization
   - Added tier badges and status icons
   - Added trend indicators (improving/declining/stable)
@@ -191,12 +191,13 @@ Potential additions:
 
 To test the system:
 
-1. Start new game: `npm run play`
-2. Press 'r' to view relationships panel
-3. Complete consultations with good/bad advice to see trust changes
-4. Watch for tier change notifications when trust crosses thresholds
-5. Build relationships to 60%+ to trigger recommendations
-6. Ignore characters to test decay system
+1. Start the app: `pnpm dev`
+2. Open http://localhost:3000
+3. View relationships panel in the web UI
+4. Complete consultations with good/bad advice to see trust changes
+5. Watch for tier change notifications when trust crosses thresholds
+6. Build relationships to 60%+ to trigger recommendations
+7. Ignore characters to test decay system
 
 ## Technical Notes
 

@@ -5,12 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "TEST_CACHE_MODE=record node --env-file=.env src/test-game.ts",
-    "test-ci": "TEST_CACHE_MODE=replay node src/test-game.ts",
-    "test:game": "node --env-file=.env src/test-game.ts",
     "test:unit": "jest",
     "test:infra": "bash scripts/terraform-validate.sh",
-    "play": "tsx --env-file=.env src/play-tui.tsx",
     "dev": "concurrently -n \"api,frontend\" -c \"blue,green\" \"pnpm run dev:api\" \"pnpm run dev:frontend\"",
     "dev:api": "node --env-file=.env --watch src/index.ts",
     "dev:frontend": "pnpm --filter frontend dev",
@@ -24,7 +20,6 @@
     "init:knowledge-base": "node --env-file=.env src/mastra/rag/init-knowledge-base.ts",
     "init:knowledge-base:enhanced": "node --env-file=.env src/mastra/rag/init-knowledge-base-enhanced.ts",
     "update:news": "node --env-file=.env src/mastra/rag/update-news-index.ts",
-    "view-transactions": "node --env-file=.env src/view-transactions.ts",
     "db:start": "docker compose  --env-file .env up"
   },
   "keywords": [],
@@ -49,7 +44,6 @@
     "ai": "^5.0.93",
     "hono": "^4.10.6",
     "pg": "^8.13.1",
-    "ink": "^6.5.0",
     "react": "^19.2.0",
     "zod": "^4.1.12"
   },
