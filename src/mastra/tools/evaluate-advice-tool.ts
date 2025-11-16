@@ -593,6 +593,10 @@ Please evaluate this advice comprehensively across all dimensions, including tra
       }
 
       if (missedOpportunities.length === 0) {
+        // Generic fallback guidance by topic
+        // Note: These are intentionally generic and only used when AI evaluator
+        // found no specific missed opportunities. They don't check if topic was
+        // mentioned because they're broad enough to always be applicable.
         const topicGuidance: { [key: string]: string } = {
           budgeting:
             "Could have suggested specific budgeting tools or the 50/30/20 rule",
@@ -604,10 +608,16 @@ Please evaluate this advice comprehensively across all dimensions, including tra
             "Could have explained risk tolerance and diversification principles",
           scam_awareness:
             "Could have provided red flags to watch for and verification steps",
-          credit_building:
+          credit_score:
             "Could have explained how credit scores work in Finland",
           insurance:
             "Could have discussed appropriate coverage levels for their situation",
+          emergency_fund:
+            "Could have explained the 3-6 month rule and where to keep emergency savings",
+          loans:
+            "Could have discussed how to compare loan offers and read terms carefully",
+          retirement:
+            "Could have explained pension systems and long-term planning basics",
         };
 
         const guidance =
