@@ -694,10 +694,7 @@ export function ChatWindow({
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => {
-                        console.log("Opening financial dashboard for:", contact.characterId, contact.name);
-                        setShowFinancialDashboard(true);
-                      }}
+                      onClick={() => setShowFinancialDashboard(true)}
                       style={{ borderRadius: "var(--radius-button)" }}
                     >
                       <BarChart3 className="w-5 h-5" />
@@ -2197,22 +2194,13 @@ export function ChatWindow({
       )}
 
       {/* Financial Dashboard Modal */}
-      {(() => {
-        const shouldShow = showFinancialDashboard && contact && contact.id !== "boss-pinned" && contact.characterId;
-        console.log("Financial Dashboard render check:", {
-          showFinancialDashboard,
-          contactId: contact?.id,
-          characterId: contact?.characterId,
-          shouldShow
-        });
-        return shouldShow ? (
-          <ClientFinancialDashboard
-            characterId={contact.characterId!}
-            characterName={contact.name}
-            onClose={() => setShowFinancialDashboard(false)}
-          />
-        ) : null;
-      })()}
+      {showFinancialDashboard && contact && contact.id !== "boss-pinned" && contact.characterId && (
+        <ClientFinancialDashboard
+          characterId={contact.characterId}
+          characterName={contact.name}
+          onClose={() => setShowFinancialDashboard(false)}
+        />
+      )}
     </div>
   );
 }

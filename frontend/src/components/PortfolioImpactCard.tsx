@@ -48,8 +48,7 @@ export function PortfolioImpactCard({
     if (sessionId) {
       const fetchRealImpact = async () => {
         try {
-          const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
-          const response = await fetch(`${API_URL}/real-portfolio-impact/${sessionId}`);
+          const response = await fetch(`/api/game/real-portfolio-impact/${sessionId}`);
           if (response.ok) {
             const data = await response.json();
             setRealImpact(data);

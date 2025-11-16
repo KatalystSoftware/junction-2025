@@ -62,6 +62,7 @@ describe("Cash System, Advisor Leveling & Promotions Integration", () => {
 
     advisorState = {
       advisorId: "test-advisor-integration",
+      advisorName: "Test Advisor",
       skillLevel: 0,
       reputation: 0,
       advisorCoins: 0,

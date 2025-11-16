@@ -2128,6 +2128,15 @@ export function getActiveThreads(
 }
 
 /**
+ * Count non-resolved character threads (boss excluded)
+ */
+export function countUnresolvedThreads(advisorState: AdvisorState): number {
+  return Object.values(advisorState.activeThreads).filter(
+    (thread) => thread.status !== "resolved",
+  ).length;
+}
+
+/**
  * Switch to a specific thread and get its details
  */
 export function switchThread(

@@ -2,6 +2,7 @@ import {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // @ts-expect-error internal helper
   getSafeAverageDimensionScore,
+  countUnresolvedThreads,
 } from "./orchestrator.ts";
 
 describe("getSafeAverageDimensionScore", () => {
@@ -29,3 +30,22 @@ describe("getSafeAverageDimensionScore", () => {
     expect(avg).toBe(6.5);
   });
 });
+
+describe("countUnresolvedThreads", () => {
+  it("returns 0 when there are no threads", () => {
+    const state: any = { activeThreads: {} };
+    expect(countUnresolvedThreads(state)).toBe(0);
+  });
+
+  it("counts only non-resolved threads", () => {
+    const state: any = {
+      activeThreads: {
+        t1: { status: "active" },
+        t2: { status: "awaiting_response" },
+        t3: { status: "resolved" },
+      },
+    };
+    expect(countUnresolvedThreads(state)).toBe(2);
+  });
+}
+);

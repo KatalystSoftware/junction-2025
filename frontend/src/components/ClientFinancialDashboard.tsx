@@ -46,23 +46,19 @@ export function ClientFinancialDashboard({
   characterName,
   onClose,
 }: ClientFinancialDashboardProps) {
-  console.log("ClientFinancialDashboard rendering for:", characterId, characterName);
-
   const [data, setData] = useState<ClientFinancialData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedView, setSelectedView] = useState<"overview" | "transactions" | "trends">("overview");
 
   useEffect(() => {
-    console.log("Fetching financial data for character:", characterId);
     fetchFinancialData();
   }, [characterId]);
 
   const fetchFinancialData = async () => {
     try {
       setLoading(true);
-      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
-      const response = await fetch(`${API_URL}/client-financial-details/${characterId}?months=6`);
+      const response = await fetch(`/api/game/client-financial-details/${characterId}?months=6`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch financial data");

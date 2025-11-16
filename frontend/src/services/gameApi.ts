@@ -162,6 +162,118 @@ interface InitRequest {
   advisorName?: string;
 }
 
+export interface ThreadMetadata {
+  characterId?: string;
+  characterName: string;
+  name: string;
+  age?: number;
+  occupation?: string;
+  gender?: "male" | "female";
+  financialProfile?: {
+    incomeLevel: "low" | "medium" | "high";
+    typicalMonthlyIncome: number;
+    hasDebt: boolean;
+    hasSavings: "none" | "minimal" | "moderate" | "good";
+    bankAccounts: Array<{
+      accountId: string;
+      bankName: string;
+      accountType: string;
+      balance: number;
+      currency: string;
+    }>;
+    creditCards: Array<{
+      cardId: string;
+      issuer: string;
+      balance: number;
+      creditLimit: number;
+      interestRate: number;
+      minimumPayment: number;
+      currency: string;
+    }>;
+    debts: Array<{
+      debtId?: string;
+      creditor?: string;
+      totalAmount: number;
+      remainingAmount: number;
+      monthlyPayment: number;
+      interestRate?: number;
+      currency?: string;
+    }>;
+    subscriptions: Array<{
+      subscriptionId: string;
+      name: string;
+      monthlyCost: number;
+      category: string;
+      currency: string;
+      startDate: string;
+    }>;
+    monthlyExpenses: {
+      rent?: number;
+      groceries?: number;
+      transportation?: number;
+      utilities?: number;
+      other?: number;
+    };
+  };
+  status?: "active" | "completed";
+}
+
+export interface ThreadMetadata {
+  characterId?: string;
+  characterName: string;
+  name: string;
+  age?: number;
+  occupation?: string;
+  gender?: "male" | "female";
+  financialProfile?: {
+    incomeLevel: "low" | "medium" | "high";
+    typicalMonthlyIncome: number;
+    hasDebt: boolean;
+    hasSavings: "none" | "minimal" | "moderate" | "good";
+    bankAccounts: Array<{
+      accountId: string;
+      bankName: string;
+      accountType: string;
+      balance: number;
+      currency: string;
+    }>;
+    creditCards: Array<{
+      cardId: string;
+      issuer: string;
+      balance: number;
+      creditLimit: number;
+      interestRate: number;
+      minimumPayment: number;
+      currency: string;
+    }>;
+    debts: Array<{
+      debtId?: string;
+      creditor?: string;
+      totalAmount: number;
+      remainingAmount: number;
+      monthlyPayment: number;
+      interestRate?: number;
+      currency?: string;
+    }>;
+    subscriptions: Array<{
+      subscriptionId: string;
+      name: string;
+      monthlyCost: number;
+      category: string;
+      currency: string;
+      startDate: string;
+    }>;
+    monthlyExpenses: {
+      rent?: number;
+      groceries?: number;
+      transportation?: number;
+      utilities?: number;
+      other?: number;
+    };
+  };
+  status?: "active" | "completed";
+}
+
 interface InitResponse {
   sessionId: string;
   advisorState: AdvisorState;
@@ -170,10 +282,7 @@ interface InitResponse {
     string,
     Array<{ role: "user" | "assistant"; content: string }>
   >;
-  threadMetadata?: Record<
-    string,
-    { name: string; age: number; occupation: string }
-  >;
+  threadMetadata?: Record<string, ThreadMetadata>;
   autoStartedConsultation?: GameResponse; // Auto-started if no active threads
 }
 
@@ -184,10 +293,7 @@ interface StartConsultationRequest {
     string,
     Array<{ role: "user" | "assistant"; content: string }>
   >;
-  threadMetadata?: Record<
-    string,
-    { name: string; age: number; occupation: string }
-  >;
+  threadMetadata?: Record<string, ThreadMetadata>;
 }
 
 interface SendMessageRequest {
@@ -200,10 +306,7 @@ interface SendMessageRequest {
     string,
     Array<{ role: "user" | "assistant"; content: string }>
   >;
-  threadMetadata?: Record<
-    string,
-    { name: string; age: number; occupation: string }
-  >;
+  threadMetadata?: Record<string, ThreadMetadata>;
 }
 
 // ============================================================================
@@ -253,10 +356,7 @@ class GameAPI {
       string,
       Array<{ role: "user" | "assistant"; content: string }>
     >,
-    threadMetadata?: Record<
-      string,
-      { name: string; age: number; occupation: string }
-    >,
+    threadMetadata?: Record<string, ThreadMetadata>,
   ): Promise<GameResponse> {
     const sessionId = getOrCreateSessionId();
 
@@ -308,10 +408,7 @@ class GameAPI {
       string,
       Array<{ role: "user" | "assistant"; content: string }>
     >,
-    threadMetadata?: Record<
-      string,
-      { name: string; age: number; occupation: string }
-    >,
+    threadMetadata?: Record<string, ThreadMetadata>,
   ): Promise<GameResponse> {
     const sessionId = getOrCreateSessionId();
 
