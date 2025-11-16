@@ -148,6 +148,7 @@ export function useDerivedUIState(
         unreadCount: hasUnreadMessages ? 1 : 0,
         online:
           thread.status === "active" || thread.status === "awaiting_response",
+        status: thread.status,
         trust: 50, // TODO: Get from backend
         age: charInfo?.age,
         occupation: charInfo?.occupation,

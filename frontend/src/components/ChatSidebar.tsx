@@ -409,6 +409,10 @@ export function ChatSidebar({
                   ? "var(--muted)"
                   : "transparent",
               minWidth: 0,
+              borderLeft:
+                bossContact.unreadCount > 0
+                  ? "3px solid var(--primary)"
+                  : "3px solid transparent",
             }}
             onMouseEnter={(e) => {
               if (selectedContactId !== bossContact.id) {
@@ -592,6 +596,10 @@ export function ChatSidebar({
                     ? "var(--muted)"
                     : "transparent",
                 minWidth: 0,
+                borderLeft:
+                  contact.status === "awaiting_response"
+                    ? "3px solid var(--primary)"
+                    : "3px solid transparent",
               }}
               onMouseEnter={(e) => {
                 if (selectedContactId !== contact.id) {
