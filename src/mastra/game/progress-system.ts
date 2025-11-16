@@ -29,7 +29,7 @@ export interface Achievement {
 }
 
 export const ACHIEVEMENTS: Achievement[] = [
-  // Progress achievements
+  // Progress achievements - MORE FREQUENT for better pacing
   {
     id: "first_client",
     name: "First Steps",
@@ -39,12 +39,44 @@ export const ACHIEVEMENTS: Achievement[] = [
     coinReward: 50,
   },
   {
+    id: "three_sessions",
+    name: "Getting Started",
+    description: "Complete 3 consultation sessions",
+    icon: "🌟",
+    category: "progress",
+    coinReward: 50,
+  },
+  {
+    id: "five_sessions",
+    name: "Five in a Row",
+    description: "Complete 5 consultation sessions",
+    icon: "🔥",
+    category: "progress",
+    coinReward: 75,
+  },
+  {
     id: "ten_clients",
     name: "Growing Practice",
     description: "Help 10 clients",
     icon: "📈",
     category: "progress",
     coinReward: 100,
+  },
+  {
+    id: "fifteen_sessions",
+    name: "Financial Helper",
+    description: "Complete 15 consultation sessions",
+    icon: "💼",
+    category: "progress",
+    coinReward: 125,
+  },
+  {
+    id: "twenty_five_sessions",
+    name: "Quarter Century",
+    description: "Complete 25 consultation sessions",
+    icon: "🎖️",
+    category: "progress",
+    coinReward: 200,
   },
   {
     id: "fifty_clients",
@@ -99,6 +131,14 @@ export const ACHIEVEMENTS: Achievement[] = [
     coinReward: 200,
   },
   {
+    id: "savings_25k",
+    name: "Savings Expert",
+    description: "Help clients save €25,000",
+    icon: "💎",
+    category: "finance",
+    coinReward: 350,
+  },
+  {
     id: "debt_crusher",
     name: "Debt Crusher",
     description: "Help clients clear €5,000 in debt",
@@ -115,12 +155,28 @@ export const ACHIEVEMENTS: Achievement[] = [
     coinReward: 1000,
   },
 
-  // Relationship achievements
+  // Relationship achievements - MORE MILESTONES for better pacing
   {
     id: "trusted_friend",
     name: "Trusted Friend",
     description: "Get a character recommendation",
     icon: "🤝",
+    category: "relationship",
+    coinReward: 100,
+  },
+  {
+    id: "reputation_25",
+    name: "Building Reputation",
+    description: "Reach 25 reputation",
+    icon: "✨",
+    category: "relationship",
+    coinReward: 75,
+  },
+  {
+    id: "reputation_50",
+    name: "Respected Advisor",
+    description: "Reach 50 reputation",
+    icon: "🌟",
     category: "relationship",
     coinReward: 100,
   },
@@ -235,15 +291,27 @@ export function checkForNewAchievements(
   const newAchievements: Achievement[] = [];
   const unlocked = new Set(advisorState.achievementsUnlocked);
 
-  // Progress achievements
+  // Progress achievements - MORE FREQUENT
   if (advisorState.totalClientsHelped === 1 && !unlocked.has("first_client")) {
     newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "first_client")!);
   }
-  if (advisorState.totalClientsHelped === 10 && !unlocked.has("ten_clients")) {
+  if (advisorState.totalSessions >= 3 && !unlocked.has("three_sessions")) {
+    newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "three_sessions")!);
+  }
+  if (advisorState.totalSessions >= 5 && !unlocked.has("five_sessions")) {
+    newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "five_sessions")!);
+  }
+  if (advisorState.totalClientsHelped >= 10 && !unlocked.has("ten_clients")) {
     newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "ten_clients")!);
   }
+  if (advisorState.totalSessions >= 15 && !unlocked.has("fifteen_sessions")) {
+    newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "fifteen_sessions")!);
+  }
+  if (advisorState.totalSessions >= 25 && !unlocked.has("twenty_five_sessions")) {
+    newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "twenty_five_sessions")!);
+  }
   if (
-    advisorState.totalClientsHelped === 50 &&
+    advisorState.totalClientsHelped >= 50 &&
     !unlocked.has("fifty_clients")
   ) {
     newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "fifty_clients")!);
@@ -336,6 +404,12 @@ export function checkForNewAchievements(
     newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "savings_10k")!);
   }
   if (
+    advisorState.lifetimeSavingsGenerated >= 25000 &&
+    !unlocked.has("savings_25k")
+  ) {
+    newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "savings_25k")!);
+  }
+  if (
     advisorState.lifetimeDebtCleared >= 5000 &&
     !unlocked.has("debt_crusher")
   ) {
@@ -350,7 +424,13 @@ export function checkForNewAchievements(
     );
   }
 
-  // Reputation achievements
+  // Reputation achievements - MORE MILESTONES
+  if (advisorState.reputation >= 25 && !unlocked.has("reputation_25")) {
+    newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "reputation_25")!);
+  }
+  if (advisorState.reputation >= 50 && !unlocked.has("reputation_50")) {
+    newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "reputation_50")!);
+  }
   if (advisorState.reputation >= 75 && !unlocked.has("reputation_75")) {
     newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "reputation_75")!);
   }

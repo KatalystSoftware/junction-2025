@@ -99,8 +99,8 @@ describe("Cash System, Advisor Leveling & Promotions Integration", () => {
         advisorState
       );
 
-      // Base consultation fee is 10 coins
-      expect(result.coinsEarned).toBe(10);
+      // Base consultation fee is 25 coins (INCREASED for better pacing)
+      expect(result.coinsEarned).toBe(25);
     });
 
     it("should award bonus coins for client savings", () => {
@@ -108,13 +108,13 @@ describe("Cash System, Advisor Leveling & Promotions Integration", () => {
         {
           qualityScore: 5,
           financialProjection: createFinancialProjection({
-            totalSaved: 1000, // €1000 saved = +50 coins (5 coins per €100)
+            totalSaved: 1000, // €1000 saved = +100 coins (10 coins per €100, DOUBLED)
           }),
         },
         advisorState
       );
 
-      expect(result.coinsEarned).toBe(60); // 10 base + 50 bonus
+      expect(result.coinsEarned).toBe(125); // 25 base + 100 bonus
     });
 
     it("should award bonus coins for debt reduction", () => {
@@ -122,13 +122,13 @@ describe("Cash System, Advisor Leveling & Promotions Integration", () => {
         {
           qualityScore: 5,
           financialProjection: createFinancialProjection({
-            totalDebtReduced: 2500, // €2500 debt reduced = +50 coins (10 coins per €500)
+            totalDebtReduced: 2500, // €2500 debt reduced = +75 coins (15 coins per €500, INCREASED)
           }),
         },
         advisorState
       );
 
-      expect(result.coinsEarned).toBe(60); // 10 base + 50 bonus
+      expect(result.coinsEarned).toBe(100); // 25 base + 75 bonus
     });
 
     it("should award bonus for high quality advice", () => {
@@ -140,7 +140,7 @@ describe("Cash System, Advisor Leveling & Promotions Integration", () => {
         advisorState
       );
 
-      expect(result.coinsEarned).toBe(15); // 10 base + 5 quality bonus
+      expect(result.coinsEarned).toBe(40); // 25 base + 15 quality bonus (TRIPLED)
     });
 
     it("should penalize for negative outcomes", () => {
@@ -153,7 +153,7 @@ describe("Cash System, Advisor Leveling & Promotions Integration", () => {
         advisorState
       );
 
-      expect(result.coinsEarned).toBe(0); // 10 base - 20 penalty = 0 (minimum 0)
+      expect(result.coinsEarned).toBe(5); // 25 base - 20 penalty = 5 (minimum 0)
     });
 
     it("should update advisor state with earnings", () => {

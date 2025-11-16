@@ -78,12 +78,13 @@ CREATE TABLE IF NOT EXISTS career_tiers (
 );
 
 -- Insert default career tiers
+-- BALANCED coin bonuses for better progression pacing (reduced from 100/250/500/1000)
 INSERT OR IGNORE INTO career_tiers (tier_level, tier_name, tier_name_fi, tier_emoji, min_reputation, min_skill_level, min_clients, min_sessions, min_achievements, min_savings_impact, coin_bonus, unlock_description, unlock_description_fi) VALUES
 (1, 'Junior Advisor', 'Juniori-neuvoja', '🌱', 0, 0, 0, 0, 0, 0, 0, 'Starting your career journey', 'Aloittaa urasi matka'),
-(2, 'Associate Advisor', 'Avustava neuvoja', '📈', 25, 3, 5, 10, 3, 5000, 100, 'Building trust and expertise', 'Luottamuksen ja asiantuntemuksen rakentaminen'),
-(3, 'Senior Advisor', 'Vanhempi neuvoja', '💼', 50, 5, 15, 30, 8, 25000, 250, 'Recognized expertise in financial guidance', 'Tunnustettu asiantuntemus talousohjauksessa'),
-(4, 'Expert Advisor', 'Asiantuntijaneuvoja', '🏆', 75, 7, 35, 60, 12, 75000, 500, 'Master of financial wisdom', 'Talousviisauden mestari'),
-(5, 'Master Advisor', 'Mestari-neuvoja', '👑', 90, 9, 75, 120, 16, 200000, 1000, 'Elite advisor with legendary impact', 'Eliittineuvoja, jolla on legendaarinen vaikutus');
+(2, 'Associate Advisor', 'Avustava neuvoja', '📈', 25, 3, 5, 10, 3, 5000, 50, 'Building trust and expertise', 'Luottamuksen ja asiantuntemuksen rakentaminen'),
+(3, 'Senior Advisor', 'Vanhempi neuvoja', '💼', 50, 5, 15, 30, 8, 25000, 150, 'Recognized expertise in financial guidance', 'Tunnustettu asiantuntemus talousohjauksessa'),
+(4, 'Expert Advisor', 'Asiantuntijaneuvoja', '🏆', 75, 7, 35, 60, 12, 75000, 300, 'Master of financial wisdom', 'Talousviisauden mestari'),
+(5, 'Master Advisor', 'Mestari-neuvoja', '👑', 90, 9, 75, 120, 16, 200000, 500, 'Elite advisor with legendary impact', 'Eliittineuvoja, jolla on legendaarinen vaikutus');
 
 -- Community Challenges
 -- Weekly/monthly challenges for competitive gameplay

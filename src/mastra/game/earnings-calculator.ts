@@ -32,21 +32,30 @@ export function calculateCoinsEarned(
   if (adviceEvaluation.financialProjection) {
     const projection = adviceEvaluation.financialProjection;
 
-    // Base consultation fee
-    coinsEarned = 10;
+    // Base consultation fee - INCREASED for better pacing
+    coinsEarned = 25;
 
     // Bonus for client financial results (projected)
-    // For every 100€ client saves: +5 coins
-    const savingsBonus = Math.floor(projection.totalSaved / 100) * 5;
+    // For every 100€ client saves: +10 coins (DOUBLED from 5)
+    const savingsBonus = Math.floor(projection.totalSaved / 100) * 10;
     coinsEarned += savingsBonus;
 
-    // For every 500€ debt reduced: +10 coins
-    const debtBonus = Math.floor(projection.totalDebtReduced / 500) * 10;
+    // For every 500€ debt reduced: +15 coins (INCREASED from 10)
+    const debtBonus = Math.floor(projection.totalDebtReduced / 500) * 15;
     coinsEarned += debtBonus;
 
-    // Bonus for high quality advice
+    // Bonus for high quality advice - TRIPLED for better rewards
     if (adviceEvaluation.qualityScore >= 8) {
-      coinsEarned += 5;
+      coinsEarned += 15;
+    }
+
+    // Streak bonus - rewards consistency
+    if (updatedState.currentStreak >= 10) {
+      coinsEarned += 50; // 10+ streak bonus
+    } else if (updatedState.currentStreak >= 5) {
+      coinsEarned += 25; // 5+ streak bonus
+    } else if (updatedState.currentStreak >= 3) {
+      coinsEarned += 10; // 3+ streak bonus
     }
 
     // Penalty for poor outcomes
