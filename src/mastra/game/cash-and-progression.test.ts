@@ -86,6 +86,8 @@ describe("Cash System, Advisor Leveling & Promotions Integration", () => {
       lastStreakCheckSession: 0,
       currentGameMonth: "2025-01",
       simulatedMonthsPassed: 0,
+      isFired: false,
+      criticalInterventionsForcedThrough: 0,
     };
   });
 
