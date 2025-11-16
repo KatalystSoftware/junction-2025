@@ -40,6 +40,9 @@ export async function transcribeAudio(
   }
 ): Promise<TranscriptionResult> {
   try {
+    // Convert buffer to base64 for Gemini API (requires base64 string)
+    const base64Audio = audioBuffer.toString("base64");
+
     // Prepare the transcription prompt
     const languageHint = options?.language
       ? `The audio is in ${options.language === "fi" ? "Finnish" : options.language === "sv" ? "Swedish" : "English"}.`
@@ -53,17 +56,15 @@ export async function transcribeAudio(
 
 Please transcribe the following audio accurately. Return ONLY the transcribed text, nothing else.`;
 
-    // Use configured Gemini model for transcription (supports audio input)
-    // Pass Buffer directly as data (AI SDK supports Buffer type)
+    // Use experimental_attachments for audio with Google provider
     const result = await generateText({
       model: google(getAgentModel()),
-      messages: [
+      prompt: transcriptionPrompt,
+      experimental_attachments: [
         {
-          role: "user",
-          content: [
-            { type: "text", text: transcriptionPrompt },
-            { type: "file", mediaType: mimeType, data: audioBuffer },
-          ],
+          name: "audio",
+          contentType: mimeType,
+          data: base64Audio,
         },
       ],
       temperature: 0.1, // Low temperature for accurate transcription
@@ -94,23 +95,22 @@ export async function transcribeAudioWithLanguageDetection(
   mimeType: AudioFormat = "audio/webm"
 ): Promise<TranscriptionResult> {
   try {
-    // Pass Buffer directly as data (AI SDK supports Buffer type)
+    // Convert buffer to base64 for Gemini API (requires base64 string)
+    const base64Audio = audioBuffer.toString("base64");
+
+    // Use experimental_attachments for audio with Google provider
     const result = await generateText({
       model: google(getAgentModel()),
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: `Please transcribe the following audio. First detect the language, then provide the transcription.
+      prompt: `Please transcribe the following audio. First detect the language, then provide the transcription.
 
 Format your response as:
 Language: [detected language]
 Transcription: [transcribed text]`,
-            },
-            { type: "file", mediaType: mimeType, data: audioBuffer },
-          ],
+      experimental_attachments: [
+        {
+          name: "audio",
+          contentType: mimeType,
+          data: base64Audio,
         },
       ],
       temperature: 0.1,
