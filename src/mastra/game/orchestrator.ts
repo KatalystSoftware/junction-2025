@@ -154,33 +154,50 @@ function getSafeAverageDimensionScore(
 }
 
 /**
- * Calculate frustration level based on wait time
+ * Calculate frustration level based on wait time and character personality
  * @param createdAt - When the thread was created
  * @param lastMessageAt - When the last message was sent
+ * @param character - Character whose patience we're measuring
  * @param lastFollowUpAt - When the last follow-up was sent (optional)
  * @returns Frustration level from 0 (calm) to 1 (very frustrated)
  */
 function calculateFrustrationLevel(
   createdAt: string,
   lastMessageAt: string,
+  character: Character,
   lastFollowUpAt?: string,
 ): number {
   const now = Date.now();
   const lastActivity = new Date(lastMessageAt).getTime();
   const minutesWaiting = (now - lastActivity) / 1000 / 60;
 
-  // Frustration thresholds (in minutes)
-  // 0-2 minutes: calm (0.0)
-  // 2-5 minutes: slightly impatient (0.0-0.3)
-  // 5-10 minutes: frustrated (0.3-0.6)
-  // 10-15 minutes: very frustrated (0.6-0.9)
-  // 15+ minutes: extremely frustrated (0.9-1.0)
+  // Character-specific patience based on personality
+  // Impulsive people get frustrated faster, patient people wait longer
+  const impulsiveness = character.personality.impulsiveness || 0.5;
+  const emotionality = character.personality.emotionality || 0.5;
 
-  if (minutesWaiting < 2) return 0.0;
-  if (minutesWaiting < 5) return (minutesWaiting - 2) / 3 * 0.3; // 0.0 to 0.3
-  if (minutesWaiting < 10) return 0.3 + (minutesWaiting - 5) / 5 * 0.3; // 0.3 to 0.6
-  if (minutesWaiting < 15) return 0.6 + (minutesWaiting - 10) / 5 * 0.3; // 0.6 to 0.9
-  return Math.min(1.0, 0.9 + (minutesWaiting - 15) / 15 * 0.1); // 0.9 to 1.0
+  // Patience multiplier: 0.5 (very impatient) to 1.5 (very patient)
+  // High impulsiveness + high emotionality = low patience
+  const patienceMultiplier = 1.5 - (impulsiveness * 0.7 + emotionality * 0.3);
+
+  // Adjust time thresholds based on patience
+  // Base thresholds: 2, 5, 10, 15 minutes
+  const calmThreshold = 2 * patienceMultiplier;
+  const slightlyImpatientThreshold = 5 * patienceMultiplier;
+  const frustratedThreshold = 10 * patienceMultiplier;
+  const veryFrustratedThreshold = 15 * patienceMultiplier;
+
+  if (minutesWaiting < calmThreshold) return 0.0;
+  if (minutesWaiting < slightlyImpatientThreshold) {
+    return (minutesWaiting - calmThreshold) / (slightlyImpatientThreshold - calmThreshold) * 0.3;
+  }
+  if (minutesWaiting < frustratedThreshold) {
+    return 0.3 + (minutesWaiting - slightlyImpatientThreshold) / (frustratedThreshold - slightlyImpatientThreshold) * 0.3;
+  }
+  if (minutesWaiting < veryFrustratedThreshold) {
+    return 0.6 + (minutesWaiting - frustratedThreshold) / (veryFrustratedThreshold - frustratedThreshold) * 0.3;
+  }
+  return Math.min(1.0, 0.9 + (minutesWaiting - veryFrustratedThreshold) / veryFrustratedThreshold * 0.1);
 }
 
 /**
@@ -763,6 +780,7 @@ export async function handleAdvisorResponse(
   const frustrationLevel = calculateFrustrationLevel(
     threadInfo.createdAt,
     threadInfo.lastMessageAt,
+    character,
     threadInfo.lastFollowUpAt,
   );
 
@@ -2231,10 +2249,15 @@ export async function checkAndSendFollowUps(
     // Skip resolved threads
     if (threadInfo.status === "resolved") continue;
 
+    // Get character
+    const character = characterPool.getCharacter(threadInfo.characterId);
+    if (!character) continue;
+
     // Calculate current frustration
     const frustrationLevel = calculateFrustrationLevel(
       threadInfo.createdAt,
       threadInfo.lastMessageAt,
+      character,
       threadInfo.lastFollowUpAt,
     );
 
@@ -2249,9 +2272,6 @@ export async function checkAndSendFollowUps(
         threadInfo.lastFollowUpAt,
       )
     ) {
-      // Get character
-      const character = characterPool.getCharacter(threadInfo.characterId);
-      if (!character) continue;
 
       // Generate follow-up message based on frustration level
       const followUpMessages = generateFollowUpMessage(

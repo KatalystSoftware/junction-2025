@@ -32,6 +32,28 @@ import type {
 } from "../types/game-types.ts";
 
 /**
+ * Helper function to check for follow-ups and include them in responses
+ * This makes the system server-led - frontend doesn't need to poll
+ */
+async function checkAndIncludeFollowUps(
+  advisorState: AdvisorState,
+): Promise<{
+  followUps: Array<{
+    threadId: string;
+    characterName: string;
+    messages: string[];
+    frustrationLevel: number;
+  }>;
+  updatedState: AdvisorState;
+}> {
+  const result = await checkAndSendFollowUps(advisorState);
+  return {
+    followUps: result.followUpsSent,
+    updatedState: result.stateUpdate,
+  };
+}
+
+/**
  * Client-safe version of AdvisorState - only fields the frontend needs
  * Excludes sensitive server-only fields like database credentials
  */
@@ -154,6 +176,12 @@ interface InitResponse {
   >;
   threadMetadata?: Record<string, ThreadMetadata>;
   autoStartedConsultation?: ClientSafeGameResponse; // Auto-started if no active threads
+  followUps?: Array<{
+    threadId: string;
+    characterName: string;
+    messages: string[];
+    frustrationLevel: number;
+  }>;
 }
 
 app.post("/init", async (c) => {
@@ -402,6 +430,23 @@ app.post("/init", async (c) => {
       }
     }
 
+    // Check for follow-ups (server-led approach)
+    const { followUps, updatedState } = await checkAndIncludeFollowUps(
+      advisorState,
+    );
+
+    // Save updated state if follow-ups were sent
+    if (followUps.length > 0) {
+      const historiesMap = threadHistories
+        ? new Map(Object.entries(threadHistories))
+        : new Map();
+      const metadataMap = threadMetadata
+        ? new Map(Object.entries(threadMetadata))
+        : new Map();
+      await saveSession(sessionId, updatedState, historiesMap, metadataMap);
+      advisorState = updatedState;
+    }
+
     return c.json<InitResponse>({
       sessionId,
       advisorState: toClientSafeAdvisorState(advisorState),
@@ -409,6 +454,7 @@ app.post("/init", async (c) => {
       threadHistories,
       threadMetadata,
       autoStartedConsultation,
+      followUps: followUps.length > 0 ? followUps : undefined,
     });
   } catch (error) {
     console.error("❌ Error in /init:", error);
@@ -595,6 +641,17 @@ app.post("/start-consultation", async (c) => {
       metadataMap,
     );
 
+    // Check for follow-ups (server-led approach)
+    const { followUps, updatedState } = await checkAndIncludeFollowUps(
+      gameResponse.stateUpdate,
+    );
+
+    // Save updated state if follow-ups were sent
+    if (followUps.length > 0) {
+      await saveSession(sessionId, updatedState, historiesMap, metadataMap);
+      gameResponse.stateUpdate = updatedState;
+    }
+
     // Convert Maps back to objects for response
     const threadHistoriesObject = Object.fromEntries(historiesMap);
     const threadMetadataObject = Object.fromEntries(metadataMap);
@@ -606,12 +663,19 @@ app.post("/start-consultation", async (c) => {
       "threads",
     );
 
-    return c.json<StartConsultationResponse>({
+    const response = {
       ...toClientSafeGameResponse(gameResponse),
       sessionId,
       threadHistories: threadHistoriesObject,
       threadMetadata: threadMetadataObject,
-    });
+    };
+
+    // Add follow-ups if any
+    if (followUps.length > 0) {
+      (response as any).followUps = followUps;
+    }
+
+    return c.json<StartConsultationResponse>(response);
   } catch (error) {
     console.error("❌ Error in /start-consultation:", error);
     return c.json({ error: "Failed to start consultation" }, 500);
@@ -826,6 +890,16 @@ app.post("/send-message", async (c) => {
     }
 
     // Save updated state with message histories and metadata
+    // Check for follow-ups (server-led approach)
+    const { followUps, updatedState } = await checkAndIncludeFollowUps(
+      gameResponse.stateUpdate,
+    );
+
+    // Save updated state (includes follow-ups if any)
+    if (followUps.length > 0) {
+      gameResponse.stateUpdate = updatedState;
+    }
+
     await saveSession(
       sessionId,
       gameResponse.stateUpdate,
@@ -837,12 +911,19 @@ app.post("/send-message", async (c) => {
     const threadHistoriesObject = Object.fromEntries(historiesMap);
     const threadMetadataObject = Object.fromEntries(metadataMap);
 
-    return c.json<SendMessageResponse>({
+    const response = {
       ...toClientSafeGameResponse(gameResponse),
       sessionId,
       threadHistories: threadHistoriesObject,
       threadMetadata: threadMetadataObject,
-    });
+    };
+
+    // Add follow-ups if any
+    if (followUps.length > 0) {
+      (response as any).followUps = followUps;
+    }
+
+    return c.json<SendMessageResponse>(response);
   } catch (error) {
     console.error("❌ Error in /send-message:", error);
     return c.json({ error: "Failed to send message" }, 500);
@@ -1369,7 +1450,12 @@ app.get("/session/:sessionId/character-progressions", async (c) => {
 
 /**
  * Check for and send follow-up messages to waiting characters
- * Should be called periodically by the frontend (e.g., every minute)
+ *
+ * NOTE: This endpoint is deprecated in favor of the server-led approach.
+ * Follow-ups are now automatically included in responses from /init,
+ * /start-consultation, and /send-message.
+ *
+ * Kept for backwards compatibility, but not recommended for use.
  */
 app.post("/check-followups", async (c) => {
   try {
