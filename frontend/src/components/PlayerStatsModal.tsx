@@ -265,7 +265,7 @@ export function PlayerStatsModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-2xl max-h-[calc(100dvh-4rem)] p-0 overflow-hidden flex flex-col"
+        className="max-w-2xl h-[90vh] max-h-[90vh] p-0 flex flex-col gap-0"
         style={{
           backgroundColor: "var(--card)",
           borderColor: "var(--border)",
@@ -290,7 +290,7 @@ export function PlayerStatsModal({
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 overflow-auto">
+        <ScrollArea className="flex-1 min-h-0">
           <Tabs defaultValue="stats" className="px-6 py-4">
             <TabsList className="grid grid-cols-4 w-full mb-6">
               <TabsTrigger value="stats">Stats</TabsTrigger>

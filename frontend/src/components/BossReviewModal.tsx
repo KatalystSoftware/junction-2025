@@ -73,14 +73,14 @@ export function BossReviewModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-3xl max-h-[calc(100dvh-4rem)] p-0 overflow-hidden"
+        className="max-w-3xl h-[90vh] max-h-[90vh] p-0 flex flex-col gap-0"
         style={{
           backgroundColor: "var(--card)",
           borderColor: "var(--border)",
         }}
       >
         <DialogHeader
-          className="px-6 py-5 border-b"
+          className="px-6 py-5 border-b flex-shrink-0"
           style={{ borderColor: "var(--border)" }}
         >
           <DialogTitle
@@ -98,7 +98,7 @@ export function BossReviewModal({
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[calc(100dvh-12rem)]">
+        <ScrollArea className="flex-1 min-h-0">
           <div className="px-6 py-6 space-y-6">
             {/* Overall Score */}
             <div
