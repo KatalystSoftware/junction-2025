@@ -1197,7 +1197,7 @@ export async function handleAdvisorResponse(
           : "english";
 
       const firingMessage = await generateFiringMessage(
-        advisorState.fireReason,
+        advisorState.fireReason || "unknown",
         {
           totalSessions: advisorState.totalSessions,
           clientsHelped: advisorState.totalClientsHelped,

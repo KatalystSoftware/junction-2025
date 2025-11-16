@@ -1,0 +1,350 @@
+[
+  {
+    "scenarioId": "scenario_jukka_first_property_idea_stage3",
+    "characterId": "char_jukka_002",
+    "scenarioType": "real_estate_introduction",
+    "difficulty": 0.6,
+    "topic": "real_estate",
+    "requiredStage": 3,
+    "successPath": "real_estate_investor",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 3, "max": 10 },
+      "characterStage": { "min": 3, "max": 4 },
+      "isFollowUp": false
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Hei! Remember when I had €8,000 in debt? I'm now completely debt-free and have €35k saved! 🎉 My friend who bought a rental apartment is making €300/month passive income. Is that something I could do? Or is that only for rich people?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Debt-free, strong savings, curious about real estate investing",
+      "emotionalState": "proud of progress, cautiously interested, slight imposter syndrome",
+      "urgency": "low",
+      "specificDetails": {
+        "currentSavings": 35000,
+        "monthlyIncome": 2400,
+        "monthlyExpenses": 1600,
+        "jobStability": "stable (retail manager)",
+        "age": 31,
+        "location": "Lahti"
+      }
+    },
+    "idealAdvice": [
+      "Incredible transformation from €8k debt to €35k savings!",
+      "Real estate basics: need 10-20% down payment + fees (5-7%)",
+      "Studio apartment: €80-120k in Lahti (€10-20k down needed)",
+      "Monthly costs: mortgage, yhtiövastike, maintenance, possible vacancies",
+      "Rental yield: aim for 5-7% gross (€4-6k annual rent on €80k apartment)",
+      "Calculate: mortgage payment + costs vs rental income = net cash flow",
+      "Start by researching market: check Etuovi, talk to real estate agents",
+      "Consider location: near schools, public transport, employment centers",
+      "Don't rush - take 3-6 months to learn and find right property",
+      "Alternative path: continue investing in stocks/funds (lower effort)"
+    ],
+    "commonMistakes": [
+      "Discouraging him because 'real estate is for rich people'",
+      "Not explaining the math of rental investing properly",
+      "Ignoring the effort required (tenant management, repairs)",
+      "Assuming one path is better than the other",
+      "Not celebrating his debt-free milestone"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_jukka_first_rental_purchase_stage4",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 5
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_jukka_first_rental_purchase_stage4",
+    "characterId": "char_jukka_002",
+    "scenarioType": "first_property_purchase",
+    "difficulty": 0.7,
+    "topic": "real_estate",
+    "requiredStage": 4,
+    "successPath": "real_estate_investor",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 4, "max": 10 },
+      "characterStage": { "min": 4, "max": 5 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_jukka_first_property_idea_stage3"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "I found a studio apartment! €95,000, 28m², near the train station. Current tenant paying €550/month. Loan would be €700/month, yhtiövastike €120/month. So I'd be losing €270/month but building equity. The bank approved my loan. Should I do it?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Found first rental property, analyzing the deal, loan approved",
+      "emotionalState": "nervous but excited, seeking validation",
+      "urgency": "medium",
+      "specificDetails": {
+        "propertyPrice": 95000,
+        "downPayment": 15000,
+        "loanAmount": 80000,
+        "monthlyMortgage": 700,
+        "monthlyFees": 120,
+        "currentRent": 550,
+        "location": "near train station Lahti",
+        "tenantSituation": "current tenant wants to stay"
+      }
+    },
+    "idealAdvice": [
+      "Full deal analysis needed:",
+      "Rental income: €550/month = €6,600/year",
+      "Costs: €700 mortgage + €120 fee = €820/month = €9,840/year",
+      "Negative cash flow: -€270/month (-€3,240/year)",
+      "BUT: building equity ~€400/month + potential appreciation",
+      "Vacancy risk: budget for 1-2 months vacant per year",
+      "Maintenance: 1-2% of value per year (€1-2k) - set aside fund",
+      "Tenant staying is good - reduces turnover risk",
+      "Location near train station is strong (liquidity + demand)",
+      "After 5 years: could refinance or raise rent to positive cash flow",
+      "Questions: Can you afford -€270/month? Emergency repairs? Vacancy?",
+      "Not a 'slam dunk' deal but reasonable for first property",
+      "Alternative: wait for better cash flow deal (but may not find one)"
+    ],
+    "commonMistakes": [
+      "Only looking at rent vs mortgage (ignoring fees, vacancy, maintenance)",
+      "Not explaining negative cash flow is okay if building equity",
+      "Ignoring location quality (near train station is great)",
+      "Not asking if he can afford the monthly loss",
+      "Expecting immediate cash flow on first property"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_jukka_tenant_nightmare_stage4",
+        "triggeredBy": "any",
+        "delayInSessions": 6
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_jukka_tenant_nightmare_stage4",
+    "characterId": "char_jukka_002",
+    "scenarioType": "tenant_management_crisis",
+    "difficulty": 0.7,
+    "topic": "real_estate",
+    "requiredStage": 4,
+    "successPath": "real_estate_investor",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 4, "max": 10 },
+      "characterStage": { "min": 4, "max": 5 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_jukka_first_rental_purchase_stage4"
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "I'm SO stressed. The tenant hasn't paid rent in 2 months. €1,100 missing. They won't answer my calls. I looked up eviction process and it takes months! I'm paying the mortgage out of pocket. What do I do? Was this a huge mistake?",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "urgent"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Tenant not paying rent, eviction process ahead, financial stress",
+      "emotionalState": "panicked, regretting purchase, financial stress",
+      "urgency": "high",
+      "specificDetails": {
+        "missedPayments": 2,
+        "amountOwed": 1100,
+        "tenantContact": "not responding",
+        "monthlyLoss": 820,
+        "emergencyFund": 12000,
+        "legalOptions": "eviction process 3-6 months"
+      }
+    },
+    "idealAdvice": [
+      "This is stressful but manageable - not a disaster",
+      "Immediate actions:",
+      "1. Send registered letter to tenant (legal requirement)",
+      "2. Contact Vuokranantajat liitto (landlord organization) for advice",
+      "3. File eviction notice (3-6 month process in Finland)",
+      "4. Consider Takuu-Säätiö (rent guarantee fund) if tenant was insured",
+      "Financial plan:",
+      "- You have €12k emergency fund - use it (this is why it exists!)",
+      "- Budget for 3-6 months of €820/month = €2.5-5k worst case",
+      "- This is painful but won't bankrupt you",
+      "Prevention for future:",
+      "- Income verification (3x rent minimum)",
+      "- Credit check and references",
+      "- Rent guarantee insurance (€30-50/month)",
+      "This is landlord initiation - happens to many, you'll learn from it",
+      "Not a mistake - just part of the learning curve"
+    ],
+    "commonMistakes": [
+      "Telling him to sell immediately (panic decision)",
+      "Not providing concrete legal steps",
+      "Ignoring his emergency fund (this is what it's for!)",
+      "Not discussing prevention for next tenant",
+      "Making him feel stupid for the purchase"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_jukka_property_two_decision_stage4",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 8
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_jukka_property_two_decision_stage4",
+    "characterId": "char_jukka_002",
+    "scenarioType": "portfolio_expansion",
+    "difficulty": 0.8,
+    "topic": "real_estate",
+    "requiredStage": 4,
+    "successPath": "real_estate_investor",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 5, "max": 10 },
+      "characterStage": { "min": 4, "max": 5 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_jukka_tenant_nightmare_stage4"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Good news - got the bad tenant out and found a GREAT new one (verified everything!). First property is now cash flow positive €100/month! 🎉 Found another property, €110k, already rented €650/month. Should I buy a second or focus on paying off the first mortgage?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "First property stable, opportunity for second property",
+      "emotionalState": "confident from lessons learned, strategic mindset",
+      "urgency": "medium",
+      "specificDetails": {
+        "property1": {
+          "value": 95000,
+          "mortgage": 72000,
+          "cashFlow": 100
+        },
+        "property2Offer": {
+          "price": 110000,
+          "downPaymentNeeded": 18000,
+          "monthlyRent": 650,
+          "estimatedCashFlow": 120
+        },
+        "currentSavings": 24000,
+        "monthlyIncome": 2400,
+        "monthlyExpenses": 1600
+      }
+    },
+    "idealAdvice": [
+      "Two valid strategies:",
+      "**Option A: Buy second property (growth)**",
+      "- Pros: €220/month total cash flow, faster wealth building, diversification",
+      "- Cons: More leverage, more tenant management, higher risk",
+      "- Need: €18k down + €5k reserves = €23k (you have €24k - tight!)",
+      "**Option B: Pay down first mortgage (safety)**",
+      "- Pros: Lower risk, higher equity, better loan terms later",
+      "- Cons: Slower growth, opportunity cost",
+      "**Recommendation at your stage:**",
+      "- Buy second IF you can keep €10k emergency fund across both properties",
+      "- Your math: €24k savings - €18k down = €6k left (too low!)",
+      "- Better: wait 6 months, save €10k more, then buy with €15k buffer",
+      "- Use this time to manage property 1 perfectly, build confidence",
+      "- Long-term goal: 3-5 properties for real passive income (€500-1000/month)",
+      "Remember: you went from €8k debt to property investor - pace yourself!"
+    ],
+    "commonMistakes": [
+      "Encouraging him to buy without adequate reserves",
+      "Not calculating total emergency fund needed for 2 properties",
+      "Assuming faster is always better",
+      "Ignoring the mental load of managing 2 properties",
+      "Not presenting both options clearly"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_jukka_portfolio_growth_stage5",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 10
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_jukka_portfolio_growth_stage5",
+    "characterId": "char_jukka_002",
+    "scenarioType": "portfolio_optimization",
+    "difficulty": 0.9,
+    "topic": "real_estate",
+    "requiredStage": 5,
+    "successPath": "real_estate_investor",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 6, "max": 10 },
+      "characterStage": { "min": 5, "max": 6 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_jukka_property_two_decision_stage4"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Portfolio update: I now own 4 properties! Total rental income €2,300/month. After mortgages and fees, net cash flow €600/month. My job pays €2,600/month. Starting to think... could I live off rental income and quit my job? What would I need? 🏠💰",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "4-property portfolio, considering quitting job for full-time landlording",
+      "emotionalState": "excited about financial independence, nervous about leaving job",
+      "urgency": "medium",
+      "specificDetails": {
+        "portfolio": {
+          "properties": 4,
+          "totalValue": 420000,
+          "totalDebt": 320000,
+          "netEquity": 100000,
+          "monthlyRent": 2300,
+          "monthlyCosts": 1700,
+          "netCashFlow": 600
+        },
+        "currentJob": {
+          "income": 2600,
+          "satisfaction": "burned out"
+        },
+        "monthlyExpenses": 1800,
+        "age": 35
+      }
+    },
+    "idealAdvice": [
+      "Financial independence calculation:",
+      "- Current cash flow: €600/month",
+      "- Living expenses: €1,800/month",
+      "- Gap: -€1,200/month (NOT ready to quit)",
+      "**To quit job safely:**",
+      "- Need: €2,500/month net cash flow (buffer for maintenance, vacancy)",
+      "- Current: €600/month",
+      "- Need to add: 6-8 more properties OR refinance existing for better cash flow",
+      "**Risks if you quit now:**",
+      "- One vacancy = financial crisis",
+      "- Major repair (roof, boiler) = debt again",
+      "- No health insurance through employer",
+      "**Better plan:**",
+      "- Negotiate part-time at job (3 days/week) if possible",
+      "- Grow portfolio to 8-10 properties over 2-3 years",
+      "- When cash flow hits €2,500/month consistently, re-evaluate",
+      "- Build €20-30k reserve fund for portfolio emergencies",
+      "**Milestone tracking:**",
+      "- From €8k debt (8 years ago) to €100k net worth - incredible!",
+      "- You're 70% there - don't rush the last 30%"
+    ],
+    "commonMistakes": [
+      "Encouraging him to quit without adequate cash flow",
+      "Not calculating true expenses (vacancy, maintenance, insurance)",
+      "Ignoring health insurance and tax implications",
+      "Not celebrating how far he's come",
+      "Assuming 4 properties is enough for financial independence"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_jukka_commercial_property_stage5",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 12
+      }
+    ]
+  }
+]

@@ -1,0 +1,541 @@
+[
+  {
+    "scenarioId": "scenario_petri_game_studio_formation_stage6",
+    "characterId": "char_petri_004",
+    "scenarioType": "studio_scaling",
+    "difficulty": 0.85,
+    "topic": "entrepreneurship",
+    "requiredStage": 6,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 7, "max": 10 },
+      "characterStage": { "min": 6, "max": 7 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_petri_second_game_viral_stage5"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Post-viral-game life: I used €1M to start a REAL game studio! Hired 12 people (programmers, artists, designers). Released 3 games in 2 years - total revenue €8M! 🎮 Now a publisher wants to acquire the studio for €25M OR I could raise €10M Series A to scale up (hire 50 people, release 5 games/year). Sell now and cash out? Or swing for €100M+ exit? I'm 32.",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Successful indie studio, acquisition offer vs growth capital",
+      "emotionalState": "proud of studio, torn between cashing out and building empire",
+      "urgency": "medium",
+      "specificDetails": {
+        "studioMetrics": {
+          "employees": 12,
+          "gamesReleased": 3,
+          "totalRevenue": 8000000,
+          "profitMargin": 0.4,
+          "netProfit": 3200000
+        },
+        "acquisitionOffer": {
+          "amount": 25000000,
+          "buyer": "Major game publisher",
+          "earnout": "€5M over 3 years if hit targets",
+          "founderRole": "Studio head, 3-year contract"
+        },
+        "seriesAOption": {
+          "amount": 10000000,
+          "valuation": 40000000,
+          "dilution": 0.25,
+          "plan": "Hire 50 people, 5 games/year, go for €100M+ exit"
+        },
+        "currentNetWorth": 5500000,
+        "age": 32
+      }
+    },
+    "idealAdvice": [
+      "From gaming café failure to €25M acquisition offer! INSANE arc! 🎮",
+      "Let's analyze both paths:",
+      "**Option A: Sell for €25M (+€5M earnout)**",
+      "**Upside:**",
+      "- Guaranteed €25M now (€15M after tax)",
+      "- Total net worth: €5.5M + €15M = €20.5M at 32!",
+      "- Earnout: Potential +€5M if you hit targets (3 years)",
+      "- Job security: 3-year contract as studio head",
+      "- Learn from major publisher (resources, distribution, etc.)",
+      "**Downside:**",
+      "- Lose independence (publisher controls creative decisions)",
+      "- If you leave after 3 years, studio isn't 'yours' anymore",
+      "- Earnout risk: Publisher might not support you properly",
+      "- Cap your upside (studio could be worth €100M+ in 5 years)",
+      "**Option B: Raise €10M Series A, swing for €100M+ exit**",
+      "**Upside:**",
+      "- Keep control + creative freedom (for now)",
+      "- Massive upside: €100M exit x 60% ownership = €60M for you!",
+      "- Build real gaming powerhouse (50 people, 5 games/year)",
+      "- Become 'that Finnish game studio' (Supercell vibes)",
+      "**Downside:**",
+      "- High risk: 50 people = €5M/year burn (2 years runway only!)",
+      "- Pressure to grow fast or die (VC treadmill)",
+      "- Dilution: You own 60% now, might be 30% after Series B/C",
+      "- Management hell: 12 → 50 people is brutal scaling",
+      "- You'd be CEO, not game designer (are you okay with that?)",
+      "**Financial comparison (5-year horizon):**",
+      "**Sell now:**",
+      "- Year 0: €20.5M net worth",
+      "- Year 3: +€5M earnout (if hit targets) = €25.5M total",
+      "- Year 5: €25.5M invested at 7% = €35M",
+      "- You're financially free, work is optional",
+      "**Raise Series A (best case):**",
+      "- Year 5: €100M exit x 60% = €60M (before tax = €40M)",
+      "- Net worth: €45M total",
+      "- But: 5 years of 80-hour weeks, high stress",
+      "**Raise Series A (worst case):**",
+      "- Studio fails, burns through €10M",
+      "- You still have €5.5M personal net worth",
+      "- But: 5 years of your life + emotional toll",
+      "**Questions to ask yourself:**",
+      "1. Do you want to be RICH (€25M) or VERY RICH (€45M)?",
+      "2. Do you want to MAKE GAMES or RUN A COMPANY? (different!)",
+      "3. Can you handle 50 employees? (you've only managed 12!)",
+      "4. What happens if you take VC money and games flop?",
+      "5. Are you doing this for money or passion? (be honest!)",
+      "**My recommendation:**",
+      "You're 32 with €5.5M - you're ALREADY financially free.",
+      "**If you love making games:** SELL to publisher, stay on as studio head",
+      "- You get €20M+ AND keep making games",
+      "- Let publisher handle business stuff",
+      "- After 3 years: Start new studio with your €25M if you want!",
+      "**If you want to build an empire:** Raise Series A",
+      "- But accept: This is 5-10 year commitment to CEO role",
+      "- Hire COO immediately (you focus on games)",
+      "- Know you might fail - can you handle that?",
+      "Most importantly: You don't NEED €100M. €25M is life-changing already!"
+    ],
+    "commonMistakes": [
+      "Assuming bigger exit is automatically better (€25M vs €45M)",
+      "Not asking what he wants to DO (make games vs run company)",
+      "Ignoring the 50-employee scaling pain (brutal!)",
+      "Not presenting the 'sell now, start new studio later' option",
+      "Missing that he's already financially free (€5.5M at 32!)",
+      "Forgetting the emotional toll of VC-backed hypergrowth"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_petri_post_exit_esports_stage6",
+        "triggeredBy": "any",
+        "delayInSessions": 12
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_petri_post_exit_esports_stage6",
+    "characterId": "char_petri_004",
+    "scenarioType": "esports_investment",
+    "difficulty": 0.9,
+    "topic": "entrepreneurship",
+    "requiredStage": 6,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 7, "max": 10 },
+      "characterStage": { "min": 6, "max": 7 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_petri_game_studio_formation_stage6"
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "Life after exit: I invested €5M into esports - bought a League of Legends team (€2M), funded 3 streamers (€500k), and started a Finnish esports arena in Helsinki (€2.5M). First year: LOSING €800k! 😅 Teams are expensive AF (player salaries, coaches, travel). Should I double down or cut my losses? Also... is this a business or expensive hobby?",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "urgent"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Esports investments losing money, decision point",
+      "emotionalState": "frustrated but passionate, questioning ROI",
+      "urgency": "high",
+      "specificDetails": {
+        "esportsInvestments": {
+          "lolTeam": {
+            "cost": 2000000,
+            "annualBurn": 500000,
+            "revenue": 150000,
+            "performance": "mid-tier"
+          },
+          "streamers": {
+            "cost": 500000,
+            "monthlyViewers": 500000,
+            "revenue": 100000,
+            "status": "growing but not profitable"
+          },
+          "arena": {
+            "cost": 2500000,
+            "monthlyRent": 15000,
+            "eventRevenue": 30000,
+            "status": "breaks even"
+          },
+          "totalInvested": 5000000,
+          "totalAnnualLoss": 800000
+        },
+        "currentNetWorth": 18000000,
+        "age": 35
+      }
+    },
+    "idealAdvice": [
+      "Esports is BRUTAL - let's analyze if this is savable or a money pit:",
+      "**The harsh reality of esports:**",
+      "- Most esports orgs LOSE money (even big ones like TSM, FaZe)",
+      "- Revenue streams: Sponsorships, merch, tournament winnings, content",
+      "- Costs: Player salaries ($50k-500k each!), coaches, bootcamps, travel",
+      "- Only top-tier teams are profitable (like Team Liquid, G2)",
+      "**Your investments breakdown:**",
+      "**LoL team (€2M investment, -€350k/year):**",
+      "- Burn: €500k/year (salaries, travel, bootcamp)",
+      "- Revenue: €150k/year (sponsors, prize money)",
+      "- Net: -€350k/year",
+      "- Problem: Mid-tier team = no big sponsors or prize money",
+      "- Fix options:",
+      "  - Upgrade roster (€1M+ for star players) → more wins → more sponsors",
+      "  - OR sell team slot (€1-1.5M) and cut losses",
+      "**Streamers (€500k investment, -€300k/year):**",
+      "- Costs: Salaries, equipment, support staff",
+      "- Revenue: €100k/year (ads, subs, sponsorships)",
+      "- Net: -€300k/year (ouch!)",
+      "- Problem: 500k viewers isn't enough (need 2M+ for profitability)",
+      "- Fix options:",
+      "  - Drop 2 streamers, keep 1 breakout star",
+      "  - OR pivot to content agency model (manage more streamers, lower costs)",
+      "**Arena (€2.5M investment, breaks even):**",
+      "- This is actually GOOD! Breaking even in Year 1 is solid!",
+      "- Revenue: €30k/month from events, rentals",
+      "- Costs: €15k rent + €15k operations",
+      "- Potential: Could become profitable with more events",
+      "**Total portfolio: -€800k/year**",
+      "At this burn rate, your €5M investment = €0 in 6 years (ouch!)",
+      "**Is this business or hobby?**",
+      "Honest answer: HOBBY disguised as business right now.",
+      "- Passion: 10/10 (you love esports!)",
+      "- ROI: 2/10 (losing €800k/year)",
+      "- Long-term viability: 4/10 (arena okay, rest struggling)",
+      "**Options:**",
+      "**Option A: Double down (invest €2M more)**",
+      "- Upgrade LoL roster to top-tier (€1M)",
+      "- Expand arena to host international tournaments (€500k)",
+      "- Hire esports business manager (€100k/year)",
+      "- Goal: Break even in Year 3, profitable by Year 5",
+      "- Risk: Could lose another €2M if it doesn't work",
+      "**Option B: Cut losses strategically**",
+      "- Sell LoL team (recover €1-1.5M)",
+      "- Drop 2 streamers, keep 1 star (save €200k/year)",
+      "- Keep arena (it's breaking even!)",
+      "- Total loss: €1.5-2M (painful but survivable)",
+      "**Option C: Pivot to 'esports media company'**",
+      "- Sell LoL team (€1-1.5M)",
+      "- Expand streamer agency (manage 20 streamers, take 20% cut)",
+      "- Use arena for content creation + events",
+      "- Lower risk, potentially profitable model",
+      "**My recommendation:**",
+      "You have €18M net worth - you CAN afford to lose €800k/year for a while.",
+      "BUT: Should you?",
+      "**Do this:**",
+      "1. Give it ONE more year with changes:",
+      "   - Sell LoL team OR upgrade roster to top-tier (pick one!)",
+      "   - Cut 2 streamers, keep best one",
+      "   - Double down on arena (this works!)",
+      "2. If still losing €500k+ in Year 2: EXIT esports investments",
+      "3. Redirect capital to game development (your actual strength!)",
+      "Esports is fun but BRUTAL business - don't let passion blind you to ROI! 🎮"
+    ],
+    "commonMistakes": [
+      "Not being honest about esports business reality (most orgs lose money!)",
+      "Encouraging doubling down without clear path to profitability",
+      "Ignoring that he has €18M (can afford the loss but shouldn't waste it!)",
+      "Not suggesting the 'one more year' trial period",
+      "Missing the arena is actually working (focus there!)",
+      "Assuming passion = good business (they're different!)"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_petri_game_publisher_empire_stage7",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 15
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_petri_game_publisher_empire_stage7",
+    "characterId": "char_petri_004",
+    "scenarioType": "publishing_empire",
+    "difficulty": 0.95,
+    "topic": "entrepreneurship",
+    "requiredStage": 7,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 8, "max": 10 },
+      "characterStage": { "min": 7, "max": 7 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_petri_post_exit_esports_stage6"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "PLOT TWIST! After cutting esports losses, I started a game PUBLISHING company - funding indie devs in exchange for 30% revenue share. Invested €10M across 20 indie games. 5 flopped, 10 doing okay, 5 are HITS! Total revenue: €45M in 3 years! Net worth: €35M! 🎮💰 Now Tencent wants to acquire my publishing company for €150M. Do I sell at 40? Or build 'Finnish Devolver Digital'?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Successful game publisher, mega acquisition offer",
+      "emotionalState": "excited, proud, questioning legacy vs cash",
+      "urgency": "medium",
+      "specificDetails": {
+        "publishingCompany": {
+          "gamesPublished": 20,
+          "totalInvested": 10000000,
+          "totalRevenue": 45000000,
+          "companyProfit": 13500000,
+          "hitGames": 5,
+          "okayGames": 10,
+          "flops": 5
+        },
+        "tencentOffer": {
+          "amount": 150000000,
+          "structure": "€100M cash + €50M earnout over 3 years",
+          "founderRole": "CEO for 5 years",
+          "autonomy": "Keep brand and decision-making"
+        },
+        "currentNetWorth": 35000000,
+        "age": 40,
+        "alternativeVision": "Build 'Finnish Devolver Digital' independently"
+      }
+    },
+    "idealAdvice": [
+      "Gaming café → €150M acquisition offer! This is LEGENDARY! 🎮🚀",
+      "Let's analyze this MASSIVE decision:",
+      "**The Tencent offer breakdown:**",
+      "- €100M cash upfront (€66M after tax)",
+      "- €50M earnout over 3 years (€33M after tax IF you hit targets)",
+      "- Total: €99M after tax (if earnout pays out)",
+      "- Your net worth: €35M + €99M = €134M at 40!",
+      "**What Tencent ownership means:**",
+      "✅ Pros:",
+      "- Tencent resources: Distribution, marketing, global reach",
+      "- Financial security (€100M cash!)",
+      "- Learn from world's biggest gaming company",
+      "- 'Keep brand and autonomy' (rare for Tencent!)",
+      "- Still CEO for 5 years (you drive the ship)",
+      "❌ Cons:",
+      "- Tencent ultimately controls (board votes, veto rights)",
+      "- Earnout risk: They might not support you properly",
+      "- 5-year golden handcuffs (can't leave without forfeiting earnout)",
+      "- Creative decisions might shift toward 'commercial hits'",
+      "- Chinese company ownership (political risk? IP concerns?)",
+      "**Alternative: Build 'Finnish Devolver Digital' independently**",
+      "Devolver Digital story:",
+      "- Independent publisher, ~40 games/year",
+      "- Valued at ~€1B+",
+      "- Known for: Creative freedom, indie-friendly, quirky marketing",
+      "- Profitable, sustainable, beloved by developers",
+      "**If you say NO to Tencent:**",
+      "- Keep 100% ownership",
+      "- Build at your own pace (no pressure!)",
+      "- Become 'THE indie publisher' in Nordic/Europe",
+      "- In 10 years: Could be worth €500M-1B independently",
+      "- But: Slower growth, more competition, harder path",
+      "**Financial comparison (10-year horizon):**",
+      "**Sell to Tencent:**",
+      "- Year 0: €134M net worth (after earnout)",
+      "- Year 10: €134M invested at 7% = €270M",
+      "- You're done at 43, do whatever you want next",
+      "**Stay independent:**",
+      "- Year 10: Company worth €500M-1B (optimistic)",
+      "- You own 100% = €500M-1B net worth",
+      "- But: 10 years of hustle, competition, stress",
+      "**Questions to ask yourself:**",
+      "1. Do you trust Tencent to keep their 'autonomy' promise? (skeptical!)",
+      "2. Can you handle 5 years reporting to Tencent overlords?",
+      "3. Is €134M enough? (spoiler: yes, it's MORE than enough!)",
+      "4. What do you want your LEGACY to be?",
+      "   - 'Sold to Tencent, got rich' OR",
+      "   - 'Built Finnish Devolver, legendary indie publisher'",
+      "5. Are you doing this for money or impact? (be honest!)",
+      "**My recommendation:**",
+      "This is tough because BOTH options are wins!",
+      "**Sell to Tencent IF:**",
+      "- You're tired and want financial freedom NOW",
+      "- €134M is your 'I won' number",
+      "- You're okay working for Tencent for 5 years",
+      "- You want to do something else after (new startup? retirement?)",
+      "**Stay independent IF:**",
+      "- You LOVE publishing and want to build legacy",
+      "- €35M is already 'I won' money (you can afford to try!)",
+      "- You want to be 'Finnish gaming hero' not 'guy who sold to Tencent'",
+      "- You're 40 - you have 20+ years to build this!",
+      "**My gut feeling:**",
+      "You're 40 with €35M - you're ALREADY financially free.",
+      "The question isn't money - it's LEGACY.",
+      "Would you rather be:",
+      "- 'The guy who sold to Tencent for €150M' OR",
+      "- 'The guy who built the Devolver Digital of Finland'?",
+      "Only you can answer that! But remember: Money is a tool, not a goal. 🎯"
+    ],
+    "commonMistakes": [
+      "Only focusing on money (€150M vs potential €500M)",
+      "Not questioning Tencent's 'autonomy' promise (often broken!)",
+      "Ignoring the legacy question (this matters at this level!)",
+      "Assuming bigger number is automatically better",
+      "Not celebrating that he's already won (€35M at 40!)",
+      "Missing that this is identity/purpose question, not financial"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_petri_billionaire_problems_stage7",
+        "triggeredBy": "any",
+        "delayInSessions": 12
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_petri_billionaire_problems_stage7",
+    "characterId": "char_petri_004",
+    "scenarioType": "absurdist_wealth",
+    "difficulty": 0.98,
+    "topic": "wealth_management",
+    "requiredStage": 7,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 9, "max": 10 },
+      "characterStage": { "min": 7, "max": 7 },
+      "isFollowUp": true
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "Okay this is ABSURD. Net worth: €120M. I bought FC Lahti for €15M (hometown team!). My wealth advisor wants me to set up family office. Someone pitched me on buying a GAME CONSOLE MANUFACTURER in China (?!?!). And check this: I got invited to speak at GDC about 'From Café to Empire.' I'm 45. I started with a €20k loan for a gaming café. WHAT IS HAPPENING?! 😂🎮⚽",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "excited"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Extreme wealth (€120M), FC Lahti owner, absurd opportunities",
+      "emotionalState": "amused, grounded, enjoying the absurdity",
+      "urgency": "low (but hilarious)",
+      "specificDetails": {
+        "currentNetWorth": 120000000,
+        "fcLahtiPurchase": {
+          "price": 15000000,
+          "stake": 0.80,
+          "annualBurn": 3000000,
+          "status": "money pit but FUN!"
+        },
+        "absurdOffers": [
+          {
+            "type": "Chinese game console manufacturer",
+            "price": 50000000,
+            "pitch": "Compete with Steam Deck, build 'Finnish Switch'"
+          },
+          {
+            "type": "Invest in Finnish game dev accelerator",
+            "price": 5000000,
+            "pitch": "Fund next generation of Finnish game devs"
+          },
+          {
+            "type": "GDC keynote speaking fee",
+            "price": 50000,
+            "pitch": "Share your story, inspire indie devs"
+          },
+          {
+            "type": "Buy Rovio (Angry Birds company) from Sega",
+            "price": 200000000,
+            "pitch": "Bring Finnish gaming icon back to Finland"
+          }
+        ],
+        "familyOfficeProposal": {
+          "minimumAUM": 80000000,
+          "annualCost": 600000
+        },
+        "age": 45,
+        "backgroundReminder": "€20k loan for gaming café that failed"
+      }
+    },
+    "idealAdvice": [
+      "Petri. From failed gaming café to €120M gaming mogul. THIS IS A MOVIE! 🎬",
+      "Let's evaluate these HILARIOUSLY ABSURD rich gamer problems:",
+      "**Family Office (€600k/year):**",
+      "- At €120M net worth: 100% YES",
+      "- Tax optimization alone saves you MILLIONS",
+      "- Plus: Investment management, estate planning, philanthropy",
+      "- Do it!",
+      "**FC Lahti (already bought for €15M):**",
+      "😂 Absurdity level: 10/10",
+      "- Financial return: TERRIBLE (€3M burn/year!)",
+      "- Emotional return: PRICELESS (hometown hero!)",
+      "- Reality: This is philanthropy disguised as investment",
+      "- My take: Keep it IF you can afford €3M/year burn (you can!)",
+      "- Set hard budget: Max €5M total loss, then reevaluate",
+      "**The absurd offers - let's rank:**",
+      "**Chinese console manufacturer (€50M):**",
+      "😂 Absurdity level: 12/10",
+      "- Compete with Nintendo, Valve, Sony? GOOD LUCK!",
+      "- Hardware is BRUTAL: R&D, manufacturing, distribution, support",
+      "- Success rate: ~1% (see: Ouya, Steam Machine failures)",
+      "- My take: HARD PASS - this is €50M bonfire",
+      "**Finnish game dev accelerator (€5M):**",
+      "😂 Absurdity level: 3/10 (actually reasonable!)",
+      "- Fund 50 indie devs at €100k each",
+      "- You know this space INTIMATELY",
+      "- Impact: Create next Supercell, Remedy, Housemarque?",
+      "- ROI: Probably break-even but HUGE legacy",
+      "- My take: DO THIS! Perfect fit for you!",
+      "**GDC keynote (€50k speaking fee):**",
+      "😂 Absurdity level: 2/10",
+      "- Share your story (café failure → €120M)",
+      "- Inspire thousands of indie devs",
+      "- €50k is peanuts to you now",
+      "- My take: DO IT and DONATE the fee to indie dev fund!",
+      "**Buy Rovio from Sega (€200M):**",
+      "😂 Absurdity level: 15/10 (PEAK ABSURDITY)",
+      "- Angry Birds! Bring it back to Finland!",
+      "- Nostalgic, iconic, emotionally resonant",
+      "- But: Rovio's best days are BEHIND it",
+      "- €200M is HUGE bet on declining IP",
+      "- My take: PASS - unless you want Finnish national hero status?",
+      "**What you SHOULD do with €120M:**",
+      "✅ **Family office** (€80M professionally managed)",
+      "✅ **Finnish game dev accelerator** (€10M endowment)",
+      "  - Fund 100 indie devs over 5 years",
+      "  - Your legacy: Create next wave of Finnish gaming",
+      "✅ **Keep FC Lahti** (€5M budget cap)",
+      "  - You're a hometown hero - embrace it!",
+      "  - But set limits so it doesn't drain you",
+      "✅ **GDC keynote** (donate fee to scholarship)",
+      "✅ **Game museum in Lahti** (€2M)",
+      "  - Celebrate Finnish gaming history",
+      "  - Your café location as historical site? 😂",
+      "✅ **Skip console manufacturer** (terrible idea)",
+      "✅ **Skip Rovio** (unless you want €200M nostalgia purchase)",
+      "**The legacy question:**",
+      "You're 45 with €120M. You could:",
+      "1. Retire, game all day, live like a king ✅",
+      "2. Build Finnish game dev ecosystem (IMPACT!) ✅✅✅",
+      "3. Buy Rovio, become national icon (EGO) 🤔",
+      "4. Burn €50M on console that fails (DUMB) ❌",
+      "**My actual recommendation:**",
+      "1. Set up family office (€80M)",
+      "2. Launch 'Petri Game Dev Fund' (€10M endowment)",
+      "   - Fund 10 indie teams/year at €100k each",
+      "   - Mentorship program (you teach them!)",
+      "   - Goal: Create 10 successful studios in 10 years",
+      "3. Keep FC Lahti (€5M budget cap)",
+      "4. Do GDC keynote (inspire next generation!)",
+      "5. Write a book: 'From Café Failure to Gaming Mogul' 📚",
+      "6. Game museum in Lahti (€2M)",
+      "7. ENJOY LIFE - you earned this! 🎮",
+      "You went from €20k loan → failed café → €120M gaming empire.",
+      "Now create 100 more Petris with that dev fund! 🇫🇮🎮"
+    ],
+    "commonMistakes": [
+      "Taking this too seriously (embrace the absurdity!)",
+      "Not celebrating the INSANE arc (café failure → €120M!)",
+      "Encouraging wasteful spending (console manufacturer is bonfire)",
+      "Missing the game dev accelerator opportunity (perfect legacy!)",
+      "Not emphasizing FC Lahti as philanthropy (it's okay to 'waste' money on it!)",
+      "Forgetting he's still a gamer at heart - money doesn't change that"
+    ],
+    "followUpScenarios": []
+  }
+]

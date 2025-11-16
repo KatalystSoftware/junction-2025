@@ -48,11 +48,6 @@ interface ChatWindowProps {
   contact: Contact | undefined;
   messages: Message[];
   onSendMessage: (content: string) => void;
-  onSendVoiceMessage?: (voiceMessage: {
-    audioBlob: Blob;
-    transcription: string;
-    duration: number;
-  }) => void;
   onBack: () => void;
   showChat: boolean;
   contactIsTyping: boolean;
@@ -130,7 +125,6 @@ export function ChatWindow({
   contact,
   messages,
   onSendMessage,
-  onSendVoiceMessage,
   onBack,
   showChat,
   contactIsTyping,
@@ -214,7 +208,9 @@ export function ChatWindow({
       };
 
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: "audio/webm",
+        });
         setAudioBlob(audioBlob);
         stream.getTracks().forEach((track) => track.stop());
       };
@@ -299,17 +295,8 @@ export function ChatWindow({
 
       console.log("Transcription:", transcription);
 
-      // If onSendVoiceMessage is provided, send as voice message with audio
-      if (onSendVoiceMessage) {
-        onSendVoiceMessage({
-          audioBlob,
-          transcription,
-          duration: recordingTime,
-        });
-      } else {
-        // Fallback: just send transcription as text
-        onSendMessage(transcription);
-      }
+      // Send the transcribed text
+      onSendMessage(transcription);
 
       // Reset state
       setAudioBlob(null);
@@ -317,7 +304,9 @@ export function ChatWindow({
       setIsTranscribing(false);
     } catch (error) {
       console.error("Failed to transcribe audio:", error);
-      alert("Failed to transcribe audio. Please try again or type your message.");
+      alert(
+        "Failed to transcribe audio. Please try again or type your message.",
+      );
       setIsTranscribing(false);
     }
   };
@@ -328,11 +317,11 @@ export function ChatWindow({
       if (recordingTimerRef.current) {
         clearInterval(recordingTimerRef.current);
       }
-      if (mediaRecorderRef.current) {
+      if (mediaRecorderRef.current && isRecording) {
         mediaRecorderRef.current.stop();
       }
     };
-  }, []); // Empty deps - only run on mount/unmount
+  }, [isRecording]);
 
   // Get multiple choice options from backend (if provided)
   // Keep the full choice objects to display actionText + projectedOutcome
@@ -1318,7 +1307,8 @@ export function ChatWindow({
                   }}
                 >
                   {isRecording ? "Recording..." : "Recording ready"}{" "}
-                  {Math.floor(recordingTime / 60)}:{String(recordingTime % 60).padStart(2, "0")}
+                  {Math.floor(recordingTime / 60)}:
+                  {String(recordingTime % 60).padStart(2, "0")}
                 </div>
 
                 {/* Actions */}
@@ -1420,11 +1410,15 @@ export function ChatWindow({
                     onClick={startRecording}
                     style={{
                       borderRadius: "9999px",
-                      backgroundColor: isRecording ? "var(--destructive)" : "var(--muted)",
+                      backgroundColor: isRecording
+                        ? "var(--destructive)"
+                        : "var(--muted)",
                       border: "1px solid var(--border)",
                     }}
                   >
-                    <Mic className={`w-4 h-4 ${isRecording ? "text-white" : "text-muted-foreground group-hover:text-foreground"} transition-colors`} />
+                    <Mic
+                      className={`w-4 h-4 ${isRecording ? "text-white" : "text-muted-foreground group-hover:text-foreground"} transition-colors`}
+                    />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>

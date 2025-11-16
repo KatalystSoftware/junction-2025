@@ -18,6 +18,7 @@ import { fileURLToPath } from "url";
 import {
   fetchFinnishFinancialNews,
   integrateNewsIntoRAG,
+  type NewsArticle,
 } from "./news-integration.ts";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -335,7 +336,7 @@ async function initializeNewsIndex(vectorStore: LibSQLVector) {
 
   // Fetch recent news for all languages
   const languages: Array<"fi" | "sv" | "en"> = ["fi", "sv", "en"];
-  const allArticles = [];
+  const allArticles: NewsArticle[] = [];
 
   for (const lang of languages) {
     const newsResults = await fetchFinnishFinancialNews("finance", lang, 5);
@@ -391,7 +392,11 @@ export async function initializeEnhancedKnowledgeBase() {
   });
   console.log("   ✓ Vector store initialized\n");
 
-  const results = [];
+  const results: Array<{
+    language: string;
+    chunkCount: number;
+    embeddingCount: number;
+  }> = [];
 
   // Initialize each language knowledge base
   for (const kb of KNOWLEDGE_BASES) {

@@ -1,0 +1,584 @@
+[
+  {
+    "scenarioId": "scenario_jukka_ten_property_portfolio_stage6",
+    "characterId": "char_jukka_002",
+    "scenarioType": "portfolio_expansion",
+    "difficulty": 0.85,
+    "topic": "real_estate",
+    "requiredStage": 6,
+    "successPath": "real_estate_investor",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 7, "max": 10 },
+      "characterStage": { "min": 6, "max": 7 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_jukka_portfolio_growth_stage5"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Portfolio update! I now own 10 rental properties across Lahti and Tampere. Total value: €1.2M, debt: €600k, net cash flow: €3,500/month. I quit my retail job last year - living 100% off rental income! 🏠💰 Now I'm thinking... should I keep buying more properties OR start a property management company? Which path grows wealth faster?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "10-property portfolio, financially independent, scaling decision",
+      "emotionalState": "proud, confident, strategic mindset",
+      "urgency": "medium",
+      "specificDetails": {
+        "portfolio": {
+          "properties": 10,
+          "totalValue": 1200000,
+          "totalDebt": 600000,
+          "netEquity": 600000,
+          "monthlyRent": 6500,
+          "monthlyCosts": 3000,
+          "netCashFlow": 3500
+        },
+        "monthlyExpenses": 2800,
+        "excessCashFlow": 700,
+        "age": 40,
+        "occupation": "full-time landlord",
+        "propertyManagementIdea": {
+          "concept": "Manage other people's rental properties for 10% fee",
+          "startupCost": 15000,
+          "potentialRevenue": "€500-1000/month per client"
+        }
+      }
+    },
+    "idealAdvice": [
+      "Incredible! From €8k debt to €600k net worth + financial freedom!",
+      "Let's analyze both paths:",
+      "**Path A: Keep buying more properties (scaling same model)**",
+      "**Pros:**",
+      "- You know this model inside-out (tenant management, maintenance, etc.)",
+      "- Leverage: €100k down payment → €300k property (3x leverage)",
+      "- Passive income compounds (20 properties = €7k/month cash flow)",
+      "- Tax advantages: Mortgage interest deductible, depreciation",
+      "**Cons:**",
+      "- Tenant management scales linearly (20 properties = 2x headaches)",
+      "- Capital intensive (need €50-100k for each new property)",
+      "- Market risk (Lahti/Tampere property values could drop)",
+      "- Liquidity (hard to sell quickly if you need cash)",
+      "**Path B: Property management company (new business model)**",
+      "**Pros:**",
+      "- Scalable revenue (1 employee can manage 50+ properties)",
+      "- Lower capital needs (€15k startup vs €100k per property)",
+      "- Monthly recurring revenue (€500-1000 per client)",
+      "- Learn new skills (sales, operations, hiring)",
+      "**Cons:**",
+      "- Customer acquisition hard (convincing landlords to trust you)",
+      "- 10% fee on €600/month rent = only €60/client (need MANY clients)",
+      "- Operational complexity (employees, insurance, complaints)",
+      "- Different skill set (you're investor, not service business operator)",
+      "**Financial projection comparison:**",
+      "**Path A (10 more properties in 5 years):**",
+      "- Need: €500k down payments (€50k x 10)",
+      "- Source: €700/month excess + refinancing existing properties",
+      "- Result: 20 properties, €7k/month cash flow, €1.2M equity",
+      "**Path B (property management, 20 clients in 5 years):**",
+      "- Need: €15k startup + €30k marketing/operations",
+      "- Revenue: 20 clients x €700/month x 10% = €1,400/month",
+      "- Result: Small business worth €100-200k, €1,400/month profit",
+      "**My recommendation:**",
+      "**Do BOTH, but sequentially:**",
+      "1. **Years 1-2**: Buy 3-5 more properties (get to 13-15 total)",
+      "2. **Year 3**: Start property management as SIDE BUSINESS",
+      "3. **Test**: Manage 5 external properties, see if you like it",
+      "4. **Year 4-5**: Double down on whichever you prefer",
+      "**Why this works:**",
+      "- Property buying uses your proven playbook (low risk)",
+      "- Property management tests new model without betting everything",
+      "- If PM works: You have dual income streams (rents + fees)",
+      "- If PM fails: You still have 15 properties (fallback plan)",
+      "You're 40 with €600k equity and financial freedom - you can afford to experiment!"
+    ],
+    "commonMistakes": [
+      "Assuming property management is 'obviously better' (it's not!)",
+      "Not calculating actual revenue from 10% property management fee",
+      "Ignoring that he's an investor, not a service business operator",
+      "Not suggesting a hybrid/sequential approach (test before committing)",
+      "Missing the incredible achievement (€8k debt → €600k equity!)",
+      "Not considering the operational complexity of property management"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_jukka_commercial_real_estate_stage6",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 12
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_jukka_commercial_real_estate_stage6",
+    "characterId": "char_jukka_002",
+    "scenarioType": "commercial_investment",
+    "difficulty": 0.9,
+    "topic": "real_estate",
+    "requiredStage": 6,
+    "successPath": "real_estate_investor",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 7, "max": 10 },
+      "characterStage": { "min": 6, "max": 7 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_jukka_ten_property_portfolio_stage6"
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "Big opportunity! A small commercial property in Lahti city center is for sale - 3 retail units + 2 office spaces. Price: €800k. Current rental income: €5,500/month. Seller says one tenant is leaving (€1,500/month loss). Bank approved loan BUT wants 40% down (€320k). I'd have to sell 3-4 residential properties to afford it. Commercial real estate seems like the 'next level' but I'm nervous. Thoughts?",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "urgent"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Commercial property opportunity, requires selling residential portfolio",
+      "emotionalState": "excited but nervous, fear of overextending",
+      "urgency": "high",
+      "specificDetails": {
+        "commercialProperty": {
+          "price": 800000,
+          "currentRent": 5500,
+          "tenantLeaving": 1500,
+          "newRentProjection": 4000,
+          "downPaymentRequired": 320000,
+          "loanAmount": 480000,
+          "loanRate": 0.045,
+          "location": "Lahti city center"
+        },
+        "currentPortfolio": {
+          "residentialProperties": 12,
+          "netEquity": 850000,
+          "monthlyCashFlow": 4200
+        },
+        "requiresSale": "3-4 residential properties to fund down payment",
+        "age": 42
+      }
+    },
+    "idealAdvice": [
+      "Commercial real estate is VERY different from residential - let's analyze:",
+      "**Commercial vs Residential key differences:**",
+      "- Leases: 5-10 year contracts (vs 1-year residential)",
+      "- Tenant risk: Business closure = instant vacancy (vs individual renters)",
+      "- Maintenance: Tenants often pay (vs you pay everything)",
+      "- Vacancy impact: ONE tenant leaving = huge revenue drop",
+      "- Management: More complex (commercial lease negotiations, etc.)",
+      "**The deal analysis:**",
+      "**Current state:**",
+      "- Rent: €5,500/month = €66k/year",
+      "- Price: €800k → 8.25% gross yield (pretty good!)",
+      "- After tenant leaves: €4,000/month = €48k/year = 6% yield (okay)",
+      "**Costs:**",
+      "- Loan payment: €480k at 4.5% = €2,430/month",
+      "- Yhtiövastike/fees: ~€800/month (estimate for commercial)",
+      "- Maintenance reserve: €500/month",
+      "- Total costs: ~€3,730/month",
+      "**Cash flow projection:**",
+      "- Best case (full occupancy): €5,500 - €3,730 = €1,770/month",
+      "- Realistic (one vacancy): €4,000 - €3,730 = €270/month",
+      "- Worst case (two vacancies): €2,500 - €3,730 = -€1,230/month (NEGATIVE!)",
+      "**To fund €320k down payment:**",
+      "- Sell 3-4 residential properties (€250-300k equity)",
+      "- Lose €800-1,200/month in residential cash flow",
+      "- Net effect: Trade €1,000/month residential for €270/month commercial?!",
+      "**MAJOR RED FLAGS:**",
+      "❌ One tenant already leaving (why? Business struggling? Rent too high?)",
+      "❌ Commercial vacancy can last 6-12 months (vs 1-2 months residential)",
+      "❌ You're selling PERFORMING assets to buy RISKY asset",
+      "❌ Cash flow is WORSE than your residential portfolio",
+      "❌ You have ZERO commercial real estate experience",
+      "**My recommendation: PASS on this deal**",
+      "**Why?**",
+      "- Risk/reward is terrible (sell stable for unstable)",
+      "- Cash flow doesn't justify the complexity",
+      "- Tenant departure is a warning sign",
+      "- You're not desperate for a deal - you have €4,200/month income!",
+      "**Better commercial real estate strategy:**",
+      "1. Keep building residential portfolio (you're GOOD at this!)",
+      "2. Save €100k cash specifically for commercial down payment",
+      "3. Find commercial property with STABLE tenants (5+ years remaining)",
+      "4. Look for 8-10% net yield minimum (not 3-6%)",
+      "5. Start small: Buy one commercial unit, not 5 units at once",
+      "Commercial real estate is the next level, but THIS deal isn't the one!",
+      "Be patient - you're 42 with €850k equity, not desperate."
+    ],
+    "commonMistakes": [
+      "Encouraging the deal just because 'commercial is next level'",
+      "Not calculating realistic cash flow with vacancy",
+      "Ignoring the red flag of tenant leaving",
+      "Not comparing to his current residential cash flow (this is worse!)",
+      "Assuming commercial is automatically better than residential",
+      "Not emphasizing patience (he doesn't need to rush!)"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_jukka_apartment_building_purchase_stage6",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 10
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_jukka_apartment_building_purchase_stage6",
+    "characterId": "char_jukka_002",
+    "scenarioType": "multi_unit_building",
+    "difficulty": 0.9,
+    "topic": "real_estate",
+    "requiredStage": 6,
+    "successPath": "real_estate_investor",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 7, "max": 10 },
+      "characterStage": { "min": 6, "max": 7 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_jukka_commercial_real_estate_stage6"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Found a better deal! Entire 8-unit apartment building in Tampere. Price: €1.5M. All units rented (€7,200/month total). Owner retiring, motivated seller. I could: A) Buy it alone (€450k down + mortgage), B) Partner with 2 other investors (€150k each), or C) Keep buying individual apartments. This feels like the 'big leagues' move. What do you think?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "8-unit apartment building opportunity, scaling decision",
+      "emotionalState": "excited, confident, ready for bigger deals",
+      "urgency": "medium",
+      "specificDetails": {
+        "building": {
+          "price": 1500000,
+          "units": 8,
+          "monthlyRent": 7200,
+          "annualRent": 86400,
+          "grossYield": 0.0576,
+          "location": "Tampere",
+          "condition": "good, built 2005",
+          "occupancy": 1.0
+        },
+        "optionA": {
+          "downPayment": 450000,
+          "loanAmount": 1050000,
+          "monthlyMortgage": 5300,
+          "ownership": 1.0
+        },
+        "optionB": {
+          "downPayment": 150000,
+          "loanAmount": 350000,
+          "ownership": 0.33,
+          "partners": 2
+        },
+        "currentPortfolio": {
+          "properties": 14,
+          "netEquity": 1100000,
+          "monthlyCashFlow": 4800
+        },
+        "age": 43
+      }
+    },
+    "idealAdvice": [
+      "Now THIS is a better deal! Let's compare all three options:",
+      "**The building analysis:**",
+      "- 8 units, €7,200/month = €900/unit average",
+      "- €1.5M / 8 = €187.5k per unit (reasonable!)",
+      "- 5.76% gross yield (decent for Tampere)",
+      "- Motivated seller = potential to negotiate down to €1.4M",
+      "**Option A: Buy alone (€450k down, 100% ownership)**",
+      "**Cash flow:**",
+      "- Rent: €7,200/month",
+      "- Mortgage: €5,300/month (€1.05M at 4.5%)",
+      "- Yhtiövastike (estimate): €1,200/month (€150/unit x 8)",
+      "- Maintenance reserve: €500/month",
+      "- Total costs: €7,000/month",
+      "- **Net cash flow: €200/month (very tight!)**",
+      "**Pros:**",
+      "- You own the whole building (100% upside)",
+      "- Economies of scale (one roof to fix, not 8)",
+      "- Build serious equity (€1.5M asset!)",
+      "**Cons:**",
+      "- Need €450k down (sell 4-5 properties!)",
+      "- Barely cash flow positive (risky)",
+      "- One vacancy = negative cash flow",
+      "**Option B: Partner with 2 investors (€150k each, 33% ownership)**",
+      "**Cash flow:**",
+      "- Your share: €7,200 x 33% = €2,376/month revenue",
+      "- Your costs: €7,000 x 33% = €2,310/month",
+      "- **Net cash flow: €66/month (terrible!)**",
+      "**Pros:**",
+      "- Only €150k down (keep most of portfolio)",
+      "- Shared risk (3 people split problems)",
+      "- Learn from co-investors",
+      "**Cons:**",
+      "- Partnership complexity (decision-making, disputes)",
+      "- Barely any cash flow (€66/month is nothing!)",
+      "- Diluted upside (only 33% of equity)",
+      "**Option C: Keep buying individual apartments**",
+      "- €150k down = 3 apartments at €50k each",
+      "- 3 apartments x €550 rent = €1,650/month revenue",
+      "- 3 apartments x €700 costs = €2,100/month costs",
+      "- **Net cash flow: -€450/month initially, +€600/month after paydown**",
+      "**My ranking:**",
+      "🥇 **Option A (buy alone) - IF you negotiate to €1.4M**",
+      "- Negotiate hard: Offer €1.35M, settle at €1.4M",
+      "- This improves cash flow to €500/month (much better!)",
+      "- Sell 4 properties to fund down payment",
+      "- You're ready for this - you have the experience!",
+      "🥈 **Option C (keep buying individual) - Safe choice**",
+      "- Less sexy but proven model",
+      "- Diversification (not all eggs in one building)",
+      "- Flexibility (sell one if needed)",
+      "🥉 **Option B (partnership) - PASS**",
+      "- Complexity without cash flow = worst of both worlds",
+      "- Only do this if you LOVE the partners",
+      "**My recommendation:**",
+      "Try to buy building alone at €1.4M. If seller won't budge, keep buying individual apartments. This is your 'level up' moment - go for it!"
+    ],
+    "commonMistakes": [
+      "Not calculating realistic cash flow for each option",
+      "Assuming partnership is 'safer' (it's just more complex!)",
+      "Not suggesting negotiation (motivated seller!)",
+      "Ignoring the option to keep doing what works (individual apartments)",
+      "Not celebrating that he's even CONSIDERING €1.5M deals!",
+      "Missing the economies of scale benefit (one building vs 8 properties)"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_jukka_multi_building_empire_stage7",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 15
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_jukka_multi_building_empire_stage7",
+    "characterId": "char_jukka_002",
+    "scenarioType": "real_estate_empire",
+    "difficulty": 0.95,
+    "topic": "real_estate",
+    "requiredStage": 7,
+    "successPath": "real_estate_investor",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 8, "max": 10 },
+      "characterStage": { "min": 7, "max": 7 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_jukka_apartment_building_purchase_stage6"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Portfolio update: I now own 3 apartment buildings (total 24 units) + 8 individual apartments = 32 rental units! Total value: €4.5M, debt: €2.2M, equity: €2.3M. Net cash flow: €12k/month! 💰 I'm 47 years old. A real estate investment company wants to buy my entire portfolio for €5.5M. Should I sell and... retire? Or keep building? What's the endgame here?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Large real estate portfolio, buyout offer, retirement decision",
+      "emotionalState": "proud but tired, questioning purpose",
+      "urgency": "medium",
+      "specificDetails": {
+        "portfolio": {
+          "buildings": 3,
+          "buildingUnits": 24,
+          "individualApartments": 8,
+          "totalUnits": 32,
+          "totalValue": 4500000,
+          "totalDebt": 2200000,
+          "netEquity": 2300000,
+          "monthlyRent": 18000,
+          "monthlyCosts": 6000,
+          "netCashFlow": 12000
+        },
+        "buyoutOffer": {
+          "amount": 5500000,
+          "buyer": "Real estate investment company",
+          "terms": "cash, 60-day close",
+          "netAfterDebt": 3300000,
+          "netAfterTaxes": 2500000
+        },
+        "age": 47,
+        "currentLifestyle": "€5k/month expenses",
+        "backgroundReminder": "€8k debt at age 28"
+      }
+    },
+    "idealAdvice": [
+      "Jukka. From €8k DEBT at 28 to €2.3M EQUITY at 47. LEGENDARY. 🏆",
+      "Let's think about the buyout offer and your life:",
+      "**The offer analysis:**",
+      "- Portfolio value: €4.5M market value",
+      "- Offer: €5.5M (22% premium!)",
+      "- Net after debt: €5.5M - €2.2M = €3.3M",
+      "- Taxes (capital gains 34%): ~€800k",
+      "- **Cash in hand: €2.5M**",
+      "**What €2.5M means for you:**",
+      "- 4% withdrawal rate = €100k/year = €8,333/month",
+      "- Your expenses: €5k/month",
+      "- Surplus: €3,333/month (live VERY comfortably)",
+      "- You're 47 - this is 40+ years of financial freedom",
+      "**If you DON'T sell:**",
+      "- Keep €12k/month cash flow (€144k/year)",
+      "- Expenses: €5k/month (€60k/year)",
+      "- Reinvest: €7k/month (€84k/year) into more properties",
+      "- In 10 years: Could own €10M+ portfolio, €20k/month cash flow",
+      "- But: Tenant calls, maintenance, vacancies, headaches",
+      "**The 'endgame' question:**",
+      "**Option A: Sell now, retire at 47**",
+      "- €2.5M invested in index funds",
+      "- Travel, hobbies, family, freedom",
+      "- No more tenant calls at 2am",
+      "- You 'won the game' - enjoy the victory lap",
+      "**Option B: Keep building, reach €10M+ by 57**",
+      "- 10 more years of hustle",
+      "- Build generational wealth (€10M+ to pass to kids)",
+      "- Become 'the real estate guy' in Lahti/Tampere",
+      "- But: More stress, more time commitment, diminishing returns on happiness?",
+      "**Option C: Hybrid - sell HALF**",
+      "- Sell the 3 buildings (€3.5M), keep 8 apartments (€1M)",
+      "- Net: €1.3M cash after debt + €1M in remaining properties",
+      "- Keep €3k/month cash flow from 8 apartments",
+      "- Reduce complexity but maintain income stream",
+      "**Questions to ask yourself:**",
+      "1. Do you ENJOY landlording or is it just income? (be honest!)",
+      "2. What would you DO with your time if you sold? (purpose matters!)",
+      "3. Do you have kids to pass wealth to? (generational thinking)",
+      "4. Are you tired of tenant management? (burnout is real)",
+      "5. What does 'winning' look like for you? (€2.5M? €10M? Freedom?)",
+      "**My recommendation:**",
+      "You've already won. €2.5M at 47 = you NEVER have to work again.",
+      "If you're tired: SELL. Enjoy life. Travel. Relax. You earned it.",
+      "If you still love it: KEEP BUILDING. You could hit €10M by 57.",
+      "But don't keep building just because you CAN - do it because you WANT to.",
+      "Remember: You worried about €8k debt 19 years ago. Look at you now! 🎉"
+    ],
+    "commonMistakes": [
+      "Telling him what to do (this is deeply personal!)",
+      "Not asking about his PURPOSE (what will he do after selling?)",
+      "Ignoring the emotional toll of landlording (burnout)",
+      "Assuming more money is always better (€2.5M is ENOUGH!)",
+      "Not celebrating the INSANE journey (€8k debt → €2.5M!)",
+      "Missing the 'you've already won' message"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_jukka_billionaire_problems_stage7",
+        "triggeredBy": "any",
+        "delayInSessions": 12
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_jukka_billionaire_problems_stage7",
+    "characterId": "char_jukka_002",
+    "scenarioType": "absurdist_wealth",
+    "difficulty": 0.98,
+    "topic": "wealth_management",
+    "requiredStage": 7,
+    "successPath": "real_estate_investor",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 9, "max": 10 },
+      "characterStage": { "min": 7, "max": 7 },
+      "isFollowUp": true
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "Okay this is getting ridiculous. I kept building and now own 12 apartment buildings (140 units!!) across Finland. Net worth: €18M. A Finnish REIT wants to buy everything for €25M. Also, I got invited to buy a minority stake in FC Lahti for €3M (?!). My wealth advisor says I should 'diversify out of real estate' but... I'm a real estate guy! What do I do with €25M if I sell? Also... should I buy FC Lahti? 😂⚽",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "excited"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "€18M real estate empire, REIT buyout offer, football team opportunity",
+      "emotionalState": "amused, slightly overwhelmed, identity tied to real estate",
+      "urgency": "low (but hilarious)",
+      "specificDetails": {
+        "portfolio": {
+          "buildings": 12,
+          "totalUnits": 140,
+          "totalValue": 22000000,
+          "totalDebt": 4000000,
+          "netEquity": 18000000,
+          "monthlyRent": 95000,
+          "monthlyCosts": 35000,
+          "netCashFlow": 60000
+        },
+        "reitOffer": {
+          "amount": 25000000,
+          "buyer": "Finnish REIT",
+          "netAfterDebt": 21000000,
+          "netAfterTaxes": 15000000
+        },
+        "fcLahtiOffer": {
+          "stake": 0.15,
+          "price": 3000000,
+          "pitch": "Hometown team, community impact, passion project"
+        },
+        "age": 52,
+        "backgroundReminder": "€8k debt at 28, now €18M at 52"
+      }
+    },
+    "idealAdvice": [
+      "JUKKA! €8k debt → €18M in 24 years! You're a LEGEND! 😂",
+      "Let's talk about these ABSURD rich people problems:",
+      "**The REIT offer (€25M):**",
+      "- They're offering €25M for €22M market value (14% premium)",
+      "- Net after debt + taxes: ~€15M cash",
+      "- You'd go from €60k/month cash flow to... index fund dividends?",
+      "**What to do with €15M if you sell:**",
+      "Your wealth advisor is RIGHT - you're 100% concentrated in Finnish real estate. Risky!",
+      "**Diversification plan:**",
+      "- €7M in global index funds (40-60 year horizon)",
+      "- €3M in bonds (stability, income)",
+      "- €2M in alternative investments (private equity, REITs - but NOT Finnish!)",
+      "- €2M 'play money' (angel investing, passion projects, FC Lahti??)",
+      "- €1M emergency fund (untouchable)",
+      "**FC Lahti minority stake (€3M):**",
+      "😂 Absurdity level: 11/10",
+      "- Football clubs are TERRIBLE investments (they lose money!)",
+      "- 15% minority stake = no control, just capital calls",
+      "- BUT: Hometown team, community hero status, fun!",
+      "**Financial analysis:**",
+      "- Expected return: -5% annually (clubs burn cash)",
+      "- Emotional return: Priceless (if you love football!)",
+      "- You could afford this as 'passion project' (€3M of €15M)",
+      "**My take on FC Lahti:**",
+      "❌ If you're doing it for ROI: PASS (terrible investment)",
+      "✅ If you LOVE football + want to give back to Lahti: DO IT!",
+      "- But: Negotiate down to €2M for 15% (they need you more than you need them)",
+      "- Set budget: Max €500k/year in additional capital calls",
+      "- Accept: This is philanthropy disguised as investment",
+      "**The identity question:**",
+      "'I'm a real estate guy' - but are you HAPPY being real estate guy?",
+      "- 140 units = you're managing a small city!",
+      "- €60k/month is INSANE cash flow, but what's the cost?",
+      "- Are you working FOR your portfolio or IS your portfolio working for you?",
+      "**Option A: Sell to REIT, diversify, buy FC Lahti**",
+      "- €15M → €12M diversified + €3M FC Lahti",
+      "- Passive income: ~€400k/year (€33k/month)",
+      "- Time: Manage FC Lahti involvement, otherwise free",
+      "- Fun: Football games, community impact, hero status",
+      "**Option B: Keep empire, hire property manager**",
+      "- Pay €10k/month to property management company",
+      "- Net cash flow: €50k/month (still insane!)",
+      "- You oversee strategy, they handle operations",
+      "- Keep building to €50M? (because you can?)",
+      "**Option C: Sell half (€12.5M), keep half**",
+      "- Sell 6 buildings, keep 6 buildings",
+      "- €7M cash to diversify + €9M in real estate",
+      "- €30k/month cash flow from remaining buildings",
+      "- Best of both worlds",
+      "**My actual recommendation:**",
+      "1. You're 52 with €18M - you WON at life",
+      "2. Sell to REIT for €25M (take the premium!)",
+      "3. Diversify €12M conservatively (index funds, bonds)",
+      "4. Buy FC Lahti for €2M if you love football (negotiate!)",
+      "5. Keep €1M for fun (travel, hobbies, family)",
+      "6. Enjoy the next 40 years as a football team owner! ⚽",
+      "You went from retail worker with €8k debt to football club owner. That's a MOVIE! 🎬"
+    ],
+    "commonMistakes": [
+      "Not celebrating the ABSURD journey (€8k → €18M!)",
+      "Treating FC Lahti as rational investment (it's passion, not ROI!)",
+      "Not addressing concentration risk (100% Finnish real estate!)",
+      "Ignoring the 'what's the cost?' question (managing 140 units!)",
+      "Assuming more real estate is automatically good (diminishing returns!)",
+      "Missing the movie-worthy arc (retail worker → football club owner!)"
+    ],
+    "followUpScenarios": []
+  }
+]

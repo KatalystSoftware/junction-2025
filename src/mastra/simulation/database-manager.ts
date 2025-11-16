@@ -13,6 +13,7 @@
 
 import pkg from "pg";
 const { Pool } = pkg;
+type PoolType = InstanceType<typeof Pool>;
 import type {
   Transaction,
   CharacterFinancialState,
@@ -24,11 +25,11 @@ import type {
 } from "./simulation-types.ts";
 
 // Singleton connection pool - shared across all database manager instances
-let sharedPool: Pool | null = null;
+let sharedPool: PoolType | null = null;
 let initializationPromise: Promise<void> | null = null;
 
 export class SimulationDatabaseManager {
-  private pool: Pool;
+  private pool: PoolType;
   private initialized: Promise<void>;
 
   constructor(connectionString: string) {

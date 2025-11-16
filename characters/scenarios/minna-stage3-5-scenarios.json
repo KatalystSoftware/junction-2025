@@ -1,0 +1,383 @@
+[
+  {
+    "scenarioId": "scenario_minna_first_investment_stage3",
+    "characterId": "char_minna_001",
+    "scenarioType": "first_investment",
+    "difficulty": 0.5,
+    "topic": "investing",
+    "requiredStage": 3,
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 3, "max": 10 },
+      "characterStage": { "min": 3, "max": 3 },
+      "isFollowUp": false,
+      "requiresPreviousScenario": null
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Hei! Big news - I graduated and got my first real dev job! €2,800/month! 🎉 I have €5,000 saved up that I want to invest. Everyone's talking about index funds vs individual stocks. What should I do? I don't want to mess this up!",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "First time investor, €5k to invest, choosing between index funds and stocks",
+      "emotionalState": "excited but nervous, eager to start investing",
+      "urgency": "medium",
+      "specificDetails": {
+        "amountToInvest": 5000,
+        "monthlyIncome": 2800,
+        "currentSavings": 12000,
+        "hasEmergencyFund": true,
+        "riskTolerance": "moderate",
+        "timeHorizon": "long-term (20+ years)"
+      }
+    },
+    "idealAdvice": [
+      "Start with broad index funds (S&P 500, global index) for diversification",
+      "Use low-cost ETFs (expense ratio <0.2%)",
+      "Dollar-cost averaging - invest monthly rather than lump sum",
+      "Keep 3-6 months emergency fund separate (don't invest all €12k)",
+      "Start small with individual stocks if interested (<10% of portfolio)",
+      "Recommend platforms: Nordnet, Degiro for Finnish investors",
+      "Tax-advantaged accounts first (ASP-tili if eligible)",
+      "Long-term mindset - don't panic sell during dips"
+    ],
+    "commonMistakes": [
+      "Recommending individual stock picking for beginners",
+      "Not mentioning emergency fund importance",
+      "Suggesting risky investments (crypto, meme stocks) without warning",
+      "Ignoring tax implications in Finland",
+      "Not asking about risk tolerance and time horizon first"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_minna_apartment_decision_stage3",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 4
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_minna_apartment_decision_stage3",
+    "characterId": "char_minna_001",
+    "scenarioType": "homeownership_decision",
+    "difficulty": 0.6,
+    "topic": "real_estate",
+    "requiredStage": 3,
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 3, "max": 10 },
+      "characterStage": { "min": 3, "max": 4 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_minna_first_investment_stage3"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "So... I've been thinking. My rent is €700/month and apartments are selling for €180-200k. My friend just bought one and says I'm 'throwing money away on rent.' But buying feels like a HUGE commitment. What should I consider? 🏠",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Considering first apartment purchase vs continuing to rent",
+      "emotionalState": "conflicted, peer pressure to buy, uncertain",
+      "urgency": "medium",
+      "specificDetails": {
+        "currentRent": 700,
+        "apartmentPrices": { "min": 180000, "max": 200000 },
+        "currentSavings": 35000,
+        "monthlyIncome": 2800,
+        "jobStability": "good (permanent contract)",
+        "interestedArea": "Helsinki suburbs"
+      }
+    },
+    "idealAdvice": [
+      "Buying vs renting depends on personal situation, not just math",
+      "Consider job stability and location flexibility (dev jobs can be remote)",
+      "Down payment needs: 10-15% (€18-30k) + fees (€5-8k)",
+      "Monthly costs: mortgage + yhtiövastike + maintenance (often > rent)",
+      "Opportunity cost: could €30k down payment grow more if invested?",
+      "Renting isn't 'throwing money away' - it's flexibility and liquidity",
+      "Buy when: stable job, plan to stay 5+ years, emotionally ready",
+      "Don't rush due to peer pressure - you're only 25!",
+      "ASP-tili (Finnish savings incentive) if planning to buy within 5 years"
+    ],
+    "commonMistakes": [
+      "Assuming buying is always better than renting",
+      "Not explaining total cost of homeownership (yhtiövastike, repairs)",
+      "Ignoring opportunity cost of down payment",
+      "Not considering her potential for job changes or side projects",
+      "Pressure to buy just because friends are buying"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_minna_side_project_idea_stage3",
+        "triggeredBy": "any",
+        "delayInSessions": 3
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_minna_side_project_idea_stage3",
+    "characterId": "char_minna_001",
+    "scenarioType": "entrepreneur_path_selection",
+    "difficulty": 0.7,
+    "topic": "entrepreneurship",
+    "requiredStage": 3,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 4, "max": 10 },
+      "characterStage": { "min": 3, "max": 4 },
+      "isFollowUp": true
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Okay so... remember how I struggled with budgeting as a student? I built a simple budgeting app for myself and showed it to some uni friends. They LOVE it and want to use it. I'm thinking of actually building this properly as a side project. Am I crazy? 🤔",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Side project idea with potential, deciding whether to pursue",
+      "emotionalState": "excited but scared, imposter syndrome kicking in",
+      "urgency": "low",
+      "specificDetails": {
+        "projectType": "Student budgeting app",
+        "initialInterest": "10-15 friends",
+        "timeRequired": "10-20 hours/week",
+        "costs": "€50-100/month (hosting, tools)",
+        "currentJobSatisfaction": "good but not passionate"
+      }
+    },
+    "idealAdvice": [
+      "Start as side project while keeping day job (low risk)",
+      "Validate idea: get 50-100 users before investing heavily",
+      "Set aside 'startup budget' (€500-1000) for 6 months",
+      "Track time investment - if >20hrs/week, reassess job/life balance",
+      "Learn business basics: pricing, user acquisition, retention",
+      "Don't quit job until app generates €1,500+/month reliably",
+      "Network: find a business-minded co-founder (you're tech, need business)",
+      "Consider this character's journey from €185 debt to potential founder!",
+      "Keep investing portfolio growing while exploring entrepreneurship"
+    ],
+    "commonMistakes": [
+      "Suggesting she quit job immediately (too risky)",
+      "Not validating market fit first",
+      "Ignoring financial safety net requirements",
+      "Not addressing time management and burnout risk",
+      "Forgetting she's only 25 - low-risk experimentation time"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_minna_startup_traction_stage4",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 6
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_minna_startup_traction_stage4",
+    "characterId": "char_minna_001",
+    "scenarioType": "startup_growth",
+    "difficulty": 0.8,
+    "topic": "entrepreneurship",
+    "requiredStage": 4,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 5, "max": 10 },
+      "characterStage": { "min": 4, "max": 5 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_minna_side_project_idea_stage3"
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "Okay this is WILD. The app now has 10,000 users! A small percent are paying €4.99/month for premium features. I'm making about €1,200/month from it! An angel investor reached out offering €250k for 20% equity. Should I take it? Should I quit my job and do this full-time? I'm freaking out!",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "excited"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "App has real traction, angel investment offer, major decision point",
+      "emotionalState": "excited, overwhelmed, imposter syndrome, fear of failure",
+      "urgency": "high",
+      "specificDetails": {
+        "users": 10000,
+        "monthlyRevenue": 1200,
+        "conversionRate": "2% to paid",
+        "angelOffer": { "amount": 250000, "equity": 0.2 },
+        "currentJobIncome": 2800,
+        "netWorth": 120000,
+        "timeSpentOnApp": "30 hours/week (burning out)"
+      }
+    },
+    "idealAdvice": [
+      "Huge milestone! Validate product-market fit is real",
+      "Angel offer evaluation: €250k for 20% values company at €1.25M - is that fair?",
+      "Due diligence: research investor, check references, lawyer review",
+      "Alternative: bootstrap longer, retain more equity, slower growth",
+      "Quit job decision: can you live on €1,200/month? (No - need €2k+ buffer)",
+      "Hybrid approach: negotiate part-time at current job (3 days/week)",
+      "Financial safety: keep 12-month runway (€25-30k liquid) before quitting",
+      "This is the 'valley of death' - most startups fail here, plan carefully",
+      "Your net worth €120k gives you runway - use it wisely",
+      "Talk to other founders who've taken angel money"
+    ],
+    "commonMistakes": [
+      "Telling her to immediately quit job (too risky)",
+      "Not questioning the €250k/20% valuation",
+      "Ignoring burnout and mental health (30hrs/week side project)",
+      "Not discussing equity dilution and control",
+      "Assuming success is guaranteed with angel money"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_minna_scaling_challenges_stage5",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 8
+      },
+      {
+        "scenarioId": "scenario_minna_startup_failure_stage3",
+        "triggeredBy": "bad_advice_or_not_followed",
+        "delayInSessions": 5
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_minna_scaling_challenges_stage5",
+    "characterId": "char_minna_001",
+    "scenarioType": "startup_scaling",
+    "difficulty": 0.9,
+    "topic": "entrepreneurship",
+    "requiredStage": 5,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 6, "max": 10 },
+      "characterStage": { "min": 5, "max": 6 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_minna_startup_traction_stage4"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "100,000 users! €15k/month revenue! But I'm drowning. I need to hire engineers, a designer, customer support... I have €180k left from the angel round. How do I scale without running out of money? Also, a bigger VC wants to invest €2M for 25%. Advice? 🚀😰",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Scaling startup, hiring decisions, Series A fundraising",
+      "emotionalState": "successful but overwhelmed, managing team stress",
+      "urgency": "high",
+      "specificDetails": {
+        "users": 100000,
+        "monthlyRevenue": 15000,
+        "burnRate": 8000,
+        "remainingCapital": 180000,
+        "runwayMonths": 11,
+        "vcOffer": { "amount": 2000000, "equity": 0.25 },
+        "teamSize": 1,
+        "hireNeeds": "2 engineers, 1 designer, 1 support"
+      }
+    },
+    "idealAdvice": [
+      "Runway critical: 11 months without new funding - need to decide soon",
+      "Hiring: start with 2 engineers first (product development priority)",
+      "Budget: fully loaded engineer cost €5-6k/month in Finland",
+      "VC offer: €2M for 25% post-money = €8M valuation (4x growth from angel!)",
+      "Dilution check: you started with 100%, now 80%, would be 60% after Series A",
+      "Don't take VC money if you can bootstrap to profitability",
+      "Path to profitability: need €20k/month revenue to break even with team",
+      "VCs expect 10x return - pressure to grow fast vs sustainable",
+      "Alternative: smaller raise (€500k), less dilution, slower growth",
+      "Mental health: hire slowly, delegate early, avoid burnout"
+    ],
+    "commonMistakes": [
+      "Not calculating runway and burn rate properly",
+      "Hiring too fast (startup death by premature scaling)",
+      "Not understanding dilution and founder equity",
+      "Assuming more funding is always better",
+      "Ignoring path to profitability",
+      "Not considering bootstrapping vs VC path"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_minna_acquisition_offer_stage5",
+        "triggeredBy": "any",
+        "delayInSessions": 10
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_minna_acquisition_offer_stage5",
+    "characterId": "char_minna_001",
+    "scenarioType": "acquisition_decision",
+    "difficulty": 0.9,
+    "topic": "entrepreneurship",
+    "requiredStage": 5,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 7, "max": 10 },
+      "characterStage": { "min": 5, "max": 6 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_minna_scaling_challenges_stage5"
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "You're not going to believe this. A big fintech company wants to acquire us for €5 MILLION. I'd walk away with about €2.5M after investors and taxes. That's... life-changing money. But I also love what I'm building. Part of me wants to keep growing and see how big we can get. What should I do?",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "excited"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "€5M acquisition offer, life-changing money vs continue building",
+      "emotionalState": "torn, excited, proud, uncertain about future",
+      "urgency": "high",
+      "specificDetails": {
+        "acquisitionOffer": 5000000,
+        "founderShare": 0.6,
+        "netAfterTaxes": 2500000,
+        "currentNetWorth": 800000,
+        "companyRevenue": 25000,
+        "companyGrowth": "20% month over month",
+        "burnRate": 18000,
+        "teamSize": 8,
+        "age": 28
+      }
+    },
+    "idealAdvice": [
+      "€2.5M is financially independent money at 28 - incredible achievement!",
+      "Tax planning: capital gains ~34% in Finland - confirm with accountant",
+      "Emotional decision: do you want to keep being CEO or cash out?",
+      "Acquirer terms: earnout? Employment agreement? Vision alignment?",
+      "Alternative: negotiate higher (try for €7-8M based on growth)",
+      "Reference back to €185 credit card debt - look at this journey!",
+      "Consider: would you regret selling in 5 years if company becomes €50M?",
+      "Counter-question: are you burned out or genuinely excited to keep building?",
+      "20% MoM growth is insane - could be worth €50M+ in 2 years",
+      "Life goals: what do you want? Wealth? Impact? Freedom?",
+      "No wrong answer - both paths are wins"
+    ],
+    "commonMistakes": [
+      "Telling her what to do (this is deeply personal)",
+      "Not exploring her emotional state and burnout level",
+      "Ignoring the incredible achievement (€185 debt → €2.5M!)",
+      "Not discussing tax implications",
+      "Assuming more money is always better",
+      "Not asking about vision for the company and personal life goals"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_minna_post_exit_stage6",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 12,
+        "condition": "if_accepted_offer"
+      },
+      {
+        "scenarioId": "scenario_minna_unicorn_path_stage6",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 15,
+        "condition": "if_rejected_offer"
+      }
+    ]
+  }
+]

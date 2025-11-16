@@ -15,18 +15,17 @@ import {
   checkForMilestones,
   ACHIEVEMENTS,
 } from "./progress-system";
-import {
-  calculateTierScore,
-  getTierDisplay,
-} from "./leaderboard-calculator";
+import { calculateTierScore, getTierDisplay } from "./leaderboard-calculator";
 import type { AdvisorState, TopicExpertise } from "../types/game-types";
 
 // Helper function to create a minimal FinancialProjection for tests
-function createFinancialProjection(overrides: Partial<{
-  totalSaved: number;
-  totalDebtReduced: number;
-  totalInterestSaved: number;
-}> = {}) {
+function createFinancialProjection(
+  overrides: Partial<{
+    totalSaved: number;
+    totalDebtReduced: number;
+    totalInterestSaved: number;
+  }> = {},
+) {
   return {
     monthlySavings: 0,
     monthlyExpenseReduction: 0,
@@ -98,7 +97,7 @@ describe("Cash System, Advisor Leveling & Promotions Integration", () => {
           qualityScore: 5,
           financialProjection: createFinancialProjection(),
         },
-        advisorState
+        advisorState,
       );
 
       // Base consultation fee is 25 coins (INCREASED for better pacing)
@@ -113,7 +112,7 @@ describe("Cash System, Advisor Leveling & Promotions Integration", () => {
             totalSaved: 1000, // €1000 saved = +100 coins (10 coins per €100, DOUBLED)
           }),
         },
-        advisorState
+        advisorState,
       );
 
       expect(result.coinsEarned).toBe(125); // 25 base + 100 bonus
@@ -127,7 +126,7 @@ describe("Cash System, Advisor Leveling & Promotions Integration", () => {
             totalDebtReduced: 2500, // €2500 debt reduced = +75 coins (15 coins per €500, INCREASED)
           }),
         },
-        advisorState
+        advisorState,
       );
 
       expect(result.coinsEarned).toBe(100); // 25 base + 75 bonus
@@ -139,7 +138,7 @@ describe("Cash System, Advisor Leveling & Promotions Integration", () => {
           qualityScore: 8.5, // High quality score (≥8)
           financialProjection: createFinancialProjection(),
         },
-        advisorState
+        advisorState,
       );
 
       expect(result.coinsEarned).toBe(40); // 25 base + 15 quality bonus (TRIPLED)
@@ -152,7 +151,7 @@ describe("Cash System, Advisor Leveling & Promotions Integration", () => {
           outcome: "negative",
           financialProjection: createFinancialProjection(),
         },
-        advisorState
+        advisorState,
       );
 
       expect(result.coinsEarned).toBe(5); // 25 base - 20 penalty = 5 (minimum 0)
@@ -168,7 +167,7 @@ describe("Cash System, Advisor Leveling & Promotions Integration", () => {
             totalSaved: 500,
           }),
         },
-        advisorState
+        advisorState,
       );
 
       expect(result.updatedState.advisorCoins).toBeGreaterThan(initialCoins);
@@ -209,7 +208,7 @@ describe("Cash System, Advisor Leveling & Promotions Integration", () => {
 
     it("should award coins for achievements", () => {
       const firstClientAchievement = ACHIEVEMENTS.find(
-        (a) => a.id === "first_client"
+        (a) => a.id === "first_client",
       );
 
       expect(firstClientAchievement).toBeDefined();
@@ -241,7 +240,7 @@ describe("Cash System, Advisor Leveling & Promotions Integration", () => {
 
       expect(milestones.length).toBeGreaterThan(0);
       const reputationMilestone = milestones.find((m) =>
-        m.message.toLowerCase().includes("reputation")
+        m.message.toLowerCase().includes("reputation"),
       );
       expect(reputationMilestone).toBeDefined();
     });
@@ -254,7 +253,7 @@ describe("Cash System, Advisor Leveling & Promotions Integration", () => {
 
       expect(milestones.length).toBeGreaterThan(0);
       const skillMilestone = milestones.find((m) =>
-        m.message.toLowerCase().includes("skill")
+        m.message.toLowerCase().includes("skill"),
       );
       expect(skillMilestone).toBeDefined();
     });
@@ -269,7 +268,7 @@ describe("Cash System, Advisor Leveling & Promotions Integration", () => {
       const clientMilestone = milestones.find(
         (m) =>
           m.message.toLowerCase().includes("client") ||
-          m.message.toLowerCase().includes("10")
+          m.message.toLowerCase().includes("10"),
       );
       expect(clientMilestone).toBeDefined();
     });
@@ -347,7 +346,7 @@ describe("Cash System, Advisor Leveling & Promotions Integration", () => {
               totalDebtReduced: session.debt,
             }),
           },
-          advisorState
+          advisorState,
         );
 
         // Update advisor state from result
@@ -424,7 +423,7 @@ describe("Cash System, Advisor Leveling & Promotions Integration", () => {
           outcome: "negative",
           financialProjection: createFinancialProjection(),
         },
-        advisorState
+        advisorState,
       );
 
       // Should not go below 0

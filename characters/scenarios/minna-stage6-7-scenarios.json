@@ -1,0 +1,614 @@
+[
+  {
+    "scenarioId": "scenario_minna_post_exit_angel_investing_stage6",
+    "characterId": "char_minna_001",
+    "scenarioType": "wealth_management",
+    "difficulty": 0.85,
+    "topic": "angel_investing",
+    "requiredStage": 6,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 7, "max": 10 },
+      "characterStage": { "min": 6, "max": 7 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_minna_acquisition_offer_stage5"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "It's been 2 years since I sold the company. I've been angel investing in 15 Finnish startups (€50k-200k each, total €1.2M invested). 3 have failed, 10 are growing, 2 are CRUSHING it. One wants me to lead their Series A round (€3M total, I'd put in €1M for 12% equity). Am I becoming a VC? Is this smart or am I just addicted to startups? 😅",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Serial angel investor, considering leading a Series A round",
+      "emotionalState": "confident but questioning identity, startup FOMO",
+      "urgency": "medium",
+      "specificDetails": {
+        "currentNetWorth": 3500000,
+        "angelPortfolio": {
+          "totalInvested": 1200000,
+          "startupsFailed": 3,
+          "startupsGrowing": 10,
+          "startupsCrushing": 2,
+          "paperValue": 2400000
+        },
+        "seriesAOpportunity": {
+          "company": "AI-powered HR tech startup",
+          "totalRound": 3000000,
+          "askingInvestment": 1000000,
+          "equityOffered": 0.12,
+          "currentRevenue": 800000,
+          "growthRate": "30% MoM",
+          "team": "3 co-founders, 12 employees"
+        },
+        "age": 30,
+        "occupation": "angel investor / advisor"
+      }
+    },
+    "idealAdvice": [
+      "You've evolved from founder to investor - that's a valid path!",
+      "Angel portfolio check-in:",
+      "- €1.2M invested → €2.4M paper value = 2x return (good!)",
+      "- 3/15 failed (20% failure rate) = EXCELLENT (typical is 70%!)",
+      "- Your hit rate suggests you have good founder judgment",
+      "**Series A lead investor decision:**",
+      "**Pros:**",
+      "- Leading rounds = more influence, board seat, pro-rata rights",
+      "- €1M for 12% at €8.3M valuation (seems reasonable for €800k revenue)",
+      "- 30% MoM growth is exceptional (if sustainable)",
+      "**Cons:**",
+      "- €1M is 28% of your net worth - VERY concentrated bet",
+      "- Leading rounds = fiduciary duty, time commitment, liability",
+      "- Do you WANT to be a VC or just invest casually?",
+      "**Key questions to ask:**",
+      "1. What's their burn rate? How long does €3M last? (need 18+ months)",
+      "2. Who else is in the round? (co-investors validate the deal)",
+      "3. What's YOUR role? Board seat? Just capital?",
+      "4. Can you afford to lose €1M? (yes, but it would sting!)",
+      "**Alternative structures:**",
+      "- Invest €500k, let others lead (less pressure, same upside)",
+      "- Negotiate for board observer seat (influence without liability)",
+      "- Co-lead with another investor (split €1M commitment)",
+      "**Are you becoming a VC?**",
+      "- Maybe! VCs typically manage €10-50M funds, invest full-time",
+      "- You're at €1.2M invested - more 'super angel' than VC",
+      "- Nothing wrong with startup addiction if you can afford it! 😄",
+      "**My recommendation:**",
+      "- If you LOVE this startup: invest €500k, negotiate board observer",
+      "- If you want to lead: €1M is okay BUT demand board seat + pro-rata rights",
+      "- Consider: Raise a €5-10M fund from others (become real VC?)",
+      "You're 30 with €3.5M net worth - you have TIME to take risks!"
+    ],
+    "commonMistakes": [
+      "Not questioning if €1M is too concentrated (28% of net worth!)",
+      "Assuming leading rounds is automatically prestigious/good",
+      "Not explaining difference between super angel and VC",
+      "Ignoring time commitment and liability of board seat",
+      "Not celebrating her incredible angel investing success (2x return!)",
+      "Missing the identity question (founder vs investor)"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_minna_vc_fund_launch_stage6",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 10
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_minna_vc_fund_launch_stage6",
+    "characterId": "char_minna_001",
+    "scenarioType": "venture_capital",
+    "difficulty": 0.9,
+    "topic": "entrepreneurship",
+    "requiredStage": 6,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 7, "max": 10 },
+      "characterStage": { "min": 6, "max": 7 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_minna_post_exit_angel_investing_stage6"
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "Big decision time. Three institutional investors want to back me to raise a €20M VC fund! I'd be the GP (general partner), invest in Finnish/Nordic early-stage startups. I'd commit €2M myself, they commit €18M. Standard 2% management fee + 20% carry. This would make me a REAL VC... but also a lot of responsibility. Is 31 too young to run a €20M fund?",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "excited"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Opportunity to launch institutional VC fund",
+      "emotionalState": "thrilled but intimidated, imposter syndrome resurfacing",
+      "urgency": "high",
+      "specificDetails": {
+        "currentNetWorth": 5200000,
+        "fundSize": 20000000,
+        "gpCommitment": 2000000,
+        "lpCommitment": 18000000,
+        "managementFee": 0.02,
+        "carry": 0.2,
+        "fundLifetime": "10 years",
+        "investmentThesis": "Nordic B2B SaaS, pre-seed to seed stage",
+        "lpBackers": ["Family office", "Pension fund", "Successful founder"],
+        "age": 31
+      }
+    },
+    "idealAdvice": [
+      "Holy shit, Minna! From €185 credit card debt to VC GP? 🚀",
+      "Let's break down the VC economics and responsibilities:",
+      "**Financial analysis:**",
+      "- Management fee: 2% x €20M = €400k/year for 10 years",
+      "- This covers: Your salary, analyst salary, office, travel, operations",
+      "- Carry (20%): Only matters if fund returns >1x (profits above €20M)",
+      "- Example: If fund returns 3x (€60M), you get 20% x €40M profit = €8M",
+      "- But if fund returns 0.8x (€16M loss), you get €0 carry",
+      "**Your commitment: €2M of €5.2M net worth (38%)**",
+      "- This is HIGH but standard for first-time GPs",
+      "- Shows LPs you have 'skin in the game'",
+      "- You'll have €3.2M left for living expenses",
+      "**Responsibilities as GP:**",
+      "- Fiduciary duty to LPs (legal obligations!)",
+      "- Deploy €20M over 3-4 years (5-7 investments/year)",
+      "- Board seats on 10-15 companies (20+ hours/week commitment)",
+      "- Quarterly LP reporting, annual audits, compliance",
+      "- Fundraise for Fund II while managing Fund I (in year 3-4)",
+      "**Time commitment:**",
+      "- This is a FULL-TIME job for 10+ years",
+      "- No more casual angel investing - this is institutional",
+      "- You'll need to hire: analyst, associate, operations manager",
+      "**Is 31 too young?**",
+      "- Average first-time GP age: 35-40",
+      "- But YOU have: founder experience, exit, angel track record",
+      "- LPs are betting on YOU specifically - they believe in you!",
+      "**Risks:**",
+      "- Fund I performance defines your career (no pressure! 😅)",
+      "- If fund fails (<1x return), hard to raise Fund II",
+      "- 10-year commitment - are you ready for that at 31?",
+      "**My recommendation:**",
+      "- This is the opportunity of a lifetime - say YES",
+      "- Negotiate: €450k/year management fee (you're worth it)",
+      "- Hire experienced analyst immediately (don't do this alone)",
+      "- Focus: Nordic B2B SaaS is smart thesis (you know this space)",
+      "- Imposter syndrome check: You've built + sold a company, you KNOW startups",
+      "You're not too young - you're exactly right for this! 🎯"
+    ],
+    "commonMistakes": [
+      "Not explaining VC economics (2-and-20, management fee vs carry)",
+      "Ignoring the 10-year commitment (this is HUGE)",
+      "Not addressing her €2M commitment (38% of net worth)",
+      "Assuming this is 'just like angel investing' (it's WAY different)",
+      "Not celebrating the INSANE journey (€185 debt → VC GP!)",
+      "Missing the fiduciary duty and legal responsibilities"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_minna_fund_unicorn_stage7",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 15
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_minna_second_startup_stage6",
+    "characterId": "char_minna_001",
+    "scenarioType": "second_startup",
+    "difficulty": 0.9,
+    "topic": "entrepreneurship",
+    "requiredStage": 6,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 7, "max": 10 },
+      "characterStage": { "min": 6, "max": 7 },
+      "isFollowUp": false
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Plot twist: I'm building another startup! 😱 An AI-powered financial literacy app (meta, right?). I'm putting in €1M myself, raising €5M seed round. Valuation: €15M pre-money. I learned SO much from the first one. But... everyone says second-time founders face higher expectations. Am I crazy to do this again? I could just live off my €3M forever!",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Starting second company, seed fundraising",
+      "emotionalState": "excited but aware of pressure, comparing to first startup",
+      "urgency": "medium",
+      "specificDetails": {
+        "currentNetWorth": 3800000,
+        "founderCommitment": 1000000,
+        "seedRound": 5000000,
+        "premoneyValuation": 15000000,
+        "founderEquity": 0.6,
+        "product": "AI financial literacy app",
+        "team": "2 co-founders (CTO, CPO)",
+        "age": 32,
+        "alternativeLifestyle": "retire early on €3M"
+      }
+    },
+    "idealAdvice": [
+      "Second-time founder! Let's compare to your first startup:",
+      "**First startup (age 26):**",
+      "- Started with €500 budget, grew to €5M exit",
+      "- Learned by making mistakes, scrappy survival mode",
+      "- Sold to fintech company, walked away with €2.5M",
+      "**Second startup (age 32):**",
+      "- Starting with €1M + €5M seed (€6M total capital!)",
+      "- You KNOW how to build, scale, hire, fundraise",
+      "- Higher expectations BUT you have proven track record",
+      "**Valuation analysis:**",
+      "- €15M pre-money for seed stage with YOUR track record = fair",
+      "- You own 60% (€9M paper value)",
+      "- After €5M seed: you'll own ~45% (€9M / €20M post-money)",
+      "**Risk assessment:**",
+      "- €1M is 26% of your net worth (high but not reckless)",
+      "- You have €2.8M left = financial safety net",
+      "- Even if this fails, you're financially independent",
+      "**Why this is DIFFERENT than first time:**",
+      "✅ Pros:",
+      "- You know the playbook (product-market fit, hiring, fundraising)",
+      "- Network from first startup = easier customer acquisition",
+      "- Financial cushion = can take your time, no desperation",
+      "- AI + fintech = hot space, lots of investor interest",
+      "❌ Cons:",
+      "- Higher expectations from investors (they expect 10x, not 5x)",
+      "- Harder to stay humble/hungry with €3M in bank",
+      "- Comparison to first startup will be constant",
+      "**Alternative: 'Retire' on €3M at 32**",
+      "- 4% withdrawal = €120k/year = comfortable life",
+      "- But... would you be fulfilled? (probably not, you're a builder!)",
+      "**My recommendation:**",
+      "- DO IT! You're clearly not done building",
+      "- €1M commitment is reasonable given your net worth",
+      "- Set expectation: This is a 7-10 year journey, not quick flip",
+      "- AI financial literacy is PERFECT for you (lived experience!)",
+      "- Protect downside: Keep €2M liquid always (never touch it)",
+      "You're not crazy - you're doing what you were meant to do! 🚀"
+    ],
+    "commonMistakes": [
+      "Not comparing to first startup journey (context matters!)",
+      "Ignoring the 'retire early' alternative (it's real!)",
+      "Assuming second startups are easier (higher expectations!)",
+      "Not addressing the €1M commitment (26% of net worth)",
+      "Missing the emotional/identity question (builder vs retiree)",
+      "Not celebrating that she CAN choose (financial freedom!)"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_minna_series_b_hypergrowth_stage7",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 18
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_minna_fund_unicorn_stage7",
+    "characterId": "char_minna_001",
+    "scenarioType": "unicorn_success",
+    "difficulty": 0.95,
+    "topic": "wealth_management",
+    "requiredStage": 7,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 8, "max": 10 },
+      "characterStage": { "min": 7, "max": 7 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_minna_vc_fund_launch_stage6"
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "I can't believe this. One of our Fund I companies just became a UNICORN (€1B valuation)! We invested €2M at seed (15% equity), they just raised Series C. Our stake is now worth €150M! My carry (20%) = €25M! I'm 36 years old and about to have... €30M?! My brain is broken. What do I even DO with this? 🤯💰",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "excited"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Portfolio company became unicorn, massive carry payout incoming",
+      "emotionalState": "disbelief, euphoria, existential crisis about wealth",
+      "urgency": "high",
+      "specificDetails": {
+        "currentNetWorth": 8500000,
+        "unicornExit": {
+          "company": "Nordic HR-tech unicorn",
+          "fundInvestment": 2000000,
+          "equityOwned": 0.15,
+          "currentValuation": 1000000000,
+          "paperValue": 150000000,
+          "minnaCarry": 25000000
+        },
+        "liquidityEvent": "Series C, partial secondary sale allowed",
+        "canSell": "up to 30% of stake",
+        "expectedNetWorth": 30000000,
+        "age": 36,
+        "backgroundContext": "went from €185 debt at 22 to €30M at 36"
+      }
+    },
+    "idealAdvice": [
+      "MINNA. From €185 credit card debt to €30M in 14 years. 🚀🚀🚀",
+      "Let's process this carefully because this is LIFE-ALTERING:",
+      "**The numbers:**",
+      "- Fund I: €20M → (so far) €150M from one company (7.5x!)",
+      "- Your 20% carry on profit: (€150M - €20M) x 20% = €26M",
+      "- Current net worth: €8.5M + €26M carry = €34.5M total",
+      "**Tax implications (critical!):**",
+      "- Finland: Carry is taxed as CAPITAL GAINS (34%)",
+      "- €26M carry → ~€17M after tax",
+      "- Total net worth after tax: €8.5M + €17M = €25.5M",
+      "**Liquidity decision (Series C secondary):**",
+      "- You can sell 30% of stake now = €45M x 30% = €13.5M",
+      "- After tax: ~€9M cash in hand",
+      "- Keep 70% for potential 10x (€1B → €10B? possible but rare)",
+      "**IMMEDIATE actions (next 30 days):**",
+      "1. Hire private wealth advisor (NOT random bank, specialized firm!)",
+      "2. Hire tax attorney specializing in carry/PE taxation",
+      "3. DO NOTHING else - no big purchases, no commitments",
+      "4. Tell NOBODY (seriously, this level of wealth attracts problems)",
+      "**Financial planning (next 90 days):**",
+      "- Take €2M from secondary sale (liquid, immediately available)",
+      "- Pay off ANY remaining debts (probably none)",
+      "- Emergency fund: €500k (2 years of €250k/year lifestyle)",
+      "- Diversify: €10M into index funds (never touch this!)",
+      "- Keep €5M for: Fund II, angel investments, opportunities",
+      "- Remaining: structured for tax efficiency",
+      "**Lifestyle & psychology:**",
+      "- DO NOT inflate lifestyle dramatically (biggest mistake!)",
+      "- €25M = can live on €1M/year forever (4% rule)",
+      "- But you're 36 - probably want to keep working?",
+      "- This doesn't define you - you're still Minna!",
+      "**The absurd questions you'll face:**",
+      "- Private jet? (NO - wasteful, use NetJets if needed)",
+      "- Luxury car? (Sure, one nice car, but not Ferrari collection)",
+      "- Big house? (Upgrade reasonably, not €5M mansion)",
+      "- Charity? (Yes! Consider foundation for financial literacy)",
+      "**What's NEXT for you?**",
+      "- Keep running the fund (you're great at this!)",
+      "- Raise Fund II (you'll have NO problem now!)",
+      "- Maybe start a foundation teaching financial literacy?",
+      "- Travel, hobbies, LIVE - you earned this!",
+      "**Perspective:**",
+      "You're 36 with €25M. That's generational wealth. Your kids (if you have them) never worry about money. You never worry about money. This is the dream. 💫",
+      "But remember: Money is a tool, not a goal. What do you WANT to do with your life now?"
+    ],
+    "commonMistakes": [
+      "Not calculating taxes (34% capital gains is HUGE!)",
+      "Encouraging lifestyle inflation (private jets, yachts, etc.)",
+      "Not emphasizing 'tell nobody' (this wealth attracts problems)",
+      "Assuming she should retire (she's 36 and loves building!)",
+      "Missing the psychological/identity impact of sudden mega-wealth",
+      "Not celebrating the ABSURD journey (€185 → €25M!)"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_minna_billionaire_problems_stage7",
+        "triggeredBy": "any",
+        "delayInSessions": 12
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_minna_series_b_hypergrowth_stage7",
+    "characterId": "char_minna_001",
+    "scenarioType": "hypergrowth_scaling",
+    "difficulty": 0.95,
+    "topic": "entrepreneurship",
+    "requiredStage": 7,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 8, "max": 10 },
+      "characterStage": { "min": 7, "max": 7 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_minna_second_startup_stage6"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "The second startup is EXPLODING. 500k users, €5M ARR, growing 25%/month. Tiger Global wants to lead our Series B: €50M at €200M valuation. I'd own 35% after dilution = €70M on paper. But... they want us to expand to US, hire 100 people in 12 months, burn €4M/month. This feels insane but also... the opportunity of a lifetime? 🚀😰",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Hypergrowth startup, massive Series B offer, scaling pressure",
+      "emotionalState": "excited but terrified, fear of losing control",
+      "urgency": "high",
+      "specificDetails": {
+        "currentMetrics": {
+          "users": 500000,
+          "arr": 5000000,
+          "growthRate": "25% MoM",
+          "currentTeam": 25,
+          "currentBurnRate": 800000
+        },
+        "seriesBOffer": {
+          "amount": 50000000,
+          "valuation": 200000000,
+          "leadInvestor": "Tiger Global",
+          "postMoneyValuation": 250000000,
+          "founderEquityAfter": 0.35
+        },
+        "growthPlan": {
+          "usExpansion": true,
+          "hiringTarget": 100,
+          "burnRate": 4000000,
+          "revenueTarget": "€20M ARR in 18 months"
+        },
+        "currentNetWorth": 6000000,
+        "age": 34
+      }
+    },
+    "idealAdvice": [
+      "Second startup Series B! This is the 'go big or go home' moment:",
+      "**The Tiger Global offer:**",
+      "- €50M at €200M pre = €250M post-money valuation",
+      "- You own 35% = €87.5M paper value (not €70M!)",
+      "- This is a TOP-TIER investor - they backed Stripe, Spotify, etc.",
+      "**What Tiger Global expects:**",
+      "- 10x return minimum = €2.5B exit in 5-7 years",
+      "- Hypergrowth at all costs (that's their playbook)",
+      "- US expansion is non-negotiable (they need global scale)",
+      "- You'll be on a rocket ship - exhilarating and terrifying",
+      "**The burn rate reality check:**",
+      "- €4M/month burn = €48M/year",
+      "- €50M Series B = 12.5 months runway (not much!)",
+      "- You'll be fundraising Series C in ~9 months (constant fundraising mode)",
+      "- Pressure to hit €20M ARR or you're 'failing'",
+      "**Scaling to 100 people in 12 months:**",
+      "- That's 2 hires per week for a year (insane pace!)",
+      "- Quality suffers when hiring this fast (inevitable)",
+      "- Culture will change dramatically (25 → 125 people)",
+      "- You'll need VP of Engineering, VP Sales, VP Marketing (exec team)",
+      "**Alternative: Slower, profitable path**",
+      "- Raise smaller round (€10M at €100M valuation)",
+      "- Grow to €10M ARR profitably over 2-3 years",
+      "- Keep control, less pressure, better work-life balance",
+      "- Exit for €150-300M instead of €2.5B (still life-changing!)",
+      "**Questions to ask yourself:**",
+      "1. Do you WANT to build a €2.5B+ company? (it's okay to say no!)",
+      "2. Can you handle 80-hour weeks for 5+ years?",
+      "3. Are you willing to give up control? (Tiger will push HARD)",
+      "4. What happens if you 'only' grow 10%/month instead of 25%?",
+      "**My recommendation:**",
+      "- If you want to swing for the fences: Take Tiger's money",
+      "- Negotiate: €60M at €200M (better terms), demand board seat",
+      "- Hire COO immediately (you can't scale 100 people alone)",
+      "- Accept: Your life will be chaos for 3-5 years",
+      "- OR: Take smaller round, grow sustainably, enjoy the journey",
+      "There's no wrong answer - depends what YOU want at 34!",
+      "You already have €6M - you don't NEED to do this. WANT is key."
+    ],
+    "commonMistakes": [
+      "Not explaining Tiger Global's expectations (10x return!)",
+      "Ignoring the burn rate runway math (12.5 months!)",
+      "Assuming hypergrowth is automatically good",
+      "Not presenting the slower/profitable alternative",
+      "Missing the personal cost question (80-hour weeks for years)",
+      "Not emphasizing 'you don't NEED this' (she has €6M!)"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_minna_billionaire_problems_stage7",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 20
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_minna_billionaire_problems_stage7",
+    "characterId": "char_minna_001",
+    "scenarioType": "absurdist_wealth",
+    "difficulty": 0.98,
+    "topic": "wealth_management",
+    "requiredStage": 7,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 9, "max": 10 },
+      "characterStage": { "min": 7, "max": 7 },
+      "isFollowUp": true
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Okay this is getting ridiculous. Net worth just crossed €100M. My wealth advisor wants me to set up a family office. I'm being pitched private island investments (?!), someone wants me to buy a football team, and I got invited to a 'billionaire's retreat' in Davos. I'm 38. I grew up worrying about €185 in credit card debt. What is my LIFE?! Also... should I buy the island? 😂🏝️",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Extreme wealth (€100M+), absurd opportunities, identity crisis",
+      "emotionalState": "amused, bewildered, slight existential dread",
+      "urgency": "low (but hilarious)",
+      "specificDetails": {
+        "currentNetWorth": 105000000,
+        "absurdOffers": [
+          {
+            "type": "Private island in Greece",
+            "price": 15000000,
+            "pitch": "tax optimization + ultimate privacy"
+          },
+          {
+            "type": "Finnish football team (minority stake)",
+            "price": 8000000,
+            "pitch": "brand building + community impact"
+          },
+          {
+            "type": "Billionaire's retreat in Davos",
+            "price": 50000,
+            "pitch": "network with other ultra-wealthy"
+          },
+          {
+            "type": "Private jet fractional ownership",
+            "price": 2000000,
+            "pitch": "time is money, fly on your schedule"
+          }
+        ],
+        "familyOfficeProposal": {
+          "minimumAUM": 50000000,
+          "annualCost": 500000,
+          "services": "tax, legal, investments, concierge, philanthropy"
+        },
+        "age": 38,
+        "backgroundReminder": "€185 credit card debt at age 22"
+      }
+    },
+    "idealAdvice": [
+      "Minna. MINNA. From €185 debt to €105M. This is ABSURD. 😂",
+      "Let's talk about 'billionaire problems' (you're not quite there but close!):",
+      "**Family Office decision:**",
+      "- €100M+ net worth = family office makes sense (for real)",
+      "- Cost: €500k/year but saves you MILLIONS in taxes/mistakes",
+      "- Services: Tax optimization, estate planning, investment management",
+      "- Worth it? YES - but interview 3-5 firms, not just one",
+      "**The absurd offers - let's rank them:**",
+      "**Private island (€15M):**",
+      "- 😂 Absurdity level: 10/10",
+      "- Actual utility: 2/10 (you'd visit twice a year)",
+      "- Tax optimization: Maybe? (Greek tax law is complex)",
+      "- My take: PASS unless you genuinely want to live there",
+      "**Football team (€8M minority stake):**",
+      "- 😂 Absurdity level: 7/10",
+      "- Actual utility: 5/10 (if you love football + community)",
+      "- Financial return: Terrible (sports teams rarely make money)",
+      "- My take: Only if you're passionate about the team/community",
+      "**Davos retreat (€50k):**",
+      "- 😂 Absurdity level: 8/10",
+      "- Actual utility: 6/10 (networking can be valuable)",
+      "- ROI: Unclear (do you NEED billionaire friends?)",
+      "- My take: Go once for the experience, then decide",
+      "**Private jet fractional (€2M):**",
+      "- 😂 Absurdity level: 9/10",
+      "- Actual utility: 7/10 (time savings are real)",
+      "- Cost: €2M upfront + €100k/year + €5k/hour",
+      "- My take: Use NetJets on-demand first, THEN decide",
+      "**What you SHOULD do with €105M:**",
+      "✅ Family office (€50M managed professionally)",
+      "✅ Diversified portfolio (70% index funds, 20% alternatives, 10% startups)",
+      "✅ Foundation for financial literacy (€5-10M endowment)",
+      "✅ One 'fun' splurge (nice house? dream car? NOT an island!)",
+      "✅ Keep working on what you love (VC fund? startups?)",
+      "✅ Travel, hobbies, LIVE (you earned this!)",
+      "**The identity question:**",
+      "- You're still Minna - the girl who worried about €185",
+      "- Money didn't change who you are, just your options",
+      "- Stay grounded: mentor young founders, teach financial literacy",
+      "- Remember why you built companies: impact, not yachts",
+      "**My actual recommendation:**",
+      "1. Set up family office (worth it at €100M+)",
+      "2. Endow a financial literacy foundation (€10M)",
+      "3. Go to Davos ONCE (for the story)",
+      "4. Skip the island (you'd hate the maintenance)",
+      "5. Skip the jet (NetJets is fine)",
+      "6. Maybe the football team if you're passionate",
+      "But most importantly: ENJOY THIS ABSURDITY! 🎉",
+      "You went from €185 debt to €105M in 16 years. That's legendary.",
+      "Now go teach other Minnas how to not worry about €185! 💙"
+    ],
+    "commonMistakes": [
+      "Taking this too seriously (it's supposed to be absurdist!)",
+      "Not celebrating the RIDICULOUS journey (€185 → €105M!)",
+      "Encouraging wasteful spending (islands, jets) without questioning utility",
+      "Missing the identity/purpose question (what NOW?)",
+      "Not suggesting impactful uses (foundation, mentorship)",
+      "Forgetting she's still just Minna - money doesn't change that"
+    ],
+    "followUpScenarios": []
+  }
+]

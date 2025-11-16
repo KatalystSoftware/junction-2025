@@ -90,7 +90,8 @@ function toClientSafeAdvisorState(state: AdvisorState): ClientSafeAdvisorState {
     careerTier: state.careerTier,
     isFired: state.isFired,
     fireReason: state.fireReason,
-    criticalInterventionsForcedThrough: state.criticalInterventionsForcedThrough,
+    criticalInterventionsForcedThrough:
+      state.criticalInterventionsForcedThrough,
   };
 }
 
@@ -1116,7 +1117,12 @@ app.get("/leaderboard/surrounding/:advisorId", async (c) => {
 
 interface TranscribeAudioRequest {
   audioData: string; // Base64 encoded audio
-  mimeType: "audio/wav" | "audio/mp3" | "audio/mpeg" | "audio/webm" | "audio/ogg";
+  mimeType:
+    | "audio/wav"
+    | "audio/mp3"
+    | "audio/mpeg"
+    | "audio/webm"
+    | "audio/ogg";
   language?: string; // Optional language hint (fi, en, sv)
 }
 
@@ -1134,7 +1140,9 @@ app.post("/transcribe-audio", async (c) => {
       return c.json({ error: "Missing audioData or mimeType" }, 400);
     }
 
-    console.log(`🎤 Transcribing audio (${mimeType}, language hint: ${language || "auto"})`);
+    console.log(
+      `🎤 Transcribing audio (${mimeType}, language hint: ${language || "auto"})`,
+    );
 
     // Import the speech-to-text service
     const { transcribeAudio } = await import(
@@ -1147,10 +1155,13 @@ app.post("/transcribe-audio", async (c) => {
     // Transcribe the audio
     const result = await transcribeAudio(audioBuffer, mimeType, {
       language,
-      prompt: "This is a voice message from a financial advisor client discussing their financial situation.",
+      prompt:
+        "This is a voice message from a financial advisor client discussing their financial situation.",
     });
 
-    console.log(`✅ Transcription complete: "${result.text.substring(0, 50)}..."`);
+    console.log(
+      `✅ Transcription complete: "${result.text.substring(0, 50)}..."`,
+    );
 
     return c.json({
       transcription: result.text,
@@ -1161,6 +1172,95 @@ app.post("/transcribe-audio", async (c) => {
     return c.json(
       {
         error: "Failed to transcribe audio",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      500,
+    );
+  }
+});
+
+// ============================================================================
+// ROUTE: Get Character Progression Data
+// ============================================================================
+app.get("/character-progression/:characterId", async (c) => {
+  try {
+    const characterId = c.req.param("characterId");
+
+    // Import characterPool
+    const { characterPool } = await import("../index.ts");
+
+    const character = characterPool.getCharacter(characterId);
+    if (!character) {
+      return c.json({ error: "Character not found" }, 404);
+    }
+
+    return c.json({
+      characterId,
+      characterName: character.name,
+      financialState: character.financialState || null,
+      completedScenarios: character.completedScenarios || [],
+      adviceHistory: character.adviceHistory || [],
+      relationshipState: character.relationshipState || null,
+    });
+  } catch (error) {
+    console.error("❌ Error in /character-progression/:characterId:", error);
+    return c.json(
+      {
+        error: "Failed to get character progression",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      500,
+    );
+  }
+});
+
+// ============================================================================
+// ROUTE: Get All Character Progressions for Session
+// ============================================================================
+app.get("/session/:sessionId/character-progressions", async (c) => {
+  try {
+    const sessionId = c.req.param("sessionId");
+
+    // Load session to get advisor state
+    const savedSession = await loadSession(sessionId);
+    if (!savedSession) {
+      return c.json({ error: "Session not found" }, 404);
+    }
+
+    // Import characterPool
+    const { characterPool } = await import("../index.ts");
+
+    // Get all characters the advisor has helped (from relationships)
+    const allRelationships = characterPool.getCharacterRelationships(
+      savedSession.advisorState.advisorId,
+    );
+
+    const characterProgressions = allRelationships
+      .map((rel) => {
+        const character = characterPool.getCharacter(rel.characterId);
+        if (!character) return null;
+
+        return {
+          characterId: rel.characterId,
+          characterName: character.name,
+          financialState: character.financialState || null,
+          relationshipState: rel,
+        };
+      })
+      .filter((c) => c !== null);
+
+    return c.json({
+      sessionId,
+      characterProgressions,
+    });
+  } catch (error) {
+    console.error(
+      "❌ Error in /session/:sessionId/character-progressions:",
+      error,
+    );
+    return c.json(
+      {
+        error: "Failed to get character progressions",
         details: error instanceof Error ? error.message : "Unknown error",
       },
       500,

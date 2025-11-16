@@ -42,9 +42,13 @@ export async function transcribeAudio(
   options?: {
     language?: string; // Language hint (e.g., "fi" for Finnish, "en" for English)
     prompt?: string; // Additional context for transcription
-  }
+  },
 ): Promise<TranscriptionResult> {
   try {
+    // Convert buffer to base64 for Gemini API
+    const base64Audio = audioBuffer.toString("base64");
+    const dataUrl = `data:${mimeType};base64,${base64Audio}`;
+
     // Prepare the transcription prompt
     const languageHint = options?.language
       ? `The audio is in ${options.language === "fi" ? "Finnish" : options.language === "sv" ? "Swedish" : "English"}.`
@@ -58,22 +62,15 @@ export async function transcribeAudio(
 
 Please transcribe the following audio accurately. Return ONLY the transcribed text, nothing else.`;
 
-    // Strip "google/" prefix from model name if present
-    const modelName = getAgentModel().replace(/^google\//, "");
-
-    // Use the file content type for audio with Google provider
+    // Use configured Gemini model for transcription (supports audio input)
     const result = await generateText({
-      model: google(modelName),
+      model: google(getAgentModel()),
       messages: [
         {
           role: "user",
           content: [
             { type: "text", text: transcriptionPrompt },
-            {
-              type: "file",
-              mediaType: mimeType,
-              data: audioBuffer,
-            },
+            { type: "file", data: dataUrl, mediaType: mimeType },
           ],
         },
       ],
@@ -90,7 +87,7 @@ Please transcribe the following audio accurately. Return ONLY the transcribed te
   } catch (error) {
     console.error("Error transcribing audio with Gemini:", error);
     throw new Error(
-      `Failed to transcribe audio: ${error instanceof Error ? error.message : "Unknown error"}`
+      `Failed to transcribe audio: ${error instanceof Error ? error.message : "Unknown error"}`,
     );
   }
 }
@@ -101,29 +98,31 @@ Please transcribe the following audio accurately. Return ONLY the transcribed te
  */
 export async function transcribeAudioWithLanguageDetection(
   audioBuffer: Buffer,
-  mimeType: AudioFormat = "audio/webm"
+  mimeType: AudioFormat = "audio/webm",
 ): Promise<TranscriptionResult> {
   try {
-    // Convert buffer to base64 for Gemini API (requires base64 string)
     const base64Audio = audioBuffer.toString("base64");
+    const dataUrl = `data:${mimeType};base64,${base64Audio}`;
 
-    // Use experimental_attachments for audio with Google provider
     const result = await generateText({
       model: google(getAgentModel()),
-      prompt: `Please transcribe the following audio. First detect the language, then provide the transcription.
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: `Please transcribe the following audio. First detect the language, then provide the transcription.
 
 Format your response as:
 Language: [detected language]
 Transcription: [transcribed text]`,
-      experimental_attachments: [
-        {
-          name: "audio",
-          contentType: mimeType,
-          data: base64Audio,
+            },
+            { type: "file", data: dataUrl, mediaType: mimeType },
+          ],
         },
       ],
       temperature: 0.1,
-      maxTokens: 500,
     });
 
     // Parse the response to extract language and transcription
@@ -146,7 +145,7 @@ Transcription: [transcribed text]`,
   } catch (error) {
     console.error("Error transcribing audio with language detection:", error);
     throw new Error(
-      `Failed to transcribe audio: ${error instanceof Error ? error.message : "Unknown error"}`
+      `Failed to transcribe audio: ${error instanceof Error ? error.message : "Unknown error"}`,
     );
   }
 }

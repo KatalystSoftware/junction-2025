@@ -1,0 +1,494 @@
+[
+  {
+    "scenarioId": "scenario_sari_angel_investing_intro_stage3",
+    "characterId": "char_sari_003",
+    "scenarioType": "investment_opportunity",
+    "difficulty": 0.6,
+    "topic": "angel_investing",
+    "requiredStage": 3,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 3, "max": 10 },
+      "characterStage": { "min": 3, "max": 4 },
+      "isFollowUp": false
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Hei! Remember me? I've been saving diligently and now have €80k invested in index funds. A nurse colleague started a medical device company and is looking for angel investors (€10-20k for 2% equity). Is this a good idea or too risky? I've never done anything like this! 🏥💡",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "First angel investing opportunity, evaluating startup investment",
+      "emotionalState": "excited but cautious, trust in colleague, fear of losing savings",
+      "urgency": "medium",
+      "specificDetails": {
+        "currentNetWorth": 95000,
+        "investmentPortfolio": 80000,
+        "proposedInvestment": { "min": 10000, "max": 20000 },
+        "equityOffered": 0.02,
+        "startupStage": "pre-revenue prototype",
+        "founder": "nurse colleague with medical device idea",
+        "product": "smart wound monitoring system"
+      }
+    },
+    "idealAdvice": [
+      "Angel investing is high-risk, high-reward - most startups fail",
+      "Due diligence checklist: team, market size, competition, IP, financials",
+      "Only invest what you can afford to lose (10-20% of net worth max)",
+      "Diversification: don't put all eggs in one basket",
+      "€10k investment for 2% equity = €500k valuation - is that fair?",
+      "Medical device regulatory path is long (FDA/CE approval = years + €€€)",
+      "Ask: What's the timeline to revenue? Next funding round plan?",
+      "Consider: Is this friendship investment or business investment?",
+      "Alternative: Stick with index funds (safer, proven)",
+      "If you invest: Get legal agreement, understand dilution risk"
+    ],
+    "commonMistakes": [
+      "Encouraging investment without explaining risks",
+      "Not addressing friendship dynamics (colleague relationship)",
+      "Ignoring regulatory complexity of medical devices",
+      "Not explaining valuation and equity dilution",
+      "Assuming angel investing is like stock investing",
+      "Not asking about her risk tolerance and financial goals"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_sari_startup_success_stage4",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 6
+      },
+      {
+        "scenarioId": "scenario_sari_startup_failure_stage3",
+        "triggeredBy": "bad_advice_or_not_followed",
+        "delayInSessions": 4
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_sari_startup_success_stage4",
+    "characterId": "char_sari_003",
+    "scenarioType": "investment_success",
+    "difficulty": 0.7,
+    "topic": "angel_investing",
+    "requiredStage": 4,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 4, "max": 10 },
+      "characterStage": { "min": 4, "max": 5 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_sari_angel_investing_intro_stage3"
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "You won't believe this! The medical device startup I invested €15k in just got FDA approval and a €2M Series A! My 2% stake is now worth €80k! A bigger investor wants to buy me out for €60k cash. Should I sell or hold? Also, they offered me a board advisor position. I'm just a nurse - am I qualified?!",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "excited"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Startup success, buyout offer, board position offer",
+      "emotionalState": "thrilled but overwhelmed, imposter syndrome kicking in",
+      "urgency": "high",
+      "specificDetails": {
+        "initialInvestment": 15000,
+        "currentPaperValue": 80000,
+        "buyoutOffer": 60000,
+        "boardAdvisorPosition": "offered with €500/month + 0.5% equity",
+        "companyStatus": "FDA approved, Series A funded, pre-revenue",
+        "currentNetWorth": 180000,
+        "currentOccupation": "nurse, 38 years old"
+      }
+    },
+    "idealAdvice": [
+      "Incredible return! €15k → €60k offer in ~18 months (4x return)",
+      "Decision framework: Sell vs Hold vs Partial sale",
+      "**Sell (€60k cash)**: Lock in gains, diversify, eliminate risk",
+      "**Hold (€80k paper)**: Potential for more upside, but illiquid + risky",
+      "**Partial sale**: Sell €30k (2x return), hold rest for upside",
+      "Board advisor position: You ARE qualified (nurse = user perspective!)",
+      "Medical device companies NEED clinical insight from nurses",
+      "Imposter syndrome is real - you have domain expertise they lack",
+      "€500/month + 0.5% equity is decent compensation for advisor role",
+      "Risk: Taking board position = potential conflict if startup fails",
+      "Consider: Do you want to transition from nursing to med-tech?",
+      "Tax implications: Capital gains tax ~34% in Finland on profit",
+      "Recommendation: Sell 50% (€30k), hold 50%, accept advisor role"
+    ],
+    "commonMistakes": [
+      "Not explaining sell vs hold trade-offs clearly",
+      "Dismissing her qualifications for board position",
+      "Ignoring imposter syndrome (needs encouragement!)",
+      "Not calculating tax implications",
+      "Assuming holding is always better (illiquidity risk)",
+      "Not discussing career transition implications"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_sari_career_transition_stage4",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 8
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_sari_startup_failure_stage3",
+    "characterId": "char_sari_003",
+    "scenarioType": "investment_failure",
+    "difficulty": 0.6,
+    "topic": "angel_investing",
+    "requiredStage": 3,
+    "successPath": "stock_market_investor",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 3, "max": 10 },
+      "characterStage": { "min": 3, "max": 4 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_sari_angel_investing_intro_stage3"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Bad news... the medical device startup shut down. FDA approval process took too long and they ran out of money. My €15k is gone. I feel stupid for risking my savings. Should I give up on investing and just stick to my nursing job? 😞",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Lost €15k angel investment, questioning investment decisions",
+      "emotionalState": "disappointed, regretful, loss aversion kicking in",
+      "urgency": "low",
+      "specificDetails": {
+        "lostAmount": 15000,
+        "currentNetWorth": 80000,
+        "remainingInvestments": 65000,
+        "lesson": "high-risk angel investing can fail"
+      }
+    },
+    "idealAdvice": [
+      "This is painful but a valuable learning experience",
+      "Angel investing reality: 70% of startups fail - you're not stupid!",
+      "You took calculated risk (€15k = ~15% of net worth) - that's smart",
+      "Lesson: Diversification is critical (never all-in on one bet)",
+      "Your index fund portfolio (€65k) is still growing - that's the foundation",
+      "Don't let one loss trigger loss aversion (common psychological trap)",
+      "Medical devices have long regulatory timelines - inherent risk",
+      "Alternative: Angel invest in 5-10 startups (€2-3k each) for diversification",
+      "Or: Stick to public markets (index funds, stocks) for now",
+      "You're still far ahead of most people (€80k net worth at 36!)",
+      "This doesn't define your investing journey - keep learning"
+    ],
+    "commonMistakes": [
+      "Making her feel stupid or reckless",
+      "Not normalizing startup failure rates",
+      "Ignoring the psychological impact (loss aversion)",
+      "Not celebrating her remaining €65k portfolio",
+      "Telling her to never angel invest again (learning opportunity!)",
+      "Not offering alternative investment strategies"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_sari_index_fund_focus_stage4",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 5
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_sari_career_transition_stage4",
+    "characterId": "char_sari_003",
+    "scenarioType": "career_decision",
+    "difficulty": 0.8,
+    "topic": "career_transition",
+    "requiredStage": 4,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 5, "max": 10 },
+      "characterStage": { "min": 4, "max": 5 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_sari_startup_success_stage4"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Big decision ahead. The med-tech company wants me to join full-time as VP of Clinical Affairs (€90k/year + 1.5% equity). I'd leave nursing after 15 years. My current salary is €3,200/month (€38k/year). The startup is growing but still risky. What should I consider? My kids are 8 and 10 now. 🤔",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Full-time startup offer vs stable nursing job",
+      "emotionalState": "torn between stability and opportunity, family considerations",
+      "urgency": "high",
+      "specificDetails": {
+        "currentSalary": 38400,
+        "offerSalary": 90000,
+        "offerEquity": 0.015,
+        "yearsAsNurse": 15,
+        "currentNetWorth": 220000,
+        "familyStatus": "two kids (8, 10), stable relationship",
+        "currentJobSecurity": "permanent hospital position",
+        "startupStage": "Series A funded, 30 employees, pre-revenue"
+      }
+    },
+    "idealAdvice": [
+      "Major life decision - let's break it down systematically",
+      "**Financial comparison:**",
+      "- Salary: €90k vs €38k = +€52k/year (+135% increase!)",
+      "- Equity: 1.5% could be worth €200k-2M if company succeeds (or €0 if fails)",
+      "- Benefits: Compare healthcare, pension, vacation (startup usually less)",
+      "**Risk assessment:**",
+      "- Startup failure rate: Still high even with Series A funding",
+      "- Runway: Ask how many months of funding they have (need 18+ months)",
+      "- Backup plan: Could you return to nursing if startup fails? (Yes - always demand)",
+      "**Family considerations:**",
+      "- Kids are 8-10: Stable age, not babies (lower childcare risk)",
+      "- Work-life balance: Startups = longer hours, more stress",
+      "- Financial security: €220k net worth = good safety net",
+      "**Career growth:**",
+      "- VP role = huge resume boost even if company fails",
+      "- Nursing ceiling: Limited growth potential long-term",
+      "- Med-tech experience = valuable for future opportunities",
+      "**Recommendation:**",
+      "- Negotiate: Ask for €100k salary (you're worth it!)",
+      "- Safety net: Keep 12-month emergency fund (€50k) liquid",
+      "- Trial period: Negotiate 6-month trial with mutual opt-out",
+      "- This is a calculated risk worth taking at your stage"
+    ],
+    "commonMistakes": [
+      "Only focusing on money (ignoring family, work-life balance)",
+      "Not asking about startup runway and financial health",
+      "Ignoring her nursing career value and exit options",
+      "Assuming equity will definitely be worth something",
+      "Not celebrating the incredible salary increase offer",
+      "Forgetting she has €220k safety net (reduces risk!)"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_sari_vp_clinical_growth_stage5",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 10
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_sari_index_fund_focus_stage4",
+    "characterId": "char_sari_003",
+    "scenarioType": "wealth_building",
+    "difficulty": 0.6,
+    "topic": "investing",
+    "requiredStage": 4,
+    "successPath": "stock_market_investor",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 4, "max": 10 },
+      "characterStage": { "min": 4, "max": 5 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_sari_startup_failure_stage3"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Update: I focused on index funds and now have €150k invested! Boring but it works. 📈 I got promoted to head nurse (€4,200/month). Saving €1,500/month. Should I keep doing the same thing or try something new? Feeling like I'm on autopilot but it's working!",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Steady wealth building, considering next steps",
+      "emotionalState": "satisfied but curious, slight boredom with routine",
+      "urgency": "low",
+      "specificDetails": {
+        "currentNetWorth": 165000,
+        "investmentPortfolio": 150000,
+        "monthlySavings": 1500,
+        "monthlyIncome": 4200,
+        "occupation": "head nurse",
+        "age": 39
+      }
+    },
+    "idealAdvice": [
+      "Incredible progress! €80k → €165k net worth in ~2 years",
+      "Autopilot investing is GOOD - consistency beats excitement",
+      "You're doing everything right: save, invest, stay the course",
+      "At €150k portfolio + €1,500/month, you're on track for early retirement",
+      "**Options to consider:**",
+      "1. **Stay the course**: Keep index funds, reach €500k in ~10 years",
+      "2. **Add bonds**: Rebalance to 80/20 stocks/bonds for stability",
+      "3. **Real estate**: Consider rental property (requires more effort)",
+      "4. **Small angel investing**: Diversify 5-10% into startups (if interested)",
+      "**Recommendation**: 90% stay the course, 10% experiment",
+      "Boredom is a feature, not a bug - means you're not panicking!",
+      "Focus on: Career growth (head nurse → director?), kids' education fund",
+      "You're in the 'boring middle' - this is where wealth is built",
+      "Celebrate: You're financially independent in ~15 years at this rate!"
+    ],
+    "commonMistakes": [
+      "Encouraging unnecessary risk just to make it exciting",
+      "Not celebrating her incredible discipline and progress",
+      "Ignoring the power of 'boring' index fund investing",
+      "Pushing real estate or alternatives without her interest",
+      "Not projecting long-term outcomes (she's on track for €500k+!)"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_sari_early_retirement_planning_stage5",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 12
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_sari_vp_clinical_growth_stage5",
+    "characterId": "char_sari_003",
+    "scenarioType": "equity_liquidity",
+    "difficulty": 0.9,
+    "topic": "equity_compensation",
+    "requiredStage": 5,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 6, "max": 10 },
+      "characterStage": { "min": 5, "max": 6 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_sari_career_transition_stage4"
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "We did it! The company just got acquired by a major medical device corporation for €40 MILLION! My equity (1.5% + advisor shares) is worth about €800k after taxes! I'm 42 years old and just became... wealthy? I don't even know what to do with this money. Also, they want me to stay on as VP for 2 years (€120k/year). Help!",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "excited"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Company acquisition, life-changing liquidity event",
+      "emotionalState": "overwhelmed, disbelief, imposter syndrome, fear of losing it",
+      "urgency": "high",
+      "specificDetails": {
+        "acquisitionAmount": 40000000,
+        "equityPayout": 800000,
+        "currentNetWorth": 1050000,
+        "retentionOffer": { "salary": 120000, "duration": "2 years" },
+        "currentAge": 42,
+        "previousOccupation": "nurse for 15 years",
+        "familyStatus": "two kids (11, 13)"
+      }
+    },
+    "idealAdvice": [
+      "Congratulations! This is a life-changing moment - let's plan carefully",
+      "**Immediate priorities (next 30 days):**",
+      "1. Do NOTHING impulsive (no big purchases, don't quit, don't tell everyone)",
+      "2. Hire a fee-only financial advisor (NOT commission-based)",
+      "3. Hire an accountant for tax planning (€800k = significant taxes)",
+      "4. Set up separate bank account for windfall (mental separation)",
+      "**Financial planning (next 90 days):**",
+      "- Emergency fund: €50k liquid (1 year expenses)",
+      "- Debt payoff: Pay off any remaining mortgage/loans",
+      "- Kids' education: Set aside €100k for university (both kids)",
+      "- Invest remainder: 70% index funds, 20% bonds, 10% cash",
+      "**Retention offer decision:**",
+      "- €120k for 2 years = €240k total (not insignificant!)",
+      "- Pros: Stability, health insurance, smooth transition",
+      "- Cons: Corporate life might be frustrating after startup",
+      "- Recommendation: Accept, use 2 years to plan next chapter",
+      "**Lifestyle inflation warning:**",
+      "- You're now financially independent (€1M net worth!)",
+      "- Resist urge to upgrade everything (new house, car, etc.)",
+      "- Live on €5-6k/month, let the €800k grow to €2M+ over 10 years",
+      "**Emotional processing:**",
+      "- Imposter syndrome is normal - you EARNED this",
+      "- From nurse to VP to €1M+ net worth - incredible journey",
+      "- Take time to process, don't make rushed decisions",
+      "**Next chapter planning:**",
+      "- After 2-year retention: Retire? Consult? Start another company?",
+      "- You're 42 - decades ahead to use wealth wisely"
+    ],
+    "commonMistakes": [
+      "Not warning about lifestyle inflation (biggest risk!)",
+      "Encouraging immediate retirement (2-year retention is smart)",
+      "Not emphasizing hiring professional advisors",
+      "Ignoring emotional/psychological impact of sudden wealth",
+      "Not celebrating her incredible journey (nurse → €1M!)",
+      "Assuming she knows how to manage €800k (she doesn't - needs help)"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_sari_post_acquisition_life_stage5",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 15
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_sari_early_retirement_planning_stage5",
+    "characterId": "char_sari_003",
+    "scenarioType": "retirement_planning",
+    "difficulty": 0.7,
+    "topic": "retirement",
+    "requiredStage": 5,
+    "successPath": "stock_market_investor",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 6, "max": 10 },
+      "characterStage": { "min": 5, "max": 6 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_sari_index_fund_focus_stage4"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Portfolio update: €420k invested! 🎉 I'm 44 now. Kids are 14 and 16. I'm thinking... could I retire at 55? That's 11 years. I'm tired of night shifts. What would I need to make that happen? Is it realistic or am I dreaming?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Considering early retirement at 55",
+      "emotionalState": "tired from nursing, hopeful, cautiously optimistic",
+      "urgency": "medium",
+      "specificDetails": {
+        "currentNetWorth": 440000,
+        "investmentPortfolio": 420000,
+        "currentAge": 44,
+        "targetRetirementAge": 55,
+        "yearsToRetirement": 11,
+        "currentIncome": 4500,
+        "monthlySavings": 1800,
+        "desiredRetirementIncome": 3000
+      }
+    },
+    "idealAdvice": [
+      "Early retirement at 55 is absolutely realistic - let's do the math!",
+      "**Current situation:**",
+      "- Portfolio: €420k",
+      "- Savings rate: €1,800/month (€21,600/year)",
+      "- Years to 55: 11 years",
+      "**Projection (7% annual return):**",
+      "- In 11 years: €420k → €820k portfolio + €21,600/year contributions",
+      "- Total at 55: ~€1.1-1.2M",
+      "**Retirement income need:**",
+      "- Safe withdrawal rate: 4% per year",
+      "- €1.1M x 4% = €44k/year = €3,666/month",
+      "- You want €3,000/month - TOTALLY ACHIEVABLE! ✅",
+      "**Finnish pension considerations:**",
+      "- Early retirement pension available at 63-65",
+      "- You'll have ~15 years working (already ~20 years)",
+      "- Estimated state pension: €1,200-1,500/month at 65",
+      "- Bridge period 55-65: Live on portfolio, pension kicks in later",
+      "**Optimization strategies:**",
+      "1. Max out työeläke contributions now (boost future pension)",
+      "2. Consider part-time nursing 55-60 (reduce burnout, earn a bit)",
+      "3. Keep healthcare coverage until state pension age",
+      "4. Delay withdrawals as long as possible (let it compound)",
+      "**Action plan:**",
+      "- Keep saving €1,800/month (you're on track!)",
+      "- Rebalance to 60/40 stocks/bonds as you approach 55 (reduce risk)",
+      "- Plan lifestyle: What will you DO in retirement?",
+      "- This is NOT a dream - it's a solid plan! 🎯"
+    ],
+    "commonMistakes": [
+      "Not calculating actual numbers (just vague encouragement)",
+      "Ignoring Finnish pension system (työeläke, kansaneläke)",
+      "Not discussing safe withdrawal rate (4% rule)",
+      "Forgetting healthcare coverage before 65",
+      "Not asking what she'll do in retirement (purpose is important)",
+      "Underestimating how achievable this is for her!"
+    ],
+    "followUpScenarios": []
+  }
+]

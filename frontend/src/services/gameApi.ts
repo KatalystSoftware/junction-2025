@@ -355,7 +355,7 @@ class GameAPI {
    */
   async transcribeAudio(
     audioBlob: Blob,
-    language?: string
+    language?: string,
   ): Promise<{ transcription: string; detectedLanguage?: string }> {
     // Convert blob to base64
     const base64Audio = await new Promise<string>((resolve, reject) => {
@@ -383,7 +383,42 @@ class GameAPI {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(
-        errorData.details || `Failed to transcribe audio: ${response.statusText}`
+        errorData.details ||
+          `Failed to transcribe audio: ${response.statusText}`,
+      );
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Get character progression data
+   */
+  async getCharacterProgression(characterId: string) {
+    const response = await fetch(
+      `${this.baseUrl}/character-progression/${characterId}`,
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to get character progression: ${response.statusText}`,
+      );
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Get all character progressions for a session
+   */
+  async getSessionCharacterProgressions(sessionId: string) {
+    const response = await fetch(
+      `${this.baseUrl}/session/${sessionId}/character-progressions`,
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to get character progressions: ${response.statusText}`,
       );
     }
 
