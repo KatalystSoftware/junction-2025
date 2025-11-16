@@ -42,7 +42,7 @@ export class LeaderboardService {
 
     if (!databaseUrl) {
       throw new Error(
-        "DATABASE_URL environment variable is required for leaderboard service"
+        "DATABASE_URL environment variable is required for leaderboard service",
       );
     }
 
@@ -139,7 +139,7 @@ export class LeaderboardService {
     averageAdviceScore: number,
     lifetimeSavingsGenerated: number,
     lifetimeDebtCleared: number,
-    achievementCount: number
+    achievementCount: number,
   ): number {
     const reputationScore = reputation * 0.3; // Max 30
     const skillScore = skillLevel * 10 * 0.2; // Max 20
@@ -155,7 +155,7 @@ export class LeaderboardService {
         adviceScore +
         impactScore +
         achievementScore
-      ).toFixed(2)
+      ).toFixed(2),
     );
   }
 
@@ -164,7 +164,7 @@ export class LeaderboardService {
    */
   async upsertLeaderboardEntry(
     advisorState: AdvisorState,
-    rawAdvisorName: string
+    rawAdvisorName: string,
   ): Promise<void> {
     await this.initialize();
 
@@ -174,7 +174,7 @@ export class LeaderboardService {
     // Calculate metrics
     const totalScores = advisorState.sessionHistory.reduce(
       (sum, session) => sum + session.adviceQualityScore,
-      0
+      0,
     );
     const averageAdviceScore =
       advisorState.sessionHistory.length > 0
@@ -192,7 +192,7 @@ export class LeaderboardService {
       averageAdviceScore,
       advisorState.lifetimeSavingsGenerated,
       advisorState.lifetimeDebtCleared,
-      advisorState.achievementsUnlocked.length
+      advisorState.achievementsUnlocked.length,
     );
 
     const now = new Date().toISOString();
@@ -234,7 +234,7 @@ export class LeaderboardService {
         globalScore,
         firstSessionDate,
         now,
-      ]
+      ],
     );
   }
 
@@ -258,24 +258,68 @@ export class LeaderboardService {
   /**
    * Get global leaderboard rankings
    */
-  async getLeaderboard(limit = 100): Promise<LeaderboardRanking> {
+  async getLeaderboard(
+    category:
+      | "global"
+      | "reputation"
+      | "impact"
+      | "expertise"
+      | "coins"
+      | "achievements" = "global",
+    limit = 100,
+  ): Promise<LeaderboardRanking> {
     await this.initialize();
 
+    // Map category to database column and order direction
+    const orderByClause = this.getCategoryOrderBy(category);
+
     const result = await this.pgPool.query(
-      `SELECT * FROM leaderboard_entries ORDER BY global_score DESC LIMIT $1`,
-      [limit]
+      `SELECT * FROM leaderboard_entries ORDER BY ${orderByClause} LIMIT $1`,
+      [limit],
     );
 
     const countResult = await this.pgPool.query(
-      `SELECT COUNT(*) as count FROM leaderboard_entries`
+      `SELECT COUNT(*) as count FROM leaderboard_entries`,
     );
     const totalParticipants = Number(countResult.rows[0].count);
 
     return {
-      entries: result.rows.map((row: any, index: number) => this.mapRowToEntry(row, index + 1)),
+      entries: result.rows.map((row: any, index: number) =>
+        this.mapRowToEntry(row, index + 1),
+      ),
       lastUpdated: new Date().toISOString(),
       totalParticipants,
     };
+  }
+
+  /**
+   * Map leaderboard category to SQL ORDER BY clause
+   */
+  private getCategoryOrderBy(
+    category:
+      | "global"
+      | "reputation"
+      | "impact"
+      | "expertise"
+      | "coins"
+      | "achievements",
+  ): string {
+    switch (category) {
+      case "global":
+        return "global_score DESC";
+      case "reputation":
+        return "reputation DESC";
+      case "impact":
+        return "(lifetime_savings_generated + lifetime_debt_cleared) DESC";
+      case "expertise":
+        return "(skill_level * 10 + average_advice_score * 10) DESC";
+      case "coins":
+        return "advisor_coins DESC";
+      case "achievements":
+        return "achievement_count DESC";
+      default:
+        return "global_score DESC";
+    }
   }
 
   /**
@@ -286,9 +330,51 @@ export class LeaderboardService {
 
     const result = await this.pgPool.query(
       `SELECT global_rank FROM leaderboard_entries WHERE advisor_id = $1`,
-      [advisorId]
+      [advisorId],
     );
     return result.rows[0]?.global_rank || null;
+  }
+
+  /**
+   * Get advisors surrounding a specific advisor in the leaderboard
+   * Useful for showing "you are ranked X, here are people near you"
+   */
+  async getSurroundingAdvisors(
+    advisorId: string,
+    category:
+      | "global"
+      | "reputation"
+      | "impact"
+      | "expertise"
+      | "coins"
+      | "achievements" = "global",
+    range = 5,
+  ): Promise<LeaderboardEntry[]> {
+    await this.initialize();
+
+    const orderByClause = this.getCategoryOrderBy(category);
+
+    // Create a ranked subquery for the specific category
+    const rankedQuery = `
+      SELECT *, ROW_NUMBER() OVER (ORDER BY ${orderByClause}) as rank
+      FROM leaderboard_entries
+    `;
+
+    // Find advisor's rank and get surrounding entries
+    const result = await this.pgPool.query(
+      `
+      WITH ranked AS (${rankedQuery})
+      SELECT * FROM ranked
+      WHERE rank BETWEEN
+        (SELECT rank - $2 FROM ranked WHERE advisor_id = $1)
+        AND
+        (SELECT rank + $2 FROM ranked WHERE advisor_id = $1)
+      ORDER BY rank
+      `,
+      [advisorId, range],
+    );
+
+    return result.rows.map((row: any) => this.mapRowToEntry(row, row.rank));
   }
 
   /**

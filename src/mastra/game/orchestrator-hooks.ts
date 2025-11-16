@@ -57,7 +57,7 @@ export async function getLeaderboardData(
   category: LeaderboardCategory = "global",
 ) {
   try {
-    const leaderboard = await leaderboardService.getLeaderboard(100);
+    const leaderboard = await leaderboardService.getLeaderboard(category, 100);
     const surroundingAdvisors = await leaderboardService.getSurroundingAdvisors(
       advisorId,
       category,
