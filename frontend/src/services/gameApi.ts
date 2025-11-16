@@ -374,12 +374,17 @@ class GameAPI {
       console.error("Failed to get user language:", e);
     }
 
+    const advisorWithId: AdvisorState = {
+      ...advisorState,
+      advisorId: advisorState.advisorId || sessionId,
+    };
+
     const response = await fetch(`${this.baseUrl}/start-consultation`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         sessionId,
-        advisorState,
+        advisorState: advisorWithId,
         threadHistories,
         threadMetadata,
         userLanguage,
@@ -426,6 +431,11 @@ class GameAPI {
       console.error("Failed to get user language:", e);
     }
 
+    const advisorWithId: AdvisorState = {
+      ...advisorState,
+      advisorId: advisorState.advisorId || sessionId,
+    };
+
     const response = await fetch(`${this.baseUrl}/send-message`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -433,7 +443,7 @@ class GameAPI {
         sessionId,
         threadId,
         message,
-        advisorState,
+        advisorState: advisorWithId,
         conversationHistory,
         threadHistories,
         threadMetadata,

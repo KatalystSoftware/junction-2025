@@ -65,6 +65,19 @@ export class LeaderboardService {
         );
       `);
 
+      // Migration: Add total_messages_sent column if it doesn't exist
+      await client.query(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (
+            SELECT 1 FROM information_schema.columns
+            WHERE table_name='leaderboard_entries' AND column_name='total_messages_sent'
+          ) THEN
+            ALTER TABLE leaderboard_entries ADD COLUMN total_messages_sent INTEGER DEFAULT 0;
+          END IF;
+        END $$;
+      `);
+
       // Create indexes
       await client.query(`
         CREATE INDEX IF NOT EXISTS idx_leaderboard_global_rank ON leaderboard_entries(global_rank);

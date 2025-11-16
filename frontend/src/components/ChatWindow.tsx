@@ -924,6 +924,7 @@ export function ChatWindow({
         messages[messages.length - 1].role === "contact" && (
           <div
             className="absolute bottom-24 left-4 right-4 px-2 py-3 transition-all duration-300 animate-in slide-in-from-bottom-2"
+            onMouseDown={(e) => e.preventDefault()} // Prevent input blur when clicking anywhere in the panel
             style={{
               backgroundColor: "var(--card)",
               boxShadow: "0px 4px 16px 0px rgba(10, 13, 18, 0.2)",

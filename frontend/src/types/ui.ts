@@ -67,6 +67,7 @@ export interface Contact {
   lastMessageTime: Date;
   unreadCount: number;
   online: boolean;
+  status?: "active" | "awaiting_response" | "resolved";
   gender?: string;
   trust: number;
   age?: number;

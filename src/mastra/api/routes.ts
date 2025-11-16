@@ -31,7 +31,10 @@ import type {
   SessionGoal,
   CompletedMaterial,
 } from "../types/game-types.ts";
-import { onAdvisorInit } from "../game/orchestrator-hooks.ts";
+import {
+  onAdvisorInit,
+  syncLeaderboardSnapshot,
+} from "../game/orchestrator-hooks.ts";
 
 /**
  * Helper function to check for follow-ups and include them in responses
@@ -60,6 +63,7 @@ async function checkAndIncludeFollowUps(
  * Excludes sensitive server-only fields like database credentials
  */
 export interface ClientSafeAdvisorState {
+  advisorId: string;
   advisorName: string;
   reputation: number;
   skillLevel: number;
@@ -91,8 +95,11 @@ export interface ClientSafeAdvisorState {
  * Map server AdvisorState to client-safe version
  * Explicitly includes only fields the frontend needs
  */
-function toClientSafeAdvisorState(state: AdvisorState): ClientSafeAdvisorState {
+export function toClientSafeAdvisorState(
+  state: AdvisorState,
+): ClientSafeAdvisorState {
   return {
+    advisorId: state.advisorId,
     advisorName: state.advisorName,
     reputation: state.reputation,
     skillLevel: state.skillLevel,
@@ -444,6 +451,9 @@ app.post("/init", async (c) => {
       await saveSession(sessionId, updatedState, historiesMap, metadataMap);
       advisorState = updatedState;
     }
+
+    // Sync latest advisor snapshot to leaderboard
+    await syncLeaderboardSnapshot(advisorState, advisorState.advisorName);
 
     return c.json<InitResponse>({
       sessionId,
@@ -887,25 +897,6 @@ app.post("/send-message", async (c) => {
       }
     }
 
-    // Update leaderboard entry when a conversation (session) ends
-    if (gameResponse.stateUpdate && gameResponse.type === "conversation_end") {
-      try {
-        const { afterSessionComplete } = await import(
-          "../game/orchestrator-hooks.ts"
-        );
-        await afterSessionComplete(
-          gameResponse.stateUpdate,
-          gameResponse.stateUpdate.advisorId,
-          gameResponse,
-        );
-      } catch (error) {
-        console.error(
-          "❌ Failed to update leaderboard after conversation_end:",
-          error,
-        );
-      }
-    }
-
     // Save updated state with message histories and metadata
     // Check for follow-ups (server-led approach)
     const followUpResult = await checkAndIncludeFollowUps(
@@ -973,6 +964,9 @@ app.post("/send-message", async (c) => {
     }
 
     await saveSession(sessionId, finalState, historiesMap, metadataMap);
+
+    // Sync latest advisor snapshot to leaderboard after every interaction
+    await syncLeaderboardSnapshot(finalState, finalState.advisorName);
 
     // Convert Maps back to objects for response
     const threadHistoriesObject = Object.fromEntries(historiesMap);
@@ -1546,6 +1540,64 @@ app.get("/real-portfolio-impact/:sessionId", async (c) => {
   } catch (error) {
     console.error("❌ Error in /real-portfolio-impact/:sessionId:", error);
     return c.json({ error: "Failed to calculate real portfolio impact" }, 500);
+  }
+});
+
+// ============================================================================
+// ROUTE: Get Portfolio Impact with Real-Time Growth Data
+// ============================================================================
+app.get("/portfolio-impact/:sessionId", async (c) => {
+  try {
+    const sessionId = c.req.param("sessionId");
+
+    const savedSession = await loadSession(sessionId);
+    if (!savedSession) {
+      return c.json({ error: "Session not found" }, 404);
+    }
+
+    const { advisorState } = savedSession;
+
+    // Get growth rate and recent deltas
+    const { getGrowthSummary, updateGrowthRate } = await import(
+      "../services/portfolio-impact-service.ts"
+    );
+
+    // Ensure growth rate is calculated for this session
+    updateGrowthRate(sessionId, advisorState);
+
+    // Get growth summary
+    const summary = getGrowthSummary(sessionId);
+
+    return c.json({
+      sessionId,
+      portfolioImpact: {
+        savings: Math.round(advisorState.lifetimeSavingsGenerated),
+        debtCleared: Math.round(advisorState.lifetimeDebtCleared),
+        total: Math.round(
+          advisorState.lifetimeSavingsGenerated + advisorState.lifetimeDebtCleared,
+        ),
+      },
+      growth: {
+        perMinute: summary.currentRate?.totalPerMinute || 0,
+        perHour: summary.projectedHourly,
+        perDay: summary.projectedDaily,
+        recentGrowth: summary.recentGrowth,
+      },
+      activeClients: summary.currentRate?.activeClients || 0,
+      stats: {
+        totalSessions: advisorState.totalSessions,
+        totalClientsHelped: advisorState.totalClientsHelped,
+        totalCoins: advisorState.advisorCoins,
+        careerTier: advisorState.careerTier,
+      },
+      timestamp: Date.now(),
+    });
+  } catch (error) {
+    console.error("❌ Error in /portfolio-impact/:sessionId:", error);
+    return c.json(
+      { error: "Failed to get portfolio impact" },
+      500,
+    );
   }
 });
 

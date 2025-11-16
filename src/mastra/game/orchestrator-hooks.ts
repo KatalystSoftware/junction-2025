@@ -28,8 +28,28 @@ export async function initializeLeaderboard(): Promise<void> {
 }
 
 /**
+ * Sync current advisor snapshot to leaderboard.
+ * Can be called whenever AdvisorState meaningfully changes.
+ */
+export async function syncLeaderboardSnapshot(
+  advisorState: AdvisorState,
+  advisorName: string,
+): Promise<void> {
+  try {
+    const leaderboardService = getLeaderboardService();
+    if (!leaderboardService) {
+      return;
+    }
+
+    await leaderboardService.upsertLeaderboardEntry(advisorState, advisorName);
+  } catch (error) {
+    console.error("❌ Failed to sync leaderboard snapshot:", error);
+  }
+}
+
+/**
  * Hook: After session completion
- * Updates leaderboard with latest advisor stats
+ * Updates leaderboard with latest advisor stats and may recalculate rankings
  */
 export async function afterSessionComplete(
   advisorState: AdvisorState,
@@ -37,13 +57,12 @@ export async function afterSessionComplete(
   gameResponse: GameResponse,
 ): Promise<GameResponse> {
   try {
+    await syncLeaderboardSnapshot(advisorState, advisorName);
+
     const leaderboardService = getLeaderboardService();
     if (!leaderboardService) {
       return gameResponse;
     }
-
-    // Update leaderboard entry
-    await leaderboardService.upsertLeaderboardEntry(advisorState, advisorName);
 
     // Recalculate rankings periodically to reduce DB load
     // Only recalculate every 10 sessions
@@ -98,13 +117,7 @@ export async function onAdvisorInit(
   advisorName: string,
 ): Promise<void> {
   try {
-    const leaderboardService = getLeaderboardService();
-    if (!leaderboardService) {
-      return;
-    }
-
-    // Create or update leaderboard entry
-    await leaderboardService.upsertLeaderboardEntry(advisorState, advisorName);
+    await syncLeaderboardSnapshot(advisorState, advisorName);
   } catch (error) {
     console.error("❌ Failed to initialize advisor in leaderboard:", error);
   }
