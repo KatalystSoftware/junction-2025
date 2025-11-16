@@ -7,6 +7,7 @@ import {
 } from "./ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ScrollArea } from "./ui/scroll-area";
+import { Button } from "./ui/button";
 import {
   Trophy,
   Clock,
@@ -17,6 +18,7 @@ import {
   TrendingUp,
   Heart,
   DollarSign,
+  RotateCcw,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { Contact } from "./WhatsAppInterface";
@@ -71,6 +73,14 @@ export function PlayerStatsModal({
       }
     }
   }, [open]); // Reload when modal opens
+
+  // Handle restart game
+  const handleRestartGame = () => {
+    if (confirm("Are you sure you want to restart the game? All progress will be lost.")) {
+      localStorage.clear();
+      window.location.reload();
+    }
+  };
 
   // Calculate average trust score across all contacts
   const averageTrust =
@@ -689,6 +699,21 @@ export function PlayerStatsModal({
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* Restart Game Button */}
+            <div
+              className="pt-6 border-t"
+              style={{ borderColor: "var(--border)" }}
+            >
+              <Button
+                variant="destructive"
+                className="w-full"
+                onClick={handleRestartGame}
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                {t.stats.restartGame}
+              </Button>
             </div>
           </div>
         </ScrollArea>

@@ -70,6 +70,7 @@ export interface Translations {
     achievements: string;
     level: string;
     xp: string;
+    restartGame: string;
   };
 }
 
@@ -135,6 +136,7 @@ const translations: Record<Language, Translations> = {
       achievements: "Achievements",
       level: "Level",
       xp: "XP",
+      restartGame: "Restart Game",
     },
   },
 
@@ -199,6 +201,7 @@ const translations: Record<Language, Translations> = {
       achievements: "Saavutukset",
       level: "Taso",
       xp: "KP",
+      restartGame: "Aloita Peli Uudelleen",
     },
   },
 
@@ -263,6 +266,7 @@ const translations: Record<Language, Translations> = {
       achievements: "Prestationer",
       level: "Nivå",
       xp: "XP",
+      restartGame: "Starta Om Spelet",
     },
   },
 };
