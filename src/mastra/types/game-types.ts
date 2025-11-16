@@ -563,6 +563,22 @@ export interface GameResponse {
     occupation: string;
     gender: "male" | "female";
   };
+
+  // For boss help messages (RAG-powered citations and learning materials)
+  citations?: Array<{
+    text: string;
+    source: string;
+    section: string;
+    relevanceScore: number;
+  }>;
+  suggestedMaterials?: Array<{
+    materialId: string;
+    title: string;
+    description: string;
+    topic: string;
+    url: string;
+    type: "article" | "guide" | "tool" | "calculator";
+  }>;
   // NEW: Scenario financial context for pre-consultation dashboard
   scenarioFinancialContext?: {
     topic: FinancialTopic;

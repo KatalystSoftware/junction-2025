@@ -505,25 +505,60 @@ app.post("/send-message", async (c) => {
     if (threadId === "boss-pinned") {
       console.log("👔 Boss message - using RAG help system");
 
-      // For now, simple acknowledgment (TODO: Add RAG agent)
-      const bossResponse =
-        "Thanks for reaching out! I'm here to help. In the future, I'll be able to answer your questions using our learning materials. For now, keep helping those clients!";
+      // Get current consultation context if available
+      let currentConsultation = undefined;
+      const activeThread = Object.values(advisorState.activeThreads).find(
+        (t) => t.status === "awaiting_response",
+      );
+
+      if (activeThread) {
+        // Get scenario details from session history
+        const scenario = advisorState.sessionHistory.find(
+          (s) => s.scenarioId === activeThread.scenarioId,
+        );
+
+        if (scenario) {
+          currentConsultation = {
+            characterName: scenario.characterName,
+            topic: scenario.topicsCovered[0] || ("general" as any),
+            scenarioSummary:
+              scenario.characterReactions[0] || "Client seeking advice",
+          };
+        }
+      }
+
+      // Invoke boss help agent with RAG
+      const { invokeBossHelpTool } = await import(
+        "../tools/invoke-boss-help-tool.ts"
+      );
+
+      const bossHistory = historiesMap.get("boss-pinned") || [];
+
+      const bossHelp = await invokeBossHelpTool({
+        userQuestion: message,
+        conversationHistory: bossHistory,
+        advisorState,
+        currentConsultationContext: currentConsultation,
+      });
 
       gameResponse = {
         type: "character_message" as const,
         threadId: "boss-pinned",
-        messages: [bossResponse],
+        messages: [bossHelp.response],
         stateUpdate: advisorState,
+        citations: bossHelp.citations,
+        suggestedMaterials: bossHelp.suggestedMaterials,
       };
 
       // Add user message and boss response to threadHistories
-      const bossHistory = historiesMap.get("boss-pinned") || [];
       bossHistory.push(
         { role: "user" as const, content: message },
-        { role: "assistant" as const, content: bossResponse },
+        { role: "assistant" as const, content: bossHelp.response },
       );
       historiesMap.set("boss-pinned", bossHistory);
-      console.log("👔 Saved boss conversation to threadHistories");
+      console.log(
+        `👔 Boss RAG help completed (${bossHelp.citations.length} citations, ${bossHelp.suggestedMaterials.length} materials)`,
+      );
     } else {
       // Process regular advisor response
       gameResponse = await handleAdvisorResponse(
@@ -765,6 +800,52 @@ app.get("/transactions/:characterId", async (c) => {
   } catch (error) {
     console.error("❌ Error in /transactions/:characterId:", error);
     return c.json({ error: "Failed to get transactions" }, 500);
+  }
+});
+
+// ============================================================================
+// ROUTE: Serve Audio Files
+// ============================================================================
+app.get("/audio/:audioId", async (c) => {
+  try {
+    const audioId = c.req.param("audioId");
+
+    // Validate UUID format to prevent path traversal
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(audioId)) {
+      return c.json({ error: "Invalid audio ID" }, 400);
+    }
+
+    // Read from disk
+    const fs = await import("fs/promises");
+    const path = await import("path");
+    const audioPath = path.join(
+      process.cwd(),
+      "saves",
+      "audio",
+      `${audioId}.mp3`,
+    );
+
+    // Check if file exists
+    try {
+      await fs.access(audioPath);
+    } catch {
+      return c.json({ error: "Audio not found" }, 404);
+    }
+
+    // Read audio file
+    const audioBuffer = await fs.readFile(audioPath);
+
+    // Serve as MP3
+    c.header("Content-Type", "audio/mpeg");
+    c.header("Content-Length", audioBuffer.length.toString());
+    c.header("Cache-Control", "public, max-age=3600"); // Cache for 1 hour
+
+    return c.body(audioBuffer);
+  } catch (error) {
+    console.error("❌ Error serving audio:", error);
+    return c.json({ error: "Failed to serve audio" }, 500);
   }
 });
 

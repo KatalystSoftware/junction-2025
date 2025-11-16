@@ -81,13 +81,9 @@ export async function saveSession(
     ? Object.fromEntries(threadMetadata)
     : {};
 
+  // Log counts instead of full content to reduce noise
   console.log(
-    `💾 Saving threadHistories:`,
-    JSON.stringify(threadHistoriesObject, null, 2),
-  );
-  console.log(
-    `💾 Saving threadMetadata:`,
-    JSON.stringify(threadMetadataObject, null, 2),
+    `💾 Saving ${Object.keys(threadHistoriesObject).length} threads and ${Object.keys(threadMetadataObject).length} metadata entries`,
   );
 
   const sessionData = {

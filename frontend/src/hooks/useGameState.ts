@@ -47,8 +47,9 @@ export function useGameState() {
       }));
 
       console.log(
-        "✅ Updated cache with threadHistories:",
-        response.threadHistories,
+        "✅ Updated cache:",
+        Object.keys(response.threadHistories || {}).length,
+        "threads",
       );
     },
   });
@@ -110,8 +111,9 @@ export function useGameState() {
       }));
 
       console.log(
-        "✅ Updated cache after message with threadHistories:",
-        response.threadHistories,
+        "✅ Updated cache after message:",
+        Object.keys(response.threadHistories || {}).length,
+        "threads",
       );
     },
     onError: (_err, _variables, context) => {

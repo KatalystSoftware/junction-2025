@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Play, Pause } from "lucide-react";
+import { Play, Pause, FileText } from "lucide-react";
 import type { Message } from "../types/ui";
 
 interface VoiceMessageProps {
@@ -9,6 +9,7 @@ interface VoiceMessageProps {
 export function VoiceMessage({ message }: VoiceMessageProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [showTranscript, setShowTranscript] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -16,6 +17,10 @@ export function VoiceMessage({ message }: VoiceMessageProps) {
   useEffect(() => {
     if (message.audioUrl) {
       audioRef.current = new Audio(message.audioUrl);
+
+      // Set playback speed to 1.25x for more natural voice message feel
+      // (ElevenLabs voices can sound too slow at 1.0x)
+      audioRef.current.playbackRate = 1.25;
 
       // Set up event listeners
       audioRef.current.addEventListener("ended", () => {
@@ -86,6 +91,35 @@ export function VoiceMessage({ message }: VoiceMessageProps) {
     }
   };
 
+  const handleWaveformClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!audioRef.current) return;
+
+    const waveformElement = e.currentTarget;
+    const rect = waveformElement.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickPercentage = (clickX / rect.width) * 100;
+
+    // Seek to the clicked position
+    const duration = audioRef.current.duration;
+    audioRef.current.currentTime = (clickPercentage / 100) * duration;
+    setProgress(clickPercentage);
+
+    // Start playing if not already playing
+    if (!isPlaying) {
+      audioRef.current.play();
+      setIsPlaying(true);
+
+      // Update progress bar
+      progressIntervalRef.current = setInterval(() => {
+        if (audioRef.current) {
+          const current = audioRef.current.currentTime;
+          const duration = audioRef.current.duration;
+          setProgress((current / duration) * 100);
+        }
+      }, 100);
+    }
+  };
+
   const formatDuration = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -141,7 +175,11 @@ export function VoiceMessage({ message }: VoiceMessageProps) {
         </button>
 
         {/* Waveform Visualization */}
-        <div className="flex-1 flex items-center gap-0.5 h-8">
+        <div
+          className="flex-1 flex items-center gap-0.5 h-8 cursor-pointer"
+          onClick={handleWaveformClick}
+          title="Click to seek"
+        >
           {[...Array(20)].map((_, i) => {
             // Fixed heights based on index to create a consistent waveform pattern
             const heights = [
@@ -185,24 +223,87 @@ export function VoiceMessage({ message }: VoiceMessageProps) {
         </span>
       </div>
 
-      {/* Timestamp */}
-      <span
-        className="block text-right mt-1"
-        style={{
-          fontFamily: "Inter, sans-serif",
-          fontSize: "var(--text-xs)",
-          color:
-            message.role === "user"
-              ? "var(--primary-foreground)"
-              : "var(--muted-foreground)",
-          opacity: 0.8,
-        }}
-      >
-        {message.timestamp.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })}
-      </span>
+      {/* Transcript Toggle & Timestamp */}
+      <div className="flex items-center justify-between mt-1">
+        <button
+          onClick={() => setShowTranscript(!showTranscript)}
+          className="flex items-center gap-1 px-2 py-0.5 rounded transition-all duration-200 hover:scale-105"
+          style={{
+            backgroundColor:
+              message.role === "user"
+                ? "rgba(255, 255, 255, 0.2)"
+                : "var(--muted)",
+          }}
+        >
+          <FileText
+            className="w-3 h-3"
+            style={{
+              color:
+                message.role === "user"
+                  ? "var(--primary-foreground)"
+                  : "var(--muted-foreground)",
+            }}
+          />
+          <span
+            style={{
+              fontFamily: "Inter, sans-serif",
+              fontSize: "var(--text-xs)",
+              fontWeight: "var(--font-weight-medium)",
+              color:
+                message.role === "user"
+                  ? "var(--primary-foreground)"
+                  : "var(--muted-foreground)",
+            }}
+          >
+            {showTranscript ? "Hide" : "Show"} transcript
+          </span>
+        </button>
+
+        <span
+          style={{
+            fontFamily: "Inter, sans-serif",
+            fontSize: "var(--text-xs)",
+            color:
+              message.role === "user"
+                ? "var(--primary-foreground)"
+                : "var(--muted-foreground)",
+            opacity: 0.8,
+          }}
+        >
+          {message.timestamp.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </span>
+      </div>
+
+      {/* Transcript */}
+      {showTranscript && (
+        <div
+          className="mt-2 pt-2"
+          style={{
+            borderTop: `1px solid ${
+              message.role === "user"
+                ? "rgba(255, 255, 255, 0.2)"
+                : "var(--border)"
+            }`,
+          }}
+        >
+          <p
+            style={{
+              fontFamily: "Inter, sans-serif",
+              fontSize: "var(--text-sm)",
+              color:
+                message.role === "user"
+                  ? "var(--primary-foreground)"
+                  : "var(--card-foreground)",
+              lineHeight: "1.5",
+            }}
+          >
+            {message.content}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

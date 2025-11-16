@@ -240,7 +240,7 @@ function getVoiceForEmotion(
 
 /**
  * Enhance text with expressive ElevenLabs tags based on emotional state and character personality
- * Makes voice messages more fun and expressive
+ * Makes voice messages more fun and expressive with natural hesitations and emotions
  */
 export function enhanceTextWithVoiceTags(
   text: string,
@@ -252,23 +252,57 @@ export function enhanceTextWithVoiceTags(
 
   let enhancedText = text;
 
-  // Add emotional tags based on state
+  // Add natural hesitations and filler words (higher chance now)
+  // These make it sound more like a real voice message
+  const sentences = enhancedText.split(/([.!?]+)/);
+  const enhancedSentences = sentences.map((sentence, idx) => {
+    // Skip punctuation-only parts
+    if (sentence.match(/^[.!?]+$/)) return sentence;
+
+    // Add occasional "umm", "uh", or pauses at sentence starts (40% chance)
+    if (Math.random() < 0.4 && sentence.trim().length > 10) {
+      const fillers = ["umm", "uh", "hmm"];
+      const filler = fillers[Math.floor(Math.random() * fillers.length)];
+      sentence = `${filler}... ${sentence.trim()}`;
+    }
+
+    // Add mid-sentence hesitations (30% chance for longer sentences)
+    if (sentence.length > 40 && Math.random() < 0.3) {
+      const words = sentence.split(" ");
+      const midPoint = Math.floor(words.length / 2);
+      words.splice(midPoint, 0, "uh...");
+      sentence = words.join(" ");
+    }
+
+    return sentence;
+  });
+
+  enhancedText = enhancedSentences.join("");
+
+  // Add emotional tags based on state (increased probabilities for more expression)
   // Scared/anxious - add nervous sounds
   if (
     lowerEmotion.includes("scared") ||
     lowerEmotion.includes("anxious") ||
     lowerEmotion.includes("panicked")
   ) {
-    // Add nervous gulp/swallow at start
-    if (Math.random() < 0.4) {
+    // Add nervous gulp/swallow at start (increased from 40% to 60%)
+    if (Math.random() < 0.6) {
       enhancedText = `[gulps] ${enhancedText}`;
     }
-    // Occasional whispers for anxiety
-    if (personality.emotionality > 0.7 && Math.random() < 0.3) {
+    // Occasional whispers for anxiety (increased from 30% to 50%)
+    if (personality.emotionality > 0.7 && Math.random() < 0.5) {
       enhancedText = enhancedText.replace(
         /\.$/,
         "... [whispers] En tiedä mitä tehdä.",
       );
+    }
+    // Add nervous exhale
+    if (Math.random() < 0.4) {
+      const words = enhancedText.split(" ");
+      const insertPoint = Math.floor(words.length * 0.6);
+      words.splice(insertPoint, 0, "[exhales]");
+      enhancedText = words.join(" ");
     }
   }
 
@@ -278,10 +312,11 @@ export function enhanceTextWithVoiceTags(
     lowerEmotion.includes("sad") ||
     lowerEmotion.includes("devastated")
   ) {
-    // Add crying tag if very emotional
-    if (personality.emotionality > 0.6 && Math.random() < 0.5) {
+    // Add crying tag if very emotional (increased from 50% to 70%)
+    if (personality.emotionality > 0.6 && Math.random() < 0.7) {
       enhancedText = `[crying] ${enhancedText}`;
-    } else if (Math.random() < 0.4) {
+    } else if (Math.random() < 0.6) {
+      // Increased from 40% to 60%
       enhancedText = `[sighs] ${enhancedText}`;
     }
   }
@@ -292,14 +327,14 @@ export function enhanceTextWithVoiceTags(
     lowerEmotion.includes("angry") ||
     lowerEmotion.includes("annoyed")
   ) {
-    // Add exhale or sigh
-    if (Math.random() < 0.4) {
+    // Add exhale or sigh (increased from 40% to 60%)
+    if (Math.random() < 0.6) {
       enhancedText = `[exhales] ${enhancedText}`;
     }
-    // Make sarcastic comments more sarcastic
+    // Make sarcastic comments more sarcastic (increased from 30% to 50%)
     if (
       (lowerText.includes("joo") || lowerText.includes("yeah")) &&
-      Math.random() < 0.3
+      Math.random() < 0.5
     ) {
       enhancedText = enhancedText.replace(/(joo|yeah)/i, "[sarcastic] $1");
     }
@@ -312,17 +347,17 @@ export function enhanceTextWithVoiceTags(
     lowerEmotion.includes("ecstatic") ||
     lowerEmotion.includes("relieved")
   ) {
-    // Add laughs to happy messages
+    // Add laughs to happy messages (increased from 40% to 60%)
     if (
       (lowerText.includes("kiitos") ||
         lowerText.includes("thanks") ||
         lowerText.includes("great")) &&
-      Math.random() < 0.4
+      Math.random() < 0.6
     ) {
       enhancedText = enhancedText.replace(/!/, "! [laughs]");
     }
-    // Add excited exclamations
-    if (personality.emotionality > 0.6 && Math.random() < 0.3) {
+    // Add excited exclamations (increased from 30% to 50%)
+    if (personality.emotionality > 0.6 && Math.random() < 0.5) {
       enhancedText = `[excited] ${enhancedText}`;
     }
   }
@@ -353,10 +388,15 @@ export function enhanceTextWithVoiceTags(
 
 /**
  * Determine if a voice message should be generated based on:
- * - Random chance (1/10 or ~10%)
+ * - Scenario progression (scripted for onboarding)
+ * - Random chance for later scenarios
  * - Character preference for voice messages
  * - Emotional intensity
- * - Scenario count: ALWAYS on scenario 2 (for demo impact), random chance after
+ *
+ * Scenario flow:
+ * - Scenario 1: NO voice (ease into game with simple text)
+ * - Scenario 2: GUARANTEED voice (introduce voice feature)
+ * - Scenario 3+: Random chance based on emotion/character
  */
 export function shouldGenerateVoiceMessage(
   character: Character,
@@ -374,18 +414,25 @@ export function shouldGenerateVoiceMessage(
     callsWhenEmotional: character.communicationStyle.callsWhenEmotional,
   });
 
-  // Scenario 2: Always generate voice message for demo impact
+  // Scenario 1: NEVER generate voice (keep first experience simple)
+  if (scenarioNumber === 1) {
+    console.log(`🚫 No voice on scenario 1 (easing into game)`);
+    return false;
+  }
+
+  // Scenario 2: ALWAYS generate voice message (demo impact + introduce feature)
   if (scenarioNumber === 2) {
     console.log(`✅ Guaranteed voice message (scenario 2 - demo enhancement)`);
     return true;
   }
 
-  // Scenario 3+: Use random chance (scenario 2 now always has voice, so this won't trigger)
+  // Scenario 3+: Use random chance
+  // (Fallback guarantee removed since scenario 2 always has voice now)
   if (scenarioNumber === 3 && !hasReceivedVoice) {
     console.log(
-      `✅ Guaranteed voice message (scenario 3, no voice on scenario 2)`,
+      `⚠️ Warning: Scenario 3 but no voice received (should not happen)`,
     );
-    return true;
+    return true; // Failsafe
   }
 
   // Check if character prefers voice messages
@@ -485,7 +532,7 @@ export async function generateVoiceMessage(
       },
     });
 
-    // Convert audio stream to base64 data URL
+    // Convert audio stream to buffer
     const chunks: Uint8Array[] = [];
     for await (const chunk of audio) {
       chunks.push(chunk);
@@ -493,8 +540,26 @@ export async function generateVoiceMessage(
 
     // Concatenate all chunks
     const audioBuffer = Buffer.concat(chunks);
-    const base64Audio = audioBuffer.toString("base64");
-    const audioUrl = `data:audio/mpeg;base64,${base64Audio}`;
+
+    // Generate unique ID for this audio file
+    const audioId = crypto.randomUUID();
+
+    // Write to disk (survives hot reloads)
+    const fs = await import("fs/promises");
+    const path = await import("path");
+    const audioDir = path.join(process.cwd(), "saves", "audio");
+    const audioPath = path.join(audioDir, `${audioId}.mp3`);
+
+    // Ensure directory exists
+    await fs.mkdir(audioDir, { recursive: true });
+
+    // Write audio file
+    await fs.writeFile(audioPath, audioBuffer);
+
+    // Return URL to audio endpoint
+    const audioUrl = `http://localhost:4111/api/audio/${audioId}`;
+
+    console.log(`🔊 Audio saved to disk: ${audioId}.mp3 (${audioBuffer.length} bytes)`);
 
     // Determine urgency from emotional state
     let urgency: "calm" | "concerned" | "urgent" | "excited" = "calm";
