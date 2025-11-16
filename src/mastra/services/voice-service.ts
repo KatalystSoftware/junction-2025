@@ -556,8 +556,8 @@ export async function generateVoiceMessage(
     // Write audio file
     await fs.writeFile(audioPath, audioBuffer);
 
-    // Return URL to audio endpoint
-    const audioUrl = `http://localhost:4111/api/audio/${audioId}`;
+    // Return relative URL so it works through Vite proxy
+    const audioUrl = `/api/audio/${audioId}`;
 
     console.log(`🔊 Audio saved to disk: ${audioId}.mp3 (${audioBuffer.length} bytes)`);
 

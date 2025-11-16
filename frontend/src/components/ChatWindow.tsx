@@ -799,44 +799,50 @@ export function ChatWindow({
                     color: "var(--card-foreground)",
                   }}
                 >
-                  🏆 Achievements Unlocked
+                  🏆 {t.consultationEnd.achievementsUnlocked}
                 </h4>
                 <div className="space-y-1">
                   {conversationEndData.achievementsUnlocked.map(
-                    (achievement: any, idx: number) => (
-                      <div
-                        key={idx}
-                        className="flex items-center gap-2 px-3 py-2 rounded-lg"
-                        style={{ backgroundColor: "var(--muted)" }}
-                      >
-                        <span style={{ fontSize: "1.2rem" }}>
-                          {achievement.icon || "🎯"}
-                        </span>
-                        <div className="flex-1">
-                          <p
-                            style={{
-                              fontFamily: "Inter, sans-serif",
-                              fontSize: "var(--text-sm)",
-                              fontWeight: "var(--font-weight-medium)",
-                              color: "var(--card-foreground)",
-                            }}
-                          >
-                            {achievement.title || achievement.name}
-                          </p>
-                          {achievement.description && (
+                    (achievement: any, idx: number) => {
+                      const translatedAchievement = achievement.id && t.achievements[achievement.id]
+                        ? t.achievements[achievement.id]
+                        : { name: achievement.title || achievement.name, description: achievement.description };
+
+                      return (
+                        <div
+                          key={idx}
+                          className="flex items-center gap-2 px-3 py-2 rounded-lg"
+                          style={{ backgroundColor: "var(--muted)" }}
+                        >
+                          <span style={{ fontSize: "1.2rem" }}>
+                            {achievement.icon || "🎯"}
+                          </span>
+                          <div className="flex-1">
                             <p
                               style={{
                                 fontFamily: "Inter, sans-serif",
-                                fontSize: "var(--text-xs)",
-                                color: "var(--muted-foreground)",
+                                fontSize: "var(--text-sm)",
+                                fontWeight: "var(--font-weight-medium)",
+                                color: "var(--card-foreground)",
                               }}
                             >
-                              {achievement.description}
+                              {translatedAchievement.name}
                             </p>
-                          )}
+                            {translatedAchievement.description && (
+                              <p
+                                style={{
+                                  fontFamily: "Inter, sans-serif",
+                                  fontSize: "var(--text-xs)",
+                                  color: "var(--muted-foreground)",
+                                }}
+                              >
+                                {translatedAchievement.description}
+                              </p>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ),
+                      );
+                    },
                   )}
                 </div>
               </div>
