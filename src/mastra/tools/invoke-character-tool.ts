@@ -35,6 +35,8 @@ export const invokeCharacterTool = {
     }>;
     characterMemory?: CharacterConversationMemory[];
     userLanguage?: string;
+    frustrationLevel?: number; // 0-1 scale of how frustrated the character is from waiting
+    followUpMessagesSent?: number; // How many follow-up messages have been sent
   }) => {
     try {
       const {
@@ -44,6 +46,8 @@ export const invokeCharacterTool = {
         conversationHistory,
         characterMemory,
         userLanguage = "en",
+        frustrationLevel = 0,
+        followUpMessagesSent = 0,
       } = context;
 
       // Create character agent dynamically with memory and advisor message for language detection
@@ -54,10 +58,28 @@ export const invokeCharacterTool = {
         advisorMessage,
       );
 
+      // Build frustration context
+      let frustrationContext = "";
+      if (frustrationLevel > 0) {
+        const emotionalState = frustrationLevel < 0.3 ? "slightly impatient" :
+                               frustrationLevel < 0.6 ? "frustrated" :
+                               frustrationLevel < 0.8 ? "very frustrated" :
+                               "extremely frustrated";
+
+        const waitTimeMinutes = Math.round(frustrationLevel * 15 + 2); // Approximate wait time
+
+        frustrationContext = `\n\nIMPORTANT CONTEXT:
+You've been waiting for ${waitTimeMinutes} minutes for a response from the advisor.
+Your emotional state should reflect this: you are ${emotionalState}.
+${followUpMessagesSent > 0 ? `You've already sent ${followUpMessagesSent} follow-up message(s) trying to get their attention.` : ""}
+${frustrationLevel > 0.7 ? "You're seriously considering just leaving and finding help elsewhere." : ""}
+Your messages should show your growing impatience and frustration from waiting.`;
+      }
+
       // Build conversation history for context
       let prompt = `The advisor has responded to your initial message.
 
-${wrapUserInput(advisorMessage, "ADVISOR'S MESSAGE")}
+${wrapUserInput(advisorMessage, "ADVISOR'S MESSAGE")}${frustrationContext}
 
 Respond in character.`;
 
@@ -71,7 +93,7 @@ Respond in character.`;
         prompt = `Conversation so far:
 ${historyText}
 
-${wrapUserInput(advisorMessage, "ADVISOR'S LATEST MESSAGE")}
+${wrapUserInput(advisorMessage, "ADVISOR'S LATEST MESSAGE")}${frustrationContext}
 
 Respond in character.`;
       }
@@ -135,12 +157,19 @@ Respond in character.`;
         parsed.messages &&
         parsed.messages.length > 0
       ) {
+        // Determine urgency based on frustration level
+        const urgency: "calm" | "concerned" | "urgent" | "excited" =
+          frustrationLevel < 0.3 ? "calm" :
+          frustrationLevel < 0.6 ? "concerned" :
+          "urgent";
+
         // Generate voice for the first message (usually the most emotional one)
         const messageForVoice = parsed.messages[0];
         voiceConfig = await generateVoiceMessage(
           character,
           messageForVoice,
           emotionalState,
+          urgency, // Pass urgency based on frustration
         );
 
         // Mark that this character has received a voice message
