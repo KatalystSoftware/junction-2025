@@ -522,18 +522,31 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
     const serverMessages = messagesByThread[selectedContactId] || [];
     const voiceMessages = pendingVoiceMessages[selectedContactId] || [];
 
-    // Filter out server text messages that have a matching voice message
-    const voiceContents = new Set(voiceMessages.map((vm) => vm.content));
-    const filteredServerMessages = serverMessages.filter(
-      (msg) =>
-        !(
-          msg.role === "user" &&
-          msg.type !== "voice" &&
-          voiceContents.has(msg.content)
-        ),
+    // Create a map of transcriptions to voice messages for quick lookup
+    const voiceByContent = new Map(
+      voiceMessages.map((vm) => [vm.content, vm]),
     );
 
-    return [...filteredServerMessages, ...voiceMessages];
+    // Replace matching text messages with voice messages to preserve order
+    const mergedMessages = serverMessages.map((msg) => {
+      // If this is a user text message that has a matching voice message, replace it
+      if (
+        msg.role === "user" &&
+        msg.type !== "voice" &&
+        voiceByContent.has(msg.content)
+      ) {
+        return voiceByContent.get(msg.content)!;
+      }
+      return msg;
+    });
+
+    // Add any voice messages that don't have a server match yet (optimistic UI)
+    const serverContents = new Set(serverMessages.map((m) => m.content));
+    const newVoiceMessages = voiceMessages.filter(
+      (vm) => !serverContents.has(vm.content),
+    );
+
+    return [...mergedMessages, ...newVoiceMessages];
   }, [selectedContactId, messagesByThread, pendingVoiceMessages]);
 
   const currentAdviceChoices = selectedContactId
