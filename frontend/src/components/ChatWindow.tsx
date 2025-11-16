@@ -148,6 +148,38 @@ export function ChatWindow({
   const [isInputFocused, setIsInputFocused] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Permission request functions
+  const requestCameraAndMicPermissions = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
+      // Stop all tracks immediately since we don't actually need them
+      stream.getTracks().forEach((track) => track.stop());
+      console.log("Camera and microphone permissions granted!");
+      return true;
+    } catch (error) {
+      console.error("Camera/microphone permission denied:", error);
+      return false;
+    }
+  };
+
+  const requestMicPermission = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
+      // Stop all tracks immediately since we don't actually need them
+      stream.getTracks().forEach((track) => track.stop());
+      console.log("Microphone permission granted!");
+      return true;
+    } catch (error) {
+      console.error("Microphone permission denied:", error);
+      return false;
+    }
+  };
+
   // Get multiple choice options from backend (if provided)
   // Keep the full choice objects to display actionText + projectedOutcome
   const multipleChoiceOptions = adviceChoices.length > 0 ? adviceChoices : [];
@@ -515,7 +547,10 @@ export function ChatWindow({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setShowVideoDialog(true)}
+              onClick={async () => {
+                await requestCameraAndMicPermissions();
+                setShowVideoDialog(true);
+              }}
               style={{ borderRadius: "var(--radius-button)" }}
             >
               <Video className="w-5 h-5" />
@@ -523,7 +558,10 @@ export function ChatWindow({
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setShowCallDialog(true)}
+              onClick={async () => {
+                await requestMicPermission();
+                setShowCallDialog(true);
+              }}
               style={{ borderRadius: "var(--radius-button)" }}
             >
               <Phone className="w-5 h-5" />
@@ -1112,6 +1150,9 @@ export function ChatWindow({
                     size="icon"
                     className="group"
                     disabled={isThreadResolved}
+                    onClick={async () => {
+                      await requestMicPermission();
+                    }}
                     style={{
                       borderRadius: "9999px",
                       backgroundColor: "var(--muted)",
