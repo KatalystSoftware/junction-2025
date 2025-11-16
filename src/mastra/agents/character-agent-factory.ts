@@ -7,6 +7,7 @@
 
 import { Agent } from "@mastra/core/agent";
 import { getAgentModel } from "./agent-model.ts";
+import { getLifeStageDescription } from "../game/progression-manager.ts";
 import type {
   Character,
   Scenario,
@@ -421,6 +422,61 @@ BEHAVIORAL RULES:
 }
 
 /**
+ * Build progression context for character prompt
+ */
+function buildProgressionContext(character: Character): string {
+  if (!character.financialState) {
+    return ""; // No progression context if not initialized
+  }
+
+  const { financialState, relationshipState } = character;
+  let context = "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+  context += `CURRENT SITUATION (${new Date().toLocaleDateString("fi-FI")})\n`;
+  context += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+
+  // Current financial snapshot
+  context += `Occupation: ${financialState.currentOccupation}\n`;
+  context += `Monthly Income: €${financialState.monthlyIncome.toLocaleString("fi-FI")}\n`;
+  context += `Net Worth: €${financialState.netWorth.toLocaleString("fi-FI")}\n`;
+  context += `Life Stage: ${getLifeStageDescription(financialState.currentStage)}\n`;
+
+  // Progression awareness (if returning character)
+  if (relationshipState.visitCount > 1) {
+    const firstIncome =
+      financialState.incomeHistory[0]?.amount ||
+      character.financialProfile.typicalMonthlyIncome;
+    const incomeChange = financialState.monthlyIncome - firstIncome;
+
+    if (incomeChange > 500) {
+      context += `\n💭 MEMORY: You remember when you started at €${firstIncome.toLocaleString("fi-FI")}/month. Your financial situation has improved significantly since then (now €${financialState.monthlyIncome.toLocaleString("fi-FI")}/month). You feel grateful to this advisor for their help.\n`;
+    } else if (incomeChange < -200) {
+      context += `\n💭 MEMORY: You remember when you were earning €${firstIncome.toLocaleString("fi-FI")}/month. Things have gotten harder financially since then. You're worried and hope the advisor can help you get back on track.\n`;
+    } else {
+      context += `\n💭 MEMORY: You've been working with this advisor for a while. Your relationship with them: ${relationshipState.trustTier}.\n`;
+    }
+  }
+
+  // Recent major events (last 3)
+  const recentEvents = financialState.majorEvents.slice(-3);
+  if (recentEvents.length > 0) {
+    context += `\n📌 RECENT LIFE EVENTS (mention naturally if relevant):\n`;
+    for (const event of recentEvents) {
+      context += `- ${event.name}: ${event.description}\n`;
+    }
+  }
+
+  context +=
+    "\n🎯 IMPORTANT: Reference your progress naturally in conversation. For example:\n";
+  context += `- "I got promoted recently!" (not "my income increased by 15%")\n`;
+  context += `- "Remember when you told me to..." (reference past advice)\n`;
+  context += `- "Things are better/worse since we last talked"\n`;
+  context += `- NEVER break immersion or mention "stages", "progression", or "game mechanics"\n`;
+  context += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+
+  return context;
+}
+
+/**
  * Create a dynamic character agent with dynamic language matching
  */
 export async function createCharacterAgent(
@@ -442,6 +498,7 @@ export async function createCharacterAgent(
     character,
     conversationHistory || [],
   );
+  const progressionContext = buildProgressionContext(character);
   const conversationExamples = getConversationExamples(advisorLanguage);
   const transactionContext = await buildTransactionContext(character);
 
@@ -454,6 +511,8 @@ ${character.background}
 ${personalityDesc}
 
 ${memoryContext}
+
+${progressionContext}
 
 YOUR CURRENT FINANCIAL SITUATION:
 - Income level: ${character.financialProfile.incomeLevel} (€${character.financialProfile.typicalMonthlyIncome}/month)

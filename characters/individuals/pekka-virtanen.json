@@ -72,5 +72,49 @@
     "visitCount": 0,
     "lastVisit": null,
     "adviceFollowedHistory": []
-  }
+  },
+  "personalityTraits": {
+    "impulsiveness": 0.2,
+    "trustingness": 0.4,
+    "financial_literacy": 0.8,
+    "stubbornness": 0.5,
+    "emotionality": 0.4
+  },
+  "financialState": {
+    "currentStage": 3,
+    "netWorth": 12064.647681272347,
+    "monthlyIncome": 5800,
+    "monthlyExpenses": 4640,
+    "totalDebt": 0,
+    "liquidSavings": 21479.713612029307,
+    "investmentPortfolio": 0,
+    "realEstateValue": 0,
+    "currentOccupation": "Bank Manager (Approaching Retirement)",
+    "stageEntryDate": "2025-11-16",
+    "monthsInCurrentStage": 0,
+    "readyForNextStage": false,
+    "netWorthHistory": [
+      {
+        "date": "2025-11-16",
+        "amount": 12064.647681272347
+      }
+    ],
+    "incomeHistory": [
+      {
+        "date": "2025-11-16",
+        "amount": 5800
+      }
+    ],
+    "majorEvents": []
+  },
+  "successPathWeights": {
+    "comfortable_stability": 0.3,
+    "corporate_career": 0.15,
+    "tech_entrepreneur": 0.1,
+    "real_estate_investor": 0.15,
+    "small_business_owner": 0.15,
+    "stock_market_investor": 0.15
+  },
+  "completedScenarios": [],
+  "adviceHistory": []
 }

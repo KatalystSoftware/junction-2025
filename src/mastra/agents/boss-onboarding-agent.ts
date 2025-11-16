@@ -20,9 +20,7 @@ function detectLanguage(
 /**
  * Get language-specific instructions for onboarding
  */
-function getLanguageInstructions(
-  language: "finnish" | "english" | "swedish",
-): {
+function getLanguageInstructions(language: "finnish" | "english" | "swedish"): {
   languageRule: string;
   exampleOutput: any;
 } {

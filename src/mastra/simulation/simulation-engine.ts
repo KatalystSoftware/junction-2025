@@ -116,6 +116,32 @@ export class SimulationEngine {
       state = (await this.db.getCharacterState(character.characterId))!;
     }
 
+    // Check if this month was already simulated to prevent duplicates
+    const existingSummary = await this.db.getMonthlySummary(
+      character.characterId,
+      month,
+    );
+    if (existingSummary) {
+      // Month already simulated, return cached result
+      const transactions = await this.db.getTransactionsByMonth(
+        character.characterId,
+        month,
+      );
+      return {
+        month,
+        characterId: character.characterId,
+        transactions,
+        startBalance:
+          state.currentBalance -
+          existingSummary.totalIncome +
+          existingSummary.totalExpenses,
+        endBalance: existingSummary.endBalance,
+        incomeTotal: existingSummary.totalIncome,
+        expensesTotal: existingSummary.totalExpenses,
+        debtReduction: existingSummary.debtReduction || 0,
+      };
+    }
+
     const startBalance = state.currentBalance;
     let spendingModel = { ...state.spendingModel };
 

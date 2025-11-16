@@ -372,7 +372,9 @@ gameResponse = await afterSessionComplete(
 
 ```bash
 # Run the game
-pnpm play
+pnpm dev
+
+# Then open http://localhost:3000
 
 # The system will automatically:
 # 1. Initialize the database on first run

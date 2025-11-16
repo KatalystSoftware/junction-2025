@@ -11,6 +11,7 @@ import { embedMany } from "ai";
 import {
   fetchFinnishFinancialNews,
   integrateNewsIntoRAG,
+  type NewsArticle,
 } from "./news-integration.ts";
 
 const NEWS_INDEX_NAME = "financial_news";
@@ -34,7 +35,7 @@ async function updateNewsIndex() {
   // Fetch latest news for all languages
   console.log("📡 Fetching latest news...");
   const languages: Array<"fi" | "sv" | "en"> = ["fi", "sv", "en"];
-  const allArticles = [];
+  const allArticles: NewsArticle[] = [];
 
   for (const lang of languages) {
     try {

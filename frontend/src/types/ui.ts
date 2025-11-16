@@ -2,6 +2,60 @@
  * Shared UI Types
  */
 
+// ============================================================================
+// Progression System Types
+// ============================================================================
+
+export type FinancialStage = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+
+export type SuccessPath =
+  | "comfortable_stability"
+  | "corporate_career"
+  | "tech_entrepreneur"
+  | "real_estate_investor"
+  | "small_business_owner"
+  | "stock_market_investor";
+
+export interface LifeEvent {
+  id: string;
+  type: "career" | "personal" | "windfall" | "setback" | "opportunity";
+  name: string;
+  description: string;
+  date: string;
+  financialImpact: {
+    oneTime?: number;
+    monthlyIncome?: number;
+    monthlyExpense?: number;
+    netWorthChange?: number;
+  };
+  scenarioCreated?: string;
+  unlocks?: string[];
+  locks?: string[];
+}
+
+export interface CharacterFinancialState {
+  currentStage: FinancialStage;
+  netWorth: number;
+  monthlyIncome: number;
+  monthlyExpenses: number;
+  totalDebt: number;
+  liquidSavings: number;
+  investmentPortfolio: number;
+  realEstateValue: number;
+  currentOccupation: string;
+  stageEntryDate: string;
+  monthsInCurrentStage: number;
+  readyForNextStage: boolean;
+  selectedSuccessPath?: SuccessPath;
+  netWorthHistory: Array<{ date: string; amount: number }>;
+  incomeHistory: Array<{ date: string; amount: number }>;
+  majorEvents: LifeEvent[];
+}
+
+// ============================================================================
+// Contact & Message Types
+// ============================================================================
+
 export interface Contact {
   id: string;
   name: string;
@@ -62,6 +116,7 @@ export interface Contact {
       other?: number;
     };
   };
+  financialState?: CharacterFinancialState;
 }
 
 export interface Message {

@@ -90,8 +90,10 @@ export interface PendingFollowUp {
 export class CharacterPoolManager {
   private characters: Map<string, Character> = new Map();
   private scenarios: Map<string, Scenario> = new Map();
-  private usedScenarios: Set<string> = new Set();
+  private scenarioLastUsed: Map<string, number> = new Map(); // Track session number when scenario was last used
   private pendingFollowUps: PendingFollowUp[] = [];
+  private readonly SCENARIO_COOLDOWN = 10; // Scenarios can be reused after 10 sessions
+  private readonly CHARACTER_COOLDOWN = 8; // Characters can return as "new" after 8 sessions
 
   /**
    * Load characters and scenarios from JSON files or directories
@@ -118,6 +120,7 @@ export class CharacterPoolManager {
             ...char.relationshipState,
             trustLevel,
             trustTier: calculateTrustTier(trustLevel),
+            lastVisitSession: char.relationshipState.lastVisitSession || 0,
             progressionHistory: char.relationshipState.progressionHistory || [],
             decayApplied: char.relationshipState.decayApplied || 0,
             wasRecommended: char.relationshipState.wasRecommended || false,
@@ -274,6 +277,7 @@ export class CharacterPoolManager {
     updates: {
       trustLevel?: number;
       visitCount?: number;
+      sessionNumber?: number; // Track when character last visited
       adviceFollowed?: {
         scenarioId: string;
         adviceGiven: string[];
@@ -309,6 +313,10 @@ export class CharacterPoolManager {
 
     if (updates.visitCount !== undefined) {
       updatedChar.relationshipState.visitCount = updates.visitCount;
+    }
+
+    if (updates.sessionNumber !== undefined) {
+      updatedChar.relationshipState.lastVisitSession = updates.sessionNumber;
     }
 
     if (updates.adviceFollowed) {
@@ -470,19 +478,47 @@ export class CharacterPoolManager {
     const character = this.characters.get(characterId);
     if (!character) return null;
 
-    // Get all scenarios for this character
+    const currentSession = advisorState.totalSessions;
+
+    // Get all scenarios for this character that are off cooldown
     const characterScenarios = Array.from(this.scenarios.values()).filter(
-      (s) =>
-        s.characterId === characterId && !this.usedScenarios.has(s.scenarioId),
+      (s) => {
+        if (s.characterId !== characterId) return false;
+
+        // Check if scenario is on cooldown
+        const lastUsed = this.scenarioLastUsed.get(s.scenarioId);
+        if (lastUsed === undefined) return true; // Never used, available
+
+        const sessionsSinceUse = currentSession - lastUsed;
+        return sessionsSinceUse >= this.SCENARIO_COOLDOWN;
+      },
     );
 
-    // Filter by advisor skill level
+    // Get character's current financial stage
+    const currentStage = character.financialState?.currentStage ?? 1;
+
+    // Filter by advisor skill level AND character's financial stage
     const suitableScenarios = characterScenarios.filter((scenario) => {
       const conditions = scenario.triggerConditions;
-      return (
-        advisorState.skillLevel >= conditions.advisorSkillLevel.min &&
-        advisorState.skillLevel <= conditions.advisorSkillLevel.max
-      );
+
+      // Check advisor skill level (NO MAX CAP - experienced advisors can handle easy scenarios)
+      const skillMatch =
+        advisorState.skillLevel >= conditions.advisorSkillLevel.min;
+
+      if (!skillMatch) return false;
+
+      // Check scenario difficulty matches character's stage
+      // Scenario difficulty (0-1) should align with stage (0-7)
+      // Stage 0-1: difficulty 0-0.25 (early stage scenarios)
+      // Stage 2-3: difficulty 0.25-0.5 (mid stage)
+      // Stage 4-5: difficulty 0.5-0.75 (advanced)
+      // Stage 6-7: difficulty 0.75-1.0 (billionaire scenarios)
+      const stageDifficulty = currentStage / 7; // Normalize to 0-1
+      const difficultyTolerance = 0.3; // Allow some range
+      const difficultyMatch =
+        Math.abs(scenario.difficulty - stageDifficulty) <= difficultyTolerance;
+
+      return difficultyMatch;
     });
 
     // If no suitable scenarios, return null
@@ -494,19 +530,29 @@ export class CharacterPoolManager {
   }
 
   /**
-   * Get a new character for the advisor (first-time client)
+   * Get a new character for the advisor (first-time client or returning after cooldown)
    */
   getNewCharacter(advisorState: AdvisorState): {
     character: Character;
     scenario: Scenario;
   } | null {
-    // Get characters that haven't visited yet
+    const currentSession = advisorState.totalSessions;
+
+    // Get characters that either:
+    // 1. Haven't visited yet (visitCount === 0), OR
+    // 2. Haven't visited in CHARACTER_COOLDOWN sessions
     const newCharacters = Array.from(this.characters.values()).filter(
-      (char) => char.relationshipState.visitCount === 0,
+      (char) => {
+        if (char.relationshipState.visitCount === 0) return true;
+
+        const lastVisit = char.relationshipState.lastVisitSession || 0;
+        const sessionsSinceVisit = currentSession - lastVisit;
+        return sessionsSinceVisit >= this.CHARACTER_COOLDOWN;
+      },
     );
 
     if (newCharacters.length === 0) {
-      console.log("⚠️ No new characters available");
+      console.log("⚠️ No characters available (all on cooldown)");
       return null;
     }
 
@@ -518,13 +564,23 @@ export class CharacterPoolManager {
 
     for (const character of newCharacters) {
       const initialScenarios = Array.from(this.scenarios.values()).filter(
-        (s) =>
-          s.characterId === character.characterId &&
-          !s.triggerConditions.isFollowUp &&
-          !this.usedScenarios.has(s.scenarioId) &&
-          advisorState.skillLevel >=
-            s.triggerConditions.advisorSkillLevel.min &&
-          advisorState.skillLevel <= s.triggerConditions.advisorSkillLevel.max,
+        (s) => {
+          if (s.characterId !== character.characterId) return false;
+          if (s.triggerConditions.isFollowUp) return false;
+
+          // Check skill level (NO MAX CAP)
+          if (
+            advisorState.skillLevel < s.triggerConditions.advisorSkillLevel.min
+          )
+            return false;
+
+          // Check scenario cooldown
+          const lastUsed = this.scenarioLastUsed.get(s.scenarioId);
+          if (lastUsed === undefined) return true; // Never used
+
+          const sessionsSinceUse = currentSession - lastUsed;
+          return sessionsSinceUse >= this.SCENARIO_COOLDOWN;
+        },
       );
 
       if (initialScenarios.length === 0) {
@@ -612,10 +668,55 @@ export class CharacterPoolManager {
   }
 
   /**
-   * Mark scenario as used
+   * Mark scenario as used (with cooldown tracking)
    */
-  markScenarioUsed(scenarioId: string): void {
-    this.usedScenarios.add(scenarioId);
+  markScenarioUsed(scenarioId: string, sessionNumber: number): void {
+    this.scenarioLastUsed.set(scenarioId, sessionNumber);
+  }
+
+  /**
+   * Get least recently used character (fallback when all on cooldown)
+   */
+  getLeastRecentlyUsedCharacter(advisorState: AdvisorState): {
+    character: Character;
+    scenario: Scenario;
+  } | null {
+    const currentSession = advisorState.totalSessions;
+
+    // Get all characters sorted by last visit (oldest first)
+    const allCharacters = Array.from(this.characters.values()).sort((a, b) => {
+      const aLastVisit = a.relationshipState.lastVisitSession || 0;
+      const bLastVisit = b.relationshipState.lastVisitSession || 0;
+      return aLastVisit - bLastVisit;
+    });
+
+    // Try to find a character with an available scenario
+    for (const character of allCharacters) {
+      // Get scenarios for this character, sorted by last use
+      const scenarios = Array.from(this.scenarios.values())
+        .filter(
+          (s) =>
+            s.characterId === character.characterId &&
+            !s.triggerConditions.isFollowUp &&
+            advisorState.skillLevel >=
+              s.triggerConditions.advisorSkillLevel.min,
+        )
+        .sort((a, b) => {
+          const aLastUsed = this.scenarioLastUsed.get(a.scenarioId) || 0;
+          const bLastUsed = this.scenarioLastUsed.get(b.scenarioId) || 0;
+          return aLastUsed - bLastUsed;
+        });
+
+      if (scenarios.length > 0) {
+        // Use the least recently used scenario
+        return { character, scenario: scenarios[0] };
+      }
+    }
+
+    console.log(
+      "❌ No scenarios available for any character (should never happen)",
+    );
+    return null;
   }
 
   /**
@@ -742,6 +843,7 @@ export class CharacterPoolManager {
       followed: boolean;
       outcome: "positive" | "negative" | "neutral";
     },
+    sessionNumber: number,
   ): {
     willRecommend: boolean;
     newTrustLevel: number;
@@ -784,6 +886,7 @@ export class CharacterPoolManager {
     this.updateCharacterRelationship(characterId, {
       trustLevel: newTrustLevel,
       visitCount: char.relationshipState.visitCount + 1,
+      sessionNumber,
       adviceFollowed: adviceOutcome,
       progressionEvent: {
         event:
@@ -944,7 +1047,7 @@ export class CharacterPoolManager {
     return {
       totalCharacters: this.characters.size,
       totalScenarios: this.scenarios.size,
-      usedScenarios: this.usedScenarios.size,
+      usedScenarios: this.scenarioLastUsed.size,
       pendingFollowUps: this.pendingFollowUps.length,
       charactersMetCount,
     };
@@ -954,7 +1057,7 @@ export class CharacterPoolManager {
    * Reset pool state (for testing)
    */
   reset(): void {
-    this.usedScenarios.clear();
+    this.scenarioLastUsed.clear();
     this.pendingFollowUps = [];
 
     // Reset all character relationship states
@@ -966,6 +1069,7 @@ export class CharacterPoolManager {
           trustTier: "trusted",
           visitCount: 0,
           lastVisit: null,
+          lastVisitSession: 0,
           adviceFollowedHistory: [],
           progressionHistory: [],
           hasReceivedVoiceMessage: false,

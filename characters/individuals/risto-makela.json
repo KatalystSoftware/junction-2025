@@ -84,5 +84,49 @@
     "visitCount": 0,
     "lastVisit": null,
     "adviceFollowedHistory": []
-  }
+  },
+  "personalityTraits": {
+    "impulsiveness": 0.3,
+    "trustingness": 0.6,
+    "financial_literacy": 0.3,
+    "stubbornness": 0.7,
+    "emotionality": 0.6
+  },
+  "financialState": {
+    "currentStage": 2,
+    "netWorth": -5054.320820036348,
+    "monthlyIncome": 2700,
+    "monthlyExpenses": 2160,
+    "totalDebt": 5400,
+    "liquidSavings": 2.0559644812239153,
+    "investmentPortfolio": 0,
+    "realEstateValue": 0,
+    "currentOccupation": "Construction Worker",
+    "stageEntryDate": "2025-11-16",
+    "monthsInCurrentStage": 0,
+    "readyForNextStage": false,
+    "netWorthHistory": [
+      {
+        "date": "2025-11-16",
+        "amount": -5054.320820036348
+      }
+    ],
+    "incomeHistory": [
+      {
+        "date": "2025-11-16",
+        "amount": 2700
+      }
+    ],
+    "majorEvents": []
+  },
+  "successPathWeights": {
+    "comfortable_stability": 0.3,
+    "corporate_career": 0.15,
+    "tech_entrepreneur": 0.1,
+    "real_estate_investor": 0.15,
+    "small_business_owner": 0.15,
+    "stock_market_investor": 0.15
+  },
+  "completedScenarios": [],
+  "adviceHistory": []
 }

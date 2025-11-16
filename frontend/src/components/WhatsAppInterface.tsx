@@ -30,11 +30,17 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
   // Translations
   const t = useTranslation();
 
+  // Track last read message count for each thread to properly show unread indicators
+  const [lastReadMessageCounts, setLastReadMessageCounts] = useState<{
+    [threadId: string]: number;
+  }>({});
+
   // Derived UI state - no storage, just computation
   const { contacts, messagesByThread } = useDerivedUIState(
     game.advisorState,
     game.threadHistories,
     game.threadMetadata,
+    lastReadMessageCounts,
   );
 
   // UI-only state (persisted in URL)
@@ -49,6 +55,11 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
     // Show chat if there's a hash in URL
     return !!window.location.hash;
   });
+
+  // Pending voice messages (optimistic UI for user voice messages)
+  const [pendingVoiceMessages, setPendingVoiceMessages] = useState<
+    Record<string, Message[]>
+  >({});
 
   // Update URL when selectedContactId changes
   useEffect(() => {
@@ -67,6 +78,13 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
         ? bossHistory[bossHistory.length - 1].content
         : "Welcome to your new job as a financial advisor!";
 
+    // Show unread indicator if there are new messages since last read
+    const lastReadCount = lastReadMessageCounts["boss-pinned"] || 0;
+    const hasUnreadBossMessage =
+      bossHistory.length > 0 &&
+      bossHistory[bossHistory.length - 1].role === "assistant" &&
+      bossHistory.length > lastReadCount;
+
     return {
       id: "boss-pinned",
       name: "Michael Scott",
@@ -74,12 +92,12 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       lastMessage: lastBossMessage,
       timestamp: "Pinned",
       lastMessageTime: new Date(),
-      unreadCount: 0,
+      unreadCount: hasUnreadBossMessage ? 1 : 0,
       online: true,
       avatarImage: michaelScottImage,
       trust: 100,
     };
-  }, [game.threadHistories]);
+  }, [game.threadHistories, lastReadMessageCounts]);
 
   // Auto-trigger onboarding on first load (with race condition protection)
   const hasTriggeredOnboarding = useRef(false);
@@ -202,13 +220,19 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
         const characterInfo =
           response.characterInfo || game.threadMetadata?.[response.threadId];
 
+        // Get the actual advisor advice and character response from thread history
+        const threadHistory = game.threadHistories?.[response.threadId] || [];
+        const adviceGiven = response.advisorAdvice?.join(" ") || undefined;
+        const lastCharacterMessage =
+          threadHistory.length > 0
+            ? threadHistory[threadHistory.length - 1]?.content
+            : undefined;
+
         setCurrentResultsData({
           characterName: characterInfo?.name || "Client",
-          adviceGiven: response.financialResults.extractedActions
-            ? "Your advice to the client" // TODO: Get actual advice text
-            : undefined,
+          adviceGiven,
           extractedActions: response.financialResults.extractedActions,
-          characterResponse: "Thank you for your help!", // TODO: Get actual response
+          characterResponse: lastCharacterMessage || "Thank you for your help!",
           projection: response.financialResults.projection,
           evaluation: response.financialResults.evaluation,
           coinsEarned: response.financialResults.coinsEarned,
@@ -434,6 +458,13 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
   const handleSelectContact = (contactId: string) => {
     setSelectedContactId(contactId);
     setShowChat(true);
+
+    // Mark the chat as read by storing current message count
+    const currentMessages = game.threadHistories[contactId]?.length || 0;
+    setLastReadMessageCounts((prev) => ({
+      ...prev,
+      [contactId]: currentMessages,
+    }));
   };
 
   const handleBackToContacts = () => {
@@ -441,6 +472,42 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
   };
 
   // Handle sending messages
+  const handleSendVoiceMessage = (voiceMessage: {
+    audioBlob: Blob;
+    transcription: string;
+    duration: number;
+  }) => {
+    if (!selectedContactId) return;
+
+    // Create blob URL for the audio
+    const audioUrl = URL.createObjectURL(voiceMessage.audioBlob);
+
+    // Create optimistic voice message
+    const voiceMsg: Message = {
+      id: `temp-voice-${Date.now()}`,
+      contactId: selectedContactId,
+      role: "user",
+      content: voiceMessage.transcription,
+      timestamp: new Date(),
+      type: "voice",
+      audioUrl,
+      duration: voiceMessage.duration,
+    };
+
+    // Add to pending messages
+    setPendingVoiceMessages((prev) => ({
+      ...prev,
+      [selectedContactId]: [...(prev[selectedContactId] || []), voiceMsg],
+    }));
+
+    // Send transcription to backend
+    game.sendMessage(selectedContactId, voiceMessage.transcription);
+
+    // Note: We keep the voice message in the UI permanently
+    // The blob URL will be valid for the session
+    // If we need to persist across page reloads, we'd need to store audio in localStorage or backend
+  };
+
   const handleSendMessage = (content: string) => {
     if (!selectedContactId) return;
 
@@ -493,12 +560,37 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       : contacts.find((c) => c.id === selectedContactId);
 
   // Boss messages now come from server threadHistories like everything else
-  // Filter out the first boss message if we're showing typing indicator
-  const messages: Message[] = (() => {
-    const allMessages = selectedContactId
-      ? messagesByThread[selectedContactId] || []
-      : [];
-    
+  // Include pending voice messages for optimistic UI and filter boss typing indicator
+  const messages: Message[] = useMemo(() => {
+    if (!selectedContactId) return [];
+
+    const serverMessages = messagesByThread[selectedContactId] || [];
+    const voiceMessages = pendingVoiceMessages[selectedContactId] || [];
+
+    // Create a map of transcriptions to voice messages for quick lookup
+    const voiceByContent = new Map(voiceMessages.map((vm) => [vm.content, vm]));
+
+    // Replace matching text messages with voice messages to preserve order
+    const mergedMessages = serverMessages.map((msg) => {
+      // If this is a user text message that has a matching voice message, replace it
+      if (
+        msg.role === "user" &&
+        msg.type !== "voice" &&
+        voiceByContent.has(msg.content)
+      ) {
+        return voiceByContent.get(msg.content)!;
+      }
+      return msg;
+    });
+
+    // Add any voice messages that don't have a server match yet (optimistic UI)
+    const serverContents = new Set(serverMessages.map((m) => m.content));
+    const newVoiceMessages = voiceMessages.filter(
+      (vm) => !serverContents.has(vm.content),
+    );
+
+    let allMessages = [...mergedMessages, ...newVoiceMessages];
+
     // If showing typing indicator for boss onboarding, hide the first message temporarily
     if (
       selectedContactId === "boss-pinned" &&
@@ -508,9 +600,9 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
     ) {
       return [];
     }
-    
+
     return allMessages;
-  })();
+  }, [selectedContactId, messagesByThread, pendingVoiceMessages, bossIsTypingOnboarding]);
 
   const currentAdviceChoices = selectedContactId
     ? adviceChoicesByThread[selectedContactId] || []
@@ -660,6 +752,7 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
         contact={displayContact}
         messages={messages}
         onSendMessage={handleSendMessage}
+        onSendVoiceMessage={handleSendVoiceMessage}
         onBack={handleBackToContacts}
         showChat={showChat}
         contactIsTyping={

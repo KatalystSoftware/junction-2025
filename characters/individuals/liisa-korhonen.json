@@ -103,5 +103,49 @@
     "visitCount": 0,
     "lastVisit": null,
     "adviceFollowedHistory": []
-  }
+  },
+  "personalityTraits": {
+    "impulsiveness": 0.2,
+    "trustingness": 0.6,
+    "financial_literacy": 0.5,
+    "stubbornness": 0.6,
+    "emotionality": 0.4
+  },
+  "financialState": {
+    "currentStage": 3,
+    "netWorth": 3939.913381828934,
+    "monthlyIncome": 3200,
+    "monthlyExpenses": 2560,
+    "totalDebt": 18000,
+    "liquidSavings": 24236.42352348694,
+    "investmentPortfolio": 0,
+    "realEstateValue": 0,
+    "currentOccupation": "Teacher",
+    "stageEntryDate": "2025-11-16",
+    "monthsInCurrentStage": 0,
+    "readyForNextStage": false,
+    "netWorthHistory": [
+      {
+        "date": "2025-11-16",
+        "amount": 3939.913381828934
+      }
+    ],
+    "incomeHistory": [
+      {
+        "date": "2025-11-16",
+        "amount": 3200
+      }
+    ],
+    "majorEvents": []
+  },
+  "successPathWeights": {
+    "comfortable_stability": 0.3,
+    "corporate_career": 0.15,
+    "tech_entrepreneur": 0.1,
+    "real_estate_investor": 0.15,
+    "small_business_owner": 0.15,
+    "stock_market_investor": 0.15
+  },
+  "completedScenarios": [],
+  "adviceHistory": []
 }

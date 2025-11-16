@@ -131,5 +131,49 @@
     "visitCount": 0,
     "lastVisit": null,
     "adviceFollowedHistory": []
-  }
+  },
+  "personalityTraits": {
+    "impulsiveness": 0.4,
+    "trustingness": 0.5,
+    "financial_literacy": 0.6,
+    "stubbornness": 0.7,
+    "emotionality": 0.5
+  },
+  "financialState": {
+    "currentStage": 3,
+    "netWorth": -206607.8087664443,
+    "monthlyIncome": 3500,
+    "monthlyExpenses": 2800,
+    "totalDebt": 207000,
+    "liquidSavings": 941.882146283129,
+    "investmentPortfolio": 0,
+    "realEstateValue": 0,
+    "currentOccupation": "Entrepreneur",
+    "stageEntryDate": "2025-11-16",
+    "monthsInCurrentStage": 0,
+    "readyForNextStage": false,
+    "netWorthHistory": [
+      {
+        "date": "2025-11-16",
+        "amount": -206607.8087664443
+      }
+    ],
+    "incomeHistory": [
+      {
+        "date": "2025-11-16",
+        "amount": 3500
+      }
+    ],
+    "majorEvents": []
+  },
+  "successPathWeights": {
+    "comfortable_stability": 0.3,
+    "corporate_career": 0.15,
+    "tech_entrepreneur": 0.1,
+    "real_estate_investor": 0.15,
+    "small_business_owner": 0.15,
+    "stock_market_investor": 0.15
+  },
+  "completedScenarios": [],
+  "adviceHistory": []
 }

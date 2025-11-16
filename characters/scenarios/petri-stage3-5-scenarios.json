@@ -1,0 +1,520 @@
+[
+  {
+    "scenarioId": "scenario_petri_gaming_cafe_launch_stage3",
+    "characterId": "char_petri_004",
+    "scenarioType": "small_business_launch",
+    "difficulty": 0.7,
+    "topic": "entrepreneurship",
+    "requiredStage": 3,
+    "successPath": "small_business_owner",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 3, "max": 10 },
+      "characterStage": { "min": 3, "max": 4 },
+      "isFollowUp": false
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Yo! Remember me? I'm 24 now and saved up €45k from streaming + part-time gigs. I want to open a gaming café in Lahti! Rent: €2k/month, equipment: €30k, 20 gaming PCs + consoles. €10/hour per station. Business loan wants 30% down payment. Is this stupid or brilliant? 🎮☕",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Planning gaming café launch, evaluating business viability",
+      "emotionalState": "excited, confident, slight fear of failure",
+      "urgency": "medium",
+      "specificDetails": {
+        "currentSavings": 45000,
+        "totalStartupCost": 50000,
+        "equipmentCost": 30000,
+        "monthlyRent": 2000,
+        "loanNeeded": 35000,
+        "downPaymentRequired": 15000,
+        "pricingModel": "€10/hour per gaming station",
+        "capacity": "20 stations",
+        "location": "Lahti city center",
+        "age": 24
+      }
+    },
+    "idealAdvice": [
+      "Gaming café can work BUT needs solid business plan",
+      "**Revenue projection:**",
+      "- 20 stations x €10/hour = €200/hour max revenue",
+      "- Realistic occupancy: 30-50% average (not always full!)",
+      "- 8 hours/day x 30 days x 40% occupancy x €10 = €19,200/month BEST case",
+      "**Costs breakdown:**",
+      "- Rent: €2,000/month",
+      "- Utilities + internet: €500/month (fast internet is EXPENSIVE)",
+      "- Equipment maintenance/upgrades: €500/month",
+      "- Staff (need 1-2 people): €2,500/month",
+      "- Loan payment (€35k at 5%): €660/month",
+      "- Insurance, licenses, misc: €300/month",
+      "- **Total costs: ~€6,500/month**",
+      "**Break-even analysis:**",
+      "- Need €6,500/month revenue = 650 hours sold/month",
+      "- = 22 hours/day EVERY day at 40% occupancy",
+      "- This is TIGHT - very little margin for error",
+      "**Risks:**",
+      "- Lahti market size: Is there demand for 20 stations?",
+      "- Competition: Check existing gaming cafés, internet cafés",
+      "- Seasonality: Summer months might be slower",
+      "- Equipment obsolescence: PCs need upgrades every 2-3 years",
+      "**Recommendations:**",
+      "1. Start smaller: 10 stations, not 20 (cut costs in half)",
+      "2. Add revenue streams: Snacks, drinks, tournament fees, LAN parties",
+      "3. Do market research: Survey Lahti gamers, check foot traffic",
+      "4. Keep €10k emergency fund (don't invest all €45k)",
+      "5. Have backup income plan (keep streaming?)",
+      "Not stupid, not brilliant - it's RISKY but can work with discipline"
+    ],
+    "commonMistakes": [
+      "Only looking at best-case revenue (ignoring realistic occupancy)",
+      "Not accounting for staff costs (can't run 24/7 alone!)",
+      "Underestimating internet costs (gaming needs premium bandwidth)",
+      "Ignoring equipment upgrade cycles",
+      "Not suggesting starting smaller to test market",
+      "Assuming 'passion = profit' (needs real business analysis)"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_petri_cafe_first_year_struggle_stage3",
+        "triggeredBy": "any",
+        "delayInSessions": 5
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_petri_cafe_first_year_struggle_stage3",
+    "characterId": "char_petri_004",
+    "scenarioType": "business_crisis",
+    "difficulty": 0.7,
+    "topic": "business_management",
+    "requiredStage": 3,
+    "successPath": "small_business_owner",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 4, "max": 10 },
+      "characterStage": { "min": 3, "max": 4 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_petri_gaming_cafe_launch_stage3"
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "Dude, I'm struggling. Café's been open 6 months. Revenue is only €4,000/month but costs are €6,500. Bleeding €2,500 monthly. I have maybe 3 months runway left. Options: 1) Close down and cut losses, 2) Take another loan to survive longer, 3) Pivot somehow. I'm stressed AF. What do I do?",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "urgent"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Gaming café losing money, 3 months runway remaining",
+      "emotionalState": "stressed, panicked, pride preventing closure",
+      "urgency": "high",
+      "specificDetails": {
+        "monthlyRevenue": 4000,
+        "monthlyCosts": 6500,
+        "monthlyLoss": 2500,
+        "remainingCash": 7500,
+        "runwayMonths": 3,
+        "loanOutstanding": 32000,
+        "occupancyRate": 0.25,
+        "age": 25
+      }
+    },
+    "idealAdvice": [
+      "This is a critical decision point - let's analyze objectively",
+      "**Current reality check:**",
+      "- 25% occupancy vs 40% needed = missing revenue targets badly",
+      "- 3 months runway = urgent action needed NOW",
+      "- Already €15k loss (6 months x €2.5k) from savings",
+      "**Option 1: Close down immediately**",
+      "- Pros: Stop bleeding, sell equipment (~€15k?), minimize total loss",
+      "- Cons: Lose €15k + pride hit, still owe €32k loan",
+      "- Total loss: ~€20-25k, but stop the bleeding",
+      "**Option 2: Take another loan**",
+      "- Pros: Buy time (6 more months?)",
+      "- Cons: Deeper debt hole if revenue doesn't improve",
+      "- Risk: Going from €32k debt to €50k+ debt",
+      "- Only do this if you have CLEAR plan to increase revenue",
+      "**Option 3: Pivot/Optimize**",
+      "- Cut costs: Fire staff, run it yourself (save €2,500/month)",
+      "- Add revenue: Host tournaments (€20 entry x 20 people = €400/event)",
+      "- Partner with schools/esports teams (guaranteed bookings)",
+      "- Sell memberships (€50/month unlimited = predictable revenue)",
+      "- Add snack/drink sales (50% margin on €500/month = €250 profit)",
+      "**My recommendation:**",
+      "1. **Immediate**: Cut staff, run it yourself nights/weekends",
+      "2. **Month 1**: Launch tournament series + membership program",
+      "3. **Month 2**: If revenue hits €5,500+ = continue, if not = close",
+      "4. **Month 3**: Decision point - pivot working or time to exit?",
+      "This is NOT failure - 50% of businesses fail in first year. You tried!",
+      "Knowing when to quit is as important as persistence"
+    ],
+    "commonMistakes": [
+      "Telling him to immediately give up (he needs to try pivot first)",
+      "Encouraging more debt without clear revenue plan",
+      "Not providing concrete pivot strategies",
+      "Ignoring his emotional state (pride, stress)",
+      "Not normalizing business failure rates",
+      "Missing the 'decision timeline' (3 months = urgent!)"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_petri_cafe_turnaround_stage4",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 6
+      },
+      {
+        "scenarioId": "scenario_petri_indie_game_pivot_stage3",
+        "triggeredBy": "any",
+        "delayInSessions": 4
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_petri_indie_game_pivot_stage3",
+    "characterId": "char_petri_004",
+    "scenarioType": "career_pivot",
+    "difficulty": 0.6,
+    "topic": "career_transition",
+    "requiredStage": 3,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 4, "max": 10 },
+      "characterStage": { "min": 3, "max": 4 },
+      "isFollowUp": true
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Update: Closed the café. Lost about €20k total but learned a ton. Found a job at an indie game studio (€2,800/month). They make mobile games. I'm thinking... I could learn game dev and maybe make my own game someday? Or is that just another risky dream after the café failure? 🎮💭",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Working at game studio, considering indie game development",
+      "emotionalState": "recovering from failure, cautiously optimistic, self-doubt",
+      "urgency": "low",
+      "specificDetails": {
+        "currentJob": "junior game developer",
+        "monthlySalary": 2800,
+        "remainingSavings": 12000,
+        "loanDebt": 32000,
+        "age": 25,
+        "skills": "basic programming, game design interest"
+      }
+    },
+    "idealAdvice": [
+      "Café taught you valuable lessons - don't see it as pure failure!",
+      "Indie game development is VERY different from gaming café business",
+      "**Key differences:**",
+      "- Lower upfront cost (€0-5k vs €50k for café)",
+      "- Scalable revenue (sell 1 copy or 100k copies, same effort)",
+      "- Can start as side project while keeping job (low risk!)",
+      "- Failure is cheaper (time lost vs money lost)",
+      "**Indie game reality check:**",
+      "- 80% of indie games make <€5,000 total revenue",
+      "- Average development time: 1-2 years for solo dev",
+      "- Success stories (Stardew Valley, Undertale) are RARE outliers",
+      "- BUT: Skills you learn are valuable even if game fails",
+      "**Smart approach (given café lessons):**",
+      "1. Keep day job at studio (stable €2,800/month)",
+      "2. Learn on the job - get PAID to learn game dev",
+      "3. Make small games on weekends (game jams, prototypes)",
+      "4. Ship 3-5 tiny games first (learn shipping process)",
+      "5. Then consider 'the big one' after 2-3 years experience",
+      "**Financial priorities:**",
+      "- Pay off €32k loan first (avoid interest drain)",
+      "- Rebuild emergency fund to €10k",
+      "- THEN allocate 'game dev budget' (time + small costs)",
+      "**This is NOT another risky dream - it's calculated skill building**",
+      "Difference: You're getting paid to learn, not paying to learn!",
+      "The café taught you to validate before going all-in - apply that here"
+    ],
+    "commonMistakes": [
+      "Discouraging him after café failure (different business model!)",
+      "Not explaining indie game economics realistically",
+      "Encouraging him to quit job and go full indie (too risky!)",
+      "Ignoring his €32k debt burden (needs to pay that first)",
+      "Not celebrating that he found a game studio job (great outcome!)",
+      "Missing the 'side project while employed' strategy"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_petri_first_game_release_stage4",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 8
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_petri_cafe_turnaround_stage4",
+    "characterId": "char_petri_004",
+    "scenarioType": "business_success",
+    "difficulty": 0.7,
+    "topic": "business_management",
+    "requiredStage": 4,
+    "successPath": "small_business_owner",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 5, "max": 10 },
+      "characterStage": { "min": 4, "max": 5 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_petri_cafe_first_year_struggle_stage3"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Yoooo! The pivot worked! Monthly tournaments + memberships brought revenue to €7,500/month! 🎉 Costs are €5,000 (cut staff, I run it myself). €2,500/month profit! Paying off loan fast. Now a local esports team wants to partner - they'd use the café as HQ, bring fans, but want 30% revenue share. Good deal or nah?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Café profitable, esports partnership offer",
+      "emotionalState": "proud, confident, eager to grow",
+      "urgency": "medium",
+      "specificDetails": {
+        "monthlyRevenue": 7500,
+        "monthlyCosts": 5000,
+        "monthlyProfit": 2500,
+        "loanRemaining": 24000,
+        "esportsPartnershipOffer": {
+          "revenueShare": 0.3,
+          "benefits": "brand association, guaranteed bookings, fan events"
+        },
+        "age": 26
+      }
+    },
+    "idealAdvice": [
+      "Incredible turnaround! €4k → €7.5k revenue is 87% growth!",
+      "Esports partnership decision analysis:",
+      "**Current state:**",
+      "- €7,500 revenue x 100% = €7,500 (all yours)",
+      "- Costs €5,000 = €2,500 profit/month",
+      "**With 30% revenue share:**",
+      "- Need to calculate: Will partnership INCREASE total revenue?",
+      "- If revenue stays €7,500: You get 70% = €5,250 (LOSS of €2,250!)",
+      "- Break-even: Revenue needs to hit €10,714 (€7,500 / 0.7)",
+      "- For same €2,500 profit: Need €10,714 revenue (43% increase)",
+      "**Questions to ask esports team:**",
+      "1. How many guaranteed hours/month will they book?",
+      "2. How many fans do they bring to events? (1 event = how much revenue?)",
+      "3. Can you charge MORE during their events? (premium pricing)",
+      "4. Do they cover their own costs or add to your costs?",
+      "**Alternative deal structures:**",
+      "- Flat monthly sponsorship fee (€500/month) instead of revenue share",
+      "- Revenue share only on THEIR events, not your regular business",
+      "- Tiered: 10% on first €10k, 20% above that (aligns incentives)",
+      "**My recommendation:**",
+      "- Counter-offer: 20% revenue share OR €400/month flat fee",
+      "- Only accept 30% if they GUARANTEE €11k+ monthly revenue",
+      "- Get it in writing: What exactly do they provide?",
+      "You have leverage - your café is working now, you don't NEED them!"
+    ],
+    "commonMistakes": [
+      "Not calculating break-even revenue with revenue share",
+      "Assuming partnership is automatically good (needs math!)",
+      "Not suggesting alternative deal structures",
+      "Ignoring that he has negotiating power now (profitable!)",
+      "Not asking what SPECIFIC value esports team brings",
+      "Forgetting he's doing this solo (capacity constraints!)"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_petri_second_location_stage4",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 10
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_petri_first_game_release_stage4",
+    "characterId": "char_petri_004",
+    "scenarioType": "product_launch",
+    "difficulty": 0.8,
+    "topic": "entrepreneurship",
+    "requiredStage": 4,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 5, "max": 10 },
+      "characterStage": { "min": 4, "max": 5 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_petri_indie_game_pivot_stage3"
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "DUDE! My first indie game launched on Steam! It's a roguelike about Finnish mythology. Took me 18 months of nights/weekends. First week sales: 2,500 copies at €12 = €30k gross (€21k after Steam cut)! 🤯 Reviews are 'Very Positive'. Should I quit my job and make games full-time or is this a fluke? I'm freaking out!",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "excited"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "First indie game unexpected success, quit job decision",
+      "emotionalState": "euphoric, imposter syndrome, fear of losing momentum",
+      "urgency": "high",
+      "specificDetails": {
+        "gameRevenue": 21000,
+        "currentJobSalary": 3200,
+        "developmentTime": "18 months",
+        "steamReviews": "Very Positive (85% positive)",
+        "firstWeekSales": 2500,
+        "currentSavings": 35000,
+        "debtRemaining": 8000,
+        "age": 27
+      }
+    },
+    "idealAdvice": [
+      "Incredible achievement! But let's think strategically, not emotionally",
+      "**Reality check on €21k:**",
+      "- 18 months development = €1,166/month equivalent",
+      "- Your job pays €3,200/month = you LOST €36k opportunity cost!",
+      "- BUT: You learned invaluable skills + proved you can ship",
+      "**Is this success sustainable?**",
+      "- First week sales are usually 30-50% of lifetime sales",
+      "- Estimate lifetime: 5,000-8,000 copies = €40-60k total",
+      "- That's ONE game over 18 months = not sustainable income yet",
+      "- Need to release 2-3 games/year to match job income",
+      "**Quit job decision framework:**",
+      "❌ **DO NOT quit if:**",
+      "- This is your only released game (could be lucky break)",
+      "- You don't have 12-month runway saved (€40k+)",
+      "- You haven't validated you can ship games FASTER (18mo too slow)",
+      "✅ **Consider quitting if:**",
+      "- Next game takes 6 months and also succeeds",
+      "- You have €50k saved (12-18 month runway)",
+      "- You have clear 3-game roadmap with realistic timelines",
+      "**My recommendation:**",
+      "1. Keep job for now (this is ONE data point, not a trend)",
+      "2. Pay off remaining €8k debt with game revenue",
+      "3. Save €15k as 'indie game fund'",
+      "4. Make second game in 6-9 months (faster iteration!)",
+      "5. If second game ALSO succeeds = quit job after that",
+      "**What you've proved:**",
+      "- You CAN finish and ship games (huge!)",
+      "- You have market appeal (Very Positive reviews)",
+      "- Finnish mythology angle is unique (good positioning)",
+      "**What you haven't proved yet:**",
+      "- Consistent ability to release quality games",
+      "- Faster development cycles (need 6mo, not 18mo)",
+      "- Sustainable income (€21k ≠ annual salary)",
+      "Patience now = long-term indie career. Rushing = back to job hunt in 12mo."
+    ],
+    "commonMistakes": [
+      "Encouraging immediate job quit (emotional, not strategic)",
+      "Not calculating opportunity cost of 18 months",
+      "Ignoring that first week ≠ lifetime sales",
+      "Not setting clear criteria for when to quit job",
+      "Assuming one success = repeatable success",
+      "Not celebrating the achievement while being realistic"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_petri_second_game_viral_stage5",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 10
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_petri_second_game_viral_stage5",
+    "characterId": "char_petri_004",
+    "scenarioType": "viral_success",
+    "difficulty": 0.9,
+    "topic": "entrepreneurship",
+    "requiredStage": 5,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 6, "max": 10 },
+      "characterStage": { "min": 5, "max": 6 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_petri_first_game_release_stage4"
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "THIS IS INSANE! My second game went VIRAL on TikTok! 500,000 copies sold in 3 weeks! That's €4.2 MILLION in revenue! €3 million after Steam cut! I quit my job. Now publishers want to buy my studio, investors want to fund me... I'm 29 and suddenly wealthy? WHAT DO I DO?! I don't even have a studio, it's just me!",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "urgent"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Viral game success, life-changing money, multiple offers",
+      "emotionalState": "overwhelmed, disbelief, fear of making wrong decision",
+      "urgency": "high",
+      "specificDetails": {
+        "gameRevenue": 3000000,
+        "copiesSold": 500000,
+        "currentNetWorth": 3100000,
+        "publisherOffers": [
+          {
+            "company": "Major Publisher A",
+            "amount": 5000000,
+            "terms": "buy IP + you as employee"
+          },
+          {
+            "company": "Publisher B",
+            "amount": 2000000,
+            "terms": "sequel funding, keep IP"
+          }
+        ],
+        "investorOffers": [
+          { "investor": "VC firm", "amount": 1000000, "equity": 0.3 }
+        ],
+        "age": 29,
+        "teamSize": 1
+      }
+    },
+    "idealAdvice": [
+      "Congratulations! This is LIFE-CHANGING - let's think VERY carefully",
+      "**Immediate priorities (DO THIS FIRST):**",
+      "1. Hire an entertainment lawyer (NOT regular lawyer!) ASAP",
+      "2. Hire an accountant - €3M = HUGE tax implications",
+      "3. Do NOTHING for 30 days - no deals, no big purchases",
+      "4. Move €500k to separate savings account (can't touch)",
+      "**Offer analysis:**",
+      "**Option A: Publisher A (€5M, sell IP + employment)**",
+      "- Pros: Huge payday, stability, learn from big publisher",
+      "- Cons: Lose your IP, become employee (creative control gone)",
+      "- Red flags: What if they fire you after 2 years? IP gone forever.",
+      "**Option B: Publisher B (€2M sequel funding, keep IP)**",
+      "- Pros: Keep IP rights, funding for sequel, you stay indie",
+      "- Cons: Less cash now, partnership complexity, may have creative conflicts",
+      "- Middle ground: Good if you want to keep building",
+      "**Option C: VC funding (€1M for 30% equity)**",
+      "- Pros: Build real studio, hire team, scale up",
+      "- Cons: Pressure to grow fast, lose control, dilution",
+      "- Question: Do you WANT to run a game studio or make games solo?",
+      "**Option D: Bootstrap (no deal, keep €3M, make games yourself)**",
+      "- Pros: Total freedom, keep all IP, no bosses/investors",
+      "- Cons: Solo pressure, no support network, might burn out",
+      "- You have €3M runway - can make games for YEARS",
+      "**My recommendation:**",
+      "1. Take 3 months to process (you just made €3M at 29!!!)",
+      "2. Talk to OTHER indie devs who took these deals (learn from them)",
+      "3. Don't sell IP unless offer is €10M+ (IP is your golden goose)",
+      "4. Consider: Hire 1-2 people, bootstrap next game, stay indie",
+      "5. If you want to scale: Publisher B (sequel funding) > VC funding",
+      "**Financial planning:**",
+      "- Tax: ~€1M owed (34% capital gains in Finland)",
+      "- Emergency fund: €200k (untouchable)",
+      "- Investment: €1.5M in index funds (diversify!)",
+      "- Living expenses: €5k/month (don't inflate lifestyle!)",
+      "- Game dev budget: €300k (hire help, better tools)",
+      "**Emotional reality check:**",
+      "- From café failure (€20k loss) to €3M in 5 years = INSANE journey",
+      "- This is NOT luck - you EARNED this through persistence",
+      "- Imposter syndrome is normal - ignore it",
+      "- Most important: What do you WANT? Money? Fame? Creative freedom?",
+      "Answer that first, THEN pick the deal that aligns"
+    ],
+    "commonMistakes": [
+      "Not emphasizing 'DO NOTHING for 30 days' (critical!)",
+      "Assuming biggest offer is best (IP value matters!)",
+      "Not asking what he actually WANTS (money vs creative control)",
+      "Ignoring tax implications (€3M ≠ €3M in pocket)",
+      "Not celebrating the INSANE journey (café → €3M!)",
+      "Pushing one option without exploring all paths",
+      "Not warning about lifestyle inflation (biggest risk!)"
+    ],
+    "followUpScenarios": []
+  }
+]

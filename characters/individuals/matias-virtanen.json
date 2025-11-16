@@ -78,5 +78,49 @@
     "visitCount": 0,
     "lastVisit": null,
     "adviceFollowedHistory": []
-  }
+  },
+  "personalityTraits": {
+    "impulsiveness": 0.5,
+    "trustingness": 0.6,
+    "financial_literacy": 0.25,
+    "stubbornness": 0.5,
+    "emotionality": 0.4
+  },
+  "financialState": {
+    "currentStage": 0,
+    "netWorth": -2407.044246498583,
+    "monthlyIncome": 650,
+    "monthlyExpenses": 520,
+    "totalDebt": 2500,
+    "liquidSavings": 937.510601048197,
+    "investmentPortfolio": 0,
+    "realEstateValue": 0,
+    "currentOccupation": "Vocational School Student (Electrician Training)",
+    "stageEntryDate": "2025-11-16",
+    "monthsInCurrentStage": 0,
+    "readyForNextStage": false,
+    "netWorthHistory": [
+      {
+        "date": "2025-11-16",
+        "amount": -2407.044246498583
+      }
+    ],
+    "incomeHistory": [
+      {
+        "date": "2025-11-16",
+        "amount": 650
+      }
+    ],
+    "majorEvents": []
+  },
+  "successPathWeights": {
+    "comfortable_stability": 0.3,
+    "corporate_career": 0.15,
+    "tech_entrepreneur": 0.1,
+    "real_estate_investor": 0.15,
+    "small_business_owner": 0.15,
+    "stock_market_investor": 0.15
+  },
+  "completedScenarios": [],
+  "adviceHistory": []
 }

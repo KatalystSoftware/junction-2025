@@ -111,6 +111,7 @@ export function useDerivedUIState(
   advisorState: AdvisorState | undefined,
   threadHistories: ThreadHistories,
   threadMetadata: CharacterInfo,
+  lastReadMessageCounts?: { [threadId: string]: number },
 ) {
   // Derive contacts from active threads
   const contacts: Contact[] = useMemo(() => {
@@ -120,6 +121,12 @@ export function useDerivedUIState(
       const charInfo = threadMetadata[thread.threadId];
       const threadMessages = threadHistories[thread.threadId] || [];
       const lastMessage = threadMessages[threadMessages.length - 1];
+
+      // Check if there are new messages since last read
+      const lastReadCount = lastReadMessageCounts?.[thread.threadId] || 0;
+      const hasUnreadMessages =
+        thread.status === "awaiting_response" &&
+        threadMessages.length > lastReadCount;
 
       return {
         id: thread.threadId,
@@ -131,7 +138,7 @@ export function useDerivedUIState(
         lastMessage: lastMessage?.content || "New consultation",
         timestamp: formatTimestamp(new Date(thread.lastMessageAt)),
         lastMessageTime: new Date(thread.lastMessageAt),
-        unreadCount: thread.status === "awaiting_response" ? 1 : 0,
+        unreadCount: hasUnreadMessages ? 1 : 0,
         online:
           thread.status === "active" || thread.status === "awaiting_response",
         trust: 50, // TODO: Get from backend
@@ -140,7 +147,12 @@ export function useDerivedUIState(
         financialProfile: charInfo?.financialProfile,
       };
     });
-  }, [advisorState?.activeThreads, threadHistories, threadMetadata]);
+  }, [
+    advisorState?.activeThreads,
+    threadHistories,
+    threadMetadata,
+    lastReadMessageCounts,
+  ]);
 
   // Derive messages for each thread
   const messagesByThread: Record<string, Message[]> = useMemo(() => {

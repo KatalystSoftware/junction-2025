@@ -9,6 +9,7 @@
  * - Credit card interest
  */
 
+import { randomUUID } from "node:crypto";
 import type { Debt } from "../types/game-types.ts";
 import type {
   Transaction,
@@ -43,7 +44,7 @@ export function calculateMonthlyInterest(
 }
 
 /**
- * Create interest charge transaction
+ * Create interest charge transaction with UUID-based ID for uniqueness
  */
 export function createInterestTransaction(
   characterId: string,
@@ -56,7 +57,7 @@ export function createInterestTransaction(
   const date = `${year}-${String(month).padStart(2, "0")}-01`;
 
   return {
-    id: `txn_interest_${characterId}_${debt.debtId}_${year}_${month}`,
+    id: `txn_${randomUUID()}`,
     characterId: characterId,
     date: date,
     type: "interest_charged",

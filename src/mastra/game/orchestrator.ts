@@ -27,6 +27,19 @@ import {
 import { calculateProjectedOutcome } from "./financial-calculator.ts";
 import { checkForIntervention } from "./intervention-checker.ts";
 import { generateInterventionMessage } from "../agents/god-boss-agent.ts";
+import {
+  checkStageTransition,
+  transitionToNextStage,
+  checkDownwardProgression,
+  applyDownwardProgression,
+  getTimeAccelerationForStage,
+  updateMonthsInStage,
+} from "./progression-manager.ts";
+import {
+  triggerLifeEvent,
+  applyLifeEvent,
+  getEventDialogueHook,
+} from "./life-events.ts";
 import type {
   AdvisorState,
   GameMasterDecision,
@@ -366,10 +379,19 @@ Respond with ONLY valid JSON (NO markdown):
   } catch (error) {
     console.error("Failed to get GM decision:", error);
 
-    // Fallback: send a new character
-    const newCharResult = characterPool.getNewCharacter(advisorState);
+    // Fallback: send a new character, or least recently used if pool depleted
+    let newCharResult = characterPool.getNewCharacter(advisorState);
     if (!newCharResult) {
-      throw new Error("No characters available");
+      console.log(
+        "⚠️ All characters on cooldown, using least recently used character...",
+      );
+      newCharResult = characterPool.getLeastRecentlyUsedCharacter(advisorState);
+    }
+
+    if (!newCharResult) {
+      throw new Error(
+        "No scenarios available for any character (should never happen)",
+      );
     }
 
     decision = {
@@ -390,10 +412,21 @@ Respond with ONLY valid JSON (NO markdown):
         `🚫 Game Master tried to trigger review too early (sessionsSinceReview=${sessionsSinceReview}). Forcing character send instead.`,
       );
       // Override decision to send a character instead
-      const newCharResult = characterPool.getNewCharacter(advisorState);
+      let newCharResult = characterPool.getNewCharacter(advisorState);
       if (!newCharResult) {
-        throw new Error("No characters available");
+        console.log(
+          "⚠️ All characters on cooldown, using least recently used character...",
+        );
+        newCharResult =
+          characterPool.getLeastRecentlyUsedCharacter(advisorState);
       }
+
+      if (!newCharResult) {
+        throw new Error(
+          "No scenarios available for any character (should never happen)",
+        );
+      }
+
       decision = {
         action: "send_character",
         reasoning: "Overridden: Review too soon, sending character instead",
@@ -415,10 +448,20 @@ Respond with ONLY valid JSON (NO markdown):
 
     if (decision.isNewCharacter) {
       // Get new character
-      const result = characterPool.getNewCharacter(advisorState);
+      let result = characterPool.getNewCharacter(advisorState);
       if (!result) {
-        throw new Error("No new characters available");
+        console.log(
+          "⚠️ All characters on cooldown, using least recently used character...",
+        );
+        result = characterPool.getLeastRecentlyUsedCharacter(advisorState);
       }
+
+      if (!result) {
+        throw new Error(
+          "No scenarios available for any character (should never happen)",
+        );
+      }
+
       character = result.character;
       scenario = result.scenario;
     } else {
@@ -429,8 +472,20 @@ Respond with ONLY valid JSON (NO markdown):
       );
       if (!result) {
         // Fallback to new character
-        const newResult = characterPool.getNewCharacter(advisorState);
-        if (!newResult) throw new Error("No characters available");
+        let newResult = characterPool.getNewCharacter(advisorState);
+        if (!newResult) {
+          console.log(
+            "⚠️ All characters on cooldown, using least recently used character...",
+          );
+          newResult = characterPool.getLeastRecentlyUsedCharacter(advisorState);
+        }
+
+        if (!newResult) {
+          throw new Error(
+            "No scenarios available for any character (should never happen)",
+          );
+        }
+
         character = newResult.character;
         scenario = newResult.scenario;
       } else {
@@ -477,8 +532,11 @@ Respond with ONLY valid JSON (NO markdown):
       }
     }
 
-    // Mark scenario as used
-    characterPool.markScenarioUsed(scenario.scenarioId);
+    // Mark scenario as used (with cooldown tracking)
+    characterPool.markScenarioUsed(
+      scenario.scenarioId,
+      advisorState.totalSessions,
+    );
 
     // Create new thread
     const threadId = `thread_${Date.now()}`;
@@ -523,15 +581,12 @@ Respond with ONLY valid JSON (NO markdown):
       situation: scenario.problemContext.currentSituation,
     };
 
-    // Generate advice choices for the player (first two sessions to ease into the game)
-    let adviceChoices =
-      advisorState.totalSessions <= 1
-        ? generateAdviceChoices(
-            scenario,
-            character.personality,
-            [], // No conversation history yet (first turn)
-          )
-        : undefined;
+    // Generate advice choices for the player to make the game more clickable
+    let adviceChoices = generateAdviceChoices(
+      scenario,
+      character.personality,
+      [], // No conversation history yet (first turn)
+    );
 
     // Translate advice choices if user language is not English
     if (adviceChoices && userLanguage !== "en") {
@@ -858,6 +913,7 @@ export async function handleAdvisorResponse(
         followed: adviceEvaluation.willFollowAdvice,
         outcome: adviceEvaluation.outcome,
       },
+      advisorState.totalSessions,
     );
 
     // Check for tier change
@@ -908,6 +964,112 @@ export async function handleAdvisorResponse(
         session.followUpScheduled = true;
       }
     }
+
+    // =========================================================================
+    // PROGRESSION SYSTEM - Update character financial state and check stage transitions
+    // =========================================================================
+
+    // Initialize financial state if not present
+    if (!character.financialState) {
+      const { FinancialStage } = await import("../types/progression-types.ts");
+      character.financialState = {
+        currentStage: FinancialStage.INSTABILITY,
+        netWorth: character.financialProfile.typicalMonthlyIncome * 0.5,
+        monthlyIncome: character.financialProfile.typicalMonthlyIncome,
+        monthlyExpenses: character.financialProfile.typicalMonthlyIncome * 0.8,
+        totalDebt: 0,
+        liquidSavings: character.financialProfile.typicalMonthlyIncome * 0.5,
+        investmentPortfolio: 0,
+        realEstateValue: 0,
+        currentOccupation: character.occupation,
+        stageEntryDate: new Date().toISOString().split("T")[0],
+        monthsInCurrentStage: 0,
+        readyForNextStage: false,
+        netWorthHistory: [
+          {
+            date: new Date().toISOString().split("T")[0],
+            amount: character.financialProfile.typicalMonthlyIncome * 0.5,
+          },
+        ],
+        incomeHistory: [
+          {
+            date: new Date().toISOString().split("T")[0],
+            amount: character.financialProfile.typicalMonthlyIncome,
+          },
+        ],
+        majorEvents: [],
+      };
+    }
+
+    // Update completed scenarios tracking
+    if (!character.completedScenarios) {
+      character.completedScenarios = [];
+    }
+    character.completedScenarios.push({
+      scenarioId: scenario.scenarioId,
+      timestamp: session.timestamp,
+      outcome: adviceEvaluation.outcome,
+      difficulty: scenario.difficulty,
+    });
+
+    // Update advice history tracking
+    if (!character.adviceHistory) {
+      character.adviceHistory = [];
+    }
+    character.adviceHistory.push({
+      timestamp: session.timestamp,
+      adviceGiven: allAdvisorAdvice.join(" | "),
+      outcome: adviceEvaluation.outcome,
+      scenarioId: scenario.scenarioId,
+    });
+
+    // Apply time progression (game months pass)
+    const monthsPassed = getTimeAccelerationForStage(
+      character.financialState.currentStage,
+    );
+    updateMonthsInStage(character, monthsPassed);
+
+    // Add net worth snapshot
+    character.financialState.netWorthHistory.push({
+      date: new Date().toISOString().split("T")[0],
+      amount: character.financialState.netWorth,
+    });
+
+    // Trigger random life event
+    const lifeEvent = triggerLifeEvent(character);
+    if (lifeEvent) {
+      applyLifeEvent(character, lifeEvent);
+      console.log(
+        `🎲 Life event for ${character.name}: ${lifeEvent.name} - ${getEventDialogueHook(lifeEvent)}`,
+      );
+    }
+
+    // Check for downward progression (bad advice consequences)
+    const downwardCheck = checkDownwardProgression(character);
+    if (downwardCheck.shouldRegress && downwardCheck.newStage !== undefined) {
+      applyDownwardProgression(
+        character,
+        downwardCheck.newStage,
+        downwardCheck.reason,
+      );
+      console.log(
+        `📉 ${character.name} regressed to stage ${downwardCheck.newStage}: ${downwardCheck.reason}`,
+      );
+    }
+
+    // Check for upward stage transition
+    const transitionCheck = checkStageTransition(character);
+    if (transitionCheck.ready) {
+      const transition = transitionToNextStage(character);
+      if (transition.success && transition.newStage !== undefined) {
+        console.log(`📈 ${character.name} ${transition.message}`);
+        // Could show this to the user in next interaction
+      }
+    }
+
+    // =========================================================================
+    // END PROGRESSION SYSTEM
+    // =========================================================================
 
     // Update skill and reputation based on comprehensive evaluation
     // Use dimension scores if available for more nuanced updates
@@ -1035,7 +1197,7 @@ export async function handleAdvisorResponse(
           : "english";
 
       const firingMessage = await generateFiringMessage(
-        advisorState.fireReason,
+        advisorState.fireReason || "unknown",
         {
           totalSessions: advisorState.totalSessions,
           clientsHelped: advisorState.totalClientsHelped,

@@ -1,0 +1,481 @@
+[
+  {
+    "scenarioId": "scenario_sari_post_acquisition_angel_fund_stage6",
+    "characterId": "char_sari_003",
+    "scenarioType": "angel_investing",
+    "difficulty": 0.85,
+    "topic": "angel_investing",
+    "requiredStage": 6,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 7, "max": 10 },
+      "characterStage": { "min": 6, "max": 7 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_sari_vp_clinical_growth_stage5"
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "Life update! Post-acquisition, I invested €500k into 10 medical device startups as an angel investor. 3 years later: 2 failed, 6 are growing, 2 are CRUSHING it (one just raised Series B!). Total portfolio value: €1.8M! 🎉 Now other nurses want me to start an 'angel fund for healthcare workers' - pool money, invest together. Is this a thing? Could I run it?",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Successful angel investor, opportunity to formalize into syndicate",
+      "emotionalState": "confident in judgment, uncertain about fund mechanics",
+      "urgency": "medium",
+      "specificDetails": {
+        "currentNetWorth": 1900000,
+        "angelPortfolio": {
+          "invested": 500000,
+          "currentValue": 1800000,
+          "startupsFailed": 2,
+          "startupsGrowing": 6,
+          "startupsCrushing": 2
+        },
+        "syndicateIdea": {
+          "concept": "Healthcare worker angel syndicate",
+          "potentialMembers": 15,
+          "avgInvestment": 10000,
+          "totalCapital": 150000,
+          "dealFlow": "Medical device, digital health, nurse-tech"
+        },
+        "age": 45,
+        "occupation": "angel investor / advisor"
+      }
+    },
+    "idealAdvice": [
+      "3.6x return on angel portfolio in 3 years = EXCELLENT! You have the touch!",
+      "Healthcare worker angel syndicate is BRILLIANT - here's why:",
+      "**Why this works:**",
+      "- Healthcare workers have DOMAIN EXPERTISE (huge competitive advantage!)",
+      "- You can spot bad medical device ideas INSTANTLY (nurses use these daily)",
+      "- Network effect: 15 nurses = 15 sets of hospital connections",
+      "- Underserved niche: Not many healthcare-focused angel groups",
+      "**How angel syndicates work:**",
+      "1. **Lead investor** (you) finds deals, does due diligence",
+      "2. **Syndicate members** (nurses) review your analysis, decide to invest",
+      "3. **SPV** (Special Purpose Vehicle) pools money for each deal",
+      "4. **Carry** (typically 20%) goes to lead investor (you!) for deal sourcing",
+      "**Example deal:**",
+      "- Startup needs €200k seed round",
+      "- You invest €50k personally",
+      "- 15 syndicate members invest €10k each = €150k",
+      "- Total: €200k from your syndicate",
+      "- If startup exits for 10x → €2M",
+      "- Your share: €500k (10x on €50k) + €300k carry (20% of €1.5M profit)",
+      "- = €800k total for you!",
+      "**Your responsibilities as lead:**",
+      "- Source 3-5 deals per year (medical device, digital health)",
+      "- Due diligence: team, product, market, clinical validation",
+      "- Present to syndicate members (clear investment memo)",
+      "- Manage SPV administration (legal, accounting)",
+      "- Board observer or advisor role (provide guidance)",
+      "**Costs & structure:**",
+      "- Legal setup: €10-20k (SPV structure, operating agreement)",
+      "- Annual admin: €5-10k (accounting, compliance)",
+      "- Time commitment: 10-20 hours/month",
+      "- Minimum viable syndicate: 10-15 members at €10k each",
+      "**Competitive advantages:**",
+      "✅ You're a nurse + VP Clinical Affairs (credibility!)",
+      "✅ You know hospitals, workflows, pain points",
+      "✅ Network of nurses = beta testers + sales channels",
+      "✅ Focus: Medical devices for nurses (super specific niche!)",
+      "**Risks:**",
+      "- Fiduciary duty to syndicate members (legal responsibility!)",
+      "- If deals fail, members might blame you",
+      "- Time-intensive (this is a real commitment)",
+      "- Need consistent deal flow (3-5 good deals/year)",
+      "**My recommendation:**",
+      "✅ DO IT! This is a perfect fit for you!",
+      "- Start small: 10 members, €100k pooled capital",
+      "- Do 2-3 test deals in Year 1 (prove the model)",
+      "- If successful: Grow to 30-50 members, €500k+ per year",
+      "- Position: 'Nurse-Led Medical Device Angel Fund'",
+      "- You're 45 with €1.9M net worth - you can afford to try this!",
+      "This could become your full-time 'retirement' job - fun AND impactful! 🏥💰"
+    ],
+    "commonMistakes": [
+      "Not explaining syndicate/SPV mechanics clearly",
+      "Ignoring the carry compensation (she should earn for her work!)",
+      "Not emphasizing her competitive advantage (nurse expertise!)",
+      "Assuming this is too complex for her (she ran a medtech company!)",
+      "Missing the 'retirement job' angle (purpose + income)",
+      "Not celebrating her angel investing success (3.6x return!)"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_sari_medical_innovation_fund_stage6",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 12
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_sari_medical_innovation_fund_stage6",
+    "characterId": "char_sari_003",
+    "scenarioType": "venture_fund",
+    "difficulty": 0.9,
+    "topic": "entrepreneurship",
+    "requiredStage": 6,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 7, "max": 10 },
+      "characterStage": { "min": 6, "max": 7 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_sari_post_acquisition_angel_fund_stage6"
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "The syndicate EXPLODED! We're now 50 healthcare workers, invested €3M across 15 startups, and 3 have already exited profitably! A Finnish institutional investor wants to back me to raise a €15M 'Nordic Healthcare Innovation Fund' - I'd be the GP. This feels HUGE but also... I'm a nurse, not a VC! Can I really manage €15M? Am I qualified for this?!",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "excited"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Syndicate success, institutional VC fund opportunity",
+      "emotionalState": "excited but imposter syndrome, doubting qualifications",
+      "urgency": "high",
+      "specificDetails": {
+        "syndicateSuccess": {
+          "members": 50,
+          "totalInvested": 3000000,
+          "startups": 15,
+          "exits": 3,
+          "avgReturn": "2.4x"
+        },
+        "fundOpportunity": {
+          "fundSize": 15000000,
+          "gpCommitment": 1000000,
+          "lpCommitment": 14000000,
+          "managementFee": 0.02,
+          "carry": 0.2,
+          "focus": "Nordic healthcare innovation (medtech, digital health)",
+          "lpBacker": "Finnish pension fund + family offices"
+        },
+        "currentNetWorth": 3200000,
+        "age": 48
+      }
+    },
+    "idealAdvice": [
+      "Sari. From NURSE to VC GP! This is INCREDIBLE! 🚀",
+      "'I'm a nurse, not a VC' - that's EXACTLY why they want you!",
+      "**Why you're PERFECT for this:**",
+      "✅ 20+ years nursing experience = unmatched domain expertise",
+      "✅ VP Clinical Affairs at medtech company = industry credibility",
+      "✅ Angel investor track record: 2.4x average return (better than most VCs!)",
+      "✅ Syndicate proof-of-concept: 50 members, €3M, 15 startups, 3 exits",
+      "✅ Network of healthcare workers = deal flow + due diligence + beta testing",
+      "**What institutional LPs want:**",
+      "- Domain expertise (you have it!)",
+      "- Track record (you have it!)",
+      "- Differentiated thesis (nurse-led healthcare fund = unique!)",
+      "- Committed GP (you're all-in on this space)",
+      "**Fund economics breakdown:**",
+      "- Management fee: 2% x €15M = €300k/year (10 years)",
+      "- Covers: Your salary + analyst + operations + expenses",
+      "- Carry: 20% of profits above €15M returned to LPs",
+      "- Example: If fund returns 3x (€45M), you get 20% x €30M = €6M",
+      "**Your €1M commitment:**",
+      "- €1M of €3.2M net worth = 31% (high but standard for first-time GP)",
+      "- Shows LPs you're committed (skin in the game)",
+      "- Liquid net worth remaining: €2.2M (still financially secure)",
+      "**Responsibilities as GP:**",
+      "- Deploy €15M over 3-4 years (4-5 investments per year)",
+      "- Board seats on 10-15 companies",
+      "- Quarterly LP reporting and annual meetings",
+      "- Fundraise for Fund II while managing Fund I (year 3-4)",
+      "- Hire: 1 analyst, 1 operations manager",
+      "**Imposter syndrome reality check:**",
+      "- Most VCs have ZERO healthcare experience (you're ahead!)",
+      "- VC is pattern matching - you've seen 100+ medical devices in hospitals",
+      "- You know what nurses/doctors actually NEED (VCs don't!)",
+      "- Average first-time VC fund returns 1.5x - you've already done 2.4x!",
+      "**Questions to ask LP backers:**",
+      "1. What's their expected fund timeline? (10-12 years standard)",
+      "2. What support do they provide? (introductions, back-office, etc.)",
+      "3. Are they committed to Fund II if Fund I performs? (continuity)",
+      "4. What's the governance structure? (how much autonomy do you have?)",
+      "**My recommendation:**",
+      "✅ DO THIS! You're uniquely qualified!",
+      "- Negotiate: €350k management fee (hire good analyst with savings)",
+      "- Hire experienced healthcare VC as advisor (not co-GP, just advisor)",
+      "- Keep syndicate running alongside fund (different capital sources)",
+      "- Focus thesis: Medical devices for hospital workflows (your expertise!)",
+      "You're not a 'nurse playing VC' - you're a HEALTHCARE EXPERT doing VC! 🏥💼"
+    ],
+    "commonMistakes": [
+      "Not addressing imposter syndrome directly (she IS qualified!)",
+      "Ignoring her competitive advantage (healthcare domain expertise!)",
+      "Not explaining VC economics (2-and-20 structure)",
+      "Assuming managing money is harder than managing hospital patients (it's not!)",
+      "Missing the 'this is your second career' framing",
+      "Not celebrating the syndicate success (proof of concept!)"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_sari_fund_unicorn_exit_stage7",
+        "triggeredBy": "good_advice_followed",
+        "delayInSessions": 18
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_sari_fund_unicorn_exit_stage7",
+    "characterId": "char_sari_003",
+    "scenarioType": "unicorn_success",
+    "difficulty": 0.95,
+    "topic": "wealth_management",
+    "requiredStage": 7,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 8, "max": 10 },
+      "characterStage": { "min": 7, "max": 7 },
+      "isFollowUp": true,
+      "requiresPreviousScenario": "scenario_sari_medical_innovation_fund_stage6"
+    },
+    "initialContact": {
+      "method": "voice",
+      "message": "I CAN'T BELIEVE THIS! Our portfolio company - a surgical robotics startup we invested €2M in - just got acquired by Medtronic for €800M!!! Our stake is worth €120M! My carry: €21M! I'm 54 years old, a former NURSE, and I just made €21M from ONE investment! My brain is broken. What do I even do now?! 🤯🏥",
+      "voiceMessage": {
+        "enabled": true,
+        "urgency": "excited"
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Portfolio company unicorn exit, massive carry payout",
+      "emotionalState": "disbelief, euphoria, existential questioning",
+      "urgency": "high",
+      "specificDetails": {
+        "currentNetWorth": 6500000,
+        "unicornExit": {
+          "company": "Surgical robotics startup",
+          "fundInvestment": 2000000,
+          "equityOwned": 0.15,
+          "exitValue": 800000000,
+          "fundReturn": 120000000,
+          "sariCarry": 21000000
+        },
+        "liquidityEvent": "Full acquisition by Medtronic",
+        "expectedNetWorth": 25000000,
+        "age": 54,
+        "backgroundReminder": "Nurse for 20 years, €35k salary"
+      }
+    },
+    "idealAdvice": [
+      "SARI! From €35k/year NURSE to €25M at 54! THIS IS LEGENDARY! 🚀",
+      "Let's process this life-changing moment:",
+      "**The numbers:**",
+      "- Fund I: €15M → (so far) €120M from ONE company (8x!)",
+      "- Your 20% carry: (€120M - €15M) x 20% = €21M",
+      "- Current net worth: €6.5M + €21M = €27.5M total",
+      "**Tax implications (Finland):**",
+      "- Carry taxed as capital gains: 34%",
+      "- €21M → ~€14M after tax",
+      "- Total net worth after tax: €6.5M + €14M = €20.5M",
+      "**What €20M means at age 54:**",
+      "- 4% withdrawal rate = €800k/year = €66k/month",
+      "- You could live on €10k/month and still save €56k/month!",
+      "- 30+ years of financial freedom ahead",
+      "- Generational wealth (grandkids never worry about money)",
+      "**IMMEDIATE actions (next 30 days):**",
+      "1. Hire private wealth advisor (€20M+ net worth tier)",
+      "2. Tax attorney specializing in carried interest",
+      "3. Estate planning attorney (this is generational wealth now!)",
+      "4. DO NOTHING ELSE - no big decisions for 90 days",
+      "5. Tell almost NOBODY (wealth attracts problems)",
+      "**Financial structuring (next 90 days):**",
+      "- €10M in diversified index funds (60% stocks, 40% bonds)",
+      "- €5M in Nordic healthcare private equity (your expertise!)",
+      "- €2M in liquid reserves (5 years of €400k/year lifestyle)",
+      "- €2M 'impact fund' (foundation for nurse scholarships?)",
+      "- €1.5M for family (kids, grandkids education funds)",
+      "**Lifestyle & identity:**",
+      "- DO NOT inflate lifestyle dramatically (biggest mistake!)",
+      "- You were happy as a nurse at €35k/year - what changed?",
+      "- €20M doesn't change who you are - you're still Sari the nurse!",
+      "- Purpose question: What will you DO now?",
+      "**Career options at 54:**",
+      "**Option A: Keep running the fund**",
+      "- Raise Fund II (easy now with 8x return!)",
+      "- This is your calling - healthcare innovation",
+      "- But: Another 10-year commitment",
+      "**Option B: Step back to advisor role**",
+      "- Hire new GP to run Fund II",
+      "- You advise part-time (20% time commitment)",
+      "- Focus on: Travel, family, hobbies",
+      "**Option C: Start a foundation**",
+      "- Nurse scholarship fund (€5-10M endowment)",
+      "- Healthcare innovation grants",
+      "- Your legacy beyond money",
+      "**Option D: Teach & mentor**",
+      "- Business school: Healthcare entrepreneurship course",
+      "- Mentor nurses interested in startups/investing",
+      "- Write a book: 'From Bedside to Boardroom'",
+      "**The perspective:**",
+      "You spent 20 years as a nurse making €35k/year = €700k total earnings.",
+      "You just made €21M from ONE investment in 6 years.",
+      "That's 30x your ENTIRE nursing career earnings. In ONE deal. 🤯",
+      "But here's the thing: You EARNED this by being an amazing nurse!",
+      "- Your medical device knowledge came from hospitals",
+      "- Your clinical judgment identified the winning startup",
+      "- Your network provided due diligence",
+      "Being a nurse wasn't a 'lesser' career - it was PREPARATION for this! 💙",
+      "**My recommendation:**",
+      "1. Take 6 months OFF (sabbatical from fund, travel, family)",
+      "2. Process this wealth emotionally (therapy? coaching?)",
+      "3. Decide: Fund II, foundation, teaching, or hybrid?",
+      "4. Start a nurse scholarship fund (€2M endowment)",
+      "5. Enjoy the freedom - you NEVER have to work again!",
+      "You're not 'just' a nurse - you're a HEALTHCARE INNOVATOR! 🏥🚀"
+    ],
+    "commonMistakes": [
+      "Not celebrating the INSANE journey (nurse → €20M!)",
+      "Ignoring tax implications (€21M ≠ €21M in pocket)",
+      "Not addressing identity shift (nurse → wealthy investor)",
+      "Assuming she should keep working (she doesn't NEED to!)",
+      "Missing the 'nursing prepared you for this' reframe",
+      "Not suggesting impact/legacy options (foundation, mentoring)"
+    ],
+    "followUpScenarios": [
+      {
+        "scenarioId": "scenario_sari_billionaire_problems_stage7",
+        "triggeredBy": "any",
+        "delayInSessions": 12
+      }
+    ]
+  },
+  {
+    "scenarioId": "scenario_sari_billionaire_problems_stage7",
+    "characterId": "char_sari_003",
+    "scenarioType": "absurdist_wealth",
+    "difficulty": 0.98,
+    "topic": "wealth_management",
+    "requiredStage": 7,
+    "successPath": "tech_entrepreneur",
+    "triggerConditions": {
+      "advisorSkillLevel": { "min": 9, "max": 10 },
+      "characterStage": { "min": 7, "max": 7 },
+      "isFollowUp": true
+    },
+    "initialContact": {
+      "method": "text",
+      "message": "This is getting RIDICULOUS. Net worth: €45M. My wealth advisor wants me to set up a family office. Someone pitched me on buying a private hospital in Estonia (?!). I got invited to Davos healthcare panel. And get this: a luxury real estate agent wants me to buy a €15M villa in Monaco 'for tax optimization.' I'm 58. I used to clean bedpans! WHAT IS MY LIFE?! 😂🏥",
+      "voiceMessage": {
+        "enabled": false
+      }
+    },
+    "problemContext": {
+      "currentSituation": "Extreme wealth (€45M+), absurd opportunities, identity crisis",
+      "emotionalState": "amused, bewildered, grounded but curious",
+      "urgency": "low (but hilarious)",
+      "specificDetails": {
+        "currentNetWorth": 45000000,
+        "absurdOffers": [
+          {
+            "type": "Private hospital in Estonia",
+            "price": 12000000,
+            "pitch": "Healthcare investment + legacy project"
+          },
+          {
+            "type": "Monaco villa",
+            "price": 15000000,
+            "pitch": "Tax optimization (0% income tax)"
+          },
+          {
+            "type": "Davos healthcare innovation panel",
+            "price": 50000,
+            "pitch": "Network with health ministers, CEOs"
+          },
+          {
+            "type": "Become LP in top-tier US healthcare VC fund",
+            "price": 5000000,
+            "pitch": "Access to best deals, learn from pros"
+          }
+        ],
+        "familyOfficeProposal": {
+          "minimumAUM": 30000000,
+          "annualCost": 400000,
+          "services": "Tax, legal, investments, philanthropy, family governance"
+        },
+        "age": 58,
+        "backgroundReminder": "Nurse for 20 years, €35k/year"
+      }
+    },
+    "idealAdvice": [
+      "Sari. From cleaning bedpans to Monaco villa offers. I'M DYING. 😂",
+      "Let's evaluate these ABSURD rich people problems:",
+      "**Family Office (€400k/year):**",
+      "- At €45M net worth: YES, this makes sense",
+      "- Saves you MILLIONS in tax optimization alone",
+      "- Services: Tax planning, estate, investments, philanthropy",
+      "- Worth it? Absolutely - but interview 3-5 firms",
+      "**The absurd offers - ranked:**",
+      "**Private hospital in Estonia (€12M):**",
+      "😂 Absurdity level: 8/10",
+      "- Actual utility: 5/10 (if you want hands-on healthcare impact)",
+      "- Financial return: 3/10 (hospitals are operationally complex!)",
+      "- Emotional appeal: 7/10 (you're a nurse - this resonates!)",
+      "- My take: ONLY if you want to run it as impact project (not investment!)",
+      "**Monaco villa (€15M for tax optimization):**",
+      "😂 Absurdity level: 10/10",
+      "- Tax savings: €0 (Finland taxes worldwide income regardless!)",
+      "- Actual utility: 2/10 (you'd visit 2 weeks/year)",
+      "- Status symbol: 9/10 (but do you care?)",
+      "- My take: HARD PASS - total waste unless you love Monaco",
+      "**Davos panel (€50k):**",
+      "😂 Absurdity level: 7/10",
+      "- Networking value: 8/10 (meet health ministers, CEOs)",
+      "- ROI: Unclear (do you NEED these connections?)",
+      "- Experience: 9/10 (once-in-lifetime for a nurse!)",
+      "- My take: GO ONCE for the story, then decide if worth it",
+      "**US VC fund LP (€5M commitment):**",
+      "😂 Absurdity level: 4/10",
+      "- Learning value: 9/10 (top-tier VCs, best practices)",
+      "- Financial return: 7/10 (good VCs return 3-5x over 10 years)",
+      "- Diversification: 8/10 (US healthcare vs Nordic)",
+      "- My take: CONSIDER IT - aligns with your expertise",
+      "**What you SHOULD do with €45M:**",
+      "✅ **Set up family office** (€30M managed professionally)",
+      "✅ **Nurse scholarship foundation** (€10M endowment)",
+      "  - Fund 20 nurses/year through university (€50k each)",
+      "  - Your legacy: 200+ nurses over 10 years!",
+      "✅ **Become LP in 2-3 top healthcare VC funds** (€10M total)",
+      "  - Learn from the best",
+      "  - Diversify beyond Nordic",
+      "  - Access to cutting-edge medical innovation",
+      "✅ **Maybe the Estonian hospital** (€5-10M IF you want impact project)",
+      "  - But hire CEO to run it - you advise strategically",
+      "  - Modernize Estonian healthcare (real impact!)",
+      "✅ **Go to Davos ONCE** (€50k - for the experience)",
+      "✅ **Skip Monaco** (you're Finnish - you love saunas, not yachts!)",
+      "**The identity question:**",
+      "You're not 'a nurse who got lucky' - you're a HEALTHCARE INNOVATOR.",
+      "- 20 years nursing = saw every problem hospitals face",
+      "- VP Clinical Affairs = learned how to build solutions",
+      "- VC GP = funded the next generation of solutions",
+      "- Now: FUND THE NEXT GENERATION OF NURSES!",
+      "**My actual recommendation:**",
+      "1. Family office (€30M professionally managed)",
+      "2. Nurse scholarship foundation (€10M endowment)",
+      "3. Commit €5M to top US healthcare VC fund (learning)",
+      "4. Go to Davos once (why not?)",
+      "5. Skip villa, maybe do hospital if passionate",
+      "6. Write a book: 'From Bedpans to Boardrooms' 📚",
+      "7. Teach healthcare entrepreneurship at university",
+      "8. ENJOY LIFE - sauna, family, travel, grandkids! 🇫🇮",
+      "You went from €35k/year nurse to €45M healthcare innovator.",
+      "Now go create 200 more Saris with that scholarship fund! 💙🏥"
+    ],
+    "commonMistakes": [
+      "Taking this too seriously (embrace the absurdity!)",
+      "Not celebrating the journey (bedpans → €45M!)",
+      "Encouraging wasteful spending (Monaco villa makes no sense)",
+      "Missing the scholarship foundation opportunity (perfect legacy!)",
+      "Not emphasizing 'you're a healthcare innovator' identity",
+      "Forgetting she's still Sari the nurse - money doesn't change that"
+    ],
+    "followUpScenarios": []
+  }
+]

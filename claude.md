@@ -41,9 +41,6 @@ This is a **monorepo** containing:
 **WE USE `pnpm`, NOT `npm`!**
 
 ```bash
-# Play the game (interactive CLI)
-pnpm play
-
 # Run full stack (backend API + frontend dev server)
 pnpm dev
 
@@ -53,16 +50,9 @@ pnpm dev:api
 # Run frontend only (UI on port 3000)
 pnpm dev:frontend
 
-# Run tests/demo (real AI, updates cache)
-pnpm test
-
-# Run cached CI-style test flow (no env / credits)
-pnpm test-ci
-
 # BEFORE EVERY COMMIT - MANDATORY
 pnpm format      # Format code with Prettier
 pnpm check       # TypeScript type checking
-pnpm test-ci     # Validate cached game flow still makes sense
 
 # Build for production
 pnpm build:all   # Build both backend and frontend
@@ -95,19 +85,8 @@ import { characterPool } from "./mastra/index";
 
 1. Run `pnpm format` (auto-formats all files)
 2. Run `pnpm check` (verify TypeScript compiles)
-3. Run `pnpm test-ci` and confirm the output story makes sense
-   - Agents adding new features SHOULD extend the test flow (e.g. more turns, boss review, follow-ups) so `pnpm test-ci` exercises new behavior over time
-4. Fix any errors before committing
-5. Commit with descriptive message
-
-### Running Files Directly
-
-```bash
-# Node can run .ts files directly
-node --env-file=.env src/play-interactive.ts
-
-# This is what pnpm scripts do internally
-```
+3. Fix any errors before committing
+4. Commit with descriptive message
 
 ---
 
@@ -200,6 +179,13 @@ puppet-master/
 │   ├── scenarios.json            # Scenario definitions (linked to characters)
 │   └── README.md                 # Character/scenario documentation
 │
+├── frontend/                     # React + Vite WhatsApp-style UI
+│   ├── src/
+│   │   ├── components/          # UI components
+│   │   ├── hooks/               # React hooks
+│   │   └── App.tsx              # Main app component
+│   └── package.json
+│
 ├── src/
 │   ├── mastra/
 │   │   ├── agents/
@@ -223,11 +209,10 @@ puppet-master/
 │   │   │
 │   │   └── index.ts                      # Mastra agent/tool registry
 │   │
-│   ├── play-interactive.ts       # Interactive CLI game (readline)
-│   └── test-game.ts              # Auto-run demo script
+│   └── index.ts                  # Backend API server
 │
 ├── HOW-TO-PLAY.md                # Player guide
-├── claude.md                     # This file
+├── CLAUDE.md                     # This file
 └── package.json
 ```
 
@@ -391,27 +376,24 @@ From `src/mastra/agents/ORCHESTRATOR.md`:
 
 ## 🚀 How to Play
 
-### Option 1: Interactive CLI (Recommended)
-
-```bash
-pnpm play
-```
-
-- Chat-like interface in terminal
-- Real-time conversations with characters
-- Color-coded output
-- Commands: `stats`, `quit`
-
-### Option 2: Mastra Dev UI
+### Web UI (Primary Interface)
 
 ```bash
 pnpm dev
-# Open http://localhost:4111
 ```
 
-- Web UI for testing individual agents
-- Good for development/debugging
-- Not the full game experience
+Then open:
+
+- **Frontend**: http://localhost:3000 - Main game interface (WhatsApp-style UI)
+- **Backend API**: http://localhost:4111 - API server (for debugging)
+
+The web UI provides:
+
+- WhatsApp-style chat interface
+- Real-time conversations with characters
+- Thread history view
+- Boss review modals
+- Stats tracking
 
 See `HOW-TO-PLAY.md` for detailed instructions.
 
@@ -535,7 +517,7 @@ We use **n8n workflows** to generate new characters and scenarios using AI.
 
 **Files**:
 
-- `src/play-tui.tsx`
+- `frontend/src/components/`
 - `src/mastra/game/orchestrator.ts`
 
 #### 4. Character Relationship System ⭐⭐
@@ -556,7 +538,7 @@ We use **n8n workflows** to generate new characters and scenarios using AI.
 **Files**:
 
 - `src/mastra/game/character-pool-manager.ts`
-- `src/play-tui.tsx`
+- `frontend/src/components/`
 - `src/mastra/types/game-types.ts`
 
 ---
@@ -569,7 +551,7 @@ We use **n8n workflows** to generate new characters and scenarios using AI.
 
 **Tasks**:
 
-- [ ] Implement quiz UI in TUI (already generated in review JSON)
+- [ ] Implement quiz UI in web interface (already generated in review JSON)
 - [ ] Player answers quizzes to prove learning
 - [ ] Quiz performance affects skill progression multiplier
 - [ ] Track quiz completion and scores
@@ -577,7 +559,7 @@ We use **n8n workflows** to generate new characters and scenarios using AI.
 
 **Files**:
 
-- `src/play-tui.tsx`
+- `frontend/src/components/`
 - `src/mastra/game/orchestrator.ts`
 - `src/mastra/types/game-types.ts` (Quiz types already defined)
 
@@ -605,14 +587,14 @@ We use **n8n workflows** to generate new characters and scenarios using AI.
 
 **Tasks**:
 
-- [ ] Show voice indicator (🔊) for voice messages in TUI
+- [ ] Show voice indicator (🔊) for voice messages in web UI
 - [ ] Display urgency/emotion: 🔊 calm, 😰 urgent, 😊 excited
 - [ ] Format voice transcriptions with "(Voice message)" prefix
 - [ ] Characters use voice based on `communicationStyle.prefersVoice`
 
 **Files**:
 
-- `src/play-tui.tsx`
+- `frontend/src/components/`
 
 #### 8. Learning Materials Tracking
 
@@ -629,7 +611,7 @@ We use **n8n workflows** to generate new characters and scenarios using AI.
 
 - `src/mastra/game/orchestrator.ts`
 - `src/mastra/types/game-types.ts`
-- `src/play-tui.tsx`
+- `frontend/src/components/`
 
 ---
 
@@ -650,7 +632,7 @@ We use **n8n workflows** to generate new characters and scenarios using AI.
 **Files**:
 
 - `src/mastra/game/save-manager.ts` (new)
-- `src/play-tui.tsx`
+- `frontend/src/components/`
 - `saves/` directory (new)
 
 #### 10. Better Error Recovery ⭐
@@ -669,7 +651,7 @@ We use **n8n workflows** to generate new characters and scenarios using AI.
 
 - `src/mastra/game/orchestrator.ts`
 - `src/mastra/tools/*.ts`
-- `src/play-tui.tsx`
+- `frontend/src/components/`
 
 ---
 
@@ -679,13 +661,10 @@ We use **n8n workflows** to generate new characters and scenarios using AI.
 # Run type checking
 pnpm check
 
-# Run auto-demo (test script)
-pnpm test:game
+# Run unit tests
+pnpm test:unit
 
-# Play interactive game
-pnpm play
-
-# Start Mastra dev server
+# Start dev server (frontend + backend)
 pnpm dev
 ```
 
@@ -698,7 +677,8 @@ pnpm dev
 - **Runtime**: Node.js 22.13.0+
 - **Language**: TypeScript
 - **Character Generation**: n8n workflows (manual JSON export)
-- **UI**: Terminal (readline), Mastra web UI
+- **Frontend**: React + Vite (WhatsApp-style UI)
+- **Backend**: Hono API server
 
 ---
 

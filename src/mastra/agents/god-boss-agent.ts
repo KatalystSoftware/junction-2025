@@ -505,8 +505,7 @@ export async function generateFiringMessage(
   const templates = {
     finnish: {
       title: "Työsuhde päättynyt",
-      reasonPrefix:
-        "Valitettavasti joudun päättämään työsuhteesi. Syy: ",
+      reasonPrefix: "Valitettavasti joudun päättämään työsuhteesi. Syy: ",
       finalMessages: [
         "Talousneuvonta ei ehkä ole sinun juttu. Ehkä kokeile jotain muuta?",
         "Näin ei voi jatkua. Asiakkaat tarvitsevat parempaa ohjausta.",
@@ -516,7 +515,8 @@ export async function generateFiringMessage(
     },
     english: {
       title: "Employment Terminated",
-      reasonPrefix: "Unfortunately, I have to terminate your employment. Reason: ",
+      reasonPrefix:
+        "Unfortunately, I have to terminate your employment. Reason: ",
       finalMessages: [
         "Financial advising might not be for you. Maybe try something else?",
         "This can't continue. Clients need better guidance.",

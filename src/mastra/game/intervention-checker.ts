@@ -46,7 +46,7 @@ export function checkForIntervention(
       shouldIntervene: true,
       severity: "critical",
       reason:
-        "Your advice is WAY too short. The client needs actual guidance, not a one-liner.",
+        "Your advice is WAY too short! The client needs actual guidance, not a one-liner.",
       correctApproach: `Give at least 2-3 specific, actionable steps. Explain WHY they should do each thing. This is about ${scenario.topic}, so be thorough.`,
       topic: scenario.topic,
     };

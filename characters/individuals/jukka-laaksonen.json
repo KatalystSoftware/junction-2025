@@ -113,5 +113,49 @@
     "visitCount": 0,
     "lastVisit": null,
     "adviceFollowedHistory": []
-  }
+  },
+  "personalityTraits": {
+    "impulsiveness": 0.5,
+    "trustingness": 0.7,
+    "financial_literacy": 0.4,
+    "stubbornness": 0.5,
+    "emotionality": 0.8
+  },
+  "financialState": {
+    "currentStage": 1,
+    "netWorth": -2934.6231975335454,
+    "monthlyIncome": 1900,
+    "monthlyExpenses": 1520,
+    "totalDebt": 3730,
+    "liquidSavings": 360.989724007547,
+    "investmentPortfolio": 0,
+    "realEstateValue": 0,
+    "currentOccupation": "Retail Store Clerk",
+    "stageEntryDate": "2025-11-16",
+    "monthsInCurrentStage": 0,
+    "readyForNextStage": false,
+    "netWorthHistory": [
+      {
+        "date": "2025-11-16",
+        "amount": -2934.6231975335454
+      }
+    ],
+    "incomeHistory": [
+      {
+        "date": "2025-11-16",
+        "amount": 1900
+      }
+    ],
+    "majorEvents": []
+  },
+  "successPathWeights": {
+    "comfortable_stability": 0.3,
+    "corporate_career": 0.15,
+    "tech_entrepreneur": 0.1,
+    "real_estate_investor": 0.15,
+    "small_business_owner": 0.15,
+    "stock_market_investor": 0.15
+  },
+  "completedScenarios": [],
+  "adviceHistory": []
 }

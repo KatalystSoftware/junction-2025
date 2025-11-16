@@ -189,7 +189,17 @@ export const queryKnowledgeEnhancedTool = createTool({
       );
 
       // Query each index and combine results
-      const allResults = [];
+      const allResults: Array<{
+        metadata?: {
+          text?: string;
+          section?: string;
+          topic?: string;
+          source?: string;
+          language?: string;
+          [key: string]: any;
+        };
+        score: number;
+      }> = [];
 
       for (const indexName of indices) {
         try {
