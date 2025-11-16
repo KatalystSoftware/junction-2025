@@ -290,16 +290,17 @@ export function PlayerStatsModal({
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 min-h-0">
-          <Tabs defaultValue="stats" className="px-6 py-4">
-            <TabsList className="grid grid-cols-4 w-full mb-6">
-              <TabsTrigger value="stats">Stats</TabsTrigger>
-              <TabsTrigger value="performance">Performance</TabsTrigger>
-              <TabsTrigger value="relationships">Relationships</TabsTrigger>
-              <TabsTrigger value="progress">Progress</TabsTrigger>
-            </TabsList>
+        <ScrollArea className="flex-1 min-h-0 overflow-y-auto">
+          <div className="px-6 py-4">
+            <Tabs defaultValue="stats">
+              <TabsList className="grid grid-cols-4 w-full mb-6">
+                <TabsTrigger value="stats">Stats</TabsTrigger>
+                <TabsTrigger value="performance">Performance</TabsTrigger>
+                <TabsTrigger value="relationships">Relationships</TabsTrigger>
+                <TabsTrigger value="progress">Progress</TabsTrigger>
+              </TabsList>
 
-            <TabsContent value="stats" className="space-y-6">
+              <TabsContent value="stats" className="space-y-6 pb-6">
               {/* Player Profile Section */}
               <div
                 className="flex flex-col items-center gap-4 pb-6 border-b"
@@ -741,7 +742,7 @@ export function PlayerStatsModal({
               </div>
             </TabsContent>
 
-            <TabsContent value="performance" className="space-y-6">
+            <TabsContent value="performance" className="space-y-6 pb-6">
               {analyticsLoading ? (
                 <div className="flex items-center justify-center py-12">
                   <div className="text-center">
@@ -1053,7 +1054,7 @@ export function PlayerStatsModal({
               )}
             </TabsContent>
 
-            <TabsContent value="relationships">
+            <TabsContent value="relationships" className="pb-6">
               <RelationshipsPanel
                 relationships={contacts.map((contact) => ({
                   characterId: contact.id,
@@ -1076,7 +1077,7 @@ export function PlayerStatsModal({
               />
             </TabsContent>
 
-            <TabsContent value="progress">
+            <TabsContent value="progress" className="pb-6">
               <ProgressChart
                 sessionHistory={advisorState?.sessionHistory || []}
                 totalSessions={totalSessions}
@@ -1085,7 +1086,8 @@ export function PlayerStatsModal({
                 skillLevel={skillLevel}
               />
             </TabsContent>
-          </Tabs>
+            </Tabs>
+          </div>
         </ScrollArea>
       </DialogContent>
     </Dialog>
