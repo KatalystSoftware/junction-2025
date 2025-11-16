@@ -57,6 +57,19 @@ export interface Translations {
     whatAreOptions: string;
   };
 
+  // Boss Onboarding Responses
+  bossOnboarding: {
+    response1Action: string;
+    response1Outcome: string;
+    response1Full: string;
+    response2Action: string;
+    response2Outcome: string;
+    response2Full: string;
+    response3Action: string;
+    response3Outcome: string;
+    response3Full: string;
+  };
+
   // Stats Modal
   stats: {
     yourStats: string;
@@ -124,6 +137,18 @@ const translations: Record<Language, Translations> = {
       whatAreOptions: "What are my options?",
     },
 
+    bossOnboarding: {
+      response1Action: "Acknowledge and express readiness",
+      response1Outcome: "Start helping clients",
+      response1Full: "Understood! I'm ready to help clients and give them the best financial advice I can. Thanks for the overview!",
+      response2Action: "Show enthusiasm to begin",
+      response2Outcome: "Get started immediately",
+      response2Full: "Got it! Let's get started. I'm excited to meet clients and help them with their financial challenges.",
+      response3Action: "Express gratitude and commitment",
+      response3Outcome: "Commit to doing well",
+      response3Full: "Thanks! I'll do my best to provide quality advice and keep learning. Looking forward to working with you!",
+    },
+
     stats: {
       yourStats: "Your Stats",
       avgTrust: "Avg Trust",
@@ -189,6 +214,18 @@ const translations: Record<Language, Translations> = {
       whatAreOptions: "Mitkä ovat vaihtoehtoni?",
     },
 
+    bossOnboarding: {
+      response1Action: "Vahvista ja ilmaise valmiutesi",
+      response1Outcome: "Aloita asiakkaiden auttaminen",
+      response1Full: "Ymmärretty! Olen valmis auttamaan asiakkaita ja antamaan heille parasta mahdollista taloudellista neuvontaa. Kiitos yleiskatsauksesta!",
+      response2Action: "Osoita innostusta aloittamiseen",
+      response2Outcome: "Aloita välittömästi",
+      response2Full: "Selvä! Aloitetaan. Odotan innolla tapaamista asiakkaiden kanssa ja heidän auttamistaan taloudellisissa haasteissaan.",
+      response3Action: "Ilmaise kiitollisuutta ja sitoutumista",
+      response3Outcome: "Sitoudu tekemään hyvin",
+      response3Full: "Kiitos! Teen parhaani antaakseni laadukasta neuvontaa ja jatkaakseni oppimista. Odotan innolla yhteistyötä kanssasi!",
+    },
+
     stats: {
       yourStats: "Tilastosi",
       avgTrust: "Keskim. Luottamus",
@@ -252,6 +289,18 @@ const translations: Record<Language, Translations> = {
       thatSoundsGood: "Det låter bra",
       helpMeUnderstand: "Hjälp mig förstå",
       whatAreOptions: "Vilka är mina alternativ?",
+    },
+
+    bossOnboarding: {
+      response1Action: "Bekräfta och uttryck beredskap",
+      response1Outcome: "Börja hjälpa klienter",
+      response1Full: "Förstått! Jag är redo att hjälpa klienter och ge dem den bästa finansiella rådgivningen jag kan. Tack för överblicken!",
+      response2Action: "Visa entusiasm att börja",
+      response2Outcome: "Kom igång omedelbart",
+      response2Full: "Jag förstår! Låt oss komma igång. Jag ser fram emot att träffa klienter och hjälpa dem med deras ekonomiska utmaningar.",
+      response3Action: "Uttryck tacksamhet och engagemang",
+      response3Outcome: "Förbind dig att göra bra ifrån dig",
+      response3Full: "Tack! Jag ska göra mitt bästa för att ge kvalitetsrådgivning och fortsätta lära mig. Ser fram emot att arbeta med dig!",
     },
 
     stats: {

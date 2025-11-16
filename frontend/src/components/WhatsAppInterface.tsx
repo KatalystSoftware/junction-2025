@@ -12,6 +12,7 @@ import type { Contact, Message } from "../types/ui";
 import michaelScottImage from "figma:asset/98a682f9e6eea0635304bf1ceada7ac6a7758d54.png";
 import { useGameState } from "../hooks/useGameState";
 import { useDerivedUIState } from "../hooks/useDerivedUIState";
+import { useTranslation } from "../utils/translations";
 
 interface WhatsAppInterfaceProps {
   onLogoClick: () => void;
@@ -20,6 +21,9 @@ interface WhatsAppInterfaceProps {
 export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
   // Server state - single source of truth
   const game = useGameState();
+
+  // Translations
+  const t = useTranslation();
 
   // Derived UI state - no storage, just computation
   const { contacts, messagesByThread } = useDerivedUIState(
@@ -290,33 +294,30 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
           "boss-pinned": [
             {
               choiceId: "onboarding_1",
-              actionText: "Acknowledge and express readiness",
+              actionText: t.bossOnboarding.response1Action,
               icon: "👍",
-              projectedOutcome: "Start helping clients",
-              fullAdviceText:
-                "Understood! I'm ready to help clients and give them the best financial advice I can. Thanks for the overview!",
+              projectedOutcome: t.bossOnboarding.response1Outcome,
+              fullAdviceText: t.bossOnboarding.response1Full,
             },
             {
               choiceId: "onboarding_2",
-              actionText: "Show enthusiasm to begin",
+              actionText: t.bossOnboarding.response2Action,
               icon: "🚀",
-              projectedOutcome: "Get started immediately",
-              fullAdviceText:
-                "Got it! Let's get started. I'm excited to meet clients and help them with their financial challenges.",
+              projectedOutcome: t.bossOnboarding.response2Outcome,
+              fullAdviceText: t.bossOnboarding.response2Full,
             },
             {
               choiceId: "onboarding_3",
-              actionText: "Express gratitude and commitment",
+              actionText: t.bossOnboarding.response3Action,
               icon: "💪",
-              projectedOutcome: "Commit to doing well",
-              fullAdviceText:
-                "Thanks! I'll do my best to provide quality advice and keep learning. Looking forward to working with you!",
+              projectedOutcome: t.bossOnboarding.response3Outcome,
+              fullAdviceText: t.bossOnboarding.response3Full,
             },
           ],
         }));
       }
     }
-  }, [game.threadHistories, game.advisorState]);
+  }, [game.threadHistories, game.advisorState, t]);
 
   // Handle contact selection
   const handleSelectContact = (contactId: string) => {
