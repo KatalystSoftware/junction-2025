@@ -58,8 +58,7 @@ export function ClientFinancialDashboard({
   const fetchFinancialData = async () => {
     try {
       setLoading(true);
-      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
-      const response = await fetch(`${API_URL}/client-financial-details/${characterId}?months=6`);
+      const response = await fetch(`/api/game/client-financial-details/${characterId}?months=6`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch financial data");
