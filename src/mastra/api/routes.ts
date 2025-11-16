@@ -1092,7 +1092,12 @@ app.get("/leaderboard/surrounding/:advisorId", async (c) => {
 
 interface TranscribeAudioRequest {
   audioData: string; // Base64 encoded audio
-  mimeType: "audio/wav" | "audio/mp3" | "audio/mpeg" | "audio/webm" | "audio/ogg";
+  mimeType:
+    | "audio/wav"
+    | "audio/mp3"
+    | "audio/mpeg"
+    | "audio/webm"
+    | "audio/ogg";
   language?: string; // Optional language hint (fi, en, sv)
 }
 
@@ -1110,7 +1115,9 @@ app.post("/transcribe-audio", async (c) => {
       return c.json({ error: "Missing audioData or mimeType" }, 400);
     }
 
-    console.log(`🎤 Transcribing audio (${mimeType}, language hint: ${language || "auto"})`);
+    console.log(
+      `🎤 Transcribing audio (${mimeType}, language hint: ${language || "auto"})`,
+    );
 
     // Import the speech-to-text service
     const { transcribeAudio } = await import(
@@ -1123,10 +1130,13 @@ app.post("/transcribe-audio", async (c) => {
     // Transcribe the audio
     const result = await transcribeAudio(audioBuffer, mimeType, {
       language,
-      prompt: "This is a voice message from a financial advisor client discussing their financial situation.",
+      prompt:
+        "This is a voice message from a financial advisor client discussing their financial situation.",
     });
 
-    console.log(`✅ Transcription complete: "${result.text.substring(0, 50)}..."`);
+    console.log(
+      `✅ Transcription complete: "${result.text.substring(0, 50)}..."`,
+    );
 
     return c.json({
       transcription: result.text,

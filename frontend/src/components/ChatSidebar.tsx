@@ -90,7 +90,7 @@ export function ChatSidebar({
 
       // Try to play sound if available
       try {
-        const audio = new Audio('/sounds/level-up.mp3');
+        const audio = new Audio("/sounds/level-up.mp3");
         audio.play().catch(() => {
           // Ignore if sound fails to play
         });

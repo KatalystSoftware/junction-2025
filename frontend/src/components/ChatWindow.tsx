@@ -208,7 +208,9 @@ export function ChatWindow({
       };
 
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        const audioBlob = new Blob(audioChunksRef.current, {
+          type: "audio/webm",
+        });
         setAudioBlob(audioBlob);
         stream.getTracks().forEach((track) => track.stop());
       };
@@ -286,7 +288,10 @@ export function ChatWindow({
       }
 
       // Transcribe audio
-      const { transcription } = await gameApi.transcribeAudio(audioBlob, userLanguage);
+      const { transcription } = await gameApi.transcribeAudio(
+        audioBlob,
+        userLanguage,
+      );
 
       console.log("Transcription:", transcription);
 
@@ -299,7 +304,9 @@ export function ChatWindow({
       setIsTranscribing(false);
     } catch (error) {
       console.error("Failed to transcribe audio:", error);
-      alert("Failed to transcribe audio. Please try again or type your message.");
+      alert(
+        "Failed to transcribe audio. Please try again or type your message.",
+      );
       setIsTranscribing(false);
     }
   };
@@ -1299,7 +1306,8 @@ export function ChatWindow({
                     fontWeight: 500,
                   }}
                 >
-                  {isRecording ? "Recording..." : "Recording ready"} {Math.floor(recordingTime / 60)}:
+                  {isRecording ? "Recording..." : "Recording ready"}{" "}
+                  {Math.floor(recordingTime / 60)}:
                   {String(recordingTime % 60).padStart(2, "0")}
                 </div>
 
@@ -1402,11 +1410,15 @@ export function ChatWindow({
                     onClick={startRecording}
                     style={{
                       borderRadius: "9999px",
-                      backgroundColor: isRecording ? "var(--destructive)" : "var(--muted)",
+                      backgroundColor: isRecording
+                        ? "var(--destructive)"
+                        : "var(--muted)",
                       border: "1px solid var(--border)",
                     }}
                   >
-                    <Mic className={`w-4 h-4 ${isRecording ? "text-white" : "text-muted-foreground group-hover:text-foreground"} transition-colors`} />
+                    <Mic
+                      className={`w-4 h-4 ${isRecording ? "text-white" : "text-muted-foreground group-hover:text-foreground"} transition-colors`}
+                    />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
