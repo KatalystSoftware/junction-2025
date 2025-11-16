@@ -545,6 +545,7 @@ Respond with ONLY valid JSON (NO markdown):
         age: character.age,
         occupation: character.occupation,
         gender: character.gender,
+        financialProfile: character.financialProfile,
       },
       scenarioFinancialContext,
       adviceChoices,
@@ -1479,6 +1480,7 @@ export function getActiveThreads(
         age: character.age,
         occupation: character.occupation,
         gender: character.gender,
+        financialProfile: character.financialProfile,
       },
     });
   }
@@ -1526,6 +1528,7 @@ export function switchThread(
       age: character.age,
       occupation: character.occupation,
       gender: character.gender,
+      financialProfile: character.financialProfile,
     },
   };
 }

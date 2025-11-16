@@ -11,6 +11,7 @@ import type {
   ConsultationSession,
 } from "../types/game-types.ts";
 import { cachedGenerate } from "../test-cache.ts";
+import { validateQuiz } from "../utils/quiz-validator.ts";
 
 export const invokeGodBossTool = {
   id: "invokeGodBossTool",
@@ -82,6 +83,23 @@ Provide comprehensive feedback following your review format.
           .trim();
 
         parsed = JSON.parse(cleanedText);
+
+        // Validate quiz if present
+        if (parsed.quiz) {
+          const validation = validateQuiz(parsed.quiz);
+
+          if (!validation.valid) {
+            console.warn(
+              "⚠️ Quiz validation failed, dropping invalid quiz:",
+              validation.errors,
+            );
+            parsed.quiz = undefined;
+          } else if (validation.warnings.length > 0) {
+            console.warn("⚠️ Quiz validation warnings:", validation.warnings);
+          } else {
+            console.log("✅ Quiz validated successfully");
+          }
+        }
       } catch (parseError) {
         console.warn(
           "⚠️ Failed to parse God/Boss review JSON, using fallback:",
@@ -108,6 +126,7 @@ Provide comprehensive feedback following your review format.
               type: "article" as const,
             },
           ],
+          quiz: undefined,
           encouragingMessage:
             "Good start! Keep practicing and remember to ask clients clarifying questions. 💪",
           reputationChange: 5,
@@ -121,6 +140,7 @@ Provide comprehensive feedback following your review format.
         strengthsIdentified: parsed.strengthsIdentified || [],
         areasForImprovement: parsed.areasForImprovement || [],
         learningMaterials: parsed.learningMaterials || [],
+        quiz: parsed.quiz || undefined,
         encouragingMessage:
           parsed.encouragingMessage || "Great work! Keep it up. 💪",
         reputationChange: parsed.reputationChange || 5,
@@ -136,6 +156,7 @@ Provide comprehensive feedback following your review format.
         strengthsIdentified: ["You tried your best"],
         areasForImprovement: ["Keep practicing"],
         learningMaterials: [],
+        quiz: undefined,
         encouragingMessage: "An error occurred, but keep trying! 💪",
         reputationChange: 0,
         skillLevelChange: 0,

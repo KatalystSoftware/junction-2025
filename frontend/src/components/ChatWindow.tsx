@@ -20,11 +20,8 @@ import {
   Mic,
   X,
   Wallet,
-  TrendingUp,
-  Award,
   Target,
   Briefcase,
-  Building2,
   Users,
 } from "lucide-react";
 import type { Contact, Message } from "./WhatsAppInterface";
@@ -34,6 +31,7 @@ import logoImage from "figma:asset/601ef144d16bf6e001c5324689cdddb5a7ea7f74.png"
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useTranslation } from "../utils/translations";
+import { StatusBar } from "./StatusBar";
 
 // Helper function to convert quality score (0-10) to quality level key
 function getQualityLevel(
@@ -61,6 +59,69 @@ interface ChatWindowProps {
     achievementsUnlocked?: any[];
     milestonesAchieved?: any[];
   };
+  advisorState?: {
+    reputation: number;
+    skillLevel: number;
+    totalSessions: number;
+    lastReviewSession?: number;
+  };
+}
+
+// Helper functions to calculate financial data
+function calculateTotalBalance(contact: Contact): number {
+  if (!contact.financialProfile) return 0;
+
+  const bankBalance = contact.financialProfile.bankAccounts.reduce(
+    (sum, acc) => sum + acc.balance,
+    0,
+  );
+
+  return bankBalance;
+}
+
+function formatCurrency(amount: number, currency: string = "EUR"): string {
+  if (currency === "EUR") {
+    return new Intl.NumberFormat("fi-FI", {
+      style: "currency",
+      currency: "EUR",
+    }).format(amount);
+  }
+  return `$${amount.toLocaleString()}`;
+}
+
+function calculateTotalDebt(contact: Contact): number {
+  if (!contact.financialProfile) return 0;
+
+  const creditCardDebt = contact.financialProfile.creditCards.reduce(
+    (sum, card) => sum + card.balance,
+    0,
+  );
+
+  const otherDebt = contact.financialProfile.debts.reduce(
+    (sum, debt) => sum + debt.remainingAmount,
+    0,
+  );
+
+  return creditCardDebt + otherDebt;
+}
+
+function calculateTotalMonthlyExpenses(contact: Contact): number {
+  if (!contact.financialProfile) return 0;
+
+  const expenses = contact.financialProfile.monthlyExpenses;
+  const fixedExpenses =
+    (expenses.rent || 0) +
+    (expenses.groceries || 0) +
+    (expenses.transportation || 0) +
+    (expenses.utilities || 0) +
+    (expenses.other || 0);
+
+  const subscriptions = contact.financialProfile.subscriptions.reduce(
+    (sum, sub) => sum + sub.monthlyCost,
+    0,
+  );
+
+  return fixedExpenses + subscriptions;
 }
 
 export function ChatWindow({
@@ -73,6 +134,7 @@ export function ChatWindow({
   adviceChoices = [],
   isThreadResolved = false,
   conversationEndData,
+  advisorState,
 }: ChatWindowProps) {
   const t = useTranslation();
   const [inputValue, setInputValue] = useState("");
@@ -349,6 +411,16 @@ export function ChatWindow({
           </div>
         </div>
       </div>
+
+      {/* Status Bar */}
+      {advisorState && (
+        <StatusBar
+          reputation={advisorState.reputation}
+          skillLevel={advisorState.skillLevel}
+          totalSessions={advisorState.totalSessions}
+          lastReviewSession={advisorState.lastReviewSession || 0}
+        />
+      )}
 
       {/* Messages Area */}
       <ScrollArea
@@ -1478,7 +1550,7 @@ export function ChatWindow({
                           fontWeight: "var(--font-weight-medium)",
                         }}
                       >
-                        Entrepreneur
+                        {contact.occupation || "N/A"}
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -1499,7 +1571,7 @@ export function ChatWindow({
                           fontWeight: "var(--font-weight-medium)",
                         }}
                       >
-                        New York, USA
+                        Finland
                       </span>
                     </div>
                     <div className="flex justify-between">
@@ -1510,7 +1582,7 @@ export function ChatWindow({
                           color: "var(--muted-foreground)",
                         }}
                       >
-                        Joined
+                        Age
                       </span>
                       <span
                         style={{
@@ -1520,7 +1592,7 @@ export function ChatWindow({
                           fontWeight: "var(--font-weight-medium)",
                         }}
                       >
-                        January 2024
+                        {contact.age || "N/A"}
                       </span>
                     </div>
                   </div>
@@ -1547,196 +1619,6 @@ export function ChatWindow({
                   Relationship Trust
                 </h4>
                 <TrustMeter trust={contact.trust} />
-              </div>
-
-              {/* Game Stats */}
-              <div
-                className="p-4 border border-border"
-                style={{
-                  backgroundColor: "var(--muted)",
-                  borderRadius: "var(--radius-card)",
-                }}
-              >
-                <h4
-                  className="mb-3"
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    fontSize: "var(--text-lg)",
-                    fontWeight: "var(--font-weight-semibold)",
-                    color: "var(--card-foreground)",
-                  }}
-                >
-                  Game Stats
-                </h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div
-                    className="p-3 flex items-center gap-3"
-                    style={{
-                      backgroundColor: "var(--card)",
-                      borderRadius: "var(--radius-button)",
-                    }}
-                  >
-                    <div
-                      className="p-2"
-                      style={{
-                        backgroundColor: "var(--primary)",
-                        borderRadius: "var(--radius-button)",
-                      }}
-                    >
-                      <Target
-                        className="w-5 h-5"
-                        style={{ color: "var(--primary-foreground)" }}
-                      />
-                    </div>
-                    <div>
-                      <p
-                        style={{
-                          fontFamily: "Inter, sans-serif",
-                          fontSize: "var(--text-xs)",
-                          color: "var(--muted-foreground)",
-                        }}
-                      >
-                        Level
-                      </p>
-                      <p
-                        style={{
-                          fontFamily: "Inter, sans-serif",
-                          fontSize: "var(--text-lg)",
-                          fontWeight: "var(--font-weight-semibold)",
-                          color: "var(--card-foreground)",
-                        }}
-                      >
-                        42
-                      </p>
-                    </div>
-                  </div>
-
-                  <div
-                    className="p-3 flex items-center gap-3"
-                    style={{
-                      backgroundColor: "var(--card)",
-                      borderRadius: "var(--radius-button)",
-                    }}
-                  >
-                    <div
-                      className="p-2"
-                      style={{
-                        backgroundColor: "var(--chart-2)",
-                        borderRadius: "var(--radius-button)",
-                      }}
-                    >
-                      <Award
-                        className="w-5 h-5"
-                        style={{ color: "var(--primary-foreground)" }}
-                      />
-                    </div>
-                    <div>
-                      <p
-                        style={{
-                          fontFamily: "Inter, sans-serif",
-                          fontSize: "var(--text-xs)",
-                          color: "var(--muted-foreground)",
-                        }}
-                      >
-                        Achievements
-                      </p>
-                      <p
-                        style={{
-                          fontFamily: "Inter, sans-serif",
-                          fontSize: "var(--text-lg)",
-                          fontWeight: "var(--font-weight-semibold)",
-                          color: "var(--card-foreground)",
-                        }}
-                      >
-                        127
-                      </p>
-                    </div>
-                  </div>
-
-                  <div
-                    className="p-3 flex items-center gap-3"
-                    style={{
-                      backgroundColor: "var(--card)",
-                      borderRadius: "var(--radius-button)",
-                    }}
-                  >
-                    <div
-                      className="p-2"
-                      style={{
-                        backgroundColor: "var(--chart-3)",
-                        borderRadius: "var(--radius-button)",
-                      }}
-                    >
-                      <TrendingUp
-                        className="w-5 h-5"
-                        style={{ color: "var(--primary-foreground)" }}
-                      />
-                    </div>
-                    <div>
-                      <p
-                        style={{
-                          fontFamily: "Inter, sans-serif",
-                          fontSize: "var(--text-xs)",
-                          color: "var(--muted-foreground)",
-                        }}
-                      >
-                        Win Rate
-                      </p>
-                      <p
-                        style={{
-                          fontFamily: "Inter, sans-serif",
-                          fontSize: "var(--text-lg)",
-                          fontWeight: "var(--font-weight-semibold)",
-                          color: "var(--card-foreground)",
-                        }}
-                      >
-                        78%
-                      </p>
-                    </div>
-                  </div>
-
-                  <div
-                    className="p-3 flex items-center gap-3"
-                    style={{
-                      backgroundColor: "var(--card)",
-                      borderRadius: "var(--radius-button)",
-                    }}
-                  >
-                    <div
-                      className="p-2"
-                      style={{
-                        backgroundColor: "var(--chart-4)",
-                        borderRadius: "var(--radius-button)",
-                      }}
-                    >
-                      <Award
-                        className="w-5 h-5"
-                        style={{ color: "var(--primary-foreground)" }}
-                      />
-                    </div>
-                    <div>
-                      <p
-                        style={{
-                          fontFamily: "Inter, sans-serif",
-                          fontSize: "var(--text-xs)",
-                          color: "var(--muted-foreground)",
-                        }}
-                      >
-                        Rank
-                      </p>
-                      <p
-                        style={{
-                          fontFamily: "Inter, sans-serif",
-                          fontSize: "var(--text-lg)",
-                          fontWeight: "var(--font-weight-semibold)",
-                          color: "var(--card-foreground)",
-                        }}
-                      >
-                        Diamond
-                      </p>
-                    </div>
-                  </div>
-                </div>
               </div>
 
               {/* Financial Status */}
@@ -1797,27 +1679,9 @@ export function ChatWindow({
                             color: "var(--card-foreground)",
                           }}
                         >
-                          $45,290
+                          {formatCurrency(calculateTotalBalance(contact))}
                         </p>
                       </div>
-                    </div>
-                    <div
-                      className="px-3 py-1"
-                      style={{
-                        backgroundColor: "var(--chart-1)",
-                        borderRadius: "var(--radius-button)",
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontFamily: "Inter, sans-serif",
-                          fontSize: "var(--text-sm)",
-                          fontWeight: "var(--font-weight-medium)",
-                          color: "var(--primary-foreground)",
-                        }}
-                      >
-                        +12.5%
-                      </span>
                     </div>
                   </div>
 
@@ -1846,7 +1710,9 @@ export function ChatWindow({
                           color: "var(--card-foreground)",
                         }}
                       >
-                        $8,500
+                        {formatCurrency(
+                          contact.financialProfile?.typicalMonthlyIncome || 0,
+                        )}
                       </p>
                     </div>
 
@@ -1864,7 +1730,7 @@ export function ChatWindow({
                           color: "var(--muted-foreground)",
                         }}
                       >
-                        Total Investments
+                        Total Debt
                       </p>
                       <p
                         style={{
@@ -1874,7 +1740,7 @@ export function ChatWindow({
                           color: "var(--card-foreground)",
                         }}
                       >
-                        $23,100
+                        {formatCurrency(calculateTotalDebt(contact))}
                       </p>
                     </div>
                   </div>

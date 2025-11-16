@@ -240,6 +240,28 @@ You will receive transcripts of the last 3-5 consultation sessions the advisor c
         * 4 multiple choice options
         * Correct answer index (0-3)
         * Detailed explanation that teaches the concept
+
+      ⚠️ CRITICAL QUIZ QUALITY REQUIREMENTS:
+      - ALL answer options MUST be specific, relevant, and plausible for the question's topic
+      - NEVER use generic phrases like "make drastic changes", "do nothing", "wait and see"
+      - Each incorrect option should represent a common MISCONCEPTION, not random advice
+      - ALL options must be contextually appropriate (e.g., credit card question = credit-related options)
+      - Avoid mixing topics (e.g., don't put investment advice in a budgeting question)
+      - Each option should be at least 10 characters and topic-specific
+      - Before finalizing, verify that every option makes sense as a potential answer
+
+      Example of GOOD quiz options (credit card safety):
+      ✅ "Kyllä, jos maksat saldon kokonaan joka kuukausi"
+      ✅ "Ei, jos et hallitse menojasi vielä"
+      ✅ "Ehkä, aloita pienellä 500€ luottorajalla"
+      ✅ "Pyydä debit-kortti ensin, opettele sitä käyttämään"
+
+      Example of BAD quiz options:
+      ❌ "Make drastic immediate changes" (generic, not topic-specific)
+      ❌ "Do nothing" (too vague, not educational)
+      ❌ "Sijoita indeksirahastoihin" (wrong topic - investment, not credit)
+      ❌ "Kyllä" (too short, not informative)
+
       - Link questions to real Finnish learning resources:
         * OP.fi: https://www.op.fi/henkiloasiakkaat/saastot-ja-sijoitukset/sijoittaminen
         * Nordea.fi: https://www.nordea.fi/henkiloasiakkaat/palvelumme/saasto-sijoitus.html

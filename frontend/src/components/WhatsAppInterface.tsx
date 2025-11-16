@@ -13,6 +13,10 @@ import michaelScottImage from "figma:asset/98a682f9e6eea0635304bf1ceada7ac6a7758
 import { useGameState } from "../hooks/useGameState";
 import { useDerivedUIState } from "../hooks/useDerivedUIState";
 import { useTranslation } from "../utils/translations";
+import { ConsultationResultsModal } from "./ConsultationResultsModal";
+import { MilestoneModal } from "./MilestoneModal";
+import { AchievementUnlockModal } from "./AchievementUnlockModal";
+import { QuizModal } from "./QuizModal";
 
 interface WhatsAppInterfaceProps {
   onLogoClick: () => void;
@@ -185,7 +189,29 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
         return updated;
       });
 
-      // Auto-trigger next consultation after 3 seconds
+      // Show modals in sequence
+      // 1. First show consultation results if available
+      if (response.financialResults) {
+        const characterInfo =
+          response.characterInfo || game.threadMetadata?.[response.threadId];
+
+        setCurrentResultsData({
+          characterName: characterInfo?.name || "Client",
+          adviceGiven: response.financialResults.extractedActions
+            ? "Your advice to the client" // TODO: Get actual advice text
+            : undefined,
+          extractedActions: response.financialResults.extractedActions,
+          characterResponse: "Thank you for your help!", // TODO: Get actual response
+          projection: response.financialResults.projection,
+          evaluation: response.financialResults.evaluation,
+          coinsEarned: response.financialResults.coinsEarned,
+          tierChange: response.tierChangeNotification,
+          recommendationMessage: response.recommendationMessage,
+        });
+        setShowResultsModal(true);
+      }
+
+      // Auto-trigger next consultation after modals are dismissed
       setTimeout(() => {
         console.log("🚀 Auto-triggering next consultation...");
         game.startConsultation();
@@ -232,6 +258,22 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       }));
     }
 
+    // Handle god boss review (full performance review with potential quiz)
+    if (response.type === "god_boss_review" && response.review) {
+      console.log("👔 Boss performance review received");
+
+      // If review includes quiz, set it up for display
+      if (response.review.quiz) {
+        console.log("📝 Quiz included in review:", response.review.quiz);
+        setCurrentQuiz(response.review.quiz);
+        setShowQuizModal(true);
+      }
+
+      // Select boss chat to show the review
+      setSelectedContactId("boss-pinned");
+      setShowChat(true);
+    }
+
     // Handle new thread (select it)
     if (response.isNewThread && response.threadId) {
       console.log("✨ New thread created:", response.threadId);
@@ -268,6 +310,16 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
   }>({});
   const [conversationEndDataByThread, setConversationEndDataByThread] =
     useState<{ [threadId: string]: any }>({});
+
+  // Modal state management
+  const [showResultsModal, setShowResultsModal] = useState(false);
+  const [showMilestonesModal, setShowMilestonesModal] = useState(false);
+  const [showAchievementsModal, setShowAchievementsModal] = useState(false);
+  const [showQuizModal, setShowQuizModal] = useState(false);
+  const [currentResultsData, setCurrentResultsData] = useState<any>(null);
+  const [currentMilestones, setCurrentMilestones] = useState<any[]>([]);
+  const [currentAchievements, setCurrentAchievements] = useState<any[]>([]);
+  const [currentQuiz, setCurrentQuiz] = useState<any>(null);
 
   // Track which responses we've already processed to avoid duplicate processing
   const processedStartResponse = useRef<any>(null);
@@ -473,6 +525,49 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
     );
   }
 
+  // Handler for closing results modal - show milestones/achievements next
+  const handleResultsModalClose = (open: boolean) => {
+    setShowResultsModal(open);
+    if (!open) {
+      // Check for milestones to show
+      const endData = selectedContactId
+        ? conversationEndDataByThread[selectedContactId]
+        : undefined;
+
+      if (
+        endData?.milestonesAchieved &&
+        endData.milestonesAchieved.length > 0
+      ) {
+        setCurrentMilestones(endData.milestonesAchieved);
+        setShowMilestonesModal(true);
+      } else if (
+        endData?.achievementsUnlocked &&
+        endData.achievementsUnlocked.length > 0
+      ) {
+        setCurrentAchievements(endData.achievementsUnlocked);
+        setShowAchievementsModal(true);
+      }
+    }
+  };
+
+  // Handler for closing milestones modal - show achievements next
+  const handleMilestonesModalClose = (open: boolean) => {
+    setShowMilestonesModal(open);
+    if (!open) {
+      const endData = selectedContactId
+        ? conversationEndDataByThread[selectedContactId]
+        : undefined;
+
+      if (
+        endData?.achievementsUnlocked &&
+        endData.achievementsUnlocked.length > 0
+      ) {
+        setCurrentAchievements(endData.achievementsUnlocked);
+        setShowAchievementsModal(true);
+      }
+    }
+  };
+
   return (
     <div className="flex h-screen">
       <ChatSidebar
@@ -494,7 +589,54 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
         adviceChoices={currentAdviceChoices}
         isThreadResolved={isThreadResolved}
         conversationEndData={conversationEndData}
+        advisorState={
+          game.advisorState
+            ? {
+                reputation: game.advisorState.reputation,
+                skillLevel: game.advisorState.skillLevel,
+                totalSessions: game.advisorState.totalSessions,
+                lastReviewSession: game.advisorState.lastReviewSession,
+              }
+            : undefined
+        }
       />
+
+      {/* Modals - shown in sequence after consultation ends */}
+      {currentResultsData && (
+        <ConsultationResultsModal
+          open={showResultsModal}
+          onOpenChange={handleResultsModalClose}
+          {...currentResultsData}
+        />
+      )}
+
+      <MilestoneModal
+        open={showMilestonesModal}
+        onOpenChange={handleMilestonesModalClose}
+        milestones={currentMilestones}
+      />
+
+      <AchievementUnlockModal
+        open={showAchievementsModal}
+        onOpenChange={setShowAchievementsModal}
+        achievements={currentAchievements}
+        totalCoins={currentAchievements.reduce(
+          (sum, ach) => sum + (ach.coinReward || 0),
+          0,
+        )}
+      />
+
+      {currentQuiz && (
+        <QuizModal
+          open={showQuizModal}
+          onOpenChange={setShowQuizModal}
+          quiz={currentQuiz}
+          onComplete={(score, correctCount) => {
+            console.log("📝 Quiz completed:", { score, correctCount });
+            setShowQuizModal(false);
+          }}
+        />
+      )}
     </div>
   );
 }

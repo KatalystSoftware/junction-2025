@@ -272,7 +272,6 @@ Ensure:
 Update your application's database configuration to use the PostgreSQL connection:
 
 ```typescript
-
 // Use PostgreSQL connection string
 const connectionString =
   process.env.DATABASE_URL ||

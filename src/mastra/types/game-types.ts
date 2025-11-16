@@ -407,6 +407,7 @@ export interface ConversationThread {
     age: number;
     occupation: string;
     gender: "male" | "female";
+    financialProfile: CharacterFinancialProfile;
   };
 }
 
@@ -562,6 +563,7 @@ export interface GameResponse {
     age: number;
     occupation: string;
     gender: "male" | "female";
+    financialProfile: CharacterFinancialProfile;
   };
 
   // For boss help messages (RAG-powered citations and learning materials)

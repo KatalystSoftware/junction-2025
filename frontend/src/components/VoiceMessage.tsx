@@ -48,6 +48,32 @@ export function VoiceMessage({ message }: VoiceMessageProps) {
     };
   }, [message.audioUrl]);
 
+  const getUrgencyIcon = (urgency?: string) => {
+    switch (urgency) {
+      case "urgent":
+        return "⚠️";
+      case "concerned":
+        return "😰";
+      case "excited":
+        return "😊";
+      default:
+        return "🔊";
+    }
+  };
+
+  const getUrgencyColor = (urgency?: string) => {
+    switch (urgency) {
+      case "urgent":
+        return "var(--destructive)";
+      case "concerned":
+        return "var(--chart-3)";
+      case "excited":
+        return "var(--chart-1)";
+      default:
+        return "var(--muted-foreground)";
+    }
+  };
+
   const handlePlayPause = () => {
     if (!audioRef.current) {
       // Fallback to simulation if no audio URL
@@ -207,20 +233,35 @@ export function VoiceMessage({ message }: VoiceMessageProps) {
           })}
         </div>
 
-        {/* Duration */}
-        <span
-          style={{
-            fontFamily: "Inter, sans-serif",
-            fontSize: "var(--text-xs)",
-            fontWeight: "var(--font-weight-medium)",
-            color:
-              message.role === "user"
-                ? "var(--primary-foreground)"
-                : "var(--muted-foreground)",
-          }}
-        >
-          {formatDuration(message.duration || 0)}
-        </span>
+        {/* Urgency Indicator & Duration */}
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          {message.voiceUrgency && message.role === "contact" && (
+            <span
+              className={
+                message.voiceUrgency === "urgent" ? "animate-pulse" : ""
+              }
+              style={{
+                fontSize: "0.9rem",
+                color: getUrgencyColor(message.voiceUrgency),
+              }}
+            >
+              {getUrgencyIcon(message.voiceUrgency)}
+            </span>
+          )}
+          <span
+            style={{
+              fontFamily: "Inter, sans-serif",
+              fontSize: "var(--text-xs)",
+              fontWeight: "var(--font-weight-medium)",
+              color:
+                message.role === "user"
+                  ? "var(--primary-foreground)"
+                  : "var(--muted-foreground)",
+            }}
+          >
+            {formatDuration(message.duration || 0)}
+          </span>
+        </div>
       </div>
 
       {/* Transcript Toggle & Timestamp */}
