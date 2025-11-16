@@ -116,7 +116,7 @@ export function QuizModal({
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent
-          className="max-w-2xl h-[90vh] max-h-[90vh] p-0 flex flex-col gap-0"
+          className="max-w-2xl h-[90vh] max-h-[90vh] p-0 flex flex-col gap-0 overflow-hidden"
           style={{
             backgroundColor: "var(--card)",
             borderColor: "var(--border)",
@@ -141,7 +141,10 @@ export function QuizModal({
             </DialogDescription>
           </DialogHeader>
 
-          <ScrollArea className="flex-1 min-h-0">
+          <ScrollArea 
+            className="flex-1 min-h-0" 
+            style={{ maxHeight: "calc(90vh - 80px)" }}
+          >
             <div className="px-6 py-6 space-y-6">
               {/* Score Display */}
               <div
@@ -196,7 +199,7 @@ export function QuizModal({
                     marginTop: "var(--spacing-2)",
                   }}
                 >
-                  Score: {results.score.toFixed(1)}/10
+                  Score: {Math.round(results.score)}/10
                 </p>
               </div>
 
