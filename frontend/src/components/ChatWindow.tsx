@@ -12,7 +12,6 @@ import {
 import { FollowingEyes } from "./ui/FollowingEyes";
 import {
   Send,
-  MoreVertical,
   Phone,
   Video,
   ArrowLeft,
@@ -708,13 +707,6 @@ export function ChatWindow({
               style={{ borderRadius: "var(--radius-button)" }}
             >
               <Phone className="w-5 h-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              style={{ borderRadius: "var(--radius-button)" }}
-            >
-              <MoreVertical className="w-5 h-5" />
             </Button>
           </div>
         </div>
