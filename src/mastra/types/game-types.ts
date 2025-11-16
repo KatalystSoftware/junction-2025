@@ -710,17 +710,20 @@ export interface AdviceEvaluation {
 }
 
 // ============================================================================
-// LEADERBOARDS & SOCIAL FEATURES
+// GLOBAL LEADERBOARD
 // ============================================================================
 
+/**
+ * Leaderboard entry matching the Postgres schema
+ * Tracks advisor performance for global rankings
+ */
 export interface LeaderboardEntry {
   advisorId: string;
-  advisorName: string;
+  advisorName: string; // AI-sanitized display name
 
   // Core Stats
   reputation: number;
   skillLevel: number;
-  careerTier: number;
   totalSessions: number;
   totalClientsHelped: number;
 
@@ -731,166 +734,36 @@ export interface LeaderboardEntry {
 
   // Performance Metrics
   averageAdviceScore: number;
-  currentStreak: number;
-  bestStreak: number;
   achievementCount: number;
 
-  // Social Metrics
-  trustedRelationships: number;
-  recommendationsReceived: number;
-  casesShared: number;
-  challengesCompleted: number;
-
-  // Rankings
+  // Global Ranking
   globalRank?: number;
-  reputationRank?: number;
-  impactRank?: number;
-  expertiseRank?: number;
+  globalScore: number; // Weighted score for ranking
 
   // Metadata
-  lastUpdated: string;
   firstSessionDate: string;
+  lastUpdated: string;
 }
 
+/**
+ * Leaderboard categories for different ranking views
+ */
 export type LeaderboardCategory =
-  | "global" // Overall ranking
+  | "global" // Overall ranking (weighted score)
   | "reputation" // By reputation score
   | "impact" // By financial impact (savings + debt cleared)
   | "expertise" // By skill level and advice quality
   | "coins" // By advisor coins earned
   | "achievements"; // By achievement count
 
+/**
+ * Leaderboard ranking response
+ */
 export interface LeaderboardRanking {
   category: LeaderboardCategory;
   entries: LeaderboardEntry[];
   lastUpdated: string;
   totalParticipants: number;
-}
-
-export interface CareerTier {
-  tierLevel: number;
-  tierName: string;
-  tierNameFi: string;
-  tierEmoji: string;
-
-  // Requirements
-  minReputation: number;
-  minSkillLevel: number;
-  minClients: number;
-  minSessions: number;
-  minAchievements: number;
-  minSavingsImpact: number;
-
-  // Rewards
-  coinBonus: number;
-  unlockDescription?: string;
-  unlockDescriptionFi?: string;
-}
-
-export type ChallengeType = "weekly" | "monthly" | "special";
-export type ChallengeMetric =
-  | "sessions" // Complete X sessions
-  | "savings" // Help clients save €X
-  | "clients" // Help X new clients
-  | "streak" // Maintain streak of X
-  | "expertise"; // Reach expertise level X in a topic
-
-export type ChallengeDifficulty = "easy" | "medium" | "hard" | "extreme";
-
-export interface CommunityChallenge {
-  id: number;
-  challengeName: string;
-  challengeNameFi: string;
-  challengeDescription: string;
-  challengeDescriptionFi: string;
-  challengeType: ChallengeType;
-
-  // Challenge Parameters
-  metricType: ChallengeMetric;
-  targetValue: number;
-  difficulty: ChallengeDifficulty;
-
-  // Rewards
-  coinReward: number;
-  achievementId?: string;
-  badgeEmoji?: string;
-
-  // Timing
-  startDate: string;
-  endDate: string;
-  isActive: boolean;
-}
-
-export interface ChallengeParticipation {
-  challengeId: number;
-  advisorId: string;
-  currentProgress: number;
-  isCompleted: boolean;
-  completedAt?: string;
-  participantRank?: number;
-}
-
-export interface SharedCase {
-  caseUuid: string;
-  advisorId: string;
-  advisorName: string;
-
-  // Case Details
-  characterName: string;
-  caseTitle: string;
-  caseSummary: string;
-
-  // Consultation Data
-  initialProblem: string;
-  adviceGiven: string;
-  financialImpact: number;
-  adviceQualityScore: number;
-
-  // Session Info
-  sessionDate: string;
-  topicsCovered: FinancialTopic[];
-
-  // Social Engagement
-  viewsCount: number;
-  likesCount: number;
-  commentsCount: number;
-
-  // Privacy
-  isPublic: boolean;
-  anonymizeCharacter: boolean;
-
-  createdAt: string;
-}
-
-export type CaseReactionType = "like" | "helpful" | "insightful";
-
-export interface CaseReaction {
-  caseUuid: string;
-  reactorAdvisorId: string;
-  reactionType: CaseReactionType;
-  createdAt: string;
-}
-
-export interface CaseComment {
-  id: number;
-  caseUuid: string;
-  commenterAdvisorId: string;
-  commenterName: string;
-  commentText: string;
-  createdAt: string;
-}
-
-export interface WeeklyRanking {
-  weekStartDate: string;
-  weekEndDate: string;
-  advisorId: string;
-  globalRank?: number;
-  reputationRank?: number;
-  impactRank?: number;
-  reputation: number;
-  skillLevel: number;
-  totalSessions: number;
-  lifetimeSavingsGenerated: number;
 }
 
 // ============================================================================

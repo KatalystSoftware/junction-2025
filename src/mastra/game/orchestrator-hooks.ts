@@ -1,38 +1,26 @@
 /**
  * Orchestrator Hooks
- * Integration points for leaderboards, challenges, and social features
+ * Integration points for global leaderboard
  */
 
-import type { AdvisorState, GameResponse } from "../types/game-types.ts";
+import type { AdvisorState, GameResponse, LeaderboardCategory } from "../types/game-types.ts";
 import { leaderboardService } from "../persistence/leaderboard-service.ts";
-import { checkTierAdvancement, applyTierAdvancement } from "./career-progression.ts";
-import {
-  updateChallengeProgress,
-  getNewlyCompletedChallenges,
-  awardChallengeRewards,
-  initializeChallenges,
-} from "./challenge-manager.ts";
 
 /**
- * Initialize social features on game start
+ * Initialize leaderboard system on game start
  */
-export async function initializeSocialFeatures(): Promise<void> {
+export async function initializeLeaderboard(): Promise<void> {
   try {
-    // Initialize database
     await leaderboardService.initialize();
-
-    // Initialize challenges
-    await initializeChallenges();
-
-    console.log("✅ Social features initialized");
+    console.log("✅ Leaderboard initialized");
   } catch (error) {
-    console.error("❌ Failed to initialize social features:", error);
+    console.error("❌ Failed to initialize leaderboard:", error);
   }
 }
 
 /**
  * Hook: After session completion
- * Updates leaderboards, checks tier advancement, updates challenge progress
+ * Updates leaderboard with latest advisor stats
  */
 export async function afterSessionComplete(
   advisorState: AdvisorState,
@@ -40,76 +28,18 @@ export async function afterSessionComplete(
   gameResponse: GameResponse
 ): Promise<GameResponse> {
   try {
-    let updatedState = { ...advisorState };
+    // Update leaderboard entry
+    await leaderboardService.upsertLeaderboardEntry(advisorState, advisorName);
 
-    // 1. Check for tier advancement
-    const tierAdvancement = await checkTierAdvancement(updatedState);
-    if (tierAdvancement) {
-      updatedState = applyTierAdvancement(updatedState, tierAdvancement);
-
-      // Add tier advancement to milestones
-      if (!gameResponse.milestonesAchieved) {
-        gameResponse.milestonesAchieved = [];
-      }
-      gameResponse.milestonesAchieved.push(tierAdvancement.milestone);
-
-      console.log(
-        `🎉 Tier advancement: ${tierAdvancement.previousTier.tierName} → ${tierAdvancement.newTier.tierName}`
-      );
-    }
-
-    // 2. Get previous challenge participations
-    const previousParticipations = await leaderboardService.getAdvisorChallenges(
-      updatedState.advisorId
-    );
-
-    // 3. Update challenge progress
-    await updateChallengeProgress(updatedState);
-
-    // 4. Check for newly completed challenges
-    const newlyCompleted = await getNewlyCompletedChallenges(
-      updatedState,
-      previousParticipations
-    );
-
-    if (newlyCompleted.length > 0) {
-      updatedState = awardChallengeRewards(updatedState, newlyCompleted);
-
-      // Add challenge completion to achievements
-      for (const challenge of newlyCompleted) {
-        console.log(`🎯 Challenge completed: ${challenge.challengeName}`);
-
-        // You could add a notification to the game response here
-        if (!gameResponse.milestonesAchieved) {
-          gameResponse.milestonesAchieved = [];
-        }
-
-        gameResponse.milestonesAchieved.push({
-          id: `challenge_${challenge.id}`,
-          title: `${challenge.badgeEmoji} Challenge Complete!`,
-          message: `${challenge.challengeName} - Earned ${challenge.coinReward} coins!`,
-          icon: challenge.badgeEmoji || "🎯",
-          type: "achievement",
-        });
-      }
-    }
-
-    // 5. Update leaderboard entry
-    await leaderboardService.upsertLeaderboardEntry(updatedState, advisorName);
-
-    // 6. Recalculate rankings (do this periodically, not every session)
-    // Only recalculate every 10 sessions to reduce DB load
-    if (updatedState.totalSessions % 10 === 0) {
+    // Recalculate rankings periodically to reduce DB load
+    // Only recalculate every 10 sessions
+    if (advisorState.totalSessions % 10 === 0) {
       await leaderboardService.recalculateRankings();
     }
 
-    // Return updated response with modified state
-    return {
-      ...gameResponse,
-      stateUpdate: updatedState,
-    };
+    return gameResponse;
   } catch (error) {
-    console.error("❌ Failed to update social features after session:", error);
+    console.error("❌ Failed to update leaderboard after session:", error);
     // Return original response if something fails
     return gameResponse;
   }
@@ -120,7 +50,7 @@ export async function afterSessionComplete(
  */
 export async function getLeaderboardData(
   advisorId: string,
-  category: "global" | "reputation" | "impact" | "expertise" | "coins" | "achievements" = "global"
+  category: LeaderboardCategory = "global"
 ) {
   try {
     const leaderboard = await leaderboardService.getLeaderboard(category, 100);
@@ -141,33 +71,7 @@ export async function getLeaderboardData(
 }
 
 /**
- * Get career progression data for UI display
- */
-export async function getCareerProgressionData(advisorState: AdvisorState) {
-  try {
-    const { getTierProgressBreakdown } = await import("./career-progression.ts");
-    return await getTierProgressBreakdown(advisorState);
-  } catch (error) {
-    console.error("❌ Failed to get career progression data:", error);
-    return null;
-  }
-}
-
-/**
- * Get challenges data for UI display
- */
-export async function getChallengesData(advisorState: AdvisorState) {
-  try {
-    const { getAdvisorChallengesWithProgress } = await import("./challenge-manager.ts");
-    return await getAdvisorChallengesWithProgress(advisorState);
-  } catch (error) {
-    console.error("❌ Failed to get challenges data:", error);
-    return [];
-  }
-}
-
-/**
- * Hook: On game initialization
+ * Hook: On advisor initialization
  * Set up advisor in leaderboard system
  */
 export async function onAdvisorInit(
@@ -177,10 +81,7 @@ export async function onAdvisorInit(
   try {
     // Create or update leaderboard entry
     await leaderboardService.upsertLeaderboardEntry(advisorState, advisorName);
-
-    // Update challenge progress (in case returning player)
-    await updateChallengeProgress(advisorState);
   } catch (error) {
-    console.error("❌ Failed to initialize advisor in social features:", error);
+    console.error("❌ Failed to initialize advisor in leaderboard:", error);
   }
 }
