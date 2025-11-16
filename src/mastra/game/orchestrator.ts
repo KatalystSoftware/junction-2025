@@ -1156,6 +1156,12 @@ export async function handleAdvisorResponse(
       scenarioId: scenario.scenarioId,
     });
 
+    // Persist character updates to pool manager (to ensure duplicate prevention works)
+    characterPool.updateCharacter(character.characterId, {
+      completedScenarios: character.completedScenarios,
+      adviceHistory: character.adviceHistory,
+    });
+
     // Apply time progression (game months pass)
     const monthsPassed = getTimeAccelerationForStage(
       character.financialState.currentStage,

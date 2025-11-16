@@ -1,4 +1,4 @@
-import { toClientSafeAdvisorState } from "./routes.ts";
+import { ensureAdvisorId, toClientSafeAdvisorState } from "./routes.ts";
 import type { AdvisorState } from "../types/game-types.ts";
 
 describe("toClientSafeAdvisorState", () => {
@@ -40,5 +40,44 @@ describe("toClientSafeAdvisorState", () => {
     expect(clientState.advisorId).toBe("test-advisor-123");
     expect(clientState.advisorName).toBe("Test Advisor");
   });
-});
 
+  test("ensureAdvisorId backfills missing advisorId from session", () => {
+    const sessionId = "session-abc";
+    const legacyState: AdvisorState = {
+      advisorId: "",
+      advisorName: "Legacy Advisor",
+      reputation: 50,
+      skillLevel: 1,
+      specializations: [],
+      topicsExpertise: {} as any,
+      sessionHistory: [],
+      totalClientsHelped: 0,
+      activeClients: [],
+      activeThreads: {},
+      godBossRelationship: 5,
+      learningMaterials: [],
+      totalSessions: 0,
+      lastReviewSession: 0,
+      hasCompletedOnboarding: false,
+      currentStreak: 0,
+      lastStreakCheckSession: 0,
+      advisorCoins: 0,
+      lifetimeSavingsGenerated: 0,
+      lifetimeDebtCleared: 0,
+      currentGoal: null,
+      achievementsUnlocked: [],
+      careerTier: 1,
+      currentGameMonth: "2025-01",
+      simulatedMonthsPassed: 0,
+      isFired: false,
+      fireReason: undefined,
+      criticalInterventionsForcedThrough: 0,
+      financialImpactHistory: [],
+    };
+
+    const fixed = ensureAdvisorId(legacyState, sessionId);
+
+    expect(fixed.advisorId).toBe(sessionId);
+    expect(fixed.advisorName).toBe("Legacy Advisor");
+  });
+});

@@ -136,12 +136,9 @@ export function PlayerStatsModal({
       return sum + (session.duration || 0);
     }, 0) || 0;
 
-  // Calculate level and XP from skillLevel (0-10 scale)
+  // Calculate level from skillLevel (0-10 scale)
   const skillLevel = advisorState?.skillLevel || 0;
   const level = Math.floor(skillLevel) + 1; // Convert 0-10 to 1-11
-  const xpProgress = Math.round((skillLevel % 1) * 100); // Get decimal part as percentage
-  const xpForNextLevel = 100;
-  const xpToNextLevel = xpForNextLevel - xpProgress;
 
   // Money saved
   const moneySaved = Math.round(advisorState?.lifetimeSavingsGenerated || 0);
@@ -407,49 +404,10 @@ export function PlayerStatsModal({
                         color: "var(--muted-foreground)",
                       }}
                     >
-                      Level {level} • {xpProgress}/{xpForNextLevel} XP
+                      Level {level}
                     </p>
                   </div>
 
-                  {/* Level Progress Bar */}
-                  <div className="w-full max-w-md">
-                    <div className="flex justify-between mb-2">
-                      <span
-                        style={{
-                          fontFamily: "Inter, sans-serif",
-                          fontSize: "var(--text-xs)",
-                          color: "var(--muted-foreground)",
-                        }}
-                      >
-                        Current Level
-                      </span>
-                      <span
-                        style={{
-                          fontFamily: "Inter, sans-serif",
-                          fontSize: "var(--text-xs)",
-                          fontWeight: "var(--font-weight-semibold)",
-                          color: "var(--primary)",
-                        }}
-                      >
-                        {xpToNextLevel} XP to Level {level + 1}
-                      </span>
-                    </div>
-                    <div
-                      className="w-full h-3 rounded-full overflow-hidden"
-                      style={{
-                        backgroundColor: "var(--muted)",
-                        filter: "brightness(0.7)",
-                      }}
-                    >
-                      <div
-                        className="h-full transition-all duration-300"
-                        style={{
-                          width: `${xpProgress}%`,
-                          backgroundColor: "var(--primary)",
-                        }}
-                      />
-                    </div>
-                  </div>
                 </div>
 
                 {/* Stats Grid */}

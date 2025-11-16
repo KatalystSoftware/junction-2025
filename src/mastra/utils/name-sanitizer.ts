@@ -36,8 +36,12 @@ export async function sanitizePlayerName(rawName: string): Promise<string> {
 
   // Use AI to detect inappropriate content
   try {
+    const { google } = await import("@ai-sdk/google");
+    const modelName = getAgentModel();
+    const model = modelName.replace(/^google\//, "");
+
     const result = await generateText({
-      model: getAgentModel(),
+      model: google(model),
       prompt: `You are a content moderation system. Analyze the following player name and determine if it's appropriate for a financial education game.
 
 Player name: "${trimmedName}"

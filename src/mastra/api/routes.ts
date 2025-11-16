@@ -129,6 +129,16 @@ export function toClientSafeAdvisorState(
   };
 }
 
+export function ensureAdvisorId(
+  state: AdvisorState,
+  sessionId: string,
+): AdvisorState {
+  if (state.advisorId) {
+    return state;
+  }
+  return { ...state, advisorId: sessionId };
+}
+
 /**
  * Client-safe version of GameResponse - sanitizes nested state
  */
@@ -311,6 +321,17 @@ app.post("/init", async (c) => {
             metadataMap,
           );
           console.log("💾 Saved updated threadMetadata with fallback choices");
+        }
+
+        if (!advisorState.advisorId) {
+          advisorState = ensureAdvisorId(advisorState, sessionId);
+          await saveSession(
+            sessionId,
+            advisorState,
+            savedSession.threadHistories,
+            savedSession.threadMetadata,
+          );
+          console.log("💾 Backfilled advisorId for legacy session");
         }
 
         // Don't save - we just loaded this data, don't overwrite it
@@ -499,11 +520,13 @@ app.post("/start-consultation", async (c) => {
   try {
     const {
       sessionId,
-      advisorState,
+      advisorState: requestAdvisorState,
       threadHistories,
       threadMetadata,
       userLanguage,
     } = await c.req.json<StartConsultationRequest>();
+
+    const advisorState = ensureAdvisorId(requestAdvisorState, sessionId);
 
     console.log(
       `🎬 Starting consultation for session: ${sessionId.substring(0, 8)}... (language: ${userLanguage || "en"})`,
@@ -730,12 +753,14 @@ app.post("/send-message", async (c) => {
       sessionId,
       threadId,
       message,
-      advisorState,
+      advisorState: requestAdvisorState,
       conversationHistory,
       threadHistories,
       threadMetadata,
       userLanguage,
     } = await c.req.json<SendMessageRequest>();
+
+    let advisorState = ensureAdvisorId(requestAdvisorState, sessionId);
 
     console.log(
       `💬 Message in thread ${threadId.substring(0, 8)}... from session ${sessionId.substring(0, 8)}... (language: ${userLanguage || "en"})`,

@@ -194,13 +194,11 @@ export function ConsultationResultsModal({
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea 
-          className="flex-1 min-h-0" 
-          style={{ maxHeight: "calc(90vh - 80px)" }}
-        >
-          <div className="px-6 py-4 space-y-5 pb-6">
-            {/* Your Advice Section */}
-            {adviceGiven && (
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <ScrollArea className="h-full">
+            <div className="px-6 py-4 space-y-5 pb-6">
+              {/* Your Advice Section */}
+              {adviceGiven && (
               <div>
                 <h3
                   className="flex items-center gap-2 mb-3"
@@ -1103,8 +1101,9 @@ export function ConsultationResultsModal({
                 </p>
               </div>
             )}
-          </div>
-        </ScrollArea>
+            </div>
+          </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );

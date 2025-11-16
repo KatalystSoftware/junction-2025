@@ -920,8 +920,7 @@ export function ChatWindow({
       {isInputFocused &&
         inputValue.length === 0 &&
         multipleChoiceOptions.length > 0 &&
-        messages.length > 0 &&
-        messages[messages.length - 1].role === "contact" && (
+        !isThreadResolved && (
           <div
             className="absolute bottom-24 left-4 right-4 px-2 py-3 transition-all duration-300 animate-in slide-in-from-bottom-2"
             onMouseDown={(e) => e.preventDefault()} // Prevent input blur when clicking anywhere in the panel

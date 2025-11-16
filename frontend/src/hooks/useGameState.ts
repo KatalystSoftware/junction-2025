@@ -29,6 +29,19 @@ export function useGameState() {
       try {
         const result = await gameApi.initSession(sessionId);
         clearTimeout(timeoutId);
+
+        // Extract advice choices from threadMetadata into adviceChoicesByThread
+        if (result.threadMetadata) {
+          const adviceChoicesByThread: Record<string, any[]> = {};
+          for (const [threadId, metadata] of Object.entries(result.threadMetadata)) {
+            if ((metadata as any).adviceChoices && (metadata as any).adviceChoices.length > 0) {
+              adviceChoicesByThread[threadId] = (metadata as any).adviceChoices;
+              console.log(`🎯 Extracted ${(metadata as any).adviceChoices.length} advice choices for thread ${threadId}`);
+            }
+          }
+          result.adviceChoicesByThread = adviceChoicesByThread;
+        }
+
         return result;
       } catch (error) {
         clearTimeout(timeoutId);
@@ -62,12 +75,25 @@ export function useGameState() {
           adviceChoicesByThread: old?.adviceChoicesByThread || {},
         };
 
-        // Store advice choices for this thread if provided
+        // Extract advice choices from threadMetadata
+        if (response.threadMetadata) {
+          for (const [threadId, metadata] of Object.entries(response.threadMetadata)) {
+            if ((metadata as any).adviceChoices && (metadata as any).adviceChoices.length > 0) {
+              updated.adviceChoicesByThread[threadId] = (metadata as any).adviceChoices;
+              console.log(
+                "🎯 Extracted advice choices for thread",
+                threadId,
+                ":",
+                (metadata as any).adviceChoices.length,
+                "choices",
+              );
+            }
+          }
+        }
+
+        // Also check for direct adviceChoices in response (backward compatibility)
         if (response.adviceChoices && response.threadId) {
-          updated.adviceChoicesByThread = {
-            ...updated.adviceChoicesByThread,
-            [response.threadId]: response.adviceChoices,
-          };
+          updated.adviceChoicesByThread[response.threadId] = response.adviceChoices;
           console.log(
             "🎯 Saved advice choices for thread",
             response.threadId,
@@ -147,12 +173,25 @@ export function useGameState() {
           adviceChoicesByThread: old?.adviceChoicesByThread || {},
         };
 
-        // Store advice choices for this thread if provided
+        // Extract advice choices from threadMetadata
+        if (response.threadMetadata) {
+          for (const [threadId, metadata] of Object.entries(response.threadMetadata)) {
+            if ((metadata as any).adviceChoices && (metadata as any).adviceChoices.length > 0) {
+              updated.adviceChoicesByThread[threadId] = (metadata as any).adviceChoices;
+              console.log(
+                "🎯 Extracted advice choices for thread",
+                threadId,
+                ":",
+                (metadata as any).adviceChoices.length,
+                "choices",
+              );
+            }
+          }
+        }
+
+        // Also check for direct adviceChoices in response (backward compatibility)
         if (response.adviceChoices && response.threadId) {
-          updated.adviceChoicesByThread = {
-            ...updated.adviceChoicesByThread,
-            [response.threadId]: response.adviceChoices,
-          };
+          updated.adviceChoicesByThread[response.threadId] = response.adviceChoices;
           console.log(
             "🎯 Saved advice choices for thread",
             response.threadId,

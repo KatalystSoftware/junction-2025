@@ -41,12 +41,12 @@ export function checkForIntervention(
   };
 
   // Quick length check - too short advice is usually bad
-  if (advice.trim().length < 30) {
+  if (advice.trim().length < 20) {
     return {
       shouldIntervene: true,
       severity: "critical",
       reason:
-        "Your advice is WAY too short! The client needs actual guidance, not a one-liner.",
+        "Your advice is too short. The client needs actual guidance, not a one-liner.",
       correctApproach: `Give at least 2-3 specific, actionable steps. Explain WHY they should do each thing. This is about ${scenario.topic}, so be thorough.`,
       topic: scenario.topic,
     };
@@ -74,7 +74,7 @@ export function checkForIntervention(
 
   // Skill-based thresholds (stricter for higher skill levels)
   const coverageThreshold =
-    advisorSkillLevel < 3 ? 0.3 : advisorSkillLevel < 7 ? 0.4 : 0.5;
+    advisorSkillLevel < 3 ? 0.25 : advisorSkillLevel < 7 ? 0.35 : 0.45;
 
   if (idealCoverage < coverageThreshold) {
     return {

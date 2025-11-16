@@ -87,11 +87,9 @@ export function ChatSidebar({
     }
   }, []);
 
-  // Calculate level and XP from advisorState
+  // Calculate level from advisorState
   const skillLevel = advisorState?.skillLevel || 0;
   const level = Math.floor(skillLevel) + 1; // Convert 0-10 to 1-11
-  const xpProgress = Math.round((skillLevel % 1) * 100); // Get decimal part as percentage
-  const xpForNextLevel = 100;
 
   // Level-up detection
   const previousLevelRef = useRef(level);
