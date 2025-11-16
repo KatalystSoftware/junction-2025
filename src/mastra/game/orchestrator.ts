@@ -2077,6 +2077,11 @@ async function triggerGodBossReview(
     throw new Error("God/Boss tool not found");
   }
 
+  // CRITICAL: Update lastReviewSession BEFORE attempting review
+  // This prevents infinite loops if the review fails
+  const previousLastReviewSession = advisorState.lastReviewSession;
+  advisorState.lastReviewSession = advisorState.totalSessions;
+
   let review: any;
   try {
     review = await godBossTool.execute({
@@ -2088,6 +2093,7 @@ async function triggerGodBossReview(
     console.error("God/Boss review failed:", error);
 
     // Fallback: use generic positive review
+    // NOTE: lastReviewSession is already updated to prevent loops
     review = {
       overallScore: 6,
       strengthsIdentified: ["You're making progress"],
@@ -2137,8 +2143,8 @@ async function triggerGodBossReview(
     });
   }
 
-  // Update last review session
-  advisorState.lastReviewSession = advisorState.totalSessions;
+  // NOTE: lastReviewSession was already updated at the start of this function
+  // to prevent infinite loops if the review fails
 
   // Format review message for boss chat (text-based, not voice call)
   const reviewMessage = formatBossReviewMessage(review);

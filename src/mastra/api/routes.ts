@@ -306,7 +306,18 @@ app.post("/init", async (c) => {
 
       // Try to load existing session
       if (sessionId) {
-      const savedSession = await loadSession(sessionId);
+      let savedSession;
+      try {
+        savedSession = await loadSession(sessionId);
+      } catch (error) {
+        // CRITICAL: If database is down, don't create a new session!
+        if ((error as any).name === "SessionLoadError") {
+          console.error(`❌ Database error while loading session - aborting /init`);
+          throw new Error("Database unavailable - please try again");
+        }
+        throw error;
+      }
+
       if (savedSession) {
         console.log(
           `📂 Loaded existing session: ${sessionId.substring(0, 8)}...`,
@@ -706,15 +717,21 @@ app.post("/start-consultation", async (c) => {
 
     // 🔒 LOCK: All session operations must be serialized to prevent race conditions
     const result = await withSessionLock(sessionId, async () => {
-      const advisorState = ensureAdvisorId(requestAdvisorState, sessionId);
-
-      // Load thread histories from disk (before starting consultation)
+      // CRITICAL: Load FRESH state from disk - NEVER trust client state!
+      // This prevents race conditions where client has stale totalSessions, coins, etc.
       const savedSession = await loadSession(sessionId);
       const historiesMap = savedSession?.threadHistories || new Map();
       const metadataMap = savedSession?.threadMetadata || new Map();
 
+      // Use server state if available, otherwise use client state (for new sessions)
+      let advisorState = savedSession?.advisorState || requestAdvisorState;
+      advisorState = ensureAdvisorId(advisorState, sessionId);
+
       console.log(
         `📂 Loaded ${historiesMap.size} thread histories, ${metadataMap.size} metadata from server`,
+      );
+      console.log(
+        `📊 Using ${savedSession ? "SERVER" : "CLIENT"} advisorState (totalSessions: ${advisorState.totalSessions})`,
       );
 
       // Call orchestrator to get next character/scenario
@@ -957,17 +974,25 @@ app.post("/send-message", async (c) => {
 
     // 🔒 LOCK: All session operations must be serialized to prevent race conditions
     const result = await withSessionLock(sessionId, async () => {
-      // ⚠️ IMPORTANT: We need advisorState from client (it's more up-to-date)
-      // but threadHistories/threadMetadata from server (to prevent race conditions)
-      let advisorState = ensureAdvisorId(requestAdvisorState, sessionId);
-
-      // Load thread histories from disk
+      // CRITICAL: Load FRESH state from disk - NEVER trust client state!
+      // Client state can be stale if multiple requests are in flight
+      // This prevents race conditions where:
+      // - Client sends message with totalSessions=5
+      // - Simultaneously starts consultation with totalSessions=5
+      // - Both increment to 6, last write wins, counter goes backwards!
       const savedSession = await loadSession(sessionId);
       const historiesMap = savedSession?.threadHistories || new Map();
       const metadataMap = savedSession?.threadMetadata || new Map();
 
+      // Use server state if available, otherwise use client state (shouldn't happen)
+      let advisorState = savedSession?.advisorState || requestAdvisorState;
+      advisorState = ensureAdvisorId(advisorState, sessionId);
+
       console.log(
         `📂 Loaded ${historiesMap.size} thread histories, ${metadataMap.size} metadata from server`,
+      );
+      console.log(
+        `📊 Using ${savedSession ? "SERVER" : "CLIENT"} advisorState (totalSessions: ${advisorState.totalSessions})`,
       );
 
       let gameResponse;

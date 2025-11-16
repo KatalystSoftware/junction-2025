@@ -450,6 +450,18 @@ export class CharacterPoolManager {
       | "bad_advice_or_not_followed"
       | "mixed_results",
   ): void {
+    // Check if this follow-up is already scheduled
+    const alreadyScheduled = this.pendingFollowUps.some(
+      (f) => f.characterId === characterId && f.scenarioId === scenarioId,
+    );
+
+    if (alreadyScheduled) {
+      console.log(
+        `⚠️ Follow-up ${scenarioId} for character ${characterId} is already scheduled. Skipping duplicate.`,
+      );
+      return;
+    }
+
     this.pendingFollowUps.push({
       characterId,
       scenarioId,
@@ -680,10 +692,35 @@ export class CharacterPoolManager {
     const character = this.characters.get(followUp.characterId);
     const scenario = this.scenarios.get(followUp.scenarioId);
 
-    if (!character || !scenario) return null;
+    if (!character || !scenario) {
+      // Character or scenario not found - remove from queue and try next
+      this.removeFollowUp(followUp.scenarioId);
+      return this.getReturningCharacter(currentSessionNumber, advisorState);
+    }
+
+    // CRITICAL: Check if this scenario was already completed
+    // This prevents the same scenario from being given twice
+    const completedScenarioIds = new Set(
+      (character.completedScenarios || []).map((cs) => cs.scenarioId),
+    );
+
+    if (completedScenarioIds.has(scenario.scenarioId)) {
+      // This follow-up was already completed - skip it
+      console.log(
+        `⚠️ Follow-up scenario "${scenario.scenarioId}" for ${character.name} was already completed. Skipping and checking next follow-up.`,
+      );
+      this.removeFollowUp(followUp.scenarioId);
+
+      // Recursively check for next available follow-up
+      return this.getReturningCharacter(currentSessionNumber, advisorState);
+    }
 
     // Remove from pending queue
     this.removeFollowUp(followUp.scenarioId);
+
+    console.log(
+      `✅ Returning character ${character.name} with follow-up scenario "${scenario.scenarioId}"`,
+    );
 
     return { character, scenario };
   }

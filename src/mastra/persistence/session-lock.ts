@@ -8,21 +8,46 @@
 // Map of sessionId -> pending save promise
 const lockMap = new Map<string, Promise<void>>();
 
+// Lock timeout in milliseconds (60 seconds)
+const LOCK_TIMEOUT_MS = 60000;
+
 /**
  * Execute a session operation with exclusive lock
  * Ensures only one operation runs at a time per session
+ * Throws error if lock cannot be acquired within timeout period
  */
 export async function withSessionLock<T>(
   sessionId: string,
   operation: () => Promise<T>,
 ): Promise<T> {
-  // Wait for any pending operation on this session
+  // Wait for any pending operation on this session (with timeout)
   const existingLock = lockMap.get(sessionId);
   if (existingLock) {
     console.log(`⏳ Waiting for lock on session ${sessionId.substring(0, 8)}...`);
-    await existingLock.catch(() => {
-      // Ignore errors from previous operation
+
+    // Create timeout promise
+    const timeout = new Promise<void>((_, reject) => {
+      setTimeout(() => {
+        reject(new Error(`Lock timeout: Previous operation on session ${sessionId.substring(0, 8)} took too long`));
+      }, LOCK_TIMEOUT_MS);
     });
+
+    try {
+      // Race between existing lock completion and timeout
+      await Promise.race([
+        existingLock.catch(() => {
+          // Ignore errors from previous operation
+        }),
+        timeout,
+      ]);
+    } catch (error) {
+      // Timeout occurred - clear the stuck lock
+      if (lockMap.get(sessionId) === existingLock) {
+        lockMap.delete(sessionId);
+        console.error(`⚠️ Cleared stuck lock for session ${sessionId.substring(0, 8)}`);
+      }
+      throw error;
+    }
   }
 
   // Create new lock for this operation

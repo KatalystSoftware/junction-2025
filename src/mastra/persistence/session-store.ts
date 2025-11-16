@@ -113,7 +113,7 @@ export async function saveSession(
     string,
     Array<{ role: "user" | "assistant"; content: string }>
   >,
-  threadMetadata?: Map<string, ThreadMetadata>,
+  threadMetadata?: Map<string, ThreadMetadata>
 ): Promise<void> {
   // Prepare metadata for quick lookups
   const metadata: Record<string, unknown> = {
@@ -133,7 +133,7 @@ export async function saveSession(
 
   // Log counts instead of full content to reduce noise
   console.log(
-    `💾 Saving ${Object.keys(threadHistoriesObject).length} threads and ${Object.keys(threadMetadataObject).length} metadata entries`,
+    `💾 Saving ${Object.keys(threadHistoriesObject).length} threads and ${Object.keys(threadMetadataObject).length} metadata entries`
   );
 
   const sessionData = {
@@ -151,34 +151,63 @@ export async function saveSession(
       workingMemory: JSON.stringify(sessionData),
       metadata,
     });
-  } catch {
-    // If update fails, create new resource
-    const now = new Date();
-    await storage.saveResource({
-      resource: {
-        id: sessionId,
-        workingMemory: JSON.stringify(sessionData),
-        metadata,
-        createdAt: now,
-        updatedAt: now,
-      },
-    });
+    console.log(`💾 Session updated: ${sessionId.substring(0, 8)}...`);
+  } catch (updateError) {
+    // If update fails, try to create new resource
+    console.log(
+      `⚠️ Update failed for ${sessionId.substring(0, 8)}, trying create...`
+    );
+    try {
+      const now = new Date();
+      await storage.saveResource({
+        resource: {
+          id: sessionId,
+          workingMemory: JSON.stringify(sessionData),
+          metadata,
+          createdAt: now,
+          updatedAt: now,
+        },
+      });
+      console.log(`💾 Session created: ${sessionId.substring(0, 8)}...`);
+    } catch (createError) {
+      // CRITICAL: Both update and create failed - throw error
+      console.error(
+        `❌ CRITICAL: Failed to save session ${sessionId.substring(0, 8)}:`,
+        {
+          updateError,
+          createError,
+        }
+      );
+      throw new Error(
+        `Failed to save session ${sessionId.substring(0, 8)} - data may be lost. Please try again.`
+      );
+    }
   }
-
-  console.log(`💾 Session saved: ${sessionId.substring(0, 8)}...`);
 }
 
 /**
  * Load a previously saved game session
  */
+/**
+ * Custom error for session load failures
+ * Allows callers to distinguish between "not found" and "database error"
+ */
+export class SessionLoadError extends Error {
+  constructor(message: string, cause: unknown, isNotFound: boolean) {
+    super(message);
+    this.name = "SessionLoadError";
+  }
+}
+
 export async function loadSession(
-  sessionId: string,
+  sessionId: string
 ): Promise<SavedSession | null> {
   try {
     // Query mastra_resources table
     const resource = await storage.getResourceById({ resourceId: sessionId });
 
     if (!resource || !resource.workingMemory) {
+      // Session legitimately doesn't exist - this is OK
       return null;
     }
 
@@ -187,11 +216,11 @@ export async function loadSession(
 
     console.log(
       `📖 Raw sessionData.threadHistories:`,
-      sessionData.threadHistories,
+      sessionData.threadHistories
     );
     console.log(
       `📖 Raw sessionData.threadMetadata:`,
-      sessionData.threadMetadata,
+      sessionData.threadMetadata
     );
 
     // Convert thread histories back to Map
@@ -202,7 +231,7 @@ export async function loadSession(
 
     // Convert thread metadata back to Map
     const threadMetadata = new Map<string, ThreadMetadata>(
-      Object.entries(sessionData.threadMetadata || {}),
+      Object.entries(sessionData.threadMetadata || {})
     );
 
     console.log(`📖 Converted threadHistories Map size:`, threadHistories.size);
@@ -216,7 +245,34 @@ export async function loadSession(
       savedAt: sessionData.savedAt,
     };
   } catch (error) {
+    // CRITICAL: Distinguish between "not found" and "database error"
     console.error(`❌ Failed to load session ${sessionId}:`, error);
+
+    // Check if this is a database connectivity error
+    const errorMessage =
+      error instanceof Error
+        ? error.message.toLowerCase()
+        : String(error).toLowerCase();
+    const isDatabaseError =
+      errorMessage.includes("connection") ||
+      errorMessage.includes("timeout") ||
+      errorMessage.includes("econnrefused") ||
+      errorMessage.includes("database") ||
+      errorMessage.includes("sqlite");
+
+    if (isDatabaseError) {
+      // This is a database error - throw it so caller knows DB is down
+      throw new SessionLoadError(
+        `Database error while loading session ${sessionId.substring(0, 8)}`,
+        error,
+        false
+      );
+    }
+
+    // Otherwise, treat as "not found" (JSON parse error, corrupted data, etc.)
+    console.warn(
+      `⚠️ Session ${sessionId.substring(0, 8)} found but could not be parsed - treating as not found`
+    );
     return null;
   }
 }
