@@ -950,6 +950,37 @@ app.get("/audio/:audioId", async (c) => {
   }
 });
 
+// ============================================================================
+// ROUTE 7: Get Analytics Dashboard
+// ============================================================================
+
+app.get("/analytics/:sessionId", async (c) => {
+  try {
+    const sessionId = c.req.param("sessionId");
+
+    console.log(
+      `📊 Getting analytics for session: ${sessionId.substring(0, 8)}...`,
+    );
+
+    const savedSession = await loadSession(sessionId);
+    if (!savedSession) {
+      return c.json({ error: "Session not found" }, 404);
+    }
+
+    // Dynamically import analytics service
+    const { getAnalyticsDashboard } = await import(
+      "../analytics/analytics-service.ts"
+    );
+
+    const dashboard = getAnalyticsDashboard(savedSession.advisorState);
+
+    return c.json(dashboard);
+  } catch (error) {
+    console.error("❌ Error in /analytics/:sessionId:", error);
+    return c.json({ error: "Failed to get analytics" }, 500);
+  }
+});
+
 // Export both the app and its type for RPC
 export { app as gameRoutes };
 export type GameApiType = typeof app;
