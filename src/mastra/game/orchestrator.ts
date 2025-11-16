@@ -40,6 +40,7 @@ import {
   applyLifeEvent,
   getEventDialogueHook,
 } from "./life-events.ts";
+import { afterSessionComplete } from "./orchestrator-hooks.ts";
 import type {
   AdvisorState,
   GameMasterDecision,
@@ -1432,6 +1433,18 @@ export async function handleAdvisorResponse(
     response.interventionMessage = interventionMessage;
   }
 
+  // Update leaderboard if session completed
+  if (characterResponse.conversationEnding) {
+    try {
+      const advisorName = `Player ${advisorState.advisorId.substring(0, 8)}`;
+      await afterSessionComplete(advisorState, advisorName, response);
+      console.log("✅ Leaderboard updated after session completion");
+    } catch (error) {
+      console.error("❌ Failed to update leaderboard:", error);
+      // Don't fail the whole request if leaderboard update fails
+    }
+  }
+
   return response;
 }
 
@@ -1764,9 +1777,9 @@ export async function handleAdviceChoice(
   // Get active threads for UI
   const activeThreads = getActiveThreads(advisorState);
 
-  // Return immediate financial results with evaluation
-  return {
-    type: "conversation_end",
+  // Prepare response
+  const response = {
+    type: "conversation_end" as const,
     threadId,
     messages: [characterReaction],
     stateUpdate: advisorState,
@@ -1785,6 +1798,18 @@ export async function handleAdviceChoice(
     },
     advisorAdvice: session.playerAdvice,
   };
+
+  // Update leaderboard after session completion
+  try {
+    const advisorName = `Player ${advisorState.advisorId.substring(0, 8)}`;
+    await afterSessionComplete(advisorState, advisorName, response);
+    console.log("✅ Leaderboard updated after session completion");
+  } catch (error) {
+    console.error("❌ Failed to update leaderboard:", error);
+    // Don't fail the whole request if leaderboard update fails
+  }
+
+  return response;
 }
 
 /**
