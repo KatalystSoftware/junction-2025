@@ -49,11 +49,22 @@ export function useGameSession() {
         params.threadMetadata,
       ),
     onSuccess: (response: GameResponse) => {
-      // Update the cached advisor state
-      queryClient.setQueryData(["game-session", sessionId], (old: any) => ({
-        ...old,
-        advisorState: response.stateUpdate,
-      }));
+      // Update ALL state fields from server response (server is source of truth)
+      queryClient.setQueryData(["game-session", sessionId], (old: any) => {
+        const updatedData = {
+          ...old,
+          advisorState: response.stateUpdate,
+          // Server returns updated threadHistories and threadMetadata
+          threadHistories: (response as any).threadHistories || old?.threadHistories,
+          threadMetadata: (response as any).threadMetadata || old?.threadMetadata,
+        };
+        console.log('📊 useGameSession: Updated cache after startConsultation', {
+          hasThreadHistories: !!(response as any).threadHistories,
+          hasThreadMetadata: !!(response as any).threadMetadata,
+          threadCount: Object.keys((response as any).threadHistories || {}).length,
+        });
+        return updatedData;
+      });
     },
   });
 

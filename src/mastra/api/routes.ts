@@ -21,6 +21,7 @@ import {
   generateSessionId,
   type ThreadMetadata,
 } from "../persistence/session-store.ts";
+import { withSessionLock } from "../persistence/session-lock.ts";
 import type {
   AdvisorState,
   GameResponse,
@@ -282,23 +283,29 @@ interface InitResponse {
 app.post("/init", async (c) => {
   try {
     const body = await c.req.json<InitRequest>();
-    let sessionId = body.sessionId;
-    let advisorState: AdvisorState;
-    let isNewSession = false;
-    let threadHistories: Record<
-      string,
-      Array<{
-        role: "user" | "assistant";
-        content: string;
-        isVoice?: boolean;
-        audioUrl?: string;
-        voiceUrgency?: string;
-      }>
-    > = {};
-    let threadMetadata: Record<string, ThreadMetadata> = {};
+    const requestSessionId = body.sessionId;
 
-    // Try to load existing session
-    if (sessionId) {
+    // 🔒 LOCK: /init can modify state (auto-start consultations, save metadata)
+    // Must be locked to prevent race with /send-message and /start-consultation
+    // For new sessions (no sessionId), no lock needed since state doesn't exist yet
+    const executeInit = async () => {
+      let sessionId = requestSessionId;
+      let advisorState: AdvisorState;
+      let isNewSession = false;
+      let threadHistories: Record<
+        string,
+        Array<{
+          role: "user" | "assistant";
+          content: string;
+          isVoice?: boolean;
+          audioUrl?: string;
+          voiceUrgency?: string;
+        }>
+      > = {};
+      let threadMetadata: Record<string, ThreadMetadata> = {};
+
+      // Try to load existing session
+      if (sessionId) {
       const savedSession = await loadSession(sessionId);
       if (savedSession) {
         console.log(
@@ -452,18 +459,79 @@ app.post("/init", async (c) => {
         const historiesMap = new Map(Object.entries(threadHistories));
         const metadataMap = new Map(Object.entries(threadMetadata));
 
-        while (activeThreadCount < 3) {
+        // Add safety limit to prevent infinite loops
+        let attempts = 0;
+        const MAX_AUTO_START_ATTEMPTS = 5;
+
+        while (activeThreadCount < 3 && attempts < MAX_AUTO_START_ATTEMPTS) {
+          attempts++;
+          console.log(
+            `🔄 Auto-start attempt ${attempts}/${MAX_AUTO_START_ATTEMPTS} (current: ${activeThreadCount}/3)`,
+          );
+
           try {
             const gameResponse = await startNewConsultation(
               advisorState.advisorId,
               advisorState,
             );
 
-            if (
+            // Update state regardless of response type
+            advisorState = gameResponse.stateUpdate;
+
+            // Handle different response types
+            if (gameResponse.type === "god_boss_review") {
+              // Boss review was triggered - save message and stop auto-starting
+              console.log(
+                "📞 Boss review triggered during auto-start, stopping auto-start loop",
+              );
+
+              // Save boss review message to threadHistories
+              if (gameResponse.message && gameResponse.threadId === "boss-pinned") {
+                const bossHistory = historiesMap.get("boss-pinned") || [];
+                bossHistory.push({
+                  role: "assistant" as const,
+                  content: gameResponse.message,
+                });
+                historiesMap.set("boss-pinned", bossHistory);
+                console.log("💬 Saved boss review message to boss-pinned thread");
+              }
+
+              autoStartedConsultation = toClientSafeGameResponse(gameResponse);
+              break;
+            } else if (gameResponse.type === "boss_checkin") {
+              // Boss check-in - save message and stop auto-starting
+              console.log(
+                "💬 Boss check-in triggered during auto-start, stopping auto-start loop",
+              );
+
+              // Save boss check-in message to threadHistories
+              if (gameResponse.checkinMessage) {
+                const msg = gameResponse.checkinMessage;
+                const bossHistory = historiesMap.get("boss-pinned") || [];
+                const checkinContent = `${msg.greeting}\n\n${msg.observation}\n\n${msg.mainMessage}\n\n${msg.advice}\n\n${msg.closing}`;
+                bossHistory.push({
+                  role: "assistant" as const,
+                  content: checkinContent,
+                });
+                historiesMap.set("boss-pinned", bossHistory);
+                console.log("💬 Saved boss check-in message to boss-pinned thread");
+              }
+
+              autoStartedConsultation = toClientSafeGameResponse(gameResponse);
+              break;
+            } else if (gameResponse.type === "onboarding") {
+              // Onboarding triggered - shouldn't happen but handle it
+              console.log(
+                "🎓 Onboarding triggered during auto-start, stopping auto-start loop",
+              );
+              autoStartedConsultation = toClientSafeGameResponse(gameResponse);
+              break;
+            } else if (
               gameResponse.type === "character_message" &&
               gameResponse.threadId &&
               gameResponse.messages
             ) {
+              // Character message - process normally
               const threadId = gameResponse.threadId;
               const existingHistory = historiesMap.get(threadId) || [];
 
@@ -503,17 +571,42 @@ app.post("/init", async (c) => {
                 };
                 metadataMap.set(threadId, metadata);
               }
+
+              autoStartedConsultation = toClientSafeGameResponse(gameResponse);
+            } else {
+              // Unknown response type - stop auto-starting
+              console.error(
+                `⚠️ Unexpected response type during auto-start: ${gameResponse.type}`,
+              );
+              break;
             }
 
-            advisorState = gameResponse.stateUpdate;
-            activeThreadCount = Object.values(
+            const newActiveCount = Object.values(
               advisorState.activeThreads,
             ).filter((thread) => thread.status !== "resolved").length;
-            autoStartedConsultation = toClientSafeGameResponse(gameResponse);
+
+            console.log(
+              `✅ Auto-start processed: thread count ${activeThreadCount} → ${newActiveCount}`,
+            );
+
+            if (newActiveCount === activeThreadCount) {
+              console.error(
+                "⚠️ WARNING: Thread count didn't increase! Breaking loop to prevent infinite loop.",
+              );
+              break;
+            }
+
+            activeThreadCount = newActiveCount;
           } catch (error) {
             console.error("❌ Failed to auto-start consultation:", error);
             break;
           }
+        }
+
+        if (attempts >= MAX_AUTO_START_ATTEMPTS) {
+          console.error(
+            `⚠️ Reached max auto-start attempts (${MAX_AUTO_START_ATTEMPTS}). Final count: ${activeThreadCount}/3`,
+          );
         }
 
         await saveSession(
@@ -546,18 +639,26 @@ app.post("/init", async (c) => {
       advisorState = updatedState;
     }
 
-    // Sync latest advisor snapshot to leaderboard
-    await syncLeaderboardSnapshot(advisorState, advisorState.advisorName);
+      // Sync latest advisor snapshot to leaderboard
+      await syncLeaderboardSnapshot(advisorState, advisorState.advisorName);
 
-    return c.json<InitResponse>({
-      sessionId,
-      advisorState: toClientSafeAdvisorState(advisorState),
-      isNewSession,
-      threadHistories,
-      threadMetadata,
-      autoStartedConsultation,
-      followUps: followUps.length > 0 ? followUps : undefined,
-    });
+      return {
+        sessionId,
+        advisorState: toClientSafeAdvisorState(advisorState),
+        isNewSession,
+        threadHistories,
+        threadMetadata,
+        autoStartedConsultation,
+        followUps: followUps.length > 0 ? followUps : undefined,
+      };
+    };
+
+    // Execute with lock if sessionId exists, otherwise execute directly
+    const result = requestSessionId
+      ? await withSessionLock(requestSessionId, executeInit)
+      : await executeInit();
+
+    return c.json<InitResponse>(result);
   } catch (error) {
     console.error("❌ Error in /init:", error);
     return c.json({ error: "Failed to initialize session" }, 500);
@@ -599,26 +700,29 @@ app.post("/start-consultation", async (c) => {
       userLanguage,
     } = await c.req.json<StartConsultationRequest>();
 
-    const advisorState = ensureAdvisorId(requestAdvisorState, sessionId);
-
     console.log(
       `🎬 Starting consultation for session: ${sessionId.substring(0, 8)}... (language: ${userLanguage || "en"})`,
     );
 
-    // Call orchestrator to get next character/scenario
-    const gameResponse = await startNewConsultation(
-      advisorState.advisorId,
-      advisorState,
-      userLanguage || "en",
-    );
+    // 🔒 LOCK: All session operations must be serialized to prevent race conditions
+    const result = await withSessionLock(sessionId, async () => {
+      const advisorState = ensureAdvisorId(requestAdvisorState, sessionId);
 
-    // Convert threadHistories and threadMetadata to Maps
-    const historiesMap = threadHistories
-      ? new Map(Object.entries(threadHistories))
-      : new Map();
-    const metadataMap = threadMetadata
-      ? new Map(Object.entries(threadMetadata))
-      : new Map();
+      // Load thread histories from disk (before starting consultation)
+      const savedSession = await loadSession(sessionId);
+      const historiesMap = savedSession?.threadHistories || new Map();
+      const metadataMap = savedSession?.threadMetadata || new Map();
+
+      console.log(
+        `📂 Loaded ${historiesMap.size} thread histories, ${metadataMap.size} metadata from server`,
+      );
+
+      // Call orchestrator to get next character/scenario
+      const gameResponse = await startNewConsultation(
+        advisorState.advisorId,
+        advisorState,
+        userLanguage || "en",
+      );
 
     // If this is onboarding, save the boss message to threadHistories
     if (gameResponse.type === "onboarding" && gameResponse.onboardingMessage) {
@@ -635,6 +739,17 @@ app.post("/start-consultation", async (c) => {
         "👔 historiesMap has boss-pinned:",
         historiesMap.has("boss-pinned"),
       );
+    }
+
+    // If this is a boss review, save the review message to threadHistories
+    if (gameResponse.type === "god_boss_review" && gameResponse.message) {
+      const bossHistory = historiesMap.get("boss-pinned") || [];
+      bossHistory.push({
+        role: "assistant" as const,
+        content: gameResponse.message,
+      });
+      historiesMap.set("boss-pinned", bossHistory);
+      console.log("💬 Saved boss review message to boss-pinned thread");
     }
 
     // If this is a new character message, save it to threadHistories
@@ -737,7 +852,7 @@ app.post("/start-consultation", async (c) => {
       console.log("🚨 Saved boss intervention message to boss threadHistories");
     }
 
-    // Save updated state with histories and metadata
+    // Save updated state with thread histories
     await saveSession(
       sessionId,
       gameResponse.stateUpdate,
@@ -756,30 +871,33 @@ app.post("/start-consultation", async (c) => {
       gameResponse.stateUpdate = updatedState;
     }
 
-    // Convert Maps back to objects for response
-    const threadHistoriesObject = Object.fromEntries(historiesMap);
-    const threadMetadataObject = Object.fromEntries(metadataMap);
+      // Convert Maps back to objects for response
+      const threadHistoriesObject = Object.fromEntries(historiesMap);
+      const threadMetadataObject = Object.fromEntries(metadataMap);
 
-    // Log thread count instead of full content to reduce noise
-    console.log(
-      "📤 Returning threadHistories:",
-      Object.keys(threadHistoriesObject).length,
-      "threads",
-    );
+      // Log thread count instead of full content to reduce noise
+      console.log(
+        "📤 Returning threadHistories:",
+        Object.keys(threadHistoriesObject).length,
+        "threads",
+      );
 
-    const response = {
-      ...toClientSafeGameResponse(gameResponse),
-      sessionId,
-      threadHistories: threadHistoriesObject,
-      threadMetadata: threadMetadataObject,
-    };
+      const response = {
+        ...toClientSafeGameResponse(gameResponse),
+        sessionId,
+        threadHistories: threadHistoriesObject,
+        threadMetadata: threadMetadataObject,
+      };
 
-    // Add follow-ups if any
-    if (followUps.length > 0) {
-      (response as any).followUps = followUps;
-    }
+      // Add follow-ups if any
+      if (followUps.length > 0) {
+        (response as any).followUps = followUps;
+      }
 
-    return c.json<StartConsultationResponse>(response);
+      return response;
+    }); // End of withSessionLock
+
+    return c.json<StartConsultationResponse>(result);
   } catch (error) {
     console.error("❌ Error in /start-consultation:", error);
     return c.json({ error: "Failed to start consultation" }, 500);
@@ -833,21 +951,26 @@ app.post("/send-message", async (c) => {
       userLanguage,
     } = await c.req.json<SendMessageRequest>();
 
-    let advisorState = ensureAdvisorId(requestAdvisorState, sessionId);
-
     console.log(
       `💬 Message in thread ${threadId.substring(0, 8)}... from session ${sessionId.substring(0, 8)}... (language: ${userLanguage || "en"})`,
     );
 
-    let gameResponse;
+    // 🔒 LOCK: All session operations must be serialized to prevent race conditions
+    const result = await withSessionLock(sessionId, async () => {
+      // ⚠️ IMPORTANT: We need advisorState from client (it's more up-to-date)
+      // but threadHistories/threadMetadata from server (to prevent race conditions)
+      let advisorState = ensureAdvisorId(requestAdvisorState, sessionId);
 
-    // Convert threadHistories and threadMetadata to Maps
-    const historiesMap = threadHistories
-      ? new Map(Object.entries(threadHistories))
-      : new Map();
-    const metadataMap = threadMetadata
-      ? new Map(Object.entries(threadMetadata))
-      : new Map();
+      // Load thread histories from disk
+      const savedSession = await loadSession(sessionId);
+      const historiesMap = savedSession?.threadHistories || new Map();
+      const metadataMap = savedSession?.threadMetadata || new Map();
+
+      console.log(
+        `📂 Loaded ${historiesMap.size} thread histories, ${metadataMap.size} metadata from server`,
+      );
+
+      let gameResponse;
 
     // Special handling for boss messages
     if (threadId === "boss-pinned") {
@@ -975,6 +1098,21 @@ app.post("/send-message", async (c) => {
         `💬 Saved conversation to thread ${threadId.substring(0, 8)}... (now ${threadHistory.length} messages)`,
       );
 
+      // Update metadata if needed
+      if (gameResponse.characterInfo && threadId) {
+        const metadata: ThreadMetadata = {
+          characterName: gameResponse.characterInfo.name,
+          name: gameResponse.characterInfo.name,
+          age: gameResponse.characterInfo.age,
+          occupation: gameResponse.characterInfo.occupation,
+          gender: gameResponse.characterInfo.gender,
+          financialProfile: gameResponse.characterInfo.financialProfile,
+          status: gameResponse.type === "conversation_end" ? "completed" : "active",
+          adviceChoices: (gameResponse as any).adviceChoices || metadataMap.get(threadId)?.adviceChoices || [],
+        };
+        metadataMap.set(threadId, metadata);
+      }
+
       // ALSO save intervention message to boss thread if present (parallel notification)
       if (gameResponse.interventionMessage) {
         const msg = gameResponse.interventionMessage;
@@ -995,7 +1133,10 @@ app.post("/send-message", async (c) => {
       }
     }
 
-    // Save updated state with message histories and metadata
+    // ✅ historiesMap and metadataMap already contain merged data
+    // We loaded initial state at the beginning, then only modified the threads we needed to
+    // No need for another load - this would create a race condition!
+
     // Check for follow-ups (server-led approach)
     const followUpResult = await checkAndIncludeFollowUps(
       gameResponse.stateUpdate,
@@ -1036,6 +1177,7 @@ app.post("/send-message", async (c) => {
               });
             }
 
+            // Add to historiesMap (this will be saved later)
             historiesMap.set(threadId, existingHistory);
 
             if (autoResponse.characterInfo && threadId) {
@@ -1061,28 +1203,32 @@ app.post("/send-message", async (c) => {
       }
     }
 
+    // Save updated state with thread histories
     await saveSession(sessionId, finalState, historiesMap, metadataMap);
 
     // Sync latest advisor snapshot to leaderboard after every interaction
     await syncLeaderboardSnapshot(finalState, finalState.advisorName);
 
-    // Convert Maps back to objects for response
-    const threadHistoriesObject = Object.fromEntries(historiesMap);
-    const threadMetadataObject = Object.fromEntries(metadataMap);
+      // Convert Maps back to objects for response
+      const threadHistoriesObject = Object.fromEntries(historiesMap);
+      const threadMetadataObject = Object.fromEntries(metadataMap);
 
-    const response = {
-      ...toClientSafeGameResponse(gameResponse),
-      sessionId,
-      threadHistories: threadHistoriesObject,
-      threadMetadata: threadMetadataObject,
-    };
+      const response = {
+        ...toClientSafeGameResponse(gameResponse),
+        sessionId,
+        threadHistories: threadHistoriesObject,
+        threadMetadata: threadMetadataObject,
+      };
 
-    // Add follow-ups if any
-    if (followUpResult.followUps.length > 0) {
-      (response as any).followUps = followUpResult.followUps;
-    }
+      // Add follow-ups if any
+      if (followUpResult.followUps.length > 0) {
+        (response as any).followUps = followUpResult.followUps;
+      }
 
-    return c.json<SendMessageResponse>(response);
+      return response;
+    }); // End of withSessionLock
+
+    return c.json<SendMessageResponse>(result);
   } catch (error) {
     console.error("❌ Error in /send-message:", error);
     return c.json({ error: "Failed to send message" }, 500);

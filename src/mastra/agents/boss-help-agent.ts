@@ -172,6 +172,9 @@ Be aware of this context when responding. If the advisor asks about "this client
     tools: {
       queryKnowledgeEnhanced: queryKnowledgeEnhancedTool,
     },
+    // Enable Gemini context caching for the large static system instructions
+    // This reduces token costs significantly on repeated calls
+    // Gemini caches system instructions automatically when the same prefix is used
     instructions: `
 ${PROMPT_INJECTION_GUARD}
 

@@ -412,43 +412,80 @@ export async function startNewConsultation(
   const sessionsSinceReview =
     advisorState.totalSessions - advisorState.lastReviewSession;
 
-  // Get last session performance (if any)
-  const lastSession = advisorState.sessionHistory.length > 0
-    ? advisorState.sessionHistory[advisorState.sessionHistory.length - 1]
-    : null;
-  const lastSessionScore = lastSession?.adviceQualityScore || 10;
+  // Get sessions SINCE last review (don't re-review already-reviewed sessions!)
+  const unreviewedSessions = advisorState.sessionHistory.slice(
+    advisorState.lastReviewSession,
+  );
+  const lastUnreviewedSession =
+    unreviewedSessions.length > 0
+      ? unreviewedSessions[unreviewedSessions.length - 1]
+      : null;
+  const lastSessionScore = lastUnreviewedSession?.adviceQualityScore || 10;
 
   // Trigger review if:
-  // 1. ANY negative performance (score < 6) - DEMO MODE for immediate feedback, OR
-  // 2. Regular timing (every 2-3 sessions for ongoing check-ins)
+  // 1. ANY negative performance (score < 6) in NEW sessions - immediate feedback, OR
+  // 2. Performance-based timing (3-5 sessions depending on performance)
   const hasNegativePerformance = lastSessionScore < 6;
 
-  // DEMO MODE: Trigger on ANY negative performance (don't check lastReviewSession)
-  // This ensures boss calls you immediately after any poor session
-  const isNegativePerformanceTrigger = hasNegativePerformance;
+  // Trigger on negative performance ONLY if we haven't already reviewed this session
+  const isNegativePerformanceTrigger =
+    hasNegativePerformance && sessionsSinceReview >= 1;
 
-  // More frequent regular reviews for demo (2-3 sessions instead of 3-5)
-  const isRegularReviewTime = sessionsSinceReview >= 2 && sessionsSinceReview <= 3;
+  // Performance-based review intervals using AVERAGE of unreviewed sessions:
+  // - Great performance (≥8): review every 5 sessions
+  // - Good performance (≥7): review every 4 sessions
+  // - Average performance (≥6): review every 3 sessions
+  const avgScore =
+    unreviewedSessions.length > 0
+      ? unreviewedSessions.reduce(
+          (sum, s) => sum + s.adviceQualityScore,
+          0,
+        ) / unreviewedSessions.length
+      : 7;
 
-  // TEMPORARY DEBUG: Force trigger if ANY completed session exists
-  const forceDebugTrigger = advisorState.totalSessions > 0;
+  let reviewInterval = 3; // Default: average performance
+  if (avgScore >= 8) {
+    reviewInterval = 5;
+  } else if (avgScore >= 7) {
+    reviewInterval = 4;
+  }
 
-  const shouldReview = isNegativePerformanceTrigger || isRegularReviewTime || forceDebugTrigger;
+  const isRegularReviewTime = sessionsSinceReview >= reviewInterval;
+
+  // Add minimum 2-session cooldown after ANY review to prevent spam
+  const MIN_SESSIONS_BETWEEN_REVIEWS = 2;
+  const isInCooldown = sessionsSinceReview < MIN_SESSIONS_BETWEEN_REVIEWS;
+
+  const shouldReview =
+    !isInCooldown && (isNegativePerformanceTrigger || isRegularReviewTime);
 
   console.log(`\n🔍 ========== VOICE CALL TRIGGER CHECK ==========`);
   console.log(`📊 Review timing check:`, {
     totalSessions: advisorState.totalSessions,
     lastReviewSession: advisorState.lastReviewSession,
     sessionsSinceReview,
+    unreviewedSessionsCount: unreviewedSessions.length,
     lastSessionScore,
+    avgScore: avgScore.toFixed(1),
+    reviewInterval,
     hasNegativePerformance,
     isNegativePerformanceTrigger,
     isRegularReviewTime,
-    forceDebugTrigger,
+    isInCooldown,
     shouldReview,
   });
   console.log(`📞 Should trigger voice call? ${shouldReview ? "YES ✅" : "NO ❌"}`);
-  console.log(`🔍 Reason: ${forceDebugTrigger ? "DEBUG: Forcing trigger for any completed session" : isNegativePerformanceTrigger ? "Negative performance (score < 6)" : isRegularReviewTime ? "Regular check-in (2-3 sessions)" : "None"}`);
+  console.log(
+    `🔍 Reason: ${
+      isInCooldown
+        ? `In cooldown (need ${MIN_SESSIONS_BETWEEN_REVIEWS} sessions between reviews)`
+        : isNegativePerformanceTrigger
+          ? "Negative performance in new session (score < 6)"
+          : isRegularReviewTime
+            ? `Regular check-in (${reviewInterval} sessions interval based on avg score ${avgScore.toFixed(1)})`
+            : "None"
+    }`,
+  );
   console.log(`🔍 ============================================\n`);
 
   // Get pool stats
@@ -473,7 +510,18 @@ ADVISOR STATE:
 
 REVIEW TIMING:
 - Should trigger review now: ${shouldReview ? "YES - Performance review needed" : "NO - Not time for review yet"}
-- Reason: ${isNegativePerformanceTrigger ? "Negative performance detected (score < 6) - intervention needed NOW" : isRegularReviewTime ? "Regular check-in time (2-3 sessions passed)" : "Not applicable"}
+- Sessions since last review: ${sessionsSinceReview}
+- Unreviewed sessions: ${unreviewedSessions.length}
+- Average score of unreviewed sessions: ${avgScore.toFixed(1)}/10
+- Reason: ${
+  isInCooldown
+    ? `In cooldown - minimum ${MIN_SESSIONS_BETWEEN_REVIEWS} sessions required between reviews`
+    : isNegativePerformanceTrigger
+      ? `Negative performance in NEW session (score ${lastSessionScore}/10 < 6) - intervention needed NOW`
+      : isRegularReviewTime
+        ? `Regular check-in time (${reviewInterval} sessions passed, based on avg score ${avgScore.toFixed(1)}/10 of unreviewed sessions)`
+        : "Not applicable"
+}
 - IMPORTANT: You must respect this timing. Only trigger god_boss_review if shouldReview is YES.
 
 AVAILABLE CHARACTERS:
@@ -2092,16 +2140,69 @@ async function triggerGodBossReview(
   // Update last review session
   advisorState.lastReviewSession = advisorState.totalSessions;
 
-  // Trigger voice call for boss intervention
-  console.log(`✅ Returning boss_voice_call_incoming response`);
+  // Format review message for boss chat (text-based, not voice call)
+  const reviewMessage = formatBossReviewMessage(review);
+
+  console.log(`✅ Returning god_boss_review response (text-based)`);
   console.log(`📋 Review data:`, JSON.stringify(review, null, 2));
-  console.log(`📞 ==============================================\n`);
+  console.log(`💬 Review message added to boss-pinned thread`);
 
   return {
-    type: "boss_voice_call_incoming",
-    review, // Include review data for reference (will be discussed in call)
+    type: "god_boss_review",
+    review,
+    message: reviewMessage,
+    threadId: "boss-pinned",
     stateUpdate: advisorState,
   };
+}
+
+/**
+ * Format boss review as a text message for the boss chat thread
+ */
+function formatBossReviewMessage(review: any): string {
+  const sections = [];
+
+  // Overall score
+  sections.push(
+    `📊 **Performance Review - Score: ${review.overallScore}/10**\n`
+  );
+
+  // Strengths
+  if (review.strengthsIdentified && review.strengthsIdentified.length > 0) {
+    sections.push(`✅ **What You Did Well:**`);
+    review.strengthsIdentified.forEach((strength: string) => {
+      sections.push(`  • ${strength}`);
+    });
+    sections.push("");
+  }
+
+  // Areas for improvement
+  if (review.areasForImprovement && review.areasForImprovement.length > 0) {
+    sections.push(`📈 **Areas to Improve:**`);
+    review.areasForImprovement.forEach((area: string) => {
+      sections.push(`  • ${area}`);
+    });
+    sections.push("");
+  }
+
+  // Learning materials
+  if (review.learningMaterials && review.learningMaterials.length > 0) {
+    sections.push(`📚 **Recommended Resources:**`);
+    review.learningMaterials.forEach((material: any) => {
+      sections.push(`  • ${material.title}: ${material.description}`);
+      if (material.url) {
+        sections.push(`    ${material.url}`);
+      }
+    });
+    sections.push("");
+  }
+
+  // Encouraging message
+  if (review.encouragingMessage) {
+    sections.push(`💪 ${review.encouragingMessage}`);
+  }
+
+  return sections.join("\n");
 }
 
 /**

@@ -33,6 +33,10 @@ export function useSendMessage() {
   const sessionId = getOrCreateSessionId();
 
   const mutation = useMutation({
+    // ⚠️ IMPORTANT: Only ONE mutation can be pending at a time per hook instance
+    // Multiple concurrent sends will queue/cancel each other, causing message loss
+    mutationKey: ["send-message", sessionId], // Dedupe concurrent sends
+
     mutationFn: ({
       threadId,
       message,
@@ -51,11 +55,23 @@ export function useSendMessage() {
       ),
 
     onSuccess: (response: GameResponse) => {
-      // Update the cached advisor state with the new state from backend
-      queryClient.setQueryData(["game-session", sessionId], (old: any) => ({
-        ...old,
-        advisorState: response.stateUpdate,
-      }));
+      // Update ALL state fields from server response (server is source of truth)
+      // This prevents race conditions when sending messages to multiple threads simultaneously
+      queryClient.setQueryData(["game-session", sessionId], (old: any) => {
+        const updatedData = {
+          ...old,
+          advisorState: response.stateUpdate,
+          // Server returns updated threadHistories and threadMetadata in EVERY response
+          threadHistories: (response as any).threadHistories || old?.threadHistories,
+          threadMetadata: (response as any).threadMetadata || old?.threadMetadata,
+        };
+        console.log('📊 useSendMessage: Updated cache after message', {
+          hasThreadHistories: !!(response as any).threadHistories,
+          hasThreadMetadata: !!(response as any).threadMetadata,
+          threadCount: Object.keys((response as any).threadHistories || {}).length,
+        });
+        return updatedData;
+      });
     },
 
     onError: (error) => {

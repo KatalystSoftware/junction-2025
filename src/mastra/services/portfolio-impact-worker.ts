@@ -162,7 +162,13 @@ export class PortfolioImpactWorker {
     }
 
     // Save updated session (even if delta is negative - portfolio can decrease!)
-    await saveSession(sessionId, advisorState);
+    // IMPORTANT: Preserve threadHistories and threadMetadata from saved session
+    await saveSession(
+      sessionId,
+      advisorState,
+      savedSession.threadHistories,
+      savedSession.threadMetadata
+    );
 
     return {
       updated: true,

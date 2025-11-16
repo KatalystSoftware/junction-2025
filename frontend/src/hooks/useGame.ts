@@ -6,7 +6,7 @@
  */
 
 import { useGameSession } from "./useGameSession";
-import { useSendMessage } from "./useSendMessage";
+import { useMessageQueue } from "./useMessageQueue";
 import { useEffect, useState } from "react";
 import type { GameResponse } from "../services/gameApi";
 
@@ -93,7 +93,7 @@ export interface UseGameReturn {
  */
 export function useGame(): UseGameReturn {
   const session = useGameSession();
-  const messaging = useSendMessage();
+  const messaging = useMessageQueue(session.advisorState);
   const [lastResponse, setLastResponse] = useState<GameResponse | undefined>(
     undefined,
   );
@@ -130,14 +130,8 @@ export function useGame(): UseGameReturn {
       return;
     }
 
-    messaging.sendMessage({
-      threadId,
-      message,
-      advisorState: session.advisorState,
-      conversationHistory: [], // Could be enhanced to track history
-      threadHistories,
-      threadMetadata,
-    });
+    // 📬 Queue message for sequential sending (prevents race conditions)
+    messaging.queueMessage(threadId, message, threadHistories, threadMetadata);
   };
 
   const startConsultation = (

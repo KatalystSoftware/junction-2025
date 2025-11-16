@@ -137,7 +137,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       />
 
       {/* Main content */}
-      <div className="relative z-10 flex-1 flex items-center justify-center px-6 py-4 min-h-0">
+      <div className="relative z-10 flex-1 flex items-center justify-center px-4 py-4 min-h-0 overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentScreen}
@@ -145,15 +145,16 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.5, ease: "easeOut" }}
-            className="w-full max-w-3xl h-full flex flex-col"
+            className="w-full max-w-3xl flex flex-col max-h-full"
           >
-            {/* Screen content card */}
+            {/* Screen content card - scrollable on mobile */}
             <div
-              className="rounded-lg p-6 flex flex-col max-h-full overflow-y-auto"
+              className="rounded-lg p-4 md:p-6 flex flex-col overflow-y-auto"
               style={{
                 backgroundColor: "var(--card)",
                 border: `1px solid var(--border)`,
                 boxShadow: "0 8px 24px rgba(0, 0, 0, 0.08)",
+                maxHeight: "100%",
               }}
             >
               {/* Icon & Illustration */}
@@ -161,7 +162,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                className="flex flex-col items-center mb-4"
+                className="flex flex-col items-center mb-2 md:mb-4"
               >
                 <motion.div
                   animate={{
@@ -223,10 +224,9 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="text-center mb-2"
+                className="text-center mb-1 md:mb-2 text-2xl md:text-4xl"
                 style={{
                   fontFamily: "Inter, sans-serif",
-                  fontSize: "var(--text-4xl)",
                   fontWeight: "var(--font-weight-semibold)",
                   color: "var(--foreground)",
                   lineHeight: "1.2",
@@ -240,10 +240,9 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="text-center mb-3"
+                className="text-center mb-2 md:mb-3 text-base md:text-lg"
                 style={{
                   fontFamily: "Inter, sans-serif",
-                  fontSize: "var(--text-lg)",
                   fontWeight: "var(--font-weight-medium)",
                   color: currentScreenData.color,
                 }}
@@ -256,10 +255,9 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
-                className="text-center mb-5"
+                className="text-center mb-3 md:mb-5 text-sm md:text-base"
                 style={{
                   fontFamily: "Inter, sans-serif",
-                  fontSize: "var(--text-base)",
                   color: "var(--muted-foreground)",
                   lineHeight: "1.6",
                   maxWidth: "600px",
@@ -310,9 +308,9 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                       }}
                     />
                   </div>
-                  <div 
-                    className="space-y-3"
-                    style={{ marginTop: "2rem" }}
+                  <div
+                    className="space-y-2"
+                    style={{ marginTop: "1rem" }}
                   >
                     <Label
                       className="text-sm font-medium leading-none"
@@ -322,7 +320,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                     >
                       {t.onboarding.yourAvatar}
                     </Label>
-                    <div className="flex flex-wrap gap-4 justify-center">
+                    <div className="flex flex-wrap gap-2 md:gap-4 justify-center">
                       {PLAYER_AVATAR_OPTIONS.map((option) => (
                         <motion.button
                           key={option.id}
@@ -333,7 +331,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                           whileTap={{ scale: 0.95 }}
                         >
                           <Avatar
-                            className="w-24 h-24"
+                            className="w-16 h-16 md:w-24 md:h-24"
                             style={{
                               border: `3px solid ${userAvatar === option.id ? "var(--primary)" : "transparent"}`,
                               boxShadow:
@@ -355,9 +353,9 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                       ))}
                     </div>
                   </div>
-                  <div 
-                    className="space-y-3"
-                    style={{ marginTop: "2rem" }}
+                  <div
+                    className="space-y-2"
+                    style={{ marginTop: "1rem" }}
                   >
                     <Label
                       className="text-sm font-medium leading-none"
@@ -367,7 +365,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                     >
                       {t.onboarding.preferredLanguage}
                     </Label>
-                    <div className="flex gap-3">
+                    <div className="flex gap-2 md:gap-3">
                       {languageOptions.map((lang) => (
                         <motion.button
                           key={lang.id}
@@ -449,8 +447,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 }}
-                className="flex justify-center"
-                style={{ marginTop: "2rem" }}
+                className="flex justify-center mt-4 md:mt-8"
               >
                 <Button
                   onClick={handleNext}

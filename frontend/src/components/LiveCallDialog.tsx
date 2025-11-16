@@ -4,7 +4,7 @@
  * Full-screen dialog for live voice/video calls with AI characters
  */
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { PhoneOff, VideoOff } from "lucide-react";
@@ -41,11 +41,24 @@ export function LiveCallDialog({
 
   const isBossCall = contact.id === "boss-pinned";
 
+  // Track if we've already called onClose to prevent duplicates
+  const hasClosedRef = useRef(false);
+
+  const safeOnClose = useCallback((duration?: number) => {
+    if (hasClosedRef.current) {
+      console.log("⚠️ onClose already called, skipping duplicate");
+      return;
+    }
+    hasClosedRef.current = true;
+    console.log("✅ Calling onClose with duration:", duration);
+    onClose(duration);
+  }, [onClose]);
+
   // Use ElevenLabs SDK for boss calls
   const bossCall = useBossCall({
     onCallEnded: (duration) => {
       console.log("📞 Boss call ended, duration:", duration);
-      onClose(duration);
+      safeOnClose(duration);
     },
     reviewData,
     language,
@@ -57,7 +70,7 @@ export function LiveCallDialog({
     characterId: contact.id,
     onCallEnded: (reason) => {
       console.log("📞 Call ended:", reason);
-      onClose();
+      safeOnClose();
     },
     onError: (error) => {
       console.error("❌ Call error:", error);
@@ -146,7 +159,7 @@ export function LiveCallDialog({
       videoCapture.stopRecording();
     }
     endCall();
-    onClose(callState.callDuration);
+    safeOnClose(callState.callDuration);
   };
 
   return (

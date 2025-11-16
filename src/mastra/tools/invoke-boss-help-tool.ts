@@ -33,6 +33,10 @@ export interface BossHelpResult {
   }>;
 }
 
+// Cache agents by language to enable Gemini's context caching
+// Same agent instance = same system prompt = cached by Gemini
+const agentCache = new Map<string, any>();
+
 /**
  * Extract citations from boss response text
  * Looks for [Source: ...] or [Lähde: ...] patterns
@@ -140,11 +144,20 @@ export async function invokeBossHelpTool(params: {
     .map((msg) => msg.content);
   advisorMessages.push(userQuestion);
 
-  // Create boss help agent with context
-  const bossAgent = createBossHelpAgent(
-    advisorMessages,
-    currentConsultationContext,
-  );
+  // Create cache key based on language and context
+  // This allows Gemini to cache the system instructions per language
+  const language = advisorMessages.some((msg) => /[äö]/i.test(msg)) ? "fi" : "en";
+  const contextKey = currentConsultationContext
+    ? `${language}_${currentConsultationContext.topic}`
+    : language;
+
+  // Reuse agent for same language/context to maximize Gemini caching
+  let bossAgent = agentCache.get(contextKey);
+  if (!bossAgent) {
+    bossAgent = createBossHelpAgent(advisorMessages, currentConsultationContext);
+    agentCache.set(contextKey, bossAgent);
+    console.log(`📦 Created new boss agent for cache key: ${contextKey}`);
+  }
 
   // Build conversation context for the agent
   const conversationContext = conversationHistory
@@ -160,6 +173,8 @@ export async function invokeBossHelpTool(params: {
     : wrapUserInput(userQuestion, "ADVISOR'S QUESTION");
 
   try {
+    // Gemini automatically caches the system instructions when the same prefix is reused
+    // No special configuration needed - caching happens transparently
     const result = await bossAgent.generate(prompt);
     const responseText = result.text || "";
 
