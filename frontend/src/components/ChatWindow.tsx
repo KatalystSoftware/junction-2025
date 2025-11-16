@@ -2191,9 +2191,9 @@ export function ChatWindow({
       )}
 
       {/* Financial Dashboard Modal */}
-      {showFinancialDashboard && contact && contact.id !== "boss-pinned" && (
+      {showFinancialDashboard && contact && contact.id !== "boss-pinned" && contact.characterId && (
         <ClientFinancialDashboard
-          characterId={contact.id}
+          characterId={contact.characterId}
           characterName={contact.name}
           onClose={() => setShowFinancialDashboard(false)}
         />
