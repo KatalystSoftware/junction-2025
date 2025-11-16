@@ -1,7 +1,7 @@
 import { Input } from "./ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ScrollArea } from "./ui/scroll-area";
-import { Search, Pin, Star, TrendingUp, Briefcase, Trophy } from "lucide-react";
+import { Search, Pin, Star, TrendingUp, Briefcase, Trophy, ChevronDown, ChevronUp } from "lucide-react";
 import type { Contact } from "./WhatsAppInterface";
 import { useState, useEffect, useRef } from "react";
 import logoImage from "figma:asset/28e39d27183eb9dbb848b6be8a7c7b00e841cd40.png";
@@ -66,6 +66,7 @@ export function ChatSidebar({
   const [playerAvatarUrl, setPlayerAvatarUrl] = useState("");
   const [showLevelUpModal, setShowLevelUpModal] = useState(false);
   const [newLevel, setNewLevel] = useState(0);
+  const [isProfileExpanded, setIsProfileExpanded] = useState(true);
 
   // Load player profile from localStorage
   useEffect(() => {
@@ -153,197 +154,254 @@ export function ChatSidebar({
         </div>
 
         {/* User Profile & Level System */}
-        <div
-          className="flex items-center gap-3 mt-4 cursor-pointer rounded-lg p-2 transition-all duration-200 hover:scale-[1.02] border"
-          onClick={() => setShowStatsModal(true)}
-          style={{
-            backgroundColor: "transparent",
-            borderColor: "transparent",
-            borderRadius: "var(--radius-card)",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "var(--muted)";
-            e.currentTarget.style.borderColor = "var(--border)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "transparent";
-            e.currentTarget.style.borderColor = "transparent";
-          }}
-        >
-          <div className="relative">
-            <Avatar className="w-14 h-14">
-              <AvatarImage src={playerAvatarUrl} alt="Player Avatar" />
-              <AvatarFallback
-                style={{
-                  backgroundColor: "var(--primary)",
-                  color: "var(--primary-foreground)",
-                  fontFamily: "Inter, sans-serif",
-                  fontWeight: "var(--font-weight-medium)",
-                }}
-              >
-                {playerName.substring(0, 2).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
+        <div className="mt-4">
+          <div className="flex items-center gap-2">
             <div
-              className="absolute -bottom-1 -right-1 flex items-center justify-center w-6 h-6 rounded-full border-2"
+              className="flex items-center gap-3 cursor-pointer rounded-lg p-2 transition-all duration-200 hover:scale-[1.02] border flex-1"
+              onClick={() => setShowStatsModal(true)}
               style={{
-                backgroundColor: "var(--primary)",
-                borderColor: "var(--card)",
+                backgroundColor: "transparent",
+                borderColor: "transparent",
+                borderRadius: "var(--radius-card)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "var(--muted)";
+                e.currentTarget.style.borderColor = "var(--border)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
+                e.currentTarget.style.borderColor = "transparent";
               }}
             >
-              <span
-                style={{
-                  fontFamily: "Inter, sans-serif",
-                  fontSize: "var(--text-xs)",
-                  fontWeight: "var(--font-weight-semibold)",
-                  color: "var(--primary-foreground)",
-                }}
-              >
-                {level}
-              </span>
+              <div className="relative">
+                <Avatar className="w-14 h-14">
+                  <AvatarImage src={playerAvatarUrl} alt="Player Avatar" />
+                  <AvatarFallback
+                    style={{
+                      backgroundColor: "var(--primary)",
+                      color: "var(--primary-foreground)",
+                      fontFamily: "Inter, sans-serif",
+                      fontWeight: "var(--font-weight-medium)",
+                    }}
+                  >
+                    {playerName.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div
+                  className="absolute -bottom-1 -right-1 flex items-center justify-center w-6 h-6 rounded-full border-2"
+                  style={{
+                    backgroundColor: "var(--primary)",
+                    borderColor: "var(--card)",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: "var(--text-xs)",
+                      fontWeight: "var(--font-weight-semibold)",
+                      color: "var(--primary-foreground)",
+                    }}
+                  >
+                    {level}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex flex-col">
+                    <span
+                      style={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: "var(--text-sm)",
+                        fontWeight: "var(--font-weight-semibold)",
+                        color: "var(--card-foreground)",
+                      }}
+                    >
+                      {playerName}
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: "var(--text-xs)",
+                        color: "var(--muted-foreground)",
+                        fontWeight: "var(--font-weight-normal)",
+                      }}
+                    >
+                      {t.chat.financialAdvisor}
+                    </span>
+                  </div>
+                  <span
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: "var(--text-xs)",
+                      color: "var(--muted-foreground)",
+                    }}
+                  >
+                    {xpProgress}/{xpForNextLevel} {t.chat.xp}
+                  </span>
+                </div>
+
+                {/* Stats Row */}
+                <div className="flex items-center gap-3 mb-2">
+                  {/* Reputation */}
+                  <div className="flex items-center gap-1">
+                    <Star
+                      className="w-3 h-3"
+                      style={{
+                        color:
+                          reputation >= 80
+                            ? "var(--chart-1)"
+                            : reputation >= 60
+                              ? "var(--chart-4)"
+                              : reputation >= 40
+                                ? "var(--chart-3)"
+                                : "var(--chart-2)",
+                      }}
+                    />
+                    <span
+                      style={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: "var(--text-xs)",
+                        fontWeight: "var(--font-weight-medium)",
+                        color: "var(--muted-foreground)",
+                      }}
+                    >
+                      {reputation}
+                    </span>
+                  </div>
+
+                  {/* Skill Level */}
+                  <div className="flex items-center gap-1">
+                    <TrendingUp
+                      className="w-3 h-3"
+                      style={{
+                        color:
+                          skillLevel >= 8
+                            ? "var(--chart-1)"
+                            : skillLevel >= 6
+                              ? "var(--chart-4)"
+                              : skillLevel >= 4
+                                ? "var(--chart-3)"
+                                : "var(--chart-2)",
+                      }}
+                    />
+                    <span
+                      style={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: "var(--text-xs)",
+                        fontWeight: "var(--font-weight-medium)",
+                        color: "var(--muted-foreground)",
+                      }}
+                    >
+                      {skillLevel.toFixed(1)}
+                    </span>
+                  </div>
+
+                  {/* Boss Review Countdown */}
+                  <div className="flex items-center gap-1">
+                    <Briefcase
+                      className="w-3 h-3"
+                      style={{ color: "var(--primary)" }}
+                    />
+                    <span
+                      style={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: "var(--text-xs)",
+                        fontWeight: "var(--font-weight-medium)",
+                        color: "var(--muted-foreground)",
+                      }}
+                    >
+                      {nextReviewIn === 0 ? "Now!" : `${nextReviewIn}`}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div
+                  className="w-full h-2 rounded-full overflow-hidden"
+                  style={{
+                    backgroundColor: "var(--muted)",
+                    filter: "brightness(0.7)",
+                  }}
+                >
+                  <div
+                    className="h-full transition-all duration-300"
+                    style={{
+                      width: `${xpProgress}%`,
+                      backgroundColor: "var(--primary)",
+                    }}
+                  />
+                </div>
+              </div>
             </div>
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between mb-1">
-              <div className="flex flex-col">
-                <span
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    fontSize: "var(--text-sm)",
-                    fontWeight: "var(--font-weight-semibold)",
-                    color: "var(--card-foreground)",
-                  }}
-                >
-                  {playerName}
-                </span>
-                <span
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    fontSize: "var(--text-xs)",
-                    color: "var(--muted-foreground)",
-                    fontWeight: "var(--font-weight-normal)",
-                  }}
-                >
-                  {t.chat.financialAdvisor}
-                </span>
-              </div>
-              <span
-                style={{
-                  fontFamily: "Inter, sans-serif",
-                  fontSize: "var(--text-xs)",
-                  color: "var(--muted-foreground)",
-                }}
-              >
-                {xpProgress}/{xpForNextLevel} {t.chat.xp}
-              </span>
-            </div>
-
-            {/* Stats Row */}
-            <div className="flex items-center gap-3 mb-2">
-              {/* Reputation */}
-              <div className="flex items-center gap-1">
-                <Star
-                  className="w-3 h-3"
-                  style={{
-                    color:
-                      reputation >= 80
-                        ? "var(--chart-1)"
-                        : reputation >= 60
-                          ? "var(--chart-4)"
-                          : reputation >= 40
-                            ? "var(--chart-3)"
-                            : "var(--chart-2)",
-                  }}
-                />
-                <span
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    fontSize: "var(--text-xs)",
-                    fontWeight: "var(--font-weight-medium)",
-                    color: "var(--muted-foreground)",
-                  }}
-                >
-                  {reputation}
-                </span>
-              </div>
-
-              {/* Skill Level */}
-              <div className="flex items-center gap-1">
-                <TrendingUp
-                  className="w-3 h-3"
-                  style={{
-                    color:
-                      skillLevel >= 8
-                        ? "var(--chart-1)"
-                        : skillLevel >= 6
-                          ? "var(--chart-4)"
-                          : skillLevel >= 4
-                            ? "var(--chart-3)"
-                            : "var(--chart-2)",
-                  }}
-                />
-                <span
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    fontSize: "var(--text-xs)",
-                    fontWeight: "var(--font-weight-medium)",
-                    color: "var(--muted-foreground)",
-                  }}
-                >
-                  {skillLevel.toFixed(1)}
-                </span>
-              </div>
-
-              {/* Boss Review Countdown */}
-              <div className="flex items-center gap-1">
-                <Briefcase
-                  className="w-3 h-3"
-                  style={{ color: "var(--primary)" }}
-                />
-                <span
-                  style={{
-                    fontFamily: "Inter, sans-serif",
-                    fontSize: "var(--text-xs)",
-                    fontWeight: "var(--font-weight-medium)",
-                    color: "var(--muted-foreground)",
-                  }}
-                >
-                  {nextReviewIn === 0 ? "Now!" : `${nextReviewIn}`}
-                </span>
-              </div>
-            </div>
-
-            {/* Progress Bar */}
-            <div
-              className="w-full h-2 rounded-full overflow-hidden"
+            
+            {/* Chevron Button */}
+            <button
+              onClick={() => setIsProfileExpanded(!isProfileExpanded)}
+              className="p-2 rounded transition-all duration-200 hover:bg-muted cursor-pointer"
               style={{
-                backgroundColor: "var(--muted)",
-                filter: "brightness(0.7)",
+                color: "var(--muted-foreground)",
               }}
             >
-              <div
-                className="h-full transition-all duration-300"
-                style={{
-                  width: `${xpProgress}%`,
-                  backgroundColor: "var(--primary)",
-                }}
-              />
-            </div>
+              {isProfileExpanded ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
+            </button>
           </div>
         </div>
 
-        {/* Portfolio Impact Card */}
-        {advisorState && (
-          <PortfolioImpactCard
-            lifetimeSavings={advisorState.lifetimeSavingsGenerated}
-            lifetimeDebtCleared={advisorState.lifetimeDebtCleared}
-            sessionId={getSessionId() || undefined}
-            recentImpact={recentImpact}
-            animate={shouldAnimateImpact}
-            onClick={onOpenImpactDashboard}
-          />
-        )}
+        {/* Collapsible Drawer */}
+        <div
+          className="overflow-hidden transition-all duration-300"
+          style={{
+            maxHeight: isProfileExpanded ? "500px" : "0",
+            opacity: isProfileExpanded ? 1 : 0,
+          }}
+        >
+          <div className="mt-2 space-y-3">
+            {/* Portfolio Impact Card */}
+            {advisorState && (
+              <PortfolioImpactCard
+                lifetimeSavings={advisorState.lifetimeSavingsGenerated}
+                lifetimeDebtCleared={advisorState.lifetimeDebtCleared}
+                sessionId={getSessionId() || undefined}
+                recentImpact={recentImpact}
+                animate={shouldAnimateImpact}
+                onClick={onOpenImpactDashboard}
+              />
+            )}
+
+            {/* Leaderboard Button */}
+            <button
+              onClick={() => setShowLeaderboardModal(true)}
+              className="w-full px-3 py-2.5 flex items-center justify-center gap-2 rounded-lg border transition-all duration-200 hover:scale-[1.02]"
+              style={{
+                backgroundColor: "var(--muted)",
+                borderColor: "var(--border)",
+                fontFamily: "Inter, sans-serif",
+                fontSize: "var(--text-sm)",
+                fontWeight: "var(--font-weight-medium)",
+                color: "var(--foreground)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "var(--primary)";
+                e.currentTarget.style.color = "var(--primary-foreground)";
+                e.currentTarget.style.borderColor = "var(--primary)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "var(--muted)";
+                e.currentTarget.style.color = "var(--foreground)";
+                e.currentTarget.style.borderColor = "var(--border)";
+              }}
+            >
+              <Trophy className="w-4 h-4" />
+              Global Leaderboard
+            </button>
+          </div>
+        </div>
 
         {/* Stats Modal */}
         <PlayerStatsModal
@@ -352,33 +410,6 @@ export function ChatSidebar({
           contacts={contacts}
           advisorState={advisorState}
         />
-
-        {/* Leaderboard Button */}
-        <button
-          onClick={() => setShowLeaderboardModal(true)}
-          className="w-full mt-3 px-3 py-2.5 flex items-center justify-center gap-2 rounded-lg border transition-all duration-200 hover:scale-[1.02]"
-          style={{
-            backgroundColor: "var(--muted)",
-            borderColor: "var(--border)",
-            fontFamily: "Inter, sans-serif",
-            fontSize: "var(--text-sm)",
-            fontWeight: "var(--font-weight-medium)",
-            color: "var(--foreground)",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "var(--primary)";
-            e.currentTarget.style.color = "var(--primary-foreground)";
-            e.currentTarget.style.borderColor = "var(--primary)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "var(--muted)";
-            e.currentTarget.style.color = "var(--foreground)";
-            e.currentTarget.style.borderColor = "var(--border)";
-          }}
-        >
-          <Trophy className="w-4 h-4" />
-          Global Leaderboard
-        </button>
 
         {/* Leaderboard Modal */}
         <LeaderboardModal

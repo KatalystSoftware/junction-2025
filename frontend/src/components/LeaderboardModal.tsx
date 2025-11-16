@@ -147,8 +147,8 @@ export function LeaderboardModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl h-[90vh] max-h-[90vh] flex flex-col gap-0 p-0">
-        <DialogHeader className="px-6 pt-6 pb-4 flex-shrink-0">
+      <DialogContent className="max-w-3xl h-[90vh] max-h-[90vh] flex flex-col gap-0 p-6">
+        <DialogHeader className="px-2 pt-2 pb-4 flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <Trophy className="w-6 h-6 text-yellow-500" />
             Global Leaderboard
@@ -159,7 +159,7 @@ export function LeaderboardModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex-1 flex flex-col min-h-0 px-6">
+        <div className="flex-1 flex flex-col min-h-0 px-2">
           {/* Category selector */}
           <div className="flex items-center gap-2 mb-3">
             {(
@@ -173,11 +173,18 @@ export function LeaderboardModal({
               <button
                 key={value}
                 onClick={() => setCategory(value)}
-                className={`px-3 py-1 rounded-full text-xs border transition-colors ${
+                className={`px-4 py-1.5 rounded-full text-xs border-2 transition-all duration-200 cursor-pointer font-semibold ${
                   category === value
-                    ? "bg-primary text-primary-foreground border-primary"
-                    : "bg-muted text-muted-foreground border-border hover:bg-muted/80"
+                    ? "bg-primary text-primary-foreground border-primary shadow-lg scale-110"
+                    : "bg-muted text-muted-foreground border-border hover:bg-muted/80 hover:scale-105 hover:shadow-sm"
                 }`}
+                style={
+                  category === value
+                    ? {
+                        boxShadow: "0 4px 12px rgba(127, 86, 217, 0.4)",
+                      }
+                    : undefined
+                }
               >
                 {label}
               </button>
@@ -242,10 +249,10 @@ export function LeaderboardModal({
                   return (
                     <div
                       key={entry.advisorId}
-                      className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                      className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-200 cursor-pointer ${
                         isCurrentUser
                           ? "bg-primary/20 border-2 border-primary"
-                          : "bg-muted/50 hover:bg-muted"
+                          : "bg-muted/50 hover:bg-muted hover:scale-[1.02] hover:shadow-md"
                       }`}
                     >
                       {/* Rank */}
@@ -295,7 +302,7 @@ export function LeaderboardModal({
           )}
         </div>
 
-        <div className="text-xs text-muted-foreground text-center pt-2 pb-4 px-6 border-t flex-shrink-0">
+        <div className="text-xs text-muted-foreground text-center pt-2 pb-2 px-2 border-t flex-shrink-0">
           {leaderboard &&
             `Last updated: ${new Date(leaderboard.lastUpdated).toLocaleString()}`}
         </div>

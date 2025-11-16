@@ -299,10 +299,39 @@ export function PlayerStatsModal({
             className="px-6 pt-4 pb-2 border-b flex-shrink-0"
             style={{ borderColor: "var(--border)" }}
           >
-            <TabsList className="grid w-full" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)" }}>
-              <TabsTrigger value="stats">Stats</TabsTrigger>
-              <TabsTrigger value="performance">Performance</TabsTrigger>
-              <TabsTrigger value="relationships">Relationships</TabsTrigger>
+            <style>{`
+              .profile-tab-trigger[data-state="active"] {
+                background-color: var(--primary) !important;
+                color: var(--primary-foreground) !important;
+                border-color: var(--primary) !important;
+                box-shadow: 0 4px 12px rgba(127, 86, 217, 0.4) !important;
+                transform: scale(1.1) !important;
+              }
+              .profile-tab-trigger[data-state="inactive"] {
+                background-color: var(--muted) !important;
+                color: var(--muted-foreground) !important;
+                border-color: var(--border) !important;
+              }
+            `}</style>
+            <TabsList className="bg-transparent p-0 h-auto gap-3">
+              <TabsTrigger 
+                value="stats"
+                className="profile-tab-trigger px-4 py-1.5 rounded-full text-xs border-2 transition-all duration-200 cursor-pointer font-semibold hover:bg-muted/80 hover:scale-105 hover:shadow-sm"
+              >
+                Stats
+              </TabsTrigger>
+              <TabsTrigger 
+                value="performance"
+                className="profile-tab-trigger px-4 py-1.5 rounded-full text-xs border-2 transition-all duration-200 cursor-pointer font-semibold hover:bg-muted/80 hover:scale-105 hover:shadow-sm"
+              >
+                Performance
+              </TabsTrigger>
+              <TabsTrigger 
+                value="relationships"
+                className="profile-tab-trigger px-4 py-1.5 rounded-full text-xs border-2 transition-all duration-200 cursor-pointer font-semibold hover:bg-muted/80 hover:scale-105 hover:shadow-sm"
+              >
+                Relationships
+              </TabsTrigger>
             </TabsList>
           </div>
 
