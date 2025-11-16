@@ -1,7 +1,7 @@
 import { Input } from "./ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ScrollArea } from "./ui/scroll-area";
-import { Search, Pin } from "lucide-react";
+import { Search, Pin, Star, TrendingUp, Briefcase } from "lucide-react";
 import type { Contact } from "./WhatsAppInterface";
 import { useState, useEffect } from "react";
 import logoImage from "figma:asset/28e39d27183eb9dbb848b6be8a7c7b00e841cd40.png";
@@ -71,6 +71,16 @@ export function ChatSidebar({
   const level = Math.floor(skillLevel) + 1; // Convert 0-10 to 1-11
   const xpProgress = Math.round((skillLevel % 1) * 100); // Get decimal part as percentage
   const xpForNextLevel = 100;
+
+  // Get advisor stats
+  const reputation = advisorState?.reputation ?? 0;
+  const totalSessions = advisorState?.totalSessions ?? 0;
+  const lastReviewSession = advisorState?.sessionHistory?.[advisorState.sessionHistory.length - 1]?.sessionNumber ?? 0;
+
+  // Calculate boss review countdown
+  const sessionsSinceLastReview = totalSessions - lastReviewSession;
+  const sessionsUntilNext = 5 - sessionsSinceLastReview;
+  const nextReviewIn = Math.max(0, Math.min(sessionsUntilNext, 5));
 
   const filteredContacts = contacts.filter((contact) =>
     contact.name.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -188,6 +198,68 @@ export function ChatSidebar({
                 {xpProgress}/{xpForNextLevel} {t.chat.xp}
               </span>
             </div>
+
+            {/* Stats Row */}
+            <div className="flex items-center gap-3 mb-2">
+              {/* Reputation */}
+              <div className="flex items-center gap-1">
+                <Star
+                  className="w-3 h-3"
+                  style={{
+                    color: reputation >= 80 ? "var(--chart-1)" : reputation >= 60 ? "var(--chart-4)" : reputation >= 40 ? "var(--chart-3)" : "var(--chart-2)",
+                  }}
+                />
+                <span
+                  style={{
+                    fontFamily: "Inter, sans-serif",
+                    fontSize: "var(--text-xs)",
+                    fontWeight: "var(--font-weight-medium)",
+                    color: "var(--muted-foreground)",
+                  }}
+                >
+                  {reputation}
+                </span>
+              </div>
+
+              {/* Skill Level */}
+              <div className="flex items-center gap-1">
+                <TrendingUp
+                  className="w-3 h-3"
+                  style={{
+                    color: skillLevel >= 8 ? "var(--chart-1)" : skillLevel >= 6 ? "var(--chart-4)" : skillLevel >= 4 ? "var(--chart-3)" : "var(--chart-2)",
+                  }}
+                />
+                <span
+                  style={{
+                    fontFamily: "Inter, sans-serif",
+                    fontSize: "var(--text-xs)",
+                    fontWeight: "var(--font-weight-medium)",
+                    color: "var(--muted-foreground)",
+                  }}
+                >
+                  {skillLevel.toFixed(1)}
+                </span>
+              </div>
+
+              {/* Boss Review Countdown */}
+              <div className="flex items-center gap-1">
+                <Briefcase
+                  className="w-3 h-3"
+                  style={{ color: "var(--primary)" }}
+                />
+                <span
+                  style={{
+                    fontFamily: "Inter, sans-serif",
+                    fontSize: "var(--text-xs)",
+                    fontWeight: "var(--font-weight-medium)",
+                    color: "var(--muted-foreground)",
+                  }}
+                >
+                  {nextReviewIn === 0 ? "Now!" : `${nextReviewIn}`}
+                </span>
+              </div>
+            </div>
+
             {/* Progress Bar */}
             <div
               className="w-full h-2 rounded-full overflow-hidden"

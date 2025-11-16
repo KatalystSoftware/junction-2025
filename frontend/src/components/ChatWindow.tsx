@@ -31,7 +31,6 @@ import logoImage from "figma:asset/601ef144d16bf6e001c5324689cdddb5a7ea7f74.png"
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useTranslation } from "../utils/translations";
-import { StatusBar } from "./StatusBar";
 
 // Helper function to convert quality score (0-10) to quality level key
 function getQualityLevel(
@@ -58,12 +57,6 @@ interface ChatWindowProps {
     miniFeedback?: string;
     achievementsUnlocked?: any[];
     milestonesAchieved?: any[];
-  };
-  advisorState?: {
-    reputation: number;
-    skillLevel: number;
-    totalSessions: number;
-    lastReviewSession?: number;
   };
 }
 
@@ -134,7 +127,6 @@ export function ChatWindow({
   adviceChoices = [],
   isThreadResolved = false,
   conversationEndData,
-  advisorState,
 }: ChatWindowProps) {
   const t = useTranslation();
   const [inputValue, setInputValue] = useState("");
@@ -308,27 +300,116 @@ export function ChatWindow({
               />
             )}
           </div>
-          <div>
-            <h4
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "var(--text-base)",
-                fontWeight: "var(--font-weight-medium)",
-                color: "var(--card-foreground)",
-              }}
-            >
-              {contact.name}
-            </h4>
-            <p
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "var(--text-sm)",
-                color: "var(--muted-foreground)",
-                fontWeight: "var(--font-weight-normal)",
-              }}
-            >
-              {contact.online ? "Online" : "Offline"}
-            </p>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <h4
+                style={{
+                  fontFamily: "Inter, sans-serif",
+                  fontSize: "var(--text-base)",
+                  fontWeight: "var(--font-weight-medium)",
+                  color: "var(--card-foreground)",
+                }}
+              >
+                {contact.name}
+              </h4>
+              <span
+                style={{
+                  fontFamily: "Inter, sans-serif",
+                  fontSize: "var(--text-sm)",
+                  color: "var(--muted-foreground)",
+                  fontWeight: "var(--font-weight-normal)",
+                }}
+              >
+                {contact.online ? "Online" : "Offline"}
+              </span>
+              {/* Financial Status Indicators */}
+              {contact.id !== "boss-pinned" && contact.financialProfile && (
+                <>
+                  <span
+                    style={{
+                      color: "var(--border)",
+                      fontSize: "var(--text-sm)",
+                    }}
+                  >
+                    •
+                  </span>
+                  <div className="hidden md:flex items-center gap-2">
+                    <span
+                      style={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: "var(--text-xs)",
+                        color: "var(--muted-foreground)",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontWeight: "var(--font-weight-semibold)",
+                          color: "var(--chart-1)",
+                        }}
+                      >
+                        {formatCurrency(calculateTotalBalance(contact))}
+                      </span>{" "}
+                      bal
+                    </span>
+                    <span
+                      style={{
+                        color: "var(--border)",
+                        fontSize: "var(--text-sm)",
+                      }}
+                    >
+                      •
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: "var(--text-xs)",
+                        color: "var(--muted-foreground)",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontWeight: "var(--font-weight-semibold)",
+                          color:
+                            calculateTotalDebt(contact) > 0
+                              ? "var(--chart-2)"
+                              : "var(--muted-foreground)",
+                        }}
+                      >
+                        {formatCurrency(calculateTotalDebt(contact))}
+                      </span>{" "}
+                      debt
+                    </span>
+                    <span
+                      style={{
+                        color: "var(--border)",
+                        fontSize: "var(--text-sm)",
+                      }}
+                    >
+                      •
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: "var(--text-xs)",
+                        color: "var(--muted-foreground)",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontWeight: "var(--font-weight-semibold)",
+                          color: "var(--card-foreground)",
+                        }}
+                      >
+                        {formatCurrency(
+                          contact.financialProfile?.typicalMonthlyIncome || 0,
+                        )}
+                      </span>
+                      /mo
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
 
@@ -411,16 +492,6 @@ export function ChatWindow({
           </div>
         </div>
       </div>
-
-      {/* Status Bar */}
-      {advisorState && (
-        <StatusBar
-          reputation={advisorState.reputation}
-          skillLevel={advisorState.skillLevel}
-          totalSessions={advisorState.totalSessions}
-          lastReviewSession={advisorState.lastReviewSession || 0}
-        />
-      )}
 
       {/* Messages Area */}
       <ScrollArea

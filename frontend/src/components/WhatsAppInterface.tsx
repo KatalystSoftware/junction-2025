@@ -589,16 +589,6 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
         adviceChoices={currentAdviceChoices}
         isThreadResolved={isThreadResolved}
         conversationEndData={conversationEndData}
-        advisorState={
-          game.advisorState
-            ? {
-                reputation: game.advisorState.reputation,
-                skillLevel: game.advisorState.skillLevel,
-                totalSessions: game.advisorState.totalSessions,
-                lastReviewSession: game.advisorState.lastReviewSession,
-              }
-            : undefined
-        }
       />
 
       {/* Modals - shown in sequence after consultation ends */}
