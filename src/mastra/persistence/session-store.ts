@@ -29,6 +29,7 @@ export interface FinancialOverview {
 
 export interface ThreadMetadata {
   characterId?: string;
+  characterName: string;
   name: string;
   age?: number;
   occupation?: string;
