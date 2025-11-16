@@ -999,28 +999,25 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
                       setShowChat(true);
 
                       // Add acknowledgment choices for the declined call
-                      setAdviceChoicesByThread((prev) => ({
-                        ...prev,
-                        "boss-pinned": [
-                          {
-                            choiceId: "declined_call_1",
-                            actionText: "Acknowledge (via text)",
-                            icon: "📝",
-                            projectedOutcome:
-                              "Respond to review professionally",
-                            fullAdviceText:
-                              "Thanks for the feedback. I understand the points you've made and I'll work on improving those areas.",
-                          },
-                          {
-                            choiceId: "declined_call_2",
-                            actionText: "Apologize for missing call",
-                            icon: "🙏",
-                            projectedOutcome: "Show respect for boss's time",
-                            fullAdviceText:
-                              "Sorry I missed your call. I've reviewed your feedback and I appreciate you taking the time to help me improve.",
-                          },
-                        ],
-                      }));
+                      setBossAdviceChoices([
+                        {
+                          choiceId: "declined_call_1",
+                          actionText: "Acknowledge (via text)",
+                          icon: "📝",
+                          projectedOutcome:
+                            "Respond to review professionally",
+                          fullAdviceText:
+                            "Thanks for the feedback. I understand the points you've made and I'll work on improving those areas.",
+                        },
+                        {
+                          choiceId: "declined_call_2",
+                          actionText: "Apologize for missing call",
+                          icon: "🙏",
+                          projectedOutcome: "Show respect for boss's time",
+                          fullAdviceText:
+                            "Sorry I missed your call. I've reviewed your feedback and I appreciate you taking the time to help me improve.",
+                        },
+                      ]);
                     }
                     setBossCallReviewData(null);
                   }}
