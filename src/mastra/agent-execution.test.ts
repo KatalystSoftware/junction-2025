@@ -1,5 +1,9 @@
 import assert from "node:assert/strict";
-import { ConcurrencyLimiter, runWithRetry } from "./agent-execution.ts";
+import {
+  ConcurrencyLimiter,
+  runWithRetry,
+  defaultAgentLimiter,
+} from "./agent-execution.ts";
 
 async function testConcurrencyLimit() {
   const limiter = new ConcurrencyLimiter(2);
@@ -48,6 +52,11 @@ async function testRetryLogic() {
   assert.equal(attempts, 3);
 }
 
+function testDefaultConcurrency() {
+  const limiter: any = defaultAgentLimiter;
+  assert.equal(limiter.maxConcurrent, 50);
+}
+
 describe("agent-execution", () => {
   test("enforces concurrency limit", async () => {
     await testConcurrencyLimit();
@@ -55,5 +64,9 @@ describe("agent-execution", () => {
 
   test("retries transient failures", async () => {
     await testRetryLogic();
+  });
+
+  test("uses default concurrency of 50", () => {
+    testDefaultConcurrency();
   });
 });

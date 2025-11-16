@@ -67,7 +67,7 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const defaultConcurrency = Number(process.env.AGENT_CONCURRENCY || "20");
+const defaultConcurrency = Number(process.env.AGENT_CONCURRENCY || "50");
 
 export const defaultAgentLimiter = new ConcurrencyLimiter(
   Number.isFinite(defaultConcurrency) && defaultConcurrency > 0
