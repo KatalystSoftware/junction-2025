@@ -6,8 +6,11 @@ describe("leaderboard-service global score", () => {
       process.env.DATABASE_URL ||
       "postgres://user:pass@localhost:5432/test_leaderboard";
 
-    const { leaderboardService } = await import("./leaderboard-service.ts");
-    const service: any = leaderboardService;
+    const { getLeaderboardService } = await import("./leaderboard-service.ts");
+    const service: any = getLeaderboardService();
+    if (!service) {
+      throw new Error("Leaderboard service not available");
+    }
 
     const lowSavingsHighRep = service.calculateGlobalScore(
       90, // reputation

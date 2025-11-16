@@ -481,5 +481,20 @@ export class LeaderboardService {
   }
 }
 
-// Export singleton instance
-export const leaderboardService = new LeaderboardService();
+// Lazy-loaded singleton instance - only created if DATABASE_URL is set
+let _leaderboardService: LeaderboardService | null = null;
+
+export function getLeaderboardService(): LeaderboardService | null {
+  if (!process.env.DATABASE_URL) {
+    return null;
+  }
+  
+  if (!_leaderboardService) {
+    _leaderboardService = new LeaderboardService();
+  }
+  
+  return _leaderboardService;
+}
+
+// Export getter for backward compatibility
+export const leaderboardService = getLeaderboardService();

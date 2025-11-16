@@ -1236,9 +1236,13 @@ app.get("/leaderboard", async (c) => {
 
     console.log(`🏆 Fetching leaderboard: ${category}, limit: ${limit}`);
 
-    const { leaderboardService } = await import(
+    const { getLeaderboardService } = await import(
       "../persistence/leaderboard-service.ts"
     );
+    const leaderboardService = getLeaderboardService();
+    if (!leaderboardService) {
+      return c.json({ error: "Leaderboard service not available" }, 503);
+    }
     const leaderboard = await leaderboardService.getLeaderboard(
       category,
       limit,
@@ -1269,9 +1273,13 @@ app.get("/leaderboard/rank/:advisorId", async (c) => {
       `🏆 Fetching rank for advisor ${advisorId.substring(0, 8)}... in ${category}`,
     );
 
-    const { leaderboardService } = await import(
+    const { getLeaderboardService } = await import(
       "../persistence/leaderboard-service.ts"
     );
+    const leaderboardService = getLeaderboardService();
+    if (!leaderboardService) {
+      return c.json({ error: "Leaderboard service not available" }, 503);
+    }
     const rank = await leaderboardService.getAdvisorRank(advisorId, category);
 
     if (!rank) {
@@ -1304,9 +1312,13 @@ app.get("/leaderboard/surrounding/:advisorId", async (c) => {
       `🏆 Fetching surrounding advisors for ${advisorId.substring(0, 8)}... in ${category} (±${range})`,
     );
 
-    const { leaderboardService } = await import(
+    const { getLeaderboardService } = await import(
       "../persistence/leaderboard-service.ts"
     );
+    const leaderboardService = getLeaderboardService();
+    if (!leaderboardService) {
+      return c.json({ error: "Leaderboard service not available" }, 503);
+    }
     const surrounding = await leaderboardService.getSurroundingAdvisors(
       advisorId,
       category,

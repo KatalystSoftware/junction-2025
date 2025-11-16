@@ -8,13 +8,18 @@ import type {
   GameResponse,
   LeaderboardCategory,
 } from "../types/game-types.ts";
-import { leaderboardService } from "../persistence/leaderboard-service.ts";
+import { getLeaderboardService } from "../persistence/leaderboard-service.ts";
 
 /**
  * Initialize leaderboard system on game start
  */
 export async function initializeLeaderboard(): Promise<void> {
   try {
+    const leaderboardService = getLeaderboardService();
+    if (!leaderboardService) {
+      console.log("⚠️  Leaderboard service not available (DATABASE_URL not set)");
+      return;
+    }
     await leaderboardService.initialize();
     console.log("✅ Leaderboard initialized");
   } catch (error) {
@@ -32,6 +37,11 @@ export async function afterSessionComplete(
   gameResponse: GameResponse,
 ): Promise<GameResponse> {
   try {
+    const leaderboardService = getLeaderboardService();
+    if (!leaderboardService) {
+      return gameResponse;
+    }
+
     // Update leaderboard entry
     await leaderboardService.upsertLeaderboardEntry(advisorState, advisorName);
 
@@ -57,6 +67,11 @@ export async function getLeaderboardData(
   category: LeaderboardCategory = "global",
 ) {
   try {
+    const leaderboardService = getLeaderboardService();
+    if (!leaderboardService) {
+      return null;
+    }
+
     const leaderboard = await leaderboardService.getLeaderboard(category, 100);
     const surroundingAdvisors = await leaderboardService.getSurroundingAdvisors(
       advisorId,
@@ -83,6 +98,11 @@ export async function onAdvisorInit(
   advisorName: string,
 ): Promise<void> {
   try {
+    const leaderboardService = getLeaderboardService();
+    if (!leaderboardService) {
+      return;
+    }
+
     // Create or update leaderboard entry
     await leaderboardService.upsertLeaderboardEntry(advisorState, advisorName);
   } catch (error) {

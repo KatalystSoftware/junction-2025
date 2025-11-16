@@ -457,7 +457,7 @@ export function ChatWindow({
 
   return (
     <div
-      className={`flex-1 flex-col relative h-screen ${showChat ? "flex" : "hidden md:flex"}`}
+      className={`flex-1 flex-col relative h-screen overflow-x-hidden ${showChat ? "flex" : "hidden md:flex"}`}
       style={{ backgroundColor: "var(--background)" }}
     >
       {/* Chat Header */}
@@ -1287,7 +1287,7 @@ export function ChatWindow({
       ) : (
         /* Normal Input Area */
         <div
-          className="absolute bottom-4 left-4 right-4 px-4 py-3 transition-all duration-200 border-2 relative"
+          className="absolute bottom-4 left-4 right-4 px-4 py-3 transition-all duration-200 border-2 relative min-w-0"
           style={{
             backgroundColor: "var(--card)",
             boxShadow: isInputFocused
@@ -1296,17 +1296,10 @@ export function ChatWindow({
             borderRadius: "9999px",
             borderColor: isInputFocused ? "var(--primary)" : "transparent",
             zIndex: 40,
+            maxWidth: "calc(100% - 2rem)",
           }}
         >
           <TooltipProvider>
-            {showChatInputTip && (
-              <div className="absolute top-0 left-0 pointer-events-none animate-bounce transform -translate-x-4 -translate-y-4">
-                <ArrowDown
-                  className="w-7 h-7"
-                  style={{ color: "var(--primary)" }}
-                />
-              </div>
-            )}
             {/* Recording UI */}
             {(isRecording || audioBlob) && (
               <div
@@ -1421,18 +1414,19 @@ export function ChatWindow({
               </div>
             )}
 
-            <div className="flex gap-2 items-end">
+            <div className="flex gap-2 items-end min-w-0">
               <Input
                 value={inputValue}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyPress}
                 placeholder="Type a message..."
                 disabled={isThreadResolved || isRecording || audioBlob !== null}
-                className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 min-w-0"
                 style={{
                   borderRadius: "9999px",
                   backgroundColor: "transparent",
                   cursor: "text",
+                  minWidth: 0,
                 }}
                 onFocus={() => setIsInputFocused(true)}
                 onBlur={() => setIsInputFocused(false)}
