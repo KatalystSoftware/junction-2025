@@ -485,10 +485,18 @@ export class CharacterPoolManager {
 
     const currentSession = advisorState.totalSessions;
 
-    // Get all scenarios for this character that are off cooldown
+    // Get completed scenario IDs for this character
+    const completedScenarioIds = new Set(
+      (character.completedScenarios || []).map((cs) => cs.scenarioId),
+    );
+
+    // Get all scenarios for this character that are off cooldown AND not completed
     const characterScenarios = Array.from(this.scenarios.values()).filter(
       (s) => {
         if (s.characterId !== characterId) return false;
+
+        // DUPLICATE PREVENTION: Skip scenarios that have already been completed
+        if (completedScenarioIds.has(s.scenarioId)) return false;
 
         // Check if scenario is on cooldown
         const lastUsed = this.scenarioLastUsed.get(s.scenarioId);
@@ -568,10 +576,18 @@ export class CharacterPoolManager {
     const candidatePairs: { character: Character; scenario: Scenario }[] = [];
 
     for (const character of newCharacters) {
+      // Get completed scenario IDs for this character
+      const completedScenarioIds = new Set(
+        (character.completedScenarios || []).map((cs) => cs.scenarioId),
+      );
+
       const initialScenarios = Array.from(this.scenarios.values()).filter(
         (s) => {
           if (s.characterId !== character.characterId) return false;
           if (s.triggerConditions.isFollowUp) return false;
+
+          // DUPLICATE PREVENTION: Skip scenarios that have already been completed
+          if (completedScenarioIds.has(s.scenarioId)) return false;
 
           // Check skill level (NO MAX CAP)
           if (
@@ -697,12 +713,19 @@ export class CharacterPoolManager {
 
     // Try to find a character with an available scenario
     for (const character of allCharacters) {
+      // Get completed scenario IDs for this character
+      const completedScenarioIds = new Set(
+        (character.completedScenarios || []).map((cs) => cs.scenarioId),
+      );
+
       // Get scenarios for this character, sorted by last use
       const scenarios = Array.from(this.scenarios.values())
         .filter(
           (s) =>
             s.characterId === character.characterId &&
             !s.triggerConditions.isFollowUp &&
+            // DUPLICATE PREVENTION: Skip scenarios that have already been completed
+            !completedScenarioIds.has(s.scenarioId) &&
             advisorState.skillLevel >=
               s.triggerConditions.advisorSkillLevel.min,
         )
