@@ -29,7 +29,56 @@ export interface FinancialOverview {
 
 export interface ThreadMetadata {
   characterId?: string;
-  characterName: string;
+  name: string;
+  age?: number;
+  occupation?: string;
+  gender?: "male" | "female";
+  financialProfile?: {
+    incomeLevel: "low" | "medium" | "high";
+    typicalMonthlyIncome: number;
+    hasDebt: boolean;
+    hasSavings: "none" | "minimal" | "moderate" | "good";
+    bankAccounts: Array<{
+      accountId: string;
+      bankName: string;
+      accountType: string;
+      balance: number;
+      currency: string;
+    }>;
+    creditCards: Array<{
+      cardId: string;
+      issuer: string;
+      balance: number;
+      creditLimit: number;
+      interestRate: number;
+      minimumPayment: number;
+      currency: string;
+    }>;
+    debts: Array<{
+      debtId?: string;
+      creditor?: string;
+      totalAmount: number;
+      remainingAmount: number;
+      monthlyPayment: number;
+      interestRate?: number;
+      currency?: string;
+    }>;
+    subscriptions: Array<{
+      subscriptionId: string;
+      name: string;
+      monthlyCost: number;
+      category: string;
+      currency: string;
+      startDate: string;
+    }>;
+    monthlyExpenses: {
+      rent?: number;
+      groceries?: number;
+      transportation?: number;
+      utilities?: number;
+      other?: number;
+    };
+  };
   status: "active" | "completed";
   financialOverview?: FinancialOverview;
   adviceChoices?: AdviceChoice[];

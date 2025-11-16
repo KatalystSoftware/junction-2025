@@ -363,7 +363,11 @@ app.post("/init", async (c) => {
             // Save character metadata if provided
             if (gameResponse.characterInfo && threadId) {
               const metadata: ThreadMetadata = {
-                characterName: gameResponse.characterInfo.name,
+                name: gameResponse.characterInfo.name,
+                age: gameResponse.characterInfo.age,
+                occupation: gameResponse.characterInfo.occupation,
+                gender: gameResponse.characterInfo.gender,
+                financialProfile: gameResponse.characterInfo.financialProfile,
                 status: "active",
                 adviceChoices: gameResponse.adviceChoices || [],
               };
@@ -531,7 +535,11 @@ app.post("/start-consultation", async (c) => {
       // Save character metadata if provided
       if (gameResponse.characterInfo && threadId) {
         const metadata: ThreadMetadata = {
-          characterName: gameResponse.characterInfo.name,
+          name: gameResponse.characterInfo.name,
+          age: gameResponse.characterInfo.age,
+          occupation: gameResponse.characterInfo.occupation,
+          gender: gameResponse.characterInfo.gender,
+          financialProfile: gameResponse.characterInfo.financialProfile,
           status: "active",
           adviceChoices: gameResponse.adviceChoices || [],
         };
