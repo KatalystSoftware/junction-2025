@@ -19,6 +19,7 @@ import { AchievementUnlockModal } from "./AchievementUnlockModal";
 import { QuizModal } from "./QuizModal";
 import { GameOverModal } from "./GameOverModal";
 import { ImpactDashboardModal } from "./ImpactDashboardModal";
+import { shouldPollForUpdates } from "@backend/gamePolling";
 
 interface WhatsAppInterfaceProps {
   onLogoClick: () => void;
@@ -102,6 +103,7 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
 
   // Auto-trigger onboarding on first load (with race condition protection)
   const hasTriggeredOnboarding = useRef(false);
+  const lastPollTimeRef = useRef<number | null>(null);
   useEffect(() => {
     if (
       game.advisorState &&
@@ -419,6 +421,37 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
   const processedStartResponse = useRef<any>(null);
   const processedMessageResponse = useRef<any>(null);
   const processedAutoStartResponse = useRef<any>(null);
+
+  // Periodically check for new server-side updates
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      const now = Date.now();
+      const isActive =
+        !!game.advisorState &&
+        !game.isLoading &&
+        !game.isSending &&
+        !game.isStartingConsultation;
+
+      if (
+        shouldPollForUpdates(
+          { lastCheckAt: lastPollTimeRef.current, isActive },
+          now,
+          10_000,
+        )
+      ) {
+        lastPollTimeRef.current = now;
+        game.refetchState();
+      }
+    }, 10_000);
+
+    return () => window.clearInterval(intervalId);
+  }, [
+    game.advisorState,
+    game.isLoading,
+    game.isSending,
+    game.isStartingConsultation,
+    game.refetchState,
+  ]);
 
   // Derive boss acknowledgment choices from conversation state
   useEffect(() => {
