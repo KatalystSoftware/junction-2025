@@ -64,7 +64,7 @@ Please transcribe the following audio accurately. Return ONLY the transcribed te
 
     // Use configured Gemini model for transcription (supports audio input)
     const result = await generateText({
-      model: getAgentModel(),
+      model: google(getAgentModel()),
       messages: [
         {
           role: "user",
@@ -105,7 +105,7 @@ export async function transcribeAudioWithLanguageDetection(
     const dataUrl = `data:${mimeType};base64,${base64Audio}`;
 
     const result = await generateText({
-      model: getAgentModel(),
+      model: google(getAgentModel()),
       messages: [
         {
           role: "user",
