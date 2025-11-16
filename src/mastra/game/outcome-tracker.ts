@@ -200,6 +200,67 @@ export function compareProjectedVsActual(
 }
 
 /**
+ * Update character's cumulative financial impact tracking
+ *
+ * @param character - Character to update
+ * @param projectedSavings - Projected savings from advice (€)
+ * @param projectedDebtReduction - Projected debt reduction (€)
+ * @param actualSavings - Actual savings (if follow-up, otherwise undefined)
+ * @param actualDebtReduction - Actual debt reduction (if follow-up, otherwise undefined)
+ */
+export function updateCharacterFinancialImpact(
+  character: Character,
+  projectedSavings: number,
+  projectedDebtReduction: number,
+  actualSavings?: number,
+  actualDebtReduction?: number,
+): void {
+  // Initialize if not present (for backward compatibility)
+  if (character.relationshipState.totalSavingsGenerated === undefined) {
+    character.relationshipState.totalSavingsGenerated = 0;
+  }
+  if (character.relationshipState.totalDebtCleared === undefined) {
+    character.relationshipState.totalDebtCleared = 0;
+  }
+
+  // If this is a follow-up with actual results, use actual values
+  if (actualSavings !== undefined && actualDebtReduction !== undefined) {
+    character.relationshipState.totalSavingsGenerated +=
+      Math.round(actualSavings);
+    character.relationshipState.totalDebtCleared +=
+      Math.round(actualDebtReduction);
+
+    // Update projection accuracy tracking
+    if (!character.relationshipState.projectedVsActual) {
+      character.relationshipState.projectedVsActual = {
+        totalProjected: 0,
+        totalActual: 0,
+        accuracyRate: 1.0,
+      };
+    }
+
+    character.relationshipState.projectedVsActual.totalProjected +=
+      projectedSavings + projectedDebtReduction;
+    character.relationshipState.projectedVsActual.totalActual +=
+      actualSavings + actualDebtReduction;
+
+    // Calculate accuracy rate (avoid division by zero)
+    if (character.relationshipState.projectedVsActual.totalProjected > 0) {
+      character.relationshipState.projectedVsActual.accuracyRate =
+        character.relationshipState.projectedVsActual.totalActual /
+        character.relationshipState.projectedVsActual.totalProjected;
+    }
+  } else {
+    // This is an initial consultation (projection only)
+    character.relationshipState.totalSavingsGenerated +=
+      Math.round(projectedSavings);
+    character.relationshipState.totalDebtCleared += Math.round(
+      projectedDebtReduction,
+    );
+  }
+}
+
+/**
  * Format outcome for display
  */
 export function formatOutcome(outcome: FinancialOutcome): string {

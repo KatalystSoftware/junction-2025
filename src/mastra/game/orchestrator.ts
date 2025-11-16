@@ -200,6 +200,8 @@ export function createNewAdvisor(advisorId: string): AdvisorState {
     isFired: false,
     fireReason: undefined,
     criticalInterventionsForcedThrough: 0,
+    // NEW: Financial Impact History (for visualization)
+    financialImpactHistory: [],
   };
 }
 
@@ -586,6 +588,10 @@ Respond with ONLY valid JSON (NO markdown):
       scenario,
       character.personality,
       [], // No conversation history yet (first turn)
+    );
+
+    console.log(
+      `🎯 Generated ${adviceChoices?.length || 0} advice choices for new consultation (thread ${threadId.substring(0, 8)}...)`,
     );
 
     // Translate advice choices if user language is not English
@@ -1229,10 +1235,16 @@ export async function handleAdvisorResponse(
     }
 
     // NEW: Calculate earnings based on financial projection
-    // Calculate coins earned and update state
+    // Calculate coins earned and update state with context for impact tracking
     const { coinsEarned, updatedState } = calculateCoinsEarned(
       adviceEvaluation,
       advisorState,
+      {
+        characterId: character.characterId,
+        characterName: character.name,
+        scenarioId: scenario.scenarioId,
+        topic: scenario.topic,
+      },
     );
     advisorState = updatedState;
 
@@ -1244,6 +1256,16 @@ export async function handleAdvisorResponse(
 
       // Update current goal progress if exists
       updateGoalProgress(advisorState, projection);
+
+      // NEW: Update per-character cumulative financial impact
+      const { updateCharacterFinancialImpact } = await import(
+        "./outcome-tracker.ts"
+      );
+      updateCharacterFinancialImpact(
+        character,
+        projection.totalSaved,
+        projection.totalDebtReduced,
+      );
     }
 
     // Check for milestones and achievements
@@ -1297,8 +1319,37 @@ export async function handleAdvisorResponse(
   // Get all active threads for UI
   const activeThreads = getActiveThreads(advisorState);
 
+  // Generate fresh advice choices for next advisor response (if conversation is not ending)
+  let adviceChoices;
+  if (!characterResponse.conversationEnding) {
+    // Build updated conversation history including the current exchange
+    const updatedHistory = conversationHistory || [];
+    updatedHistory.push({ role: "user", content: advisorMessage });
+    updatedHistory.push({
+      role: "assistant",
+      content: characterResponse.messages.join(" "),
+    });
+
+    // Generate new advice choices based on conversation so far
+    adviceChoices = generateAdviceChoices(
+      scenario,
+      character.personality,
+      updatedHistory,
+    );
+
+    console.log(
+      `🎯 Generated ${adviceChoices?.length || 0} advice choices for advisor response (thread ${threadId.substring(0, 8)}...)`,
+    );
+
+    // Translate advice choices if user language is not English
+    if (adviceChoices && userLanguage !== "en") {
+      adviceChoices = await translateAdviceChoices(adviceChoices, userLanguage);
+    }
+  }
+
   // If conversation is ending, include financial results and progress data from the last session
   let financialResults;
+  let financialImpactUpdate;
   let miniFeedback;
   let milestonesAchieved;
   let achievementsUnlocked;
@@ -1327,6 +1378,23 @@ export async function handleAdvisorResponse(
         // NEW: Include extracted actions for UI display (Phase C)
         extractedActions: (lastSession as any).extractedActions,
       };
+
+      // NEW: Create financial impact update for real-time visualization
+      if (lastSession.financialProjection) {
+        const projection = lastSession.financialProjection;
+        financialImpactUpdate = {
+          savingsIncrement: Math.round(projection.totalSaved),
+          debtReductionIncrement: Math.round(projection.totalDebtReduced),
+          characterId: character.characterId,
+          characterName: character.name,
+          isActual: false, // This is a projection (actual comes from follow-ups)
+          newLifetimeTotals: {
+            savings: advisorState.lifetimeSavingsGenerated,
+            debtCleared: advisorState.lifetimeDebtCleared,
+          },
+          categorySavings: projection.categorySavings,
+        };
+      }
     }
 
     // Get progress data from session
@@ -1348,9 +1416,11 @@ export async function handleAdvisorResponse(
     recommendationMessage,
     tierChangeNotification,
     financialResults,
+    financialImpactUpdate, // NEW: Include financial impact delta for visualization
     miniFeedback,
     milestonesAchieved,
     achievementsUnlocked,
+    adviceChoices, // Add fresh advice choices for every character response
     advisorAdvice: characterResponse.conversationEnding
       ? advisorState.sessionHistory[advisorState.sessionHistory.length - 1]
           ?.playerAdvice

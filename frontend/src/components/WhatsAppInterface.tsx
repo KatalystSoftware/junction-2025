@@ -18,6 +18,7 @@ import { MilestoneModal } from "./MilestoneModal";
 import { AchievementUnlockModal } from "./AchievementUnlockModal";
 import { QuizModal } from "./QuizModal";
 import { GameOverModal } from "./GameOverModal";
+import { ImpactDashboardModal } from "./ImpactDashboardModal";
 
 interface WhatsAppInterfaceProps {
   onLogoClick: () => void;
@@ -173,19 +174,8 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       );
     }
 
-    // Handle advice choices (only set if present and non-empty)
-    if (
-      response.adviceChoices &&
-      response.adviceChoices.length > 0 &&
-      response.threadId
-    ) {
-      console.log("🎯 Got advice choices for thread", response.threadId);
-      // Store in component state for display
-      setAdviceChoicesByThread((prev) => ({
-        ...prev,
-        [response.threadId!]: response.adviceChoices || [],
-      }));
-    }
+    // NOTE: Advice choices are now automatically stored in useGameState cache
+    // No need to manually manage them here
 
     // Handle conversation end
     if (response.type === "conversation_end" && response.threadId) {
@@ -194,6 +184,20 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       console.log("🏁 Mini feedback:", response.miniFeedback);
       console.log("🏁 Achievements:", response.achievementsUnlocked);
       console.log("🏁 Milestones:", response.milestonesAchieved);
+
+      // Handle financial impact update for visualization
+      if (response.financialImpactUpdate) {
+        console.log(
+          "💰 Financial impact update:",
+          response.financialImpactUpdate,
+        );
+        setRecentImpact({
+          savings: response.financialImpactUpdate.savingsIncrement,
+          debtReduction: response.financialImpactUpdate.debtReductionIncrement,
+          characterName: response.financialImpactUpdate.characterName,
+        });
+        setShouldAnimateImpact(true);
+      }
 
       // Store end data for display
       const endData = {
@@ -277,35 +281,32 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       setShowChat(true);
 
       // Set acknowledgment choices for boss check-in
-      setAdviceChoicesByThread((prev) => ({
-        ...prev,
-        "boss-pinned": [
-          {
-            choiceId: "checkin_1",
-            actionText: "Thank boss and acknowledge feedback",
-            icon: "🙏",
-            projectedOutcome: "Show appreciation for guidance",
-            fullAdviceText:
-              "Thanks for the feedback, I really appreciate you taking the time to review my work. I'll keep your advice in mind for the next client.",
-          },
-          {
-            choiceId: "checkin_2",
-            actionText: "Commit to improvement",
-            icon: "📈",
-            projectedOutcome: "Demonstrate growth mindset",
-            fullAdviceText:
-              "Got it! I'll work on being more specific and actionable with my advice. I can see where I need to improve.",
-          },
-          {
-            choiceId: "checkin_3",
-            actionText: "Express gratitude for mentorship",
-            icon: "💡",
-            projectedOutcome: "Build rapport with boss",
-            fullAdviceText:
-              "Thank you, that's really helpful advice. It's great to have someone guiding me through this learning process. I'll apply these insights moving forward.",
-          },
-        ],
-      }));
+      setBossAdviceChoices([
+        {
+          choiceId: "checkin_1",
+          actionText: "Thank boss and acknowledge feedback",
+          icon: "🙏",
+          projectedOutcome: "Show appreciation for guidance",
+          fullAdviceText:
+            "Thanks for the feedback, I really appreciate you taking the time to review my work. I'll keep your advice in mind for the next client.",
+        },
+        {
+          choiceId: "checkin_2",
+          actionText: "Commit to improvement",
+          icon: "📈",
+          projectedOutcome: "Demonstrate growth mindset",
+          fullAdviceText:
+            "Got it! I'll work on being more specific and actionable with my advice. I can see where I need to improve.",
+        },
+        {
+          choiceId: "checkin_3",
+          actionText: "Express gratitude for mentorship",
+          icon: "💡",
+          projectedOutcome: "Build rapport with boss",
+          fullAdviceText:
+            "Thank you, that's really helpful advice. It's great to have someone guiding me through this learning process. I'll apply these insights moving forward.",
+        },
+      ]);
     }
 
     // Handle god boss review (full performance review with potential quiz)
@@ -376,10 +377,10 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
     }
   }, []);
 
-  // Temporary state for advice choices and conversation end data (UI-only)
-  const [adviceChoicesByThread, setAdviceChoicesByThread] = useState<{
-    [threadId: string]: any[];
-  }>({});
+  // Temporary state for conversation end data and boss-specific advice choices (UI-only)
+  // NOTE: Regular character adviceChoices are now managed in useGameState cache
+  // Boss choices (onboarding, check-in) are still local since they're hardcoded UI responses
+  const [bossAdviceChoices, setBossAdviceChoices] = useState<any[]>([]);
   const [conversationEndDataByThread, setConversationEndDataByThread] =
     useState<{ [threadId: string]: any }>({});
 
@@ -389,11 +390,21 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
   const [showAchievementsModal, setShowAchievementsModal] = useState(false);
   const [showQuizModal, setShowQuizModal] = useState(false);
   const [showGameOverModal, setShowGameOverModal] = useState(false);
+  const [showImpactDashboard, setShowImpactDashboard] = useState(false);
   const [gameOverData, setGameOverData] = useState<any>(null);
   const [currentResultsData, setCurrentResultsData] = useState<any>(null);
   const [currentMilestones, setCurrentMilestones] = useState<any[]>([]);
   const [currentAchievements, setCurrentAchievements] = useState<any[]>([]);
   const [currentQuiz, setCurrentQuiz] = useState<any>(null);
+  const [recentImpact, setRecentImpact] = useState<
+    | {
+        savings: number;
+        debtReduction: number;
+        characterName: string;
+      }
+    | undefined
+  >(undefined);
+  const [shouldAnimateImpact, setShouldAnimateImpact] = useState(false);
 
   // Boss intervention state - removed modal, interventions now appear in boss chat
 
@@ -424,32 +435,29 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
 
       // Only show if no other threads exist (first consultation not started yet)
       if (!hasThreads) {
-        setAdviceChoicesByThread((prev) => ({
-          ...prev,
-          "boss-pinned": [
-            {
-              choiceId: "onboarding_1",
-              actionText: t.bossOnboarding.response1Action,
-              icon: "👍",
-              projectedOutcome: t.bossOnboarding.response1Outcome,
-              fullAdviceText: t.bossOnboarding.response1Full,
-            },
-            {
-              choiceId: "onboarding_2",
-              actionText: t.bossOnboarding.response2Action,
-              icon: "🚀",
-              projectedOutcome: t.bossOnboarding.response2Outcome,
-              fullAdviceText: t.bossOnboarding.response2Full,
-            },
-            {
-              choiceId: "onboarding_3",
-              actionText: t.bossOnboarding.response3Action,
-              icon: "💪",
-              projectedOutcome: t.bossOnboarding.response3Outcome,
-              fullAdviceText: t.bossOnboarding.response3Full,
-            },
-          ],
-        }));
+        setBossAdviceChoices([
+          {
+            choiceId: "onboarding_1",
+            actionText: t.bossOnboarding.response1Action,
+            icon: "👍",
+            projectedOutcome: t.bossOnboarding.response1Outcome,
+            fullAdviceText: t.bossOnboarding.response1Full,
+          },
+          {
+            choiceId: "onboarding_2",
+            actionText: t.bossOnboarding.response2Action,
+            icon: "🚀",
+            projectedOutcome: t.bossOnboarding.response2Outcome,
+            fullAdviceText: t.bossOnboarding.response2Full,
+          },
+          {
+            choiceId: "onboarding_3",
+            actionText: t.bossOnboarding.response3Action,
+            icon: "💪",
+            projectedOutcome: t.bossOnboarding.response3Outcome,
+            fullAdviceText: t.bossOnboarding.response3Full,
+          },
+        ]);
       }
     }
   }, [game.threadHistories, game.advisorState, t]);
@@ -516,9 +524,7 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
 
     // Special handling for boss messages with advice choices (onboarding or check-in)
     if (selectedContactId === "boss-pinned") {
-      const hasAdviceChoices =
-        adviceChoicesByThread["boss-pinned"] &&
-        adviceChoicesByThread["boss-pinned"].length > 0;
+      const hasAdviceChoices = bossAdviceChoices.length > 0;
 
       if (hasAdviceChoices) {
         // This is either onboarding or check-in acknowledgment
@@ -533,11 +539,8 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
           game.startConsultation();
         }, 1500);
 
-        // Clear advice choices
-        setAdviceChoicesByThread((prev) => ({
-          ...prev,
-          [selectedContactId]: [],
-        }));
+        // Clear boss advice choices
+        setBossAdviceChoices([]);
         return;
       }
     }
@@ -546,11 +549,8 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
     console.log("📤 Sending message to thread:", selectedContactId);
     game.sendMessage(selectedContactId, content);
 
-    // Clear advice choices after sending
-    setAdviceChoicesByThread((prev) => ({
-      ...prev,
-      [selectedContactId]: [],
-    }));
+    // NOTE: Advice choices will be updated automatically when server responds
+    // No need to manually clear them here
   };
 
   // Get current contact and messages
@@ -604,9 +604,13 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
     return allMessages;
   }, [selectedContactId, messagesByThread, pendingVoiceMessages, bossIsTypingOnboarding]);
 
-  const currentAdviceChoices = selectedContactId
-    ? adviceChoicesByThread[selectedContactId] || []
-    : [];
+  // Get advice choices: boss uses local state, characters use cached game state
+  const currentAdviceChoices =
+    selectedContactId === "boss-pinned"
+      ? bossAdviceChoices
+      : selectedContactId
+        ? game.adviceChoicesByThread[selectedContactId] || []
+        : [];
 
   const isThreadResolved =
     selectedContactId &&
@@ -747,6 +751,9 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
         bossContact={bossContact}
         onLogoClick={onLogoClick}
         advisorState={game.advisorState}
+        recentImpact={recentImpact}
+        shouldAnimateImpact={shouldAnimateImpact}
+        onOpenImpactDashboard={() => setShowImpactDashboard(true)}
       />
       <ChatWindow
         contact={displayContact}
@@ -817,6 +824,13 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       />
 
       {/* Boss interventions now appear in boss-pinned chat thread, no modal needed */}
+
+      {/* Financial Impact Dashboard */}
+      <ImpactDashboardModal
+        open={showImpactDashboard}
+        onOpenChange={setShowImpactDashboard}
+        advisorState={game.advisorState}
+      />
     </div>
   );
 }

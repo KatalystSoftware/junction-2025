@@ -11,6 +11,7 @@ import { LevelUpModal } from "./LevelUpModal";
 import { getPlayerAvatarUrl } from "../utils/avatarUtils";
 import { useTranslation } from "../utils/translations";
 import { FollowingEyes } from "./ui/FollowingEyes";
+import { PortfolioImpactCard } from "./PortfolioImpactCard";
 
 interface AdvisorState {
   advisorId: string;
@@ -35,6 +36,13 @@ interface ChatSidebarProps {
   bossContact: Contact;
   onLogoClick: () => void;
   advisorState?: AdvisorState;
+  recentImpact?: {
+    savings: number;
+    debtReduction: number;
+    characterName: string;
+  };
+  shouldAnimateImpact?: boolean;
+  onOpenImpactDashboard?: () => void;
 }
 
 export function ChatSidebar({
@@ -45,6 +53,9 @@ export function ChatSidebar({
   bossContact,
   onLogoClick,
   advisorState,
+  recentImpact,
+  shouldAnimateImpact,
+  onOpenImpactDashboard,
 }: ChatSidebarProps) {
   const t = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
@@ -320,6 +331,17 @@ export function ChatSidebar({
             </div>
           </div>
         </div>
+
+        {/* Portfolio Impact Card */}
+        {advisorState && (
+          <PortfolioImpactCard
+            lifetimeSavings={advisorState.lifetimeSavingsGenerated}
+            lifetimeDebtCleared={advisorState.lifetimeDebtCleared}
+            recentImpact={recentImpact}
+            animate={shouldAnimateImpact}
+            onClick={onOpenImpactDashboard}
+          />
+        )}
 
         {/* Stats Modal */}
         <PlayerStatsModal

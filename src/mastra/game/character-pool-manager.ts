@@ -124,6 +124,11 @@ export class CharacterPoolManager {
             progressionHistory: char.relationshipState.progressionHistory || [],
             decayApplied: char.relationshipState.decayApplied || 0,
             wasRecommended: char.relationshipState.wasRecommended || false,
+            // NEW: Initialize financial impact tracking fields
+            totalSavingsGenerated:
+              char.relationshipState.totalSavingsGenerated || 0,
+            totalDebtCleared: char.relationshipState.totalDebtCleared || 0,
+            projectedVsActual: char.relationshipState.projectedVsActual,
           },
         });
       }
@@ -1076,6 +1081,8 @@ export class CharacterPoolManager {
           currentScenarioNumber: 0,
           decayApplied: 0,
           wasRecommended: false,
+          totalSavingsGenerated: 0,
+          totalDebtCleared: 0,
         },
         conversationHistory: [],
         advisorNotes: "",

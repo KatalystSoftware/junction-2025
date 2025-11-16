@@ -1,4 +1,9 @@
-import type { AdvisorState, FinancialProjection } from "../types/game-types.ts";
+import type {
+  AdvisorState,
+  FinancialProjection,
+  FinancialImpactHistoryEntry,
+  FinancialTopic,
+} from "../types/game-types.ts";
 
 export interface EarningsCalculationResult {
   coinsEarned: number;
@@ -13,6 +18,14 @@ interface EvaluationWithFinancials {
   financialProjection?: FinancialProjection;
 }
 
+// Context needed to track financial impact history
+interface ConsultationContext {
+  characterId: string;
+  characterName: string;
+  scenarioId: string;
+  topic: FinancialTopic;
+}
+
 /**
  * Calculate coins earned and update advisor state based on advice evaluation.
  * This centralizes the earnings calculation logic that was previously duplicated
@@ -20,11 +33,13 @@ interface EvaluationWithFinancials {
  *
  * @param adviceEvaluation - The evaluation of the advice given
  * @param advisorState - Current advisor state (will be cloned, not mutated)
+ * @param context - Optional consultation context for tracking financial impact history
  * @returns Object containing coins earned and updated advisor state
  */
 export function calculateCoinsEarned(
   adviceEvaluation: EvaluationWithFinancials,
   advisorState: AdvisorState,
+  context?: ConsultationContext,
 ): EarningsCalculationResult {
   let coinsEarned = 0;
   const updatedState = { ...advisorState };
@@ -69,6 +84,36 @@ export function calculateCoinsEarned(
     // Track lifetime stats
     updatedState.lifetimeSavingsGenerated += Math.round(projection.totalSaved);
     updatedState.lifetimeDebtCleared += Math.round(projection.totalDebtReduced);
+
+    // NEW: Track financial impact history if context is provided
+    if (context) {
+      // Initialize financialImpactHistory if not present (for backward compatibility)
+      if (!updatedState.financialImpactHistory) {
+        updatedState.financialImpactHistory = [];
+      }
+
+      const historyEntry: FinancialImpactHistoryEntry = {
+        timestamp: new Date().toISOString(),
+        sessionNumber: updatedState.totalSessions + 1, // +1 because session count increments after this
+        characterId: context.characterId,
+        characterName: context.characterName,
+        scenarioId: context.scenarioId,
+        topic: context.topic,
+        projectedSavings: Math.round(projection.totalSaved),
+        projectedDebtReduction: Math.round(projection.totalDebtReduced),
+        categorySavings: projection.categorySavings,
+        adviceQualityScore: adviceEvaluation.qualityScore,
+        wasFollowUp: false, // Initial projection, not a follow-up
+      };
+
+      updatedState.financialImpactHistory.push(historyEntry);
+
+      // Keep only last 100 entries to prevent bloat
+      if (updatedState.financialImpactHistory.length > 100) {
+        updatedState.financialImpactHistory =
+          updatedState.financialImpactHistory.slice(-100);
+      }
+    }
   }
 
   return { coinsEarned, updatedState };

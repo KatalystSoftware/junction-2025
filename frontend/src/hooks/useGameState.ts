@@ -52,12 +52,33 @@ export function useGameState() {
     },
     onSuccess: (response: any) => {
       // Update the cache with response data (includes threadHistories and threadMetadata)
-      queryClient.setQueryData(["game-state", sessionId], (old: any) => ({
-        ...old,
-        advisorState: response.stateUpdate,
-        threadHistories: response.threadHistories || old?.threadHistories || {},
-        threadMetadata: response.threadMetadata || old?.threadMetadata || {},
-      }));
+      queryClient.setQueryData(["game-state", sessionId], (old: any) => {
+        const updated = {
+          ...old,
+          advisorState: response.stateUpdate,
+          threadHistories:
+            response.threadHistories || old?.threadHistories || {},
+          threadMetadata: response.threadMetadata || old?.threadMetadata || {},
+          adviceChoicesByThread: old?.adviceChoicesByThread || {},
+        };
+
+        // Store advice choices for this thread if provided
+        if (response.adviceChoices && response.threadId) {
+          updated.adviceChoicesByThread = {
+            ...updated.adviceChoicesByThread,
+            [response.threadId]: response.adviceChoices,
+          };
+          console.log(
+            "🎯 Saved advice choices for thread",
+            response.threadId,
+            ":",
+            response.adviceChoices.length,
+            "choices",
+          );
+        }
+
+        return updated;
+      });
 
       console.log(
         "✅ Updated cache:",
@@ -116,12 +137,33 @@ export function useGameState() {
     },
     onSuccess: (response: any) => {
       // Update with server response (includes updated threadHistories)
-      queryClient.setQueryData(["game-state", sessionId], (old: any) => ({
-        ...old,
-        advisorState: response.stateUpdate,
-        threadHistories: response.threadHistories || old?.threadHistories || {},
-        threadMetadata: response.threadMetadata || old?.threadMetadata || {},
-      }));
+      queryClient.setQueryData(["game-state", sessionId], (old: any) => {
+        const updated = {
+          ...old,
+          advisorState: response.stateUpdate,
+          threadHistories:
+            response.threadHistories || old?.threadHistories || {},
+          threadMetadata: response.threadMetadata || old?.threadMetadata || {},
+          adviceChoicesByThread: old?.adviceChoicesByThread || {},
+        };
+
+        // Store advice choices for this thread if provided
+        if (response.adviceChoices && response.threadId) {
+          updated.adviceChoicesByThread = {
+            ...updated.adviceChoicesByThread,
+            [response.threadId]: response.adviceChoices,
+          };
+          console.log(
+            "🎯 Saved advice choices for thread",
+            response.threadId,
+            ":",
+            response.adviceChoices.length,
+            "choices",
+          );
+        }
+
+        return updated;
+      });
 
       console.log(
         "✅ Updated cache after message:",
@@ -149,6 +191,7 @@ export function useGameState() {
     advisorState: gameState?.advisorState,
     threadHistories: gameState?.threadHistories || {},
     threadMetadata: gameState?.threadMetadata || {},
+    adviceChoicesByThread: gameState?.adviceChoicesByThread || {},
 
     // Loading states
     isLoading,
