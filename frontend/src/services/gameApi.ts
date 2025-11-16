@@ -355,7 +355,7 @@ class GameAPI {
    */
   async transcribeAudio(
     audioBlob: Blob,
-    language?: string,
+    language?: string
   ): Promise<{ transcription: string; detectedLanguage?: string }> {
     // Convert blob to base64
     const base64Audio = await new Promise<string>((resolve, reject) => {
@@ -383,8 +383,7 @@ class GameAPI {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(
-        errorData.details ||
-          `Failed to transcribe audio: ${response.statusText}`,
+        errorData.details || `Failed to transcribe audio: ${response.statusText}`
       );
     }
 

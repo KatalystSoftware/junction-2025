@@ -42,7 +42,6 @@ From impulse-buying a pet tiger to taking out a loan to start a "guaranteed-to-f
 ## 🚀 Getting Started
 
 ### Option 1: Web App (Recommended)
-
 **👉 [brokenomore.club](https://brokenomore.club)** - Just click and play!
 
 ### Option 2: Local Development
@@ -75,12 +74,10 @@ pnpm play
 5. **Boss reviews** → Every few sessions, your boss gives feedback and learning materials
 
 **Play modes**:
-
 - ⚡ **Choice Mode** - Pick from 3 AI-generated advice options (fast)
 - ✍️ **Free-Text Mode** - Type your own advice (deeper learning)
 
 **Special features**:
-
 - 🔊 Voice messages from characters (emotional, personality-matched)
 - 📊 Progress tracking (reputation, skill level, topic expertise)
 - 🏆 Achievements and leaderboards
@@ -103,7 +100,6 @@ pnpm play
 ## 🏗️ Tech Stack
 
 **AI Architecture**:
-
 - Multi-agent system with Mastra Framework (Game Master orchestrates Character, Evaluator, and Boss agents)
 - Google Gemini 2.0 Flash for fast, cost-effective AI responses
 - RAG system with 800+ lines of Finnish financial literacy research (Bank of Finland, OPH, OECD)
@@ -114,7 +110,6 @@ pnpm play
 **Infrastructure**: Google Cloud Run, Terraform, Docker
 
 **Key systems**:
-
 - 🎯 **Relationship System** - 5 trust tiers, characters recommend you to friends if you do well
 - 🔄 **Consequence System** - Characters return to show results of your advice
 - 📊 **Progression** - Reputation (0-100), Skill Level (0-10), Topic Expertise per financial topic
@@ -134,7 +129,6 @@ junction-2025/
 ├── frontend/            # React web interface
 └── infra/               # Terraform infrastructure
 ```
-
 </details>
 
 ---
@@ -177,7 +171,6 @@ pnpm init:knowledge-base  # Initialize RAG knowledge base
 **Add knowledge**: Edit `knowledge-base/*.md` files, then re-run `pnpm init:knowledge-base`
 
 See [claude.md](claude.md) for full developer documentation.
-
 </details>
 
 ---

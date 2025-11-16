@@ -36,64 +36,6 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
     game.threadMetadata,
   );
 
-  // Update page title with unread count
-  useEffect(() => {
-    // Filter out the currently selected contact from unread count if viewing it
-    const totalUnread = contacts.reduce((sum, contact) => {
-      // Don't count unread for currently selected contact
-      if (contact.id === selectedContactId) return sum;
-      return sum + (contact.unreadCount || 0);
-    }, 0);
-
-    if (totalUnread > 0) {
-      document.title = `(${totalUnread}) Broke no more!`;
-    } else {
-      document.title = "Broke no more!";
-    }
-  }, [contacts, selectedContactId]);
-
-  // Flash title when there are new unread messages (only when tab is not visible)
-  useEffect(() => {
-    const totalUnread = contacts.reduce(
-      (sum, contact) => sum + (contact.unreadCount || 0),
-      0,
-    );
-
-    if (totalUnread === 0 || document.hidden === false) return;
-
-    let isOriginalTitle = true;
-    const interval = setInterval(() => {
-      if (isOriginalTitle) {
-        document.title = "💬 New message!";
-      } else {
-        document.title = `(${totalUnread}) Broke no more!`;
-      }
-      isOriginalTitle = !isOriginalTitle;
-    }, 1000);
-
-    // Stop flashing when tab becomes visible
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        clearInterval(interval);
-        const filteredUnread = contacts.reduce((sum, contact) => {
-          if (contact.id === selectedContactId) return sum;
-          return sum + (contact.unreadCount || 0);
-        }, 0);
-        document.title =
-          filteredUnread > 0
-            ? `(${filteredUnread}) Broke no more!`
-            : "Broke no more!";
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
-    return () => {
-      clearInterval(interval);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [contacts, selectedContactId]);
-
   // UI-only state (persisted in URL)
   const [selectedContactId, setSelectedContactId] = useState<string | null>(
     () => {

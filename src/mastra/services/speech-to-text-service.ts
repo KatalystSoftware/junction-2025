@@ -12,12 +12,7 @@ import { getAgentModel } from "../agents/agent-model.ts";
 /**
  * Supported audio formats for Gemini
  */
-export type AudioFormat =
-  | "audio/wav"
-  | "audio/mp3"
-  | "audio/mpeg"
-  | "audio/webm"
-  | "audio/ogg";
+export type AudioFormat = "audio/wav" | "audio/mp3" | "audio/mpeg" | "audio/webm" | "audio/ogg";
 
 /**
  * Result from transcribing audio
@@ -42,7 +37,7 @@ export async function transcribeAudio(
   options?: {
     language?: string; // Language hint (e.g., "fi" for Finnish, "en" for English)
     prompt?: string; // Additional context for transcription
-  },
+  }
 ): Promise<TranscriptionResult> {
   try {
     // Convert buffer to base64 for Gemini API
@@ -88,7 +83,7 @@ Please transcribe the following audio accurately. Return ONLY the transcribed te
   } catch (error) {
     console.error("Error transcribing audio with Gemini:", error);
     throw new Error(
-      `Failed to transcribe audio: ${error instanceof Error ? error.message : "Unknown error"}`,
+      `Failed to transcribe audio: ${error instanceof Error ? error.message : "Unknown error"}`
     );
   }
 }
@@ -99,7 +94,7 @@ Please transcribe the following audio accurately. Return ONLY the transcribed te
  */
 export async function transcribeAudioWithLanguageDetection(
   audioBuffer: Buffer,
-  mimeType: AudioFormat = "audio/webm",
+  mimeType: AudioFormat = "audio/webm"
 ): Promise<TranscriptionResult> {
   try {
     const base64Audio = audioBuffer.toString("base64");
@@ -132,12 +127,8 @@ Transcription: [transcribed text]`,
     const languageMatch = responseText.match(/Language:\s*(\w+)/i);
     const transcriptionMatch = responseText.match(/Transcription:\s*(.+)/is);
 
-    const detectedLanguage = languageMatch
-      ? languageMatch[1].toLowerCase()
-      : undefined;
-    const transcription = transcriptionMatch
-      ? transcriptionMatch[1].trim()
-      : responseText;
+    const detectedLanguage = languageMatch ? languageMatch[1].toLowerCase() : undefined;
+    const transcription = transcriptionMatch ? transcriptionMatch[1].trim() : responseText;
 
     return {
       text: transcription,
@@ -147,7 +138,7 @@ Transcription: [transcribed text]`,
   } catch (error) {
     console.error("Error transcribing audio with language detection:", error);
     throw new Error(
-      `Failed to transcribe audio: ${error instanceof Error ? error.message : "Unknown error"}`,
+      `Failed to transcribe audio: ${error instanceof Error ? error.message : "Unknown error"}`
     );
   }
 }

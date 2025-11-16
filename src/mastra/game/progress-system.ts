@@ -305,19 +305,15 @@ export function checkForNewAchievements(
     newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "ten_clients")!);
   }
   if (advisorState.totalSessions >= 15 && !unlocked.has("fifteen_sessions")) {
-    newAchievements.push(
-      ACHIEVEMENTS.find((a) => a.id === "fifteen_sessions")!,
-    );
+    newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "fifteen_sessions")!);
+  }
+  if (advisorState.totalSessions >= 25 && !unlocked.has("twenty_five_sessions")) {
+    newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "twenty_five_sessions")!);
   }
   if (
-    advisorState.totalSessions >= 25 &&
-    !unlocked.has("twenty_five_sessions")
+    advisorState.totalClientsHelped >= 50 &&
+    !unlocked.has("fifty_clients")
   ) {
-    newAchievements.push(
-      ACHIEVEMENTS.find((a) => a.id === "twenty_five_sessions")!,
-    );
-  }
-  if (advisorState.totalClientsHelped >= 50 && !unlocked.has("fifty_clients")) {
     newAchievements.push(ACHIEVEMENTS.find((a) => a.id === "fifty_clients")!);
   }
 
