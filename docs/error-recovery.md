@@ -232,7 +232,7 @@ const recentErrors = getRecentErrors(10);
 Run error recovery tests:
 
 ```bash
-node src/mastra/utils/error-recovery.test.ts
+pnpm test:unit
 ```
 
 Tests cover:

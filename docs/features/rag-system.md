@@ -142,8 +142,8 @@ src/mastra/tools/
 Initialize the knowledge base (one-time setup):
 
 ```bash
-# Initialize all languages
-pnpm init:knowledge-base
+# Initialize enhanced multi-language knowledge base
+pnpm init:knowledge-base:enhanced
 
 # Or run manually
 npx tsx src/mastra/rag/init-knowledge-base-enhanced.ts
@@ -409,7 +409,7 @@ To connect real news APIs:
 2. **Re-initialize database:**
 
    ```bash
-   pnpm init:knowledge-base
+   pnpm init:knowledge-base:enhanced
    ```
 
 3. **Test queries:**
@@ -470,7 +470,7 @@ Check relevance scores in evaluator outputs:
 
 ```bash
 # Initialize the database
-pnpm init:knowledge-base
+pnpm init:knowledge-base:enhanced
 ```
 
 ### Low relevance scores

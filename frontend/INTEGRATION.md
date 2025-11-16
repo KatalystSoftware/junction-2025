@@ -7,7 +7,7 @@ This guide explains how to connect the React frontend with the Mastra backend.
 ### 1. Start the Backend
 
 ```bash
-cd puppet-master
+cd junction-2025
 pnpm install
 pnpm dev:api  # Starts server on port 4111
 ```
@@ -15,7 +15,7 @@ pnpm dev:api  # Starts server on port 4111
 ### 2. Start the Frontend
 
 ```bash
-cd Aichatinterface
+cd frontend
 pnpm install
 pnpm dev  # Starts on port 3000, proxies /api to backend
 ```

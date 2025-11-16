@@ -38,7 +38,7 @@ _"Learn financial literacy the hard way—without the hard consequences. Give ad
 ```bash
 # Clone the repository
 git clone https://github.com/KatalystSoftware/junction-2025.git
-cd junction-2025/puppet-master
+cd junction-2025
 
 # Install dependencies
 pnpm install
@@ -274,7 +274,7 @@ See [docs/features/relationship-system.md](docs/features/relationship-system.md)
 ## 📁 Project Structure
 
 ```
-puppet-master/
+junction-2025/
 ├── src/
 │   ├── mastra/
 │   │   ├── agents/          # AI agents (game master, evaluator, boss, character factory)
@@ -287,7 +287,7 @@ puppet-master/
 │   └── test-game.ts         # Demo script
 ├── characters/
 │   ├── individuals/         # 34 character JSON files
-│   └── scenarios/           # 50+ scenario JSON files
+│   └── scenarios/           # 40+ scenario JSON files
 ├── knowledge-base/          # Financial literacy content (Finnish/Swedish/English)
 ├── docs/
 │   ├── features/            # Feature documentation

@@ -13,7 +13,7 @@ This is a monorepo containing:
 
 ```bash
 # Run both backend and frontend (recommended)
-pnpm run dev:all
+pnpm dev
 
 # Run backend only (API on port 4111)
 pnpm run dev:api
