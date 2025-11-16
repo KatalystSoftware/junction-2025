@@ -1,5 +1,3 @@
-import { describe, expect, test } from "@jest/globals";
-
 describe("leaderboard-service global score", () => {
   test("higher savings produce higher global score even with lower reputation", async () => {
     process.env.DATABASE_URL =
@@ -32,5 +30,4 @@ describe("leaderboard-service global score", () => {
 
     expect(highSavingsLowRep).toBeGreaterThan(lowSavingsHighRep);
   });
-}
-
+});

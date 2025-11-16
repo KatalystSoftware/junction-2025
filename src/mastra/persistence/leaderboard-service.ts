@@ -118,7 +118,13 @@ export class LeaderboardService {
     lifetimeSavingsGenerated: number,
     lifetimeDebtCleared: number,
     achievementCount: number,
+    totalSessions: number,
   ): number {
+    // New advisors should start at 0 points until they've completed at least one session
+    if (totalSessions === 0) {
+      return 0;
+    }
+
     const totalImpact = Math.max(
       0,
       lifetimeSavingsGenerated + lifetimeDebtCleared,
@@ -183,6 +189,7 @@ export class LeaderboardService {
       advisorState.lifetimeSavingsGenerated,
       advisorState.lifetimeDebtCleared,
       advisorState.achievementsUnlocked.length,
+      advisorState.totalSessions,
     );
 
     const now = new Date().toISOString();

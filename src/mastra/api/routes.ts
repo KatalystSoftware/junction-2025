@@ -12,6 +12,7 @@ import {
   handleAdvisorResponse,
   handleInterventionResponse,
   checkAndSendFollowUps,
+  countUnresolvedThreads,
 } from "../game/orchestrator.ts";
 import {
   saveSession,
@@ -333,110 +334,97 @@ app.post("/init", async (c) => {
       await onAdvisorInit(advisorState, advisorState.advisorName);
     }
 
-    // SANITY CHECK: Auto-start consultation if onboarding is done and no active threads
+    // SANITY CHECK: Auto-start consultations if onboarding is done and we have too few active threads
     let autoStartedConsultation: ClientSafeGameResponse | undefined;
 
     if (advisorState.hasCompletedOnboarding) {
-      // Count active (non-resolved) threads
-      const activeThreadCount = Object.values(
+      // Count active (non-resolved) threads (excluding boss)
+      let activeThreadCount = Object.values(
         advisorState.activeThreads,
       ).filter((thread) => thread.status !== "resolved").length;
 
-      if (activeThreadCount === 0) {
+      if (activeThreadCount < 3) {
         console.log(
-          "🚨 SANITY CHECK: No active threads detected, auto-starting consultation...",
+          `🚨 SANITY CHECK: Only ${activeThreadCount} active threads, auto-starting consultations to reach 3...`,
         );
 
-        try {
-          // Auto-start a new consultation
-          const gameResponse = await startNewConsultation(
-            advisorState.advisorId,
-            advisorState,
-          );
+        const historiesMap = new Map(Object.entries(threadHistories));
+        const metadataMap = new Map(Object.entries(threadMetadata));
 
-          // Convert to Maps for processing
-          const historiesMap = threadHistories
-            ? new Map(Object.entries(threadHistories))
-            : new Map();
-          const metadataMap = threadMetadata
-            ? new Map(Object.entries(threadMetadata))
-            : new Map();
-
-          // Process the consultation response (same logic as /start-consultation)
-          if (
-            gameResponse.type === "character_message" &&
-            gameResponse.threadId &&
-            gameResponse.messages
-          ) {
-            const threadId = gameResponse.threadId;
-            const existingHistory = historiesMap.get(threadId) || [];
-
-            // Add character's initial messages
-            for (const msg of gameResponse.messages) {
-              const messageEntry: {
-                role: "assistant";
-                content: string;
-                isVoice?: boolean;
-                audioUrl?: string;
-                voiceUrgency?: string;
-              } = {
-                role: "assistant" as const,
-                content: msg,
-              };
-
-              // Include voice data if present
-              if (gameResponse.voiceNeeded && gameResponse.voiceConfig) {
-                messageEntry.isVoice = true;
-                messageEntry.audioUrl = gameResponse.voiceConfig.audioUrl;
-                messageEntry.voiceUrgency = gameResponse.voiceConfig.urgency;
-              }
-
-              existingHistory.push(messageEntry);
-            }
-
-            historiesMap.set(threadId, existingHistory);
-            console.log(
-              `💬 Auto-started: Saved initial message(s) to thread ${threadId.substring(0, 8)}...`,
+        while (activeThreadCount < 3) {
+          try {
+            const gameResponse = await startNewConsultation(
+              advisorState.advisorId,
+              advisorState,
             );
 
-            // Save character metadata if provided
-            if (gameResponse.characterInfo && threadId) {
-              const metadata: ThreadMetadata = {
-                characterName: gameResponse.characterInfo.name,
-                name: gameResponse.characterInfo.name,
-                age: gameResponse.characterInfo.age,
-                occupation: gameResponse.characterInfo.occupation,
-                gender: gameResponse.characterInfo.gender,
-                financialProfile: gameResponse.characterInfo.financialProfile,
-                status: "active",
-                adviceChoices: gameResponse.adviceChoices || [],
-              };
-              metadataMap.set(threadId, metadata);
-              console.log(
-                `👤 Auto-started: Saved character metadata for thread ${threadId.substring(0, 8)}... (${metadata.adviceChoices?.length || 0} advice choices)`,
-              );
+            if (
+              gameResponse.type === "character_message" &&
+              gameResponse.threadId &&
+              gameResponse.messages
+            ) {
+              const threadId = gameResponse.threadId;
+              const existingHistory = historiesMap.get(threadId) || [];
+
+              for (const msg of gameResponse.messages) {
+                const messageEntry: {
+                  role: "assistant";
+                  content: string;
+                  isVoice?: boolean;
+                  audioUrl?: string;
+                  voiceUrgency?: string;
+                } = {
+                  role: "assistant" as const,
+                  content: msg,
+                };
+
+                if (gameResponse.voiceNeeded && gameResponse.voiceConfig) {
+                  messageEntry.isVoice = true;
+                  messageEntry.audioUrl = gameResponse.voiceConfig.audioUrl;
+                  messageEntry.voiceUrgency = gameResponse.voiceConfig.urgency;
+                }
+
+                existingHistory.push(messageEntry);
+              }
+
+              historiesMap.set(threadId, existingHistory);
+
+              if (gameResponse.characterInfo && threadId) {
+                const metadata: ThreadMetadata = {
+                  characterName: gameResponse.characterInfo.name,
+                  name: gameResponse.characterInfo.name,
+                  age: gameResponse.characterInfo.age,
+                  occupation: gameResponse.characterInfo.occupation,
+                  gender: gameResponse.characterInfo.gender,
+                  financialProfile: gameResponse.characterInfo.financialProfile,
+                  status: "active",
+                  adviceChoices: gameResponse.adviceChoices || [],
+                };
+                metadataMap.set(threadId, metadata);
+              }
             }
+
+            advisorState = gameResponse.stateUpdate;
+            activeThreadCount = Object.values(
+              advisorState.activeThreads,
+            ).filter((thread) => thread.status !== "resolved").length;
+            autoStartedConsultation = toClientSafeGameResponse(gameResponse);
+          } catch (error) {
+            console.error("❌ Failed to auto-start consultation:", error);
+            break;
           }
-
-          // Save updated state with the new consultation
-          await saveSession(
-            sessionId,
-            gameResponse.stateUpdate,
-            historiesMap,
-            metadataMap,
-          );
-
-          // Update our response data
-          advisorState = gameResponse.stateUpdate;
-          threadHistories = Object.fromEntries(historiesMap);
-          threadMetadata = Object.fromEntries(metadataMap);
-          autoStartedConsultation = toClientSafeGameResponse(gameResponse);
-
-          console.log("✅ Auto-started consultation successfully");
-        } catch (error) {
-          console.error("❌ Failed to auto-start consultation:", error);
-          // Don't fail the whole request, just log and continue
         }
+
+        await saveSession(
+          sessionId,
+          advisorState,
+          historiesMap,
+          metadataMap,
+        );
+
+        threadHistories = Object.fromEntries(historiesMap);
+        threadMetadata = Object.fromEntries(metadataMap);
+        console.log("✅ Auto-started consultations to maintain active threads");
       }
     }
 
@@ -920,21 +908,71 @@ app.post("/send-message", async (c) => {
 
     // Save updated state with message histories and metadata
     // Check for follow-ups (server-led approach)
-    const { followUps, updatedState } = await checkAndIncludeFollowUps(
+    const followUpResult = await checkAndIncludeFollowUps(
       gameResponse.stateUpdate,
     );
 
-    // Save updated state (includes follow-ups if any)
-    if (followUps.length > 0) {
-      gameResponse.stateUpdate = updatedState;
+    if (followUpResult.followUps.length > 0) {
+      gameResponse.stateUpdate = followUpResult.stateUpdate;
     }
 
-    await saveSession(
-      sessionId,
-      gameResponse.stateUpdate,
-      historiesMap,
-      metadataMap,
-    );
+    let finalState = gameResponse.stateUpdate;
+
+    // After a conversation ends, try to maintain ~3 active character threads
+    if (
+      finalState.hasCompletedOnboarding &&
+      gameResponse.type === "conversation_end"
+    ) {
+      const currentCount = countUnresolvedThreads(finalState);
+      if (currentCount < 3) {
+        try {
+          const autoResponse = await startNewConsultation(
+            finalState.advisorId,
+            finalState,
+            userLanguage || "en",
+          );
+
+          if (
+            autoResponse.type === "character_message" &&
+            autoResponse.threadId &&
+            autoResponse.messages
+          ) {
+            const threadId = autoResponse.threadId;
+            const existingHistory = historiesMap.get(threadId) || [];
+
+            for (const msg of autoResponse.messages) {
+              existingHistory.push({
+                role: "assistant" as const,
+                content: msg,
+              });
+            }
+
+            historiesMap.set(threadId, existingHistory);
+
+            if (autoResponse.characterInfo && threadId) {
+              const metadata: ThreadMetadata = {
+                characterName: autoResponse.characterInfo.name,
+                name: autoResponse.characterInfo.name,
+                age: autoResponse.characterInfo.age,
+                occupation: autoResponse.characterInfo.occupation,
+                gender: autoResponse.characterInfo.gender,
+                financialProfile: autoResponse.characterInfo.financialProfile,
+                status: "active",
+                adviceChoices: autoResponse.adviceChoices || [],
+              };
+              metadataMap.set(threadId, metadata);
+            }
+          }
+
+          finalState = autoResponse.stateUpdate;
+          gameResponse.stateUpdate = autoResponse.stateUpdate;
+        } catch (error) {
+          console.error("❌ Failed to auto-start consultation:", error);
+        }
+      }
+    }
+
+    await saveSession(sessionId, finalState, historiesMap, metadataMap);
 
     // Convert Maps back to objects for response
     const threadHistoriesObject = Object.fromEntries(historiesMap);
@@ -948,8 +986,8 @@ app.post("/send-message", async (c) => {
     };
 
     // Add follow-ups if any
-    if (followUps.length > 0) {
-      (response as any).followUps = followUps;
+    if (followUpResult.followUps.length > 0) {
+      (response as any).followUps = followUpResult.followUps;
     }
 
     return c.json<SendMessageResponse>(response);
