@@ -517,11 +517,16 @@ Please evaluate this advice comprehensively across all dimensions, including tra
         }
 
         // Missed opportunities based on transaction data
+        // Note: Only add "Could have" if the topic was not mentioned at all
+        // If mentioned but addressed incorrectly, the AI evaluator will handle it
         if (transactionContext.anomalies.length > 0) {
+          const adviceLower = advice.toLowerCase();
           transactionContext.anomalies.forEach((anomaly) => {
             if (
               anomaly.includes("coffee") &&
-              !advice.toLowerCase().includes("coffee")
+              !adviceLower.includes("coffee") &&
+              !adviceLower.includes("caffeine") &&
+              !adviceLower.includes("café")
             ) {
               missedOpportunities.push(
                 `Could have addressed high coffee spending (€${Math.abs(transactionContext.spending.coffee || 0).toFixed(2)}/month)`,
@@ -529,8 +534,10 @@ Please evaluate this advice comprehensively across all dimensions, including tra
             }
             if (
               anomaly.includes("online shopping") &&
-              !advice.toLowerCase().includes("shopping") &&
-              !advice.toLowerCase().includes("temu")
+              !adviceLower.includes("shopping") &&
+              !adviceLower.includes("temu") &&
+              !adviceLower.includes("impulse") &&
+              !adviceLower.includes("online")
             ) {
               missedOpportunities.push(
                 `Could have addressed excessive online shopping (€${Math.abs(transactionContext.spending.onlineShopping || 0).toFixed(2)}/month)`,
@@ -538,8 +545,10 @@ Please evaluate this advice comprehensively across all dimensions, including tra
             }
             if (
               anomaly.includes("dining") &&
-              !advice.toLowerCase().includes("dining") &&
-              !advice.toLowerCase().includes("restaurant")
+              !adviceLower.includes("dining") &&
+              !adviceLower.includes("restaurant") &&
+              !adviceLower.includes("delivery") &&
+              !adviceLower.includes("eating out")
             ) {
               missedOpportunities.push(
                 `Could have addressed high dining/delivery costs (€${Math.abs(transactionContext.spending.dining || 0).toFixed(2)}/month)`,
