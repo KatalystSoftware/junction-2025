@@ -1231,7 +1231,8 @@ app.get("/leaderboard", async (c) => {
       | "impact"
       | "expertise"
       | "coins"
-      | "achievements";
+      | "achievements"
+      | "messages";
     const limit = parseInt(c.req.query("limit") || "100");
 
     console.log(`🏆 Fetching leaderboard: ${category}, limit: ${limit}`);
@@ -1263,7 +1264,8 @@ app.get("/leaderboard/rank/:advisorId", async (c) => {
       | "impact"
       | "expertise"
       | "coins"
-      | "achievements";
+      | "achievements"
+      | "messages";
 
     console.log(
       `🏆 Fetching rank for advisor ${advisorId.substring(0, 8)}... in ${category}`,
@@ -1297,7 +1299,8 @@ app.get("/leaderboard/surrounding/:advisorId", async (c) => {
       | "impact"
       | "expertise"
       | "coins"
-      | "achievements";
+      | "achievements"
+      | "messages";
     const range = parseInt(c.req.query("range") || "5");
 
     console.log(
