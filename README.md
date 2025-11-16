@@ -6,6 +6,8 @@
 
 **No installation required. Works on mobile and desktop.**
 
+🎥 **[Watch 3-Minute Demo Video](https://youtu.be/NiEyyrPADYE)** - See the game in action!
+
 ---
 
 ![Broke No More! intro](https://github.com/user-attachments/assets/a63c596a-32f3-45ad-9d6e-e0e6c41468db)
