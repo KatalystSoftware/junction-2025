@@ -157,13 +157,12 @@ export const invokeCharacterTool = {
                 `${character.characterId}_${userLanguage}_${message.substring(0, 50)}`,
                 translationPrompt,
                 async () => {
-                  const { Model } = await import("@mastra/core");
-                  const model = new Model({
-                    provider: "GOOGLE",
-                    name: "gemini-2.0-flash-exp",
-                    toolChoice: "auto",
+                  const { generateText } = await import("ai");
+                  const { google } = await import("@ai-sdk/google");
+                  return await generateText({
+                    model: google("gemini-2.0-flash-exp"),
+                    prompt: translationPrompt,
                   });
-                  return await model.generate(translationPrompt);
                 }
               );
               return translationResponse.text || message;
