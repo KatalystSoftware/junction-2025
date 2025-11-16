@@ -46,12 +46,15 @@ export function ClientFinancialDashboard({
   characterName,
   onClose,
 }: ClientFinancialDashboardProps) {
+  console.log("ClientFinancialDashboard rendering for:", characterId, characterName);
+
   const [data, setData] = useState<ClientFinancialData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedView, setSelectedView] = useState<"overview" | "transactions" | "trends">("overview");
 
   useEffect(() => {
+    console.log("Fetching financial data for character:", characterId);
     fetchFinancialData();
   }, [characterId]);
 
