@@ -17,6 +17,7 @@ import { ConsultationResultsModal } from "./ConsultationResultsModal";
 import { MilestoneModal } from "./MilestoneModal";
 import { AchievementUnlockModal } from "./AchievementUnlockModal";
 import { QuizModal } from "./QuizModal";
+import { GameOverModal } from "./GameOverModal";
 
 interface WhatsAppInterfaceProps {
   onLogoClick: () => void;
@@ -315,6 +316,13 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       setSelectedContactId("boss-pinned");
       setShowChat(true); // Show the chat window
     }
+
+    // Handle game over - show firing modal
+    if (response.type === "game_over" && response.firingMessage) {
+      console.log("💀 Game over - advisor fired");
+      setGameOverData(response.firingMessage);
+      setShowGameOverModal(true);
+    }
   }, [
     game.lastStartResponse,
     game.lastMessageResponse,
@@ -341,6 +349,8 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
   const [showMilestonesModal, setShowMilestonesModal] = useState(false);
   const [showAchievementsModal, setShowAchievementsModal] = useState(false);
   const [showQuizModal, setShowQuizModal] = useState(false);
+  const [showGameOverModal, setShowGameOverModal] = useState(false);
+  const [gameOverData, setGameOverData] = useState<any>(null);
   const [currentResultsData, setCurrentResultsData] = useState<any>(null);
   const [currentMilestones, setCurrentMilestones] = useState<any[]>([]);
   const [currentAchievements, setCurrentAchievements] = useState<any[]>([]);
@@ -662,6 +672,18 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
           }}
         />
       )}
+
+      {/* Game Over Modal - shown when advisor is fired */}
+      <GameOverModal
+        open={showGameOverModal}
+        onOpenChange={setShowGameOverModal}
+        firingMessage={gameOverData}
+        onRestart={() => {
+          // Clear session and reload
+          localStorage.clear();
+          window.location.reload();
+        }}
+      />
 
       {/* Boss interventions now appear in boss-pinned chat thread, no modal needed */}
     </div>
