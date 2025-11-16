@@ -515,7 +515,7 @@ export function ChatWindow({
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-baseline gap-2 flex-wrap">
+            <div className="flex flex-col md:flex-row md:items-baseline gap-0.5 md:gap-2 md:flex-wrap">
               <h4
                 style={{
                   fontFamily: "Inter, sans-serif",

@@ -142,8 +142,8 @@ export function LeaderboardModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
-        <DialogHeader>
+      <DialogContent className="max-w-3xl h-[90vh] max-h-[90vh] flex flex-col gap-0 p-0">
+        <DialogHeader className="px-6 pt-6 pb-4 flex-shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <Trophy className="w-6 h-6 text-yellow-500" />
             Global Leaderboard
@@ -157,9 +157,9 @@ export function LeaderboardModal({
         <Tabs
           value={selectedCategory}
           onValueChange={setSelectedCategory}
-          className="flex-1 flex flex-col"
+          className="flex-1 flex flex-col min-h-0 px-6"
         >
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-6 flex-shrink-0">
             <TabsTrigger value="global" className="flex items-center gap-1">
               <Trophy className="w-3 h-3" />
               <span className="hidden sm:inline">Global</span>
@@ -189,7 +189,7 @@ export function LeaderboardModal({
             </TabsTrigger>
           </TabsList>
 
-          <div className="flex-1 mt-4">
+          <div className="flex-1 min-h-0 mt-4">
             {loading && (
               <div className="flex items-center justify-center h-64">
                 <div className="text-muted-foreground">Loading...</div>
@@ -203,7 +203,7 @@ export function LeaderboardModal({
             )}
 
             {!loading && !error && leaderboard && (
-              <ScrollArea className="h-[500px] pr-4">
+              <ScrollArea className="h-full pr-4">
                 {/* Current user's rank banner */}
                 {currentUserEntry && (
                   <div className="mb-4 p-4 bg-primary/10 rounded-lg border-2 border-primary">
@@ -287,7 +287,7 @@ export function LeaderboardModal({
           </div>
         </Tabs>
 
-        <div className="text-xs text-muted-foreground text-center pt-2 border-t">
+        <div className="text-xs text-muted-foreground text-center pt-2 pb-4 px-6 border-t flex-shrink-0">
           {leaderboard &&
             `Last updated: ${new Date(leaderboard.lastUpdated).toLocaleString()}`}
         </div>

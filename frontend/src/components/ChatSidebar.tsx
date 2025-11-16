@@ -95,7 +95,7 @@ export function ChatSidebar({
 
   return (
     <div
-      className={`w-full md:w-96 md:border-r border-border flex flex-col h-screen ${
+      className={`w-full md:w-96 md:min-w-96 md:max-w-96 md:flex-shrink-0 md:border-r border-border flex flex-col h-screen ${
         showChat ? "hidden md:flex" : "flex"
       }`}
       style={{ backgroundColor: "var(--card)" }}
