@@ -36,6 +36,7 @@ const mastraSchema = process.env.MASTRA_SCHEMA ?? "mastra";
 // Create storage instance (shared between mastra and session store)
 export const storage = databaseUrl
   ? new PostgresStore({
+      id: "mastra-agent-store",
       connectionString: databaseUrl,
       schemaName: mastraSchema,
     })
