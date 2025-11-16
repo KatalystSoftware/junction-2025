@@ -44,10 +44,21 @@
         "creditor": "Kela",
         "totalAmount": 12000,
         "remainingAmount": 11200,
-        "monthlyPayment": 0,
+        "monthlyPayment": 65,
         "interestRate": 0.5,
         "currency": "EUR",
         "startDate": "2022-06-01"
+      },
+      {
+        "debtId": "debt_mikko_002",
+        "type": "other",
+        "creditor": "S-Pankki Student Card",
+        "totalAmount": 890,
+        "remainingAmount": 890,
+        "monthlyPayment": 30,
+        "interestRate": 16.9,
+        "currency": "EUR",
+        "startDate": "2024-01-01"
       }
     ],
     "subscriptions": [
