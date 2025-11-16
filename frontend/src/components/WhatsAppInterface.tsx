@@ -296,11 +296,10 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       setShowChat(true);
     }
 
-    // Handle new thread (select it)
+    // Handle new thread (just log it, don't auto-jump)
     if (response.isNewThread && response.threadId) {
       console.log("✨ New thread created:", response.threadId);
-      setSelectedContactId(response.threadId);
-      setShowChat(true);
+      // Don't auto-select new threads - let user choose when to open them
     }
 
     // Handle onboarding - select boss chat
@@ -319,16 +318,13 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
     game.autoStartedConsultation,
   ]);
 
-  // Auto-select first contact if none selected
+  // Default to boss chat if no chat is selected
   useEffect(() => {
-    if (
-      contacts.length > 0 &&
-      !selectedContactId &&
-      selectedContactId !== "boss-pinned"
-    ) {
-      setSelectedContactId(contacts[0].id);
+    if (!selectedContactId) {
+      setSelectedContactId("boss-pinned");
+      setShowChat(true);
     }
-  }, [contacts]);
+  }, []);
 
   // Temporary state for advice choices and conversation end data (UI-only)
   const [adviceChoicesByThread, setAdviceChoicesByThread] = useState<{
