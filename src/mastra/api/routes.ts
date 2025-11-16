@@ -981,6 +981,114 @@ app.get("/analytics/:sessionId", async (c) => {
   }
 });
 
+// ============================================================================
+// LEADERBOARD ROUTES
+// ============================================================================
+
+/**
+ * Get global leaderboard
+ * Query params: category (global|reputation|impact|expertise|coins|achievements), limit (default 100)
+ */
+app.get("/leaderboard", async (c) => {
+  try {
+    const category = (c.req.query("category") || "global") as
+      | "global"
+      | "reputation"
+      | "impact"
+      | "expertise"
+      | "coins"
+      | "achievements";
+    const limit = parseInt(c.req.query("limit") || "100");
+
+    console.log(`🏆 Fetching leaderboard: ${category}, limit: ${limit}`);
+
+    const { leaderboardService } = await import(
+      "../persistence/leaderboard-service.ts"
+    );
+    const leaderboard = await leaderboardService.getLeaderboard(
+      category,
+      limit,
+    );
+
+    return c.json(leaderboard);
+  } catch (error) {
+    console.error("❌ Error in /leaderboard:", error);
+    return c.json({ error: "Failed to get leaderboard" }, 500);
+  }
+});
+
+/**
+ * Get advisor rank in a specific category
+ */
+app.get("/leaderboard/rank/:advisorId", async (c) => {
+  try {
+    const advisorId = c.req.param("advisorId");
+    const category = (c.req.query("category") || "global") as
+      | "global"
+      | "reputation"
+      | "impact"
+      | "expertise"
+      | "coins"
+      | "achievements";
+
+    console.log(
+      `🏆 Fetching rank for advisor ${advisorId.substring(0, 8)}... in ${category}`,
+    );
+
+    const { leaderboardService } = await import(
+      "../persistence/leaderboard-service.ts"
+    );
+    const rank = await leaderboardService.getAdvisorRank(advisorId, category);
+
+    if (!rank) {
+      return c.json({ error: "Advisor not found in leaderboard" }, 404);
+    }
+
+    return c.json(rank);
+  } catch (error) {
+    console.error("❌ Error in /leaderboard/rank/:advisorId:", error);
+    return c.json({ error: "Failed to get advisor rank" }, 500);
+  }
+});
+
+/**
+ * Get surrounding advisors in leaderboard (for contextual view)
+ */
+app.get("/leaderboard/surrounding/:advisorId", async (c) => {
+  try {
+    const advisorId = c.req.param("advisorId");
+    const category = (c.req.query("category") || "global") as
+      | "global"
+      | "reputation"
+      | "impact"
+      | "expertise"
+      | "coins"
+      | "achievements";
+    const range = parseInt(c.req.query("range") || "5");
+
+    console.log(
+      `🏆 Fetching surrounding advisors for ${advisorId.substring(0, 8)}... in ${category} (±${range})`,
+    );
+
+    const { leaderboardService } = await import(
+      "../persistence/leaderboard-service.ts"
+    );
+    const surrounding = await leaderboardService.getSurroundingAdvisors(
+      advisorId,
+      category,
+      range,
+    );
+
+    return c.json(surrounding);
+  } catch (error) {
+    console.error(
+      "❌ Error in /leaderboard/surrounding/:advisorId:",
+      error,
+    );
+    return c.json({ error: "Failed to get surrounding advisors" }, 500);
+  }
+});
+
 // Export both the app and its type for RPC
 export { app as gameRoutes };
 export type GameApiType = typeof app;

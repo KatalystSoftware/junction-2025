@@ -1,16 +1,18 @@
 import { Input } from "./ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ScrollArea } from "./ui/scroll-area";
-import { Search, Pin, Star, TrendingUp, Briefcase } from "lucide-react";
+import { Search, Pin, Star, TrendingUp, Briefcase, Trophy } from "lucide-react";
 import type { Contact } from "./WhatsAppInterface";
 import { useState, useEffect } from "react";
 import logoImage from "figma:asset/28e39d27183eb9dbb848b6be8a7c7b00e841cd40.png";
 import { PlayerStatsModal } from "./PlayerStatsModal";
+import { LeaderboardModal } from "./LeaderboardModal";
 import { getPlayerAvatarUrl } from "../utils/avatarUtils";
 import { useTranslation } from "../utils/translations";
 import { FollowingEyes } from "./ui/FollowingEyes";
 
 interface AdvisorState {
+  advisorId: string;
   advisorCoins: number;
   lifetimeSavingsGenerated: number;
   lifetimeDebtCleared: number;
@@ -46,6 +48,7 @@ export function ChatSidebar({
   const t = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [showStatsModal, setShowStatsModal] = useState(false);
+  const [showLeaderboardModal, setShowLeaderboardModal] = useState(false);
   const [playerName, setPlayerName] = useState("Player");
   const [playerAvatarUrl, setPlayerAvatarUrl] = useState("");
 
@@ -299,6 +302,40 @@ export function ChatSidebar({
           onOpenChange={setShowStatsModal}
           contacts={contacts}
           advisorState={advisorState}
+        />
+
+        {/* Leaderboard Button */}
+        <button
+          onClick={() => setShowLeaderboardModal(true)}
+          className="w-full mt-3 px-3 py-2.5 flex items-center justify-center gap-2 rounded-lg border transition-all duration-200 hover:scale-[1.02]"
+          style={{
+            backgroundColor: "var(--muted)",
+            borderColor: "var(--border)",
+            fontFamily: "Inter, sans-serif",
+            fontSize: "var(--text-sm)",
+            fontWeight: "var(--font-weight-medium)",
+            color: "var(--foreground)",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "var(--primary)";
+            e.currentTarget.style.color = "var(--primary-foreground)";
+            e.currentTarget.style.borderColor = "var(--primary)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "var(--muted)";
+            e.currentTarget.style.color = "var(--foreground)";
+            e.currentTarget.style.borderColor = "var(--border)";
+          }}
+        >
+          <Trophy className="w-4 h-4" />
+          Global Leaderboard
+        </button>
+
+        {/* Leaderboard Modal */}
+        <LeaderboardModal
+          open={showLeaderboardModal}
+          onOpenChange={setShowLeaderboardModal}
+          advisorId={advisorState?.advisorId}
         />
       </div>
 

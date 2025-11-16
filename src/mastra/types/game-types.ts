@@ -710,6 +710,63 @@ export interface AdviceEvaluation {
 }
 
 // ============================================================================
+// GLOBAL LEADERBOARD
+// ============================================================================
+
+/**
+ * Leaderboard entry matching the Postgres schema
+ * Tracks advisor performance for global rankings
+ */
+export interface LeaderboardEntry {
+  advisorId: string;
+  advisorName: string; // AI-sanitized display name
+
+  // Core Stats
+  reputation: number;
+  skillLevel: number;
+  totalSessions: number;
+  totalClientsHelped: number;
+
+  // Financial Impact
+  lifetimeSavingsGenerated: number;
+  lifetimeDebtCleared: number;
+  advisorCoins: number;
+
+  // Performance Metrics
+  averageAdviceScore: number;
+  achievementCount: number;
+
+  // Global Ranking
+  globalRank?: number;
+  globalScore: number; // Weighted score for ranking
+
+  // Metadata
+  firstSessionDate: string;
+  lastUpdated: string;
+}
+
+/**
+ * Leaderboard categories for different ranking views
+ */
+export type LeaderboardCategory =
+  | "global" // Overall ranking (weighted score)
+  | "reputation" // By reputation score
+  | "impact" // By financial impact (savings + debt cleared)
+  | "expertise" // By skill level and advice quality
+  | "coins" // By advisor coins earned
+  | "achievements"; // By achievement count
+
+/**
+ * Leaderboard ranking response
+ */
+export interface LeaderboardRanking {
+  category: LeaderboardCategory;
+  entries: LeaderboardEntry[];
+  lastUpdated: string;
+  totalParticipants: number;
+}
+
+// ============================================================================
 // BACKWARD COMPATIBILITY (for migration)
 // ============================================================================
 
