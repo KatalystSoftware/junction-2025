@@ -43,6 +43,47 @@ interface LeaderboardModalProps {
   advisorId?: string;
 }
 
+export function getLeaderboardCategoryTagline(
+  category: LeaderboardCategory,
+): string {
+  switch (category) {
+    case "impact":
+      return "Ranked by client money saved and debt cleared";
+    case "coins":
+      return "Ranked by Advisor Coins earned from helping clients";
+    case "achievements":
+      return "Ranked by achievements unlocked and milestones reached";
+    case "messages":
+      return "Ranked by messages sent and relationships nurtured";
+    default:
+      return "Global ranking of all financial advisors";
+  }
+}
+
+export function getLeaderboardMotivation(
+  rank: number,
+  totalParticipants: number,
+): string {
+  if (!totalParticipants || rank <= 0 || rank > totalParticipants) {
+    return "";
+  }
+
+  const percentile =
+    100 - Math.floor(((rank - 1) / totalParticipants) * 100);
+
+  if (percentile >= 90) {
+    return "You are in the top 10% – legendary advisor status!";
+  }
+  if (percentile >= 75) {
+    return "Top 25%! Clients are lining up for you.";
+  }
+  if (percentile >= 50) {
+    return "Above average – keep pushing towards the podium.";
+  }
+
+  return "Every legend starts somewhere. One great session at a time!";
+}
+
 export function LeaderboardModal({
   open,
   onOpenChange,
@@ -113,8 +154,8 @@ export function LeaderboardModal({
             Global Leaderboard
           </DialogTitle>
           <DialogDescription>
-            Ranked by client money saved and debt cleared
-            {leaderboard && ` • ${leaderboard.totalParticipants} participants`}
+            {getLeaderboardCategoryTagline(category)}
+            {leaderboard && ` • ${leaderboard.totalParticipants} advisors`}
           </DialogDescription>
         </DialogHeader>
 
@@ -158,7 +199,7 @@ export function LeaderboardModal({
           {!loading && !error && leaderboard && (
             <ScrollArea className="h-full pr-4">
               {/* Current user's rank banner */}
-              {currentUserEntry && (
+              {currentUserEntry && leaderboard && (
                 <div className="mb-4 p-4 bg-primary/10 rounded-lg border-2 border-primary">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -179,6 +220,12 @@ export function LeaderboardModal({
                           coins • {currentUserEntry.achievementCount} achievements
                           {" • "}
                           {currentUserEntry.globalScore.toFixed(0)} pts
+                        </div>
+                        <div className="mt-1 text-xs text-primary">
+                          {getLeaderboardMotivation(
+                            currentUserEntry.globalRank || 0,
+                            leaderboard.totalParticipants,
+                          )}
                         </div>
                       </div>
                     </div>
