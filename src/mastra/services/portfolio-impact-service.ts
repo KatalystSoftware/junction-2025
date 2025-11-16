@@ -42,6 +42,7 @@ const recentDeltas = new Map<string, PortfolioImpactDelta[]>();
  * - Base: €0.10 per minute per client helped
  * - Multiplier: Based on average coins earned (proxy for advice quality)
  * - Scaling: Increases with more clients and better advice
+ * - Penalties: Bad advice, interventions, and poor performance cause negative growth
  */
 export function calculateGrowthRate(advisorState: AdvisorState): PortfolioGrowthRate {
   const {
@@ -50,7 +51,23 @@ export function calculateGrowthRate(advisorState: AdvisorState): PortfolioGrowth
     advisorCoins,
     totalClientsHelped,
     totalSessions,
+    isFired,
+    activeIntervention,
+    criticalInterventionsForcedThrough,
+    currentStreak,
+    godBossRelationship,
   } = advisorState;
+
+  // If advisor is FIRED, portfolio tanks hard
+  if (isFired) {
+    return {
+      savingsPerMinute: -5.0,
+      debtReductionPerMinute: -5.0,
+      totalPerMinute: -10.0,
+      activeClients: totalClientsHelped,
+      lastCalculated: Date.now(),
+    };
+  }
 
   // Count active clients (those we've helped)
   const activeClients = totalClientsHelped;
@@ -64,16 +81,61 @@ export function calculateGrowthRate(advisorState: AdvisorState): PortfolioGrowth
   const avgCoinsPerSession = totalSessions > 0
     ? advisorCoins / totalSessions
     : 0;
-  const qualityMultiplier = 1 + (avgCoinsPerSession / 100); // +1% per coin
+
+  // Base quality multiplier
+  let qualityMultiplier = 1 + (avgCoinsPerSession / 100); // +1% per coin
+
+  // NEGATIVE GROWTH FACTORS:
+
+  // 1. Active boss intervention = BAD advice being given RIGHT NOW
+  if (activeIntervention) {
+    const severity = activeIntervention.severity;
+    if (severity === "critical") {
+      // Critical intervention = clients losing money due to bad advice
+      qualityMultiplier -= 2.0; // -200% penalty
+    } else {
+      // Warning intervention = risky advice
+      qualityMultiplier -= 0.5; // -50% penalty
+    }
+  }
+
+  // 2. Critical interventions forced through = reckless behavior
+  if (criticalInterventionsForcedThrough > 0) {
+    // Each forced-through critical intervention causes ongoing damage
+    qualityMultiplier -= criticalInterventionsForcedThrough * 0.3;
+  }
+
+  // 3. Negative performance streak = consistent poor advice
+  if (currentStreak < 0) {
+    // Negative streak reduces growth (each bad session = -10% growth)
+    qualityMultiplier += currentStreak * 0.1; // currentStreak is negative
+  }
+
+  // 4. Very low boss relationship = clients are suffering
+  if (godBossRelationship < 3) {
+    // Boss unhappy = clients not doing well
+    qualityMultiplier -= (3 - godBossRelationship) * 0.15;
+  }
+
+  // 5. Very low coins per session = objectively bad advice
+  if (totalSessions > 3 && avgCoinsPerSession < 2) {
+    // Consistently earning very few coins = bad outcomes
+    qualityMultiplier -= 0.5;
+  }
 
   // Base rate: €0.10 per minute per active client
   const baseRatePerClient = 0.10;
   const baseRate = activeClients * baseRatePerClient;
 
-  // Apply quality multiplier
-  const totalPerMinute = baseRate * qualityMultiplier;
+  // Apply quality multiplier (can now be negative!)
+  let totalPerMinute = baseRate * qualityMultiplier;
 
-  // Split between savings and debt reduction (70/30 ratio by default)
+  // Minimum cap: Don't let it decay TOO fast (unless fired)
+  if (totalPerMinute < -5.0 && !isFired) {
+    totalPerMinute = -5.0;
+  }
+
+  // Split between savings and debt reduction
   const savingsRatio = lifetimeSavingsGenerated > 0
     ? lifetimeSavingsGenerated / (lifetimeSavingsGenerated + lifetimeDebtCleared + 1)
     : 0.7;
@@ -109,22 +171,33 @@ export function getGrowthRate(sessionId: string): PortfolioGrowthRate | null {
 /**
  * Apply growth increment to advisor state
  * Returns the delta that was applied
+ *
+ * NOTE: Can apply NEGATIVE deltas if performance is poor!
  */
 export function applyGrowthIncrement(
   advisorState: AdvisorState,
   sessionId: string,
 ): PortfolioImpactDelta | null {
   const rate = growthRates.get(sessionId);
-  if (!rate || rate.totalPerMinute <= 0) {
+  if (!rate) {
     return null;
   }
 
   // Apply increment (rounded to 2 decimal places)
+  // NOTE: Can be negative if advisor is performing poorly!
   const savingsDelta = Math.round(rate.savingsPerMinute * 100) / 100;
   const debtDelta = Math.round(rate.debtReductionPerMinute * 100) / 100;
 
   advisorState.lifetimeSavingsGenerated += savingsDelta;
   advisorState.lifetimeDebtCleared += debtDelta;
+
+  // Don't let values go below 0 (can't have negative savings generated)
+  if (advisorState.lifetimeSavingsGenerated < 0) {
+    advisorState.lifetimeSavingsGenerated = 0;
+  }
+  if (advisorState.lifetimeDebtCleared < 0) {
+    advisorState.lifetimeDebtCleared = 0;
+  }
 
   const delta: PortfolioImpactDelta = {
     savings: savingsDelta,

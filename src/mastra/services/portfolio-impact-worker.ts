@@ -101,8 +101,11 @@ export class PortfolioImpactWorker {
       }
 
       if (successCount > 0) {
+        const sign = totalGrowth >= 0 ? "+" : "";
+        const emoji = totalGrowth >= 0 ? "✅" : "⚠️";
+        const action = totalGrowth >= 0 ? "growth" : "decline";
         console.log(
-          `✅ Portfolio growth applied: ${successCount} sessions, +€${totalGrowth.toFixed(2)} total`,
+          `${emoji} Portfolio ${action} applied: ${successCount} sessions, ${sign}€${totalGrowth.toFixed(2)} total`,
         );
       }
 
@@ -150,20 +153,20 @@ export class PortfolioImpactWorker {
     // Recalculate growth rate (in case advisor state changed)
     updateGrowthRate(sessionId, advisorState);
 
-    // Apply growth increment
+    // Apply growth increment (can be negative if performance is poor!)
     const delta = applyGrowthIncrement(advisorState, sessionId);
 
-    if (!delta || delta.total <= 0) {
-      // No growth to apply
+    if (!delta) {
+      // No delta calculated
       return { updated: false, growth: 0 };
     }
 
-    // Save updated session
+    // Save updated session (even if delta is negative - portfolio can decrease!)
     await saveSession(sessionId, advisorState);
 
     return {
       updated: true,
-      growth: delta.total,
+      growth: delta.total, // Can be negative!
     };
   }
 

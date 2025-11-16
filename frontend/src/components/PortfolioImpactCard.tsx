@@ -298,31 +298,71 @@ export function PortfolioImpactCard({
       </div>
 
       {/* Growth Rate Indicator */}
-      {growthData && growthData.growth.perMinute > 0 && (
+      {growthData && growthData.growth.perMinute !== 0 && (
         <div
           className="mb-3 p-2 rounded text-xs"
           style={{
-            backgroundColor: "rgba(34, 197, 94, 0.1)",
-            borderLeft: "3px solid var(--chart-1)",
+            backgroundColor: growthData.growth.perMinute > 0
+              ? "rgba(34, 197, 94, 0.1)"
+              : "rgba(239, 68, 68, 0.1)",
+            borderLeft: growthData.growth.perMinute > 0
+              ? "3px solid var(--chart-1)"
+              : "3px solid var(--chart-2)",
           }}
         >
           <div className="flex items-center justify-between">
             <span style={{ color: "var(--muted-foreground)" }}>
-              <TrendingUp className="w-3 h-3 inline mr-1" style={{ color: "var(--chart-1)" }} />
-              Growing:
+              {growthData.growth.perMinute > 0 ? (
+                <>
+                  <TrendingUp className="w-3 h-3 inline mr-1" style={{ color: "var(--chart-1)" }} />
+                  Growing:
+                </>
+              ) : (
+                <>
+                  <TrendingDown className="w-3 h-3 inline mr-1" style={{ color: "var(--chart-2)" }} />
+                  Declining:
+                </>
+              )}
             </span>
-            <span className="font-semibold" style={{ color: "var(--chart-1)" }}>
-              +{formatCurrency(growthData.growth.perMinute)}/min
+            <span
+              className="font-semibold"
+              style={{
+                color: growthData.growth.perMinute > 0
+                  ? "var(--chart-1)"
+                  : "var(--chart-2)"
+              }}
+            >
+              {growthData.growth.perMinute > 0 ? "+" : ""}
+              {formatCurrency(Math.abs(growthData.growth.perMinute))}/min
             </span>
           </div>
           <div className="flex items-center justify-between mt-1">
             <span style={{ color: "var(--muted-foreground)" }}>
               Projected daily:
             </span>
-            <span className="font-medium" style={{ color: "var(--muted-foreground)" }}>
-              {formatCurrency(growthData.growth.perDay)}
+            <span
+              className="font-medium"
+              style={{
+                color: growthData.growth.perMinute > 0
+                  ? "var(--muted-foreground)"
+                  : "var(--chart-2)"
+              }}
+            >
+              {growthData.growth.perMinute > 0 ? "" : "-"}
+              {formatCurrency(Math.abs(growthData.growth.perDay))}
             </span>
           </div>
+          {growthData.growth.perMinute < 0 && (
+            <div
+              className="mt-2 pt-2 border-t text-xs"
+              style={{
+                borderColor: "rgba(239, 68, 68, 0.3)",
+                color: "var(--chart-2)"
+              }}
+            >
+              ⚠️ Poor advice is causing client losses
+            </div>
+          )}
         </div>
       )}
 
