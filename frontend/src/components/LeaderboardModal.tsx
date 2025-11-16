@@ -51,6 +51,13 @@ export function LeaderboardModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const formatCurrency = (amount: number) =>
+    new Intl.NumberFormat("fi-FI", {
+      style: "currency",
+      currency: "EUR",
+      maximumFractionDigits: 0,
+    }).format(amount);
+
   // Fetch leaderboard data when modal opens
   useEffect(() => {
     if (!open) return;
@@ -102,7 +109,7 @@ export function LeaderboardModal({
             Global Leaderboard
           </DialogTitle>
           <DialogDescription>
-            Compete with advisors worldwide
+            Ranked by client money saved and debt cleared
             {leaderboard && ` • ${leaderboard.totalParticipants} participants`}
           </DialogDescription>
         </DialogHeader>
@@ -135,7 +142,11 @@ export function LeaderboardModal({
                           {currentUserEntry.advisorName} (You)
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          {currentUserEntry.globalScore.toFixed(0)} pts
+                          {formatCurrency(
+                            currentUserEntry.lifetimeSavingsGenerated +
+                              currentUserEntry.lifetimeDebtCleared,
+                          )}{" "}
+                          impact • {currentUserEntry.globalScore.toFixed(0)} pts
                         </div>
                       </div>
                     </div>
@@ -170,7 +181,11 @@ export function LeaderboardModal({
                           {isCurrentUser && " (You)"}
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          {entry.totalSessions} sessions •{" "}
+                          {formatCurrency(
+                            entry.lifetimeSavingsGenerated +
+                              entry.lifetimeDebtCleared,
+                          )}{" "}
+                          impact • {entry.totalSessions} sessions •{" "}
                           {entry.totalClientsHelped} clients
                         </div>
                       </div>

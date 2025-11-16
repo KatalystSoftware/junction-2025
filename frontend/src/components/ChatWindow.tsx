@@ -15,6 +15,7 @@ import {
   Phone,
   Video,
   ArrowLeft,
+  ArrowDown,
   PhoneOff,
   VideoOff,
   Mic,
@@ -23,14 +24,17 @@ import {
   Target,
   Briefcase,
   Users,
+  BarChart3,
 } from "lucide-react";
 import type { Contact, Message } from "./WhatsAppInterface";
 import { TrustMeter } from "./TrustMeter";
 import { VoiceMessage } from "./VoiceMessage";
+import { ClientFinancialDashboard } from "./ClientFinancialDashboard";
 import logoImage from "figma:asset/601ef144d16bf6e001c5324689cdddb5a7ea7f74.png";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useTranslation } from "../utils/translations";
+import { shouldShowChatInputTip } from "@backend/chatOnboarding";
 
 // Helper function to convert quality score (0-10) to quality level key
 function getQualityLevel(
@@ -61,6 +65,8 @@ interface ChatWindowProps {
   // Controlled input support (for boss intervention revisions)
   inputValue?: string;
   onInputChange?: (value: string) => void;
+  // Global onboarding state: has the player ever sent a message
+  hasAnyUserMessages?: boolean;
 }
 
 // Helper functions to calculate financial data
@@ -132,6 +138,7 @@ export function ChatWindow({
   conversationEndData,
   inputValue: controlledInputValue,
   onInputChange,
+  hasAnyUserMessages,
 }: ChatWindowProps) {
   const t = useTranslation();
   // Use controlled input from parent if provided, otherwise local state
@@ -142,6 +149,7 @@ export function ChatWindow({
   const [showCallDialog, setShowCallDialog] = useState(false);
   const [showVideoDialog, setShowVideoDialog] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showFinancialDashboard, setShowFinancialDashboard] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
   const [videoDuration, setVideoDuration] = useState(0);
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -325,6 +333,18 @@ export function ChatWindow({
   // Get multiple choice options from backend (if provided)
   // Keep the full choice objects to display actionText + projectedOutcome
   const multipleChoiceOptions = adviceChoices.length > 0 ? adviceChoices : [];
+
+  const hasUserMessages =
+    typeof hasAnyUserMessages === "boolean"
+      ? hasAnyUserMessages
+      : messages.some((message) => message.role === "user");
+  const isInputActive =
+    isInputFocused || isRecording || audioBlob !== null || isTranscribing;
+
+  const showChatInputTip = shouldShowChatInputTip({
+    hasUserMessages,
+    isInputActive,
+  });
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -684,6 +704,25 @@ export function ChatWindow({
           </div>
 
           <div className="flex items-center gap-2">
+            {contact.id !== "boss-pinned" && contact.financialProfile && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setShowFinancialDashboard(true)}
+                      style={{ borderRadius: "var(--radius-button)" }}
+                    >
+                      <BarChart3 className="w-5 h-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>View Financial Details</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
             <Button
               variant="ghost"
               size="icon"
@@ -1248,7 +1287,7 @@ export function ChatWindow({
       ) : (
         /* Normal Input Area */
         <div
-          className="absolute bottom-4 left-4 right-4 px-4 py-3 transition-all duration-200 border-2"
+          className="absolute bottom-4 left-4 right-4 px-4 py-3 transition-all duration-200 border-2 relative"
           style={{
             backgroundColor: "var(--card)",
             boxShadow: isInputFocused
@@ -1260,6 +1299,14 @@ export function ChatWindow({
           }}
         >
           <TooltipProvider>
+            {showChatInputTip && (
+              <div className="absolute top-0 left-0 pointer-events-none animate-bounce transform -translate-x-4 -translate-y-4">
+                <ArrowDown
+                  className="w-7 h-7"
+                  style={{ color: "var(--primary)" }}
+                />
+              </div>
+            )}
             {/* Recording UI */}
             {(isRecording || audioBlob) && (
               <div
@@ -2167,6 +2214,15 @@ export function ChatWindow({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Financial Dashboard Modal */}
+      {showFinancialDashboard && contact && contact.id !== "boss-pinned" && contact.characterId && (
+        <ClientFinancialDashboard
+          characterId={contact.characterId}
+          characterName={contact.name}
+          onClose={() => setShowFinancialDashboard(false)}
+        />
       )}
     </div>
   );

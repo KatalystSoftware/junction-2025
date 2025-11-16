@@ -13,6 +13,7 @@ import { getOrCreateSessionId } from "./sessionManager";
 
 export interface AdvisorState {
   advisorId: string;
+  advisorName: string;
   reputation: number;
   skillLevel: number;
   specializations: string[];
@@ -158,6 +159,7 @@ export interface GameResponse {
 
 interface InitRequest {
   sessionId?: string;
+  advisorName?: string;
 }
 
 interface InitResponse {
@@ -215,10 +217,24 @@ class GameAPI {
    * Initialize or load a game session
    */
   async initSession(sessionId?: string): Promise<InitResponse> {
+    // Get user name from localStorage (set during onboarding)
+    let advisorName: string | undefined;
+    try {
+      const userProfileStr = localStorage.getItem("userProfile");
+      if (userProfileStr) {
+        const userProfile = JSON.parse(userProfileStr);
+        if (userProfile.name) {
+          advisorName = userProfile.name;
+        }
+      }
+    } catch (e) {
+      console.error("Failed to get user name:", e);
+    }
+
     const response = await fetch(`${this.baseUrl}/init`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sessionId } as InitRequest),
+      body: JSON.stringify({ sessionId, advisorName } as InitRequest),
     });
 
     if (!response.ok) {

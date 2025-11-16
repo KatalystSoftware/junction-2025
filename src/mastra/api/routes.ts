@@ -11,6 +11,7 @@ import {
   startNewConsultation,
   handleAdvisorResponse,
   handleInterventionResponse,
+  checkAndSendFollowUps,
 } from "../game/orchestrator.ts";
 import {
   saveSession,
@@ -29,12 +30,36 @@ import type {
   SessionGoal,
   CompletedMaterial,
 } from "../types/game-types.ts";
+import { onAdvisorInit } from "../game/orchestrator-hooks.ts";
+
+/**
+ * Helper function to check for follow-ups and include them in responses
+ * This makes the system server-led - frontend doesn't need to poll
+ */
+async function checkAndIncludeFollowUps(
+  advisorState: AdvisorState,
+): Promise<{
+  followUps: Array<{
+    threadId: string;
+    characterName: string;
+    messages: string[];
+    frustrationLevel: number;
+  }>;
+  updatedState: AdvisorState;
+}> {
+  const result = await checkAndSendFollowUps(advisorState);
+  return {
+    followUps: result.followUpsSent,
+    updatedState: result.stateUpdate,
+  };
+}
 
 /**
  * Client-safe version of AdvisorState - only fields the frontend needs
  * Excludes sensitive server-only fields like database credentials
  */
 export interface ClientSafeAdvisorState {
+  advisorName: string;
   reputation: number;
   skillLevel: number;
   specializations: FinancialTopic[];
@@ -67,6 +92,7 @@ export interface ClientSafeAdvisorState {
  */
 function toClientSafeAdvisorState(state: AdvisorState): ClientSafeAdvisorState {
   return {
+    advisorName: state.advisorName,
     reputation: state.reputation,
     skillLevel: state.skillLevel,
     specializations: state.specializations,
@@ -135,6 +161,7 @@ app.use(
 
 interface InitRequest {
   sessionId?: string; // If provided, try to load existing session
+  advisorName?: string; // User's chosen name (from onboarding)
 }
 
 interface InitResponse {
@@ -153,6 +180,12 @@ interface InitResponse {
   >;
   threadMetadata?: Record<string, ThreadMetadata>;
   autoStartedConsultation?: ClientSafeGameResponse; // Auto-started if no active threads
+  followUps?: Array<{
+    threadId: string;
+    characterName: string;
+    messages: string[];
+    frustrationLevel: number;
+  }>;
 }
 
 app.post("/init", async (c) => {
@@ -277,21 +310,27 @@ app.post("/init", async (c) => {
         console.log(
           `⚠️ Session ${sessionId.substring(0, 8)}... not found, creating new`,
         );
-        advisorState = createNewAdvisor(sessionId);
+        advisorState = createNewAdvisor(sessionId, body.advisorName);
         isNewSession = true;
 
         // Save initial state for new session
         await saveSession(sessionId, advisorState);
+
+        // Initialize in leaderboard
+        await onAdvisorInit(advisorState, advisorState.advisorName);
       }
     } else {
       // Create brand new session
       sessionId = generateSessionId();
-      advisorState = createNewAdvisor(sessionId);
+      advisorState = createNewAdvisor(sessionId, body.advisorName);
       isNewSession = true;
       console.log(`✨ Created new session: ${sessionId.substring(0, 8)}...`);
 
       // Save initial state for new session
       await saveSession(sessionId, advisorState);
+
+      // Initialize in leaderboard
+      await onAdvisorInit(advisorState, advisorState.advisorName);
     }
 
     // SANITY CHECK: Auto-start consultation if onboarding is done and no active threads
@@ -401,6 +440,23 @@ app.post("/init", async (c) => {
       }
     }
 
+    // Check for follow-ups (server-led approach)
+    const { followUps, updatedState } = await checkAndIncludeFollowUps(
+      advisorState,
+    );
+
+    // Save updated state if follow-ups were sent
+    if (followUps.length > 0) {
+      const historiesMap = threadHistories
+        ? new Map(Object.entries(threadHistories))
+        : new Map();
+      const metadataMap = threadMetadata
+        ? new Map(Object.entries(threadMetadata))
+        : new Map();
+      await saveSession(sessionId, updatedState, historiesMap, metadataMap);
+      advisorState = updatedState;
+    }
+
     return c.json<InitResponse>({
       sessionId,
       advisorState: toClientSafeAdvisorState(advisorState),
@@ -408,6 +464,7 @@ app.post("/init", async (c) => {
       threadHistories,
       threadMetadata,
       autoStartedConsultation,
+      followUps: followUps.length > 0 ? followUps : undefined,
     });
   } catch (error) {
     console.error("❌ Error in /init:", error);
@@ -594,6 +651,17 @@ app.post("/start-consultation", async (c) => {
       metadataMap,
     );
 
+    // Check for follow-ups (server-led approach)
+    const { followUps, updatedState } = await checkAndIncludeFollowUps(
+      gameResponse.stateUpdate,
+    );
+
+    // Save updated state if follow-ups were sent
+    if (followUps.length > 0) {
+      await saveSession(sessionId, updatedState, historiesMap, metadataMap);
+      gameResponse.stateUpdate = updatedState;
+    }
+
     // Convert Maps back to objects for response
     const threadHistoriesObject = Object.fromEntries(historiesMap);
     const threadMetadataObject = Object.fromEntries(metadataMap);
@@ -605,12 +673,19 @@ app.post("/start-consultation", async (c) => {
       "threads",
     );
 
-    return c.json<StartConsultationResponse>({
+    const response = {
       ...toClientSafeGameResponse(gameResponse),
       sessionId,
       threadHistories: threadHistoriesObject,
       threadMetadata: threadMetadataObject,
-    });
+    };
+
+    // Add follow-ups if any
+    if (followUps.length > 0) {
+      (response as any).followUps = followUps;
+    }
+
+    return c.json<StartConsultationResponse>(response);
   } catch (error) {
     console.error("❌ Error in /start-consultation:", error);
     return c.json({ error: "Failed to start consultation" }, 500);
@@ -824,7 +899,36 @@ app.post("/send-message", async (c) => {
       }
     }
 
+    // Update leaderboard entry when a conversation (session) ends
+    if (gameResponse.stateUpdate && gameResponse.type === "conversation_end") {
+      try {
+        const { afterSessionComplete } = await import(
+          "../game/orchestrator-hooks.ts"
+        );
+        await afterSessionComplete(
+          gameResponse.stateUpdate,
+          gameResponse.stateUpdate.advisorId,
+          gameResponse,
+        );
+      } catch (error) {
+        console.error(
+          "❌ Failed to update leaderboard after conversation_end:",
+          error,
+        );
+      }
+    }
+
     // Save updated state with message histories and metadata
+    // Check for follow-ups (server-led approach)
+    const { followUps, updatedState } = await checkAndIncludeFollowUps(
+      gameResponse.stateUpdate,
+    );
+
+    // Save updated state (includes follow-ups if any)
+    if (followUps.length > 0) {
+      gameResponse.stateUpdate = updatedState;
+    }
+
     await saveSession(
       sessionId,
       gameResponse.stateUpdate,
@@ -836,12 +940,19 @@ app.post("/send-message", async (c) => {
     const threadHistoriesObject = Object.fromEntries(historiesMap);
     const threadMetadataObject = Object.fromEntries(metadataMap);
 
-    return c.json<SendMessageResponse>({
+    const response = {
       ...toClientSafeGameResponse(gameResponse),
       sessionId,
       threadHistories: threadHistoriesObject,
       threadMetadata: threadMetadataObject,
-    });
+    };
+
+    // Add follow-ups if any
+    if (followUps.length > 0) {
+      (response as any).followUps = followUps;
+    }
+
+    return c.json<SendMessageResponse>(response);
   } catch (error) {
     console.error("❌ Error in /send-message:", error);
     return c.json({ error: "Failed to send message" }, 500);
@@ -1278,6 +1389,226 @@ app.post("/transcribe-audio", async (c) => {
 });
 
 // ============================================================================
+// ROUTE: Get Real Portfolio Impact (Based on Actual Transactions)
+// ============================================================================
+app.get("/real-portfolio-impact/:sessionId", async (c) => {
+  try {
+    const sessionId = c.req.param("sessionId");
+
+    console.log(
+      `💰 Calculating real portfolio impact for session: ${sessionId.substring(0, 8)}...`,
+    );
+
+    const savedSession = await loadSession(sessionId);
+    if (!savedSession) {
+      return c.json({ error: "Session not found" }, 404);
+    }
+
+    const { SimulationEngine } = await import(
+      "../simulation/simulation-engine.ts"
+    );
+    const { characterPool } = await import("../index.ts");
+    const engine = new SimulationEngine();
+
+    // Get all characters this advisor has helped
+    const allRelationships = characterPool.getCharacterRelationships(
+      savedSession.advisorState.advisorId,
+    );
+
+    let totalRealSavings = 0;
+    let totalRealDebtReduced = 0;
+    const clientImpacts: Array<{
+      characterId: string;
+      characterName: string;
+      savingsGenerated: number;
+      debtReduced: number;
+      balanceImprovement: number;
+      sessionsCount: number;
+    }> = [];
+
+    for (const rel of allRelationships) {
+      const character = characterPool.getCharacter(rel.characterId);
+      if (!character) continue;
+
+      // Get monthly summaries to calculate improvement
+      const summaries = await engine.getMonthlySummaries(rel.characterId, 12);
+
+      if (summaries.length >= 2) {
+        // Compare first month (baseline) vs latest month
+        const firstMonth = summaries[summaries.length - 1]; // oldest
+        const latestMonth = summaries[0]; // most recent
+
+        // Calculate balance improvement
+        const balanceImprovement = latestMonth.endBalance - firstMonth.endBalance;
+
+        // Calculate savings improvement (net income trend)
+        const firstNetIncome = firstMonth.totalIncome - firstMonth.totalExpenses;
+        const latestNetIncome = latestMonth.totalIncome - latestMonth.totalExpenses;
+        const savingsImprovement = latestNetIncome - firstNetIncome;
+
+        // Calculate debt reduction from debt_payment transactions
+        const db = engine.getDatabase();
+        if (db) {
+          const allTransactions = await engine.getRecentTransactions(
+            rel.characterId,
+            1000,
+          );
+          const debtPayments = allTransactions
+            .filter((txn) => txn.type === "debt_payment")
+            .reduce((sum, txn) => sum + Math.abs(txn.amount), 0);
+
+          totalRealDebtReduced += debtPayments;
+        }
+
+        totalRealSavings += Math.max(0, balanceImprovement);
+
+        clientImpacts.push({
+          characterId: rel.characterId,
+          characterName: character.name,
+          savingsGenerated: Math.max(0, balanceImprovement),
+          debtReduced: 0, // Will calculate separately if needed
+          balanceImprovement,
+          sessionsCount: rel.totalSessions,
+        });
+      }
+    }
+
+    await engine.close();
+
+    return c.json({
+      totalRealSavings: Math.round(totalRealSavings),
+      totalRealDebtReduced: Math.round(totalRealDebtReduced),
+      totalClientsHelped: allRelationships.length,
+      avgImpactPerClient:
+        allRelationships.length > 0
+          ? Math.round(totalRealSavings / allRelationships.length)
+          : 0,
+      clientImpacts: clientImpacts.sort(
+        (a, b) => b.savingsGenerated - a.savingsGenerated,
+      ),
+      // Also include projected numbers for comparison
+      projectedSavings: savedSession.advisorState.lifetimeSavingsGenerated,
+      projectedDebtCleared: savedSession.advisorState.lifetimeDebtCleared,
+    });
+  } catch (error) {
+    console.error("❌ Error in /real-portfolio-impact/:sessionId:", error);
+    return c.json({ error: "Failed to calculate real portfolio impact" }, 500);
+  }
+});
+
+// ============================================================================
+// ROUTE: Get Client Financial Details (Full Dashboard Data)
+// ============================================================================
+app.get("/client-financial-details/:characterId", async (c) => {
+  try {
+    const characterId = c.req.param("characterId");
+    const monthsBack = parseInt(c.req.query("months") || "6");
+
+    console.log(
+      `📊 Getting detailed financial data for character: ${characterId}`,
+    );
+
+    const { SimulationEngine } = await import(
+      "../simulation/simulation-engine.ts"
+    );
+    const { characterPool } = await import("../index.ts");
+    const engine = new SimulationEngine();
+
+    const character = characterPool.getCharacter(characterId);
+    if (!character) {
+      await engine.close();
+      return c.json({ error: "Character not found" }, 404);
+    }
+
+    const state = await engine.getCharacterState(characterId);
+    if (!state) {
+      await engine.close();
+      return c.json({ error: "Character state not found" }, 404);
+    }
+
+    // Get monthly summaries for trend
+    const monthlySummaries = await engine.getMonthlySummaries(
+      characterId,
+      monthsBack,
+    );
+
+    // Get recent transactions
+    const recentTransactions = await engine.getRecentTransactions(
+      characterId,
+      50,
+    );
+
+    // Get spending by category for current month
+    const db = engine.getDatabase();
+    let categorySpending = {};
+
+    if (db && monthlySummaries.length > 0) {
+      const currentMonth = monthlySummaries[0];
+      categorySpending = await db.getSpendingByCategory(
+        characterId,
+        currentMonth.month + "-01",
+        currentMonth.month + "-31",
+      );
+    }
+
+    // Calculate income vs expenses trend
+    const monthlyTrend = monthlySummaries.reverse().map((month) => ({
+      month: month.month,
+      income: month.totalIncome,
+      expenses: month.totalExpenses,
+      netSavings: month.totalIncome - month.totalExpenses,
+      balance: month.endBalance,
+    }));
+
+    // Get advice-influenced transactions
+    const adviceInfluencedTransactions = recentTransactions.filter(
+      (txn) => txn.adviceInfluenced,
+    );
+
+    // Calculate total impact from advice
+    const adviceImpact = adviceInfluencedTransactions.reduce((sum, txn) => {
+      // For expenses, positive impact = reduced spending (saved money)
+      if (txn.amount < 0) return sum + Math.abs(txn.amount);
+      return sum;
+    }, 0);
+
+    await engine.close();
+
+    return c.json({
+      characterId,
+      characterName: character.name,
+      currentBalance: state.currentBalance,
+      financialProfile: character.financialProfile,
+      monthlySummaries,
+      monthlyTrend,
+      recentTransactions: recentTransactions.slice(0, 30).map((txn) => ({
+        id: txn.id,
+        date: txn.date,
+        type: txn.type,
+        category: txn.category,
+        amount: txn.amount,
+        balanceAfter: txn.balanceAfter,
+        description: txn.description,
+        merchantName: txn.merchantName,
+        adviceInfluenced: txn.adviceInfluenced,
+      })),
+      categorySpending,
+      adviceInfluencedTransactions: adviceInfluencedTransactions.length,
+      totalAdviceImpact: Math.round(adviceImpact),
+    });
+  } catch (error) {
+    console.error("❌ Error in /client-financial-details/:characterId:", error);
+    return c.json(
+      {
+        error: "Failed to get client financial details",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      500,
+    );
+  }
+});
+
+// ============================================================================
 // ROUTE: Get Character Progression Data
 // ============================================================================
 app.get("/character-progression/:characterId", async (c) => {
@@ -1365,6 +1696,40 @@ app.get("/session/:sessionId/character-progressions", async (c) => {
     );
   }
 });
+
+// ============================================================================
+// FOLLOW-UP SYSTEM DOCUMENTATION
+// ============================================================================
+/**
+ * SERVER-LED FOLLOW-UP SYSTEM
+ *
+ * Follow-ups are automatically checked and included in ALL game flow endpoints:
+ * - /init - Session initialization
+ * - /start-consultation - Starting new consultations
+ * - /send-message - Sending messages
+ *
+ * IDLE DETECTION (optional):
+ * If you want follow-ups to appear while the user is idle (not interacting),
+ * set up a timer in the frontend to call /init every 30-60 seconds:
+ *
+ * Example:
+ *   setInterval(async () => {
+ *     const response = await fetch('/init', {
+ *       method: 'POST',
+ *       body: JSON.stringify({ sessionId: currentSessionId })
+ *     });
+ *     const data = await response.json();
+ *     if (data.followUps && data.followUps.length > 0) {
+ *       // Display follow-up messages to user
+ *       displayFollowUps(data.followUps);
+ *     }
+ *   }, 60000); // Every 60 seconds
+ *
+ * This approach:
+ * - Refreshes the entire session state (useful for detecting changes)
+ * - Automatically includes any pending follow-ups
+ * - No need for a special-purpose polling endpoint
+ */
 
 // Export both the app and its type for RPC
 export { app as gameRoutes };

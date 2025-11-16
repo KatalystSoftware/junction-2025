@@ -206,6 +206,10 @@ You will receive transcripts of the last 3-5 consultation sessions the advisor c
    c) AREAS FOR IMPROVEMENT (2-3 specific things to work on):
       - Be constructive, not critical
       - Give actionable suggestions
+      - **CRITICAL**: Distinguish between WRONG advice vs MISSING topics:
+        * If advisor mentioned a topic but gave inappropriate/incorrect advice, be specific about what was wrong
+        * If advisor completely missed an important topic, mention what should have been covered
+        * Avoid contradictions like "could have mentioned X" when they DID mention X (but incorrectly)
       - Example: "${exampleOutput.areasForImprovement[0]}"
 
    d) LEARNING MATERIALS (2-4 resources):
