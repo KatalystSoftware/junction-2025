@@ -148,6 +148,15 @@ export function ChatWindow({
   const [isInputFocused, setIsInputFocused] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Audio recording state
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const recordingTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   // Permission request functions
   const requestCameraAndMicPermissions = async () => {
     try {
@@ -179,6 +188,133 @@ export function ChatWindow({
       return false;
     }
   };
+
+  // Audio recording functions
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: "audio/webm",
+      });
+
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        setAudioBlob(audioBlob);
+        stream.getTracks().forEach((track) => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+      setRecordingTime(0);
+
+      // Start timer
+      recordingTimerRef.current = setInterval(() => {
+        setRecordingTime((prev) => prev + 1);
+      }, 1000);
+
+      console.log("Recording started");
+    } catch (error) {
+      console.error("Failed to start recording:", error);
+      alert("Failed to start recording. Please check microphone permissions.");
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+
+      if (recordingTimerRef.current) {
+        clearInterval(recordingTimerRef.current);
+        recordingTimerRef.current = null;
+      }
+
+      console.log("Recording stopped");
+    }
+  };
+
+  const cancelRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+
+      if (recordingTimerRef.current) {
+        clearInterval(recordingTimerRef.current);
+        recordingTimerRef.current = null;
+      }
+
+      // Clear the audio
+      audioChunksRef.current = [];
+      setAudioBlob(null);
+      setRecordingTime(0);
+
+      console.log("Recording cancelled");
+    }
+  };
+
+  const sendVoiceMessage = async () => {
+    if (!audioBlob) return;
+
+    try {
+      setIsTranscribing(true);
+
+      // Import gameApi
+      const { gameApi } = await import("../services/gameApi");
+
+      // Get user's language preference
+      let userLanguage = "en";
+      try {
+        const userProfileStr = localStorage.getItem("userProfile");
+        if (userProfileStr) {
+          const userProfile = JSON.parse(userProfileStr);
+          if (userProfile.language) {
+            userLanguage = userProfile.language;
+          }
+        }
+      } catch (e) {
+        console.error("Failed to get user language:", e);
+      }
+
+      // Transcribe audio
+      const { transcription } = await gameApi.transcribeAudio(audioBlob, userLanguage);
+
+      console.log("Transcription:", transcription);
+
+      // Send the transcribed text
+      onSendMessage(transcription);
+
+      // Reset state
+      setAudioBlob(null);
+      setRecordingTime(0);
+      setIsTranscribing(false);
+    } catch (error) {
+      console.error("Failed to transcribe audio:", error);
+      alert("Failed to transcribe audio. Please try again or type your message.");
+      setIsTranscribing(false);
+    }
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (recordingTimerRef.current) {
+        clearInterval(recordingTimerRef.current);
+      }
+      if (mediaRecorderRef.current && isRecording) {
+        mediaRecorderRef.current.stop();
+      }
+    };
+  }, [isRecording]);
 
   // Get multiple choice options from backend (if provided)
   // Keep the full choice objects to display actionText + projectedOutcome
@@ -1128,13 +1264,126 @@ export function ChatWindow({
           }}
         >
           <TooltipProvider>
+            {/* Recording UI */}
+            {(isRecording || audioBlob) && (
+              <div
+                style={{
+                  display: "flex",
+                  gap: "0.75rem",
+                  alignItems: "center",
+                  padding: "0.75rem",
+                  backgroundColor: "var(--muted)",
+                  borderRadius: "0.75rem",
+                  marginBottom: "0.75rem",
+                }}
+              >
+                {/* Recording indicator */}
+                {isRecording && (
+                  <div
+                    style={{
+                      width: "0.75rem",
+                      height: "0.75rem",
+                      backgroundColor: "var(--destructive)",
+                      borderRadius: "50%",
+                      animation: "pulse 1.5s ease-in-out infinite",
+                    }}
+                  />
+                )}
+
+                {/* Timer */}
+                <div
+                  style={{
+                    flex: 1,
+                    fontFamily: "Inter, sans-serif",
+                    fontSize: "0.875rem",
+                    fontWeight: 500,
+                  }}
+                >
+                  {isRecording ? "Recording..." : "Recording ready"} {Math.floor(recordingTime / 60)}:
+                  {String(recordingTime % 60).padStart(2, "0")}
+                </div>
+
+                {/* Actions */}
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  {isRecording ? (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={stopRecording}
+                        style={{
+                          borderRadius: "9999px",
+                          fontFamily: "Inter, sans-serif",
+                        }}
+                      >
+                        Stop
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={cancelRecording}
+                        style={{
+                          borderRadius: "9999px",
+                          fontFamily: "Inter, sans-serif",
+                        }}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      {isTranscribing ? (
+                        <div
+                          style={{
+                            fontFamily: "Inter, sans-serif",
+                            fontSize: "0.875rem",
+                            color: "var(--muted-foreground)",
+                          }}
+                        >
+                          Transcribing...
+                        </div>
+                      ) : (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setAudioBlob(null);
+                              setRecordingTime(0);
+                            }}
+                            style={{
+                              borderRadius: "9999px",
+                              fontFamily: "Inter, sans-serif",
+                            }}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={sendVoiceMessage}
+                            style={{
+                              borderRadius: "9999px",
+                              fontFamily: "Inter, sans-serif",
+                            }}
+                          >
+                            <Send className="w-4 h-4 mr-1" />
+                            Send
+                          </Button>
+                        </>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className="flex gap-2 items-end">
               <Input
                 value={inputValue}
                 onChange={handleInputChange}
                 onKeyDown={handleKeyPress}
                 placeholder="Type a message..."
-                disabled={isThreadResolved}
+                disabled={isThreadResolved || isRecording || audioBlob !== null}
                 className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                 style={{
                   borderRadius: "9999px",
@@ -1149,22 +1398,20 @@ export function ChatWindow({
                     variant="ghost"
                     size="icon"
                     className="group"
-                    disabled={isThreadResolved}
-                    onClick={async () => {
-                      await requestMicPermission();
-                    }}
+                    disabled={isThreadResolved || isRecording || isTranscribing}
+                    onClick={startRecording}
                     style={{
                       borderRadius: "9999px",
-                      backgroundColor: "var(--muted)",
+                      backgroundColor: isRecording ? "var(--destructive)" : "var(--muted)",
                       border: "1px solid var(--border)",
                     }}
                   >
-                    <Mic className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                    <Mic className={`w-4 h-4 ${isRecording ? "text-white" : "text-muted-foreground group-hover:text-foreground"} transition-colors`} />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p style={{ fontFamily: "Inter, sans-serif" }}>
-                    Record a voice message
+                    {isRecording ? "Recording..." : "Record a voice message"}
                   </p>
                 </TooltipContent>
               </Tooltip>

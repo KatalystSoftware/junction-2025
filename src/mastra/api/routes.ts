@@ -1086,6 +1086,64 @@ app.get("/leaderboard/surrounding/:advisorId", async (c) => {
   }
 });
 
+// ============================================================================
+// ROUTE: Transcribe Audio (Voice Messages)
+// ============================================================================
+
+interface TranscribeAudioRequest {
+  audioData: string; // Base64 encoded audio
+  mimeType: "audio/wav" | "audio/mp3" | "audio/mpeg" | "audio/webm" | "audio/ogg";
+  language?: string; // Optional language hint (fi, en, sv)
+}
+
+interface TranscribeAudioResponse {
+  transcription: string;
+  detectedLanguage?: string;
+}
+
+app.post("/transcribe-audio", async (c) => {
+  try {
+    const body = await c.req.json<TranscribeAudioRequest>();
+    const { audioData, mimeType, language } = body;
+
+    if (!audioData || !mimeType) {
+      return c.json({ error: "Missing audioData or mimeType" }, 400);
+    }
+
+    console.log(`🎤 Transcribing audio (${mimeType}, language hint: ${language || "auto"})`);
+
+    // Import the speech-to-text service
+    const { transcribeAudio } = await import(
+      "../services/speech-to-text-service.ts"
+    );
+
+    // Convert base64 to buffer
+    const audioBuffer = Buffer.from(audioData, "base64");
+
+    // Transcribe the audio
+    const result = await transcribeAudio(audioBuffer, mimeType, {
+      language,
+      prompt: "This is a voice message from a financial advisor client discussing their financial situation.",
+    });
+
+    console.log(`✅ Transcription complete: "${result.text.substring(0, 50)}..."`);
+
+    return c.json({
+      transcription: result.text,
+      detectedLanguage: result.language,
+    } as TranscribeAudioResponse);
+  } catch (error) {
+    console.error("❌ Error transcribing audio:", error);
+    return c.json(
+      {
+        error: "Failed to transcribe audio",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      500,
+    );
+  }
+});
+
 // Export both the app and its type for RPC
 export { app as gameRoutes };
 export type GameApiType = typeof app;
