@@ -528,7 +528,7 @@ export async function generateVoiceMessage(
     // Generate speech using ElevenLabs streaming API with enhanced text
     const audio = await client.textToSpeech.convert(voiceConfig.voiceId, {
       text: enhancedText,
-      modelId: "eleven_multilingual_v2", // Supports Finnish and English
+      modelId: "eleven_v3", // v3 alpha - Most expressive model with better audio tag support
       voiceSettings: {
         stability: voiceConfig.stability,
         similarityBoost: voiceConfig.similarityBoost,
