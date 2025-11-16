@@ -671,14 +671,6 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
     conversationEndDataByThread,
   ]);
 
-  const hasAnyUserMessages = useMemo(
-    () =>
-      Object.values(game.threadHistories || {}).some((thread) =>
-        thread.some((message) => message.role === "user"),
-      ),
-    [game.threadHistories],
-  );
-
   // Loading state
   if (game.isLoading) {
     return (
@@ -813,7 +805,6 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
         conversationEndData={conversationEndData}
         inputValue={currentInputValue}
         onInputChange={setCurrentInputValue}
-        hasAnyUserMessages={hasAnyUserMessages}
       />
 
       {/* Modals - shown in sequence after consultation ends */}

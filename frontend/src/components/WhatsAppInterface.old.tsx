@@ -580,10 +580,6 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
     selectedContactId === "boss-pinned" ? bossContact : selectedContact;
   const messages = allMessages[selectedContactId || ""] || [];
 
-  const hasAnyUserMessages = Object.values(allMessages).some((thread) =>
-    thread.some((message) => message.role === "user"),
-  );
-
   // Get advice choices for the currently selected thread only
   const currentAdviceChoices = selectedContactId
     ? adviceChoicesByThread[selectedContactId] || []
@@ -793,7 +789,6 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
         adviceChoices={currentAdviceChoices}
         isThreadResolved={isThreadResolved}
         conversationEndData={conversationEndData}
-        hasAnyUserMessages={hasAnyUserMessages}
       />
     </div>
   );
