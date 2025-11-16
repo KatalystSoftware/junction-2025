@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { X, TrendingUp, TrendingDown, Wallet, CreditCard, Calendar, Tag } from "lucide-react";
 import { Button } from "./ui/button";
-import { ScrollArea } from "./ui/scroll-area";
 import { Card } from "./ui/card";
 
 interface Transaction {
@@ -122,12 +121,12 @@ export function ClientFinancialDashboard({
 
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-        <div className="bg-white rounded-lg p-8 max-w-4xl w-full mx-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+        <div className="rounded-lg p-8 max-w-4xl w-full mx-4 shadow-lg border" style={{ backgroundColor: 'var(--background)' }}>
           <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: 'var(--primary)' }}></div>
           </div>
-          <p className="text-center mt-4 text-gray-600">Loading financial data...</p>
+          <p className="text-center mt-4" style={{ color: 'var(--muted-foreground)' }}>Loading financial data...</p>
         </div>
       </div>
     );
@@ -135,15 +134,15 @@ export function ClientFinancialDashboard({
 
   if (error || !data) {
     return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-        <div className="bg-white rounded-lg p-8 max-w-4xl w-full mx-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+        <div className="rounded-lg p-8 max-w-4xl w-full mx-4 shadow-lg border" style={{ backgroundColor: 'var(--background)' }}>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-red-600">Error</h2>
+            <h2 className="text-2xl font-bold" style={{ color: 'var(--destructive)' }}>Error</h2>
             <Button variant="ghost" size="icon" onClick={onClose}>
               <X className="h-5 w-5" />
             </Button>
           </div>
-          <p className="text-gray-600">{error || "Failed to load financial data"}</p>
+          <p style={{ color: 'var(--muted-foreground)' }}>{error || "Failed to load financial data"}</p>
           <Button onClick={onClose} className="mt-4">Close</Button>
         </div>
       </div>
@@ -154,13 +153,13 @@ export function ClientFinancialDashboard({
   const previousMonth = data.monthlyTrend[data.monthlyTrend.length - 2];
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-      <div className="bg-white rounded-lg p-6 max-w-6xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+      <div className="rounded-lg shadow-lg border w-full max-w-4xl max-h-[90vh] flex flex-col" style={{ backgroundColor: 'var(--background)' }}>
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: 'var(--border)' }}>
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">{characterName}'s Finances</h2>
-            <p className="text-sm text-gray-500">Complete financial overview and history</p>
+            <h2 className="text-2xl font-bold" style={{ color: 'var(--foreground)' }}>{characterName}'s Finances</h2>
+            <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>Complete financial overview and history</p>
           </div>
           <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="h-5 w-5" />
@@ -168,41 +167,44 @@ export function ClientFinancialDashboard({
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex space-x-2 mb-6 border-b">
+        <div className="flex space-x-2 px-6 border-b" style={{ borderColor: 'var(--border)' }}>
           <button
             onClick={() => setSelectedView("overview")}
-            className={`px-4 py-2 font-medium transition-colors ${
+            className="px-4 py-2 font-medium transition-colors"
+            style={
               selectedView === "overview"
-                ? "text-blue-600 border-b-2 border-blue-600"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
+                ? { color: 'var(--primary)', borderBottom: '2px solid var(--primary)' }
+                : { color: 'var(--muted-foreground)' }
+            }
           >
             Overview
           </button>
           <button
             onClick={() => setSelectedView("transactions")}
-            className={`px-4 py-2 font-medium transition-colors ${
+            className="px-4 py-2 font-medium transition-colors"
+            style={
               selectedView === "transactions"
-                ? "text-blue-600 border-b-2 border-blue-600"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
+                ? { color: 'var(--primary)', borderBottom: '2px solid var(--primary)' }
+                : { color: 'var(--muted-foreground)' }
+            }
           >
             Transactions
           </button>
           <button
             onClick={() => setSelectedView("trends")}
-            className={`px-4 py-2 font-medium transition-colors ${
+            className="px-4 py-2 font-medium transition-colors"
+            style={
               selectedView === "trends"
-                ? "text-blue-600 border-b-2 border-blue-600"
-                : "text-gray-500 hover:text-gray-700"
-            }`}
+                ? { color: 'var(--primary)', borderBottom: '2px solid var(--primary)' }
+                : { color: 'var(--muted-foreground)' }
+            }
           >
             Trends
           </button>
         </div>
 
         {/* Content */}
-        <ScrollArea className="flex-1">
+        <div className="flex-1 overflow-y-auto px-6 py-6" style={{ minHeight: 0 }}>
           {selectedView === "overview" && (
             <div className="space-y-6">
               {/* Key Metrics */}
@@ -210,8 +212,8 @@ export function ClientFinancialDashboard({
                 <Card className="p-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-500">Current Balance</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>Current Balance</p>
+                      <p className="text-2xl font-bold" style={{ color: 'var(--foreground)' }}>
                         {formatCurrency(data.currentBalance)}
                       </p>
                     </div>
@@ -469,7 +471,7 @@ export function ClientFinancialDashboard({
               </Card>
             </div>
           )}
-        </ScrollArea>
+        </div>
       </div>
     </div>
   );
