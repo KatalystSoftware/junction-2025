@@ -85,6 +85,16 @@ export interface Translations {
     xp: string;
     restartGame: string;
   };
+
+  // Consultation End
+  consultationEnd: {
+    title: string;
+    coinsEarned: string;
+    quality: string;
+    startingNext: string;
+    firstSteps: string;
+    firstStepsDesc: string;
+  };
 }
 
 const translations: Record<Language, Translations> = {
@@ -163,6 +173,15 @@ const translations: Record<Language, Translations> = {
       xp: "XP",
       restartGame: "Restart Game",
     },
+
+    consultationEnd: {
+      title: "Consultation Complete!",
+      coinsEarned: "Coins Earned",
+      quality: "Quality:",
+      startingNext: "Starting next consultation in a moment...",
+      firstSteps: "First Steps",
+      firstStepsDesc: "Help your first client",
+    },
   },
 
   fi: {
@@ -240,6 +259,15 @@ const translations: Record<Language, Translations> = {
       xp: "KP",
       restartGame: "Aloita Peli Uudelleen",
     },
+
+    consultationEnd: {
+      title: "Konsultaatio Valmis!",
+      coinsEarned: "Ansaitut Kolikot",
+      quality: "Laatu:",
+      startingNext: "Aloitetaan seuraava konsultaatio hetken kuluttua...",
+      firstSteps: "Ensimmäiset Askeleet",
+      firstStepsDesc: "Auta ensimmäistä asiakastasi",
+    },
   },
 
   sv: {
@@ -316,6 +344,15 @@ const translations: Record<Language, Translations> = {
       level: "Nivå",
       xp: "XP",
       restartGame: "Starta Om Spelet",
+    },
+
+    consultationEnd: {
+      title: "Konsultation Klar!",
+      coinsEarned: "Intjänade Mynt",
+      quality: "Kvalitet:",
+      startingNext: "Startar nästa konsultation om ett ögonblick...",
+      firstSteps: "Första Stegen",
+      firstStepsDesc: "Hjälp din första klient",
     },
   },
 };

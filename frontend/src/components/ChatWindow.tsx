@@ -31,6 +31,9 @@ import type { Contact, Message } from "./WhatsAppInterface";
 import { TrustMeter } from "./TrustMeter";
 import { VoiceMessage } from "./VoiceMessage";
 import logoImage from "figma:asset/601ef144d16bf6e001c5324689cdddb5a7ea7f74.png";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { useTranslation } from "../utils/translations";
 
 interface ChatWindowProps {
   contact: Contact | undefined;
@@ -60,6 +63,7 @@ export function ChatWindow({
   isThreadResolved = false,
   conversationEndData,
 }: ChatWindowProps) {
+  const t = useTranslation();
   const [inputValue, setInputValue] = useState("");
   const [showCallDialog, setShowCallDialog] = useState(false);
   const [showVideoDialog, setShowVideoDialog] = useState(false);
@@ -384,17 +388,74 @@ export function ChatWindow({
                     boxShadow: "var(--elevation-sm)",
                   }}
                 >
-                  <p
-                    style={{
-                      fontFamily: "Inter, sans-serif",
-                      fontSize: "var(--text-sm)",
-                      fontWeight: "var(--font-weight-normal)",
-                      lineHeight: 1.5,
-                      whiteSpace: "pre-line",
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      p: ({ children }) => (
+                        <p
+                          style={{
+                            fontFamily: "Inter, sans-serif",
+                            fontSize: "var(--text-sm)",
+                            fontWeight: "var(--font-weight-normal)",
+                            lineHeight: 1.5,
+                            marginBottom: "0.5rem",
+                          }}
+                        >
+                          {children}
+                        </p>
+                      ),
+                      strong: ({ children }) => (
+                        <strong style={{ fontWeight: "var(--font-weight-semibold)" }}>
+                          {children}
+                        </strong>
+                      ),
+                      ol: ({ children }) => (
+                        <ol
+                          style={{
+                            fontFamily: "Inter, sans-serif",
+                            fontSize: "var(--text-sm)",
+                            paddingLeft: "1.5rem",
+                            marginBottom: "0.5rem",
+                            listStyleType: "decimal",
+                          }}
+                        >
+                          {children}
+                        </ol>
+                      ),
+                      ul: ({ children }) => (
+                        <ul
+                          style={{
+                            fontFamily: "Inter, sans-serif",
+                            fontSize: "var(--text-sm)",
+                            paddingLeft: "1.5rem",
+                            marginBottom: "0.5rem",
+                          }}
+                        >
+                          {children}
+                        </ul>
+                      ),
+                      li: ({ children }) => (
+                        <li style={{ marginBottom: "0.25rem" }}>{children}</li>
+                      ),
+                      a: ({ children, href }) => (
+                        <a
+                          href={href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            color: message.role === "user"
+                              ? "var(--primary-foreground)"
+                              : "var(--primary)",
+                            textDecoration: "underline",
+                          }}
+                        >
+                          {children}
+                        </a>
+                      ),
                     }}
                   >
                     {message.content}
-                  </p>
+                  </ReactMarkdown>
                   <span
                     className="block text-right mt-1"
                     style={{
@@ -648,7 +709,7 @@ export function ChatWindow({
                 color: "var(--card-foreground)",
               }}
             >
-              🎉 Consultation Complete!
+              🎉 {t.consultationEnd.title}
             </h3>
           </div>
 
@@ -687,7 +748,7 @@ export function ChatWindow({
                       color: "var(--card-foreground)",
                     }}
                   >
-                    💰 Coins Earned
+                    💰 {t.consultationEnd.coinsEarned}
                   </span>
                   <span
                     style={{
@@ -714,7 +775,7 @@ export function ChatWindow({
                       fontSize: "var(--text-xs)",
                     }}
                   >
-                    <strong>Quality:</strong>{" "}
+                    <strong>{t.consultationEnd.quality}</strong>{" "}
                     {conversationEndData.financialResults.evaluation
                       .qualityDescription || "Good advice"}
                   </p>
@@ -789,7 +850,7 @@ export function ChatWindow({
                 color: "var(--muted-foreground)",
               }}
             >
-              Starting next consultation in a moment...
+              {t.consultationEnd.startingNext}
             </p>
           </div>
         </div>
