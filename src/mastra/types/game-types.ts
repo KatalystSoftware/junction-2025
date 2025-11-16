@@ -385,6 +385,11 @@ export interface AdvisorState {
     severity: "warning" | "critical";
     conversationHistory: Array<{ role: "boss" | "advisor"; content: string }>; // Intervention conversation
   };
+
+  // NEW: Lose condition tracking
+  isFired: boolean; // Whether the advisor has been fired
+  fireReason?: string; // Reason for being fired
+  criticalInterventionsForcedThrough: number; // Number of times critical interventions were forced through
 }
 
 // ============================================================================
@@ -554,13 +559,27 @@ export interface GameResponse {
     | "onboarding"
     | "boss_checkin"
     | "boss_intervention"
-    | "boss_intervention_message"; // NEW: Boss responding during intervention
+    | "boss_intervention_message" // NEW: Boss responding during intervention
+    | "game_over"; // NEW: Fired/lose condition
 
   // For onboarding
   onboardingMessage?: BossOnboardingMessage;
 
   // For boss check-in
   checkinMessage?: BossCheckinMessage;
+
+  // For game over / firing
+  firingMessage?: {
+    title: string;
+    reason: string;
+    finalMessage: string;
+    stats: {
+      totalSessions: number;
+      clientsHelped: number;
+      reputation: number;
+      skillLevel: number;
+    };
+  };
 
   // For boss intervention (real-time)
   interventionMessage?: {

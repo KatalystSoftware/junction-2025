@@ -183,6 +183,10 @@ export function createNewAdvisor(advisorId: string): AdvisorState {
     // NEW: Financial Simulation
     currentGameMonth: "2025-01", // Start at January 2025 (game time, not real-time)
     simulatedMonthsPassed: 0,
+    // NEW: Lose condition tracking
+    isFired: false,
+    fireReason: undefined,
+    criticalInterventionsForcedThrough: 0,
   };
 }
 
@@ -1002,6 +1006,52 @@ export async function handleAdvisorResponse(
       advisorState.currentStreak = 0;
     }
     advisorState.lastStreakCheckSession = advisorState.totalSessions;
+
+    // CHECK FOR LOSE CONDITION: Fire advisor if performance is seriously bad
+    const shouldFire =
+      advisorState.reputation <= 20 || // Reputation critically low
+      advisorState.currentStreak <= -3; // 3+ consecutive bad sessions
+
+    if (shouldFire && !advisorState.isFired) {
+      advisorState.isFired = true;
+
+      // Determine specific fire reason
+      if (advisorState.currentStreak <= -3) {
+        advisorState.fireReason =
+          "Consistent poor performance - multiple sessions with bad advice";
+      } else if (advisorState.reputation <= 20) {
+        advisorState.fireReason =
+          "Reputation dropped too low - clients have lost trust";
+      }
+
+      // Generate firing message from boss
+      const { generateFiringMessage } = await import(
+        "../agents/god-boss-agent.ts"
+      );
+      const language = userLanguage.startsWith("fi")
+        ? "finnish"
+        : userLanguage.startsWith("sv")
+          ? "swedish"
+          : "english";
+
+      const firingMessage = await generateFiringMessage(
+        advisorState.fireReason,
+        {
+          totalSessions: advisorState.totalSessions,
+          clientsHelped: advisorState.totalClientsHelped,
+          reputation: advisorState.reputation,
+          skillLevel: advisorState.skillLevel,
+        },
+        language,
+      );
+
+      // Return game over response immediately
+      return {
+        type: "game_over",
+        firingMessage,
+        stateUpdate: advisorState,
+      };
+    }
 
     // Update topic expertise for all topics covered in the evaluation
     const topicsToUpdate = adviceEvaluation.topicsCovered || [scenario.topic];

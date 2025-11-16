@@ -479,3 +479,70 @@ export function generateInterventionMessage(
     correctApproach: enhancedCorrectApproach,
   };
 }
+
+/**
+ * Generate firing message when advisor performance is too poor
+ * Returns a structured message for the game over screen
+ */
+export async function generateFiringMessage(
+  fireReason: string,
+  stats: {
+    totalSessions: number;
+    clientsHelped: number;
+    reputation: number;
+    skillLevel: number;
+  },
+  language: "finnish" | "english" | "swedish" = "english",
+): Promise<{
+  title: string;
+  reason: string;
+  finalMessage: string;
+  stats: typeof stats;
+}> {
+  const templates = {
+    finnish: {
+      title: "Työsuhde päättynyt",
+      reasonPrefix:
+        "Valitettavasti joudun päättämään työsuhteesi. Syy: ",
+      finalMessages: [
+        "Talousneuvonta ei ehkä ole sinun juttu. Ehkä kokeile jotain muuta?",
+        "Näin ei voi jatkua. Asiakkaat tarvitsevat parempaa ohjausta.",
+        "Toivon että opit tästä. Ehkä seuraavalla kerralla menee paremmin.",
+        "Tämä on vaikea päätös, mutta välttämätön. Onnea jatkoon.",
+      ],
+    },
+    english: {
+      title: "Employment Terminated",
+      reasonPrefix: "Unfortunately, I have to terminate your employment. Reason: ",
+      finalMessages: [
+        "Financial advising might not be for you. Maybe try something else?",
+        "This can't continue. Clients need better guidance.",
+        "I hope you learn from this. Maybe next time will go better.",
+        "This is a difficult decision, but necessary. Good luck going forward.",
+      ],
+    },
+    swedish: {
+      title: "Anställningen avslutas",
+      reasonPrefix: "Tyvärr måste jag avsluta din anställning. Orsak: ",
+      finalMessages: [
+        "Finansiell rådgivning kanske inte är för dig. Kanske prova något annat?",
+        "Detta kan inte fortsätta. Kunderna behöver bättre vägledning.",
+        "Jag hoppas du lär dig av detta. Kanske nästa gång går det bättre.",
+        "Detta är ett svårt beslut, men nödvändigt. Lycka till framöver.",
+      ],
+    },
+  };
+
+  const lang = templates[language];
+
+  // Select message based on stats (deterministic but varies)
+  const messageIndex = stats.totalSessions % lang.finalMessages.length;
+  const finalMessage = lang.finalMessages[messageIndex];
+
+  return {
+    title: lang.title,
+    reason: `${lang.reasonPrefix}${fireReason}`,
+    finalMessage,
+    stats,
+  };
+}

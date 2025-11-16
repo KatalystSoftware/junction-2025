@@ -56,6 +56,9 @@ export interface ClientSafeAdvisorState {
   currentGoal: SessionGoal | null;
   achievementsUnlocked: string[];
   careerTier: number;
+  isFired: boolean;
+  fireReason?: string;
+  criticalInterventionsForcedThrough: number;
 }
 
 /**
@@ -85,6 +88,9 @@ function toClientSafeAdvisorState(state: AdvisorState): ClientSafeAdvisorState {
     currentGoal: state.currentGoal,
     achievementsUnlocked: state.achievementsUnlocked,
     careerTier: state.careerTier,
+    isFired: state.isFired,
+    fireReason: state.fireReason,
+    criticalInterventionsForcedThrough: state.criticalInterventionsForcedThrough,
   };
 }
 
