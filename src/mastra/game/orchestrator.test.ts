@@ -1,4 +1,3 @@
-import { describe, expect, it } from "@jest/globals";
 import {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   // @ts-expect-error internal helper
@@ -23,7 +22,6 @@ describe("getSafeAverageDimensionScore", () => {
   it("falls back to qualityScore when any dimension is non-numeric", () => {
     const avg = getSafeAverageDimensionScore(6.5, {
       adviceQuality: 8,
-      // @ts-expect-error simulate bad data from model
       communicationEffectiveness: undefined,
       learningObjectives: 4,
       characterProgression: 6,
