@@ -35,6 +35,8 @@ interface LeaderboardRanking {
   totalParticipants: number;
 }
 
+type LeaderboardCategory = "impact" | "coins" | "achievements" | "messages";
+
 interface LeaderboardModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -51,6 +53,7 @@ export function LeaderboardModal({
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [category, setCategory] = useState<LeaderboardCategory>("impact");
 
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat("fi-FI", {
@@ -69,7 +72,7 @@ export function LeaderboardModal({
 
       try {
         const response = await fetch(
-          `/api/game/leaderboard?category=impact&limit=100`,
+          `/api/game/leaderboard?category=${category}&limit=100`,
         );
 
         if (!response.ok) {
@@ -87,7 +90,7 @@ export function LeaderboardModal({
     };
 
     fetchLeaderboard();
-  }, [open]);
+  }, [open, category]);
 
   // Get current user's rank
   const currentUserEntry = leaderboard?.entries.find(
@@ -116,6 +119,30 @@ export function LeaderboardModal({
         </DialogHeader>
 
         <div className="flex-1 flex flex-col min-h-0 px-6">
+          {/* Category selector */}
+          <div className="flex items-center gap-2 mb-3">
+            {(
+              [
+                ["impact", "Impact"],
+                ["coins", "Coins"],
+                ["achievements", "Achievements"],
+                ["messages", "Messages"],
+              ] as [LeaderboardCategory, string][]
+            ).map(([value, label]) => (
+              <button
+                key={value}
+                onClick={() => setCategory(value)}
+                className={`px-3 py-1 rounded-full text-xs border transition-colors ${
+                  category === value
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-muted text-muted-foreground border-border hover:bg-muted/80"
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
           {loading && (
             <div className="flex items-center justify-center h-64">
               <div className="text-muted-foreground">Loading...</div>

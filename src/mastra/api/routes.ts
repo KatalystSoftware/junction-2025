@@ -31,7 +31,10 @@ import type {
   SessionGoal,
   CompletedMaterial,
 } from "../types/game-types.ts";
-import { onAdvisorInit } from "../game/orchestrator-hooks.ts";
+import {
+  onAdvisorInit,
+  syncLeaderboardSnapshot,
+} from "../game/orchestrator-hooks.ts";
 
 /**
  * Helper function to check for follow-ups and include them in responses
@@ -444,6 +447,9 @@ app.post("/init", async (c) => {
       await saveSession(sessionId, updatedState, historiesMap, metadataMap);
       advisorState = updatedState;
     }
+
+    // Sync latest advisor snapshot to leaderboard
+    await syncLeaderboardSnapshot(advisorState, advisorState.advisorName);
 
     return c.json<InitResponse>({
       sessionId,
@@ -887,25 +893,6 @@ app.post("/send-message", async (c) => {
       }
     }
 
-    // Update leaderboard entry when a conversation (session) ends
-    if (gameResponse.stateUpdate && gameResponse.type === "conversation_end") {
-      try {
-        const { afterSessionComplete } = await import(
-          "../game/orchestrator-hooks.ts"
-        );
-        await afterSessionComplete(
-          gameResponse.stateUpdate,
-          gameResponse.stateUpdate.advisorId,
-          gameResponse,
-        );
-      } catch (error) {
-        console.error(
-          "❌ Failed to update leaderboard after conversation_end:",
-          error,
-        );
-      }
-    }
-
     // Save updated state with message histories and metadata
     // Check for follow-ups (server-led approach)
     const followUpResult = await checkAndIncludeFollowUps(
@@ -973,6 +960,9 @@ app.post("/send-message", async (c) => {
     }
 
     await saveSession(sessionId, finalState, historiesMap, metadataMap);
+
+    // Sync latest advisor snapshot to leaderboard after every interaction
+    await syncLeaderboardSnapshot(finalState, finalState.advisorName);
 
     // Convert Maps back to objects for response
     const threadHistoriesObject = Object.fromEntries(historiesMap);

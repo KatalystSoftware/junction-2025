@@ -107,6 +107,12 @@ function formatTimestamp(date: Date): string {
   return "Just now";
 }
 
+export function sortContactsByLastMessageTime(contacts: Contact[]): Contact[] {
+  return [...contacts].sort(
+    (a, b) => b.lastMessageTime.getTime() - a.lastMessageTime.getTime(),
+  );
+}
+
 export function useDerivedUIState(
   advisorState: AdvisorState | undefined,
   threadHistories: ThreadHistories,
@@ -117,7 +123,7 @@ export function useDerivedUIState(
   const contacts: Contact[] = useMemo(() => {
     if (!advisorState?.activeThreads) return [];
 
-    return Object.values(advisorState.activeThreads).map((thread) => {
+    const derivedContacts = Object.values(advisorState.activeThreads).map((thread) => {
       const charInfo = threadMetadata[thread.threadId];
       const threadMessages = threadHistories[thread.threadId] || [];
       const lastMessage = threadMessages[threadMessages.length - 1];
@@ -148,6 +154,8 @@ export function useDerivedUIState(
         financialProfile: charInfo?.financialProfile,
       };
     });
+
+    return sortContactsByLastMessageTime(derivedContacts);
   }, [
     advisorState?.activeThreads,
     threadHistories,
