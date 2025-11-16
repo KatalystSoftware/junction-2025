@@ -291,11 +291,14 @@ export function enhanceTextWithVoiceTags(
       enhancedText = `[gulps] ${enhancedText}`;
     }
     // Occasional whispers for anxiety (increased from 30% to 50%)
+    // Note: The whisper text will be in the character's language (from translated message)
     if (personality.emotionality > 0.7 && Math.random() < 0.5) {
-      enhancedText = enhancedText.replace(
-        /\.$/,
-        "... [whispers] En tiedä mitä tehdä.",
-      );
+      // Add whisper tag without hardcoded text - let the translated message speak for itself
+      const sentences = enhancedText.split(". ");
+      if (sentences.length > 1) {
+        sentences[sentences.length - 1] = `[whispers] ${sentences[sentences.length - 1]}`;
+        enhancedText = sentences.join(". ");
+      }
     }
     // Add nervous exhale
     if (Math.random() < 0.4) {
