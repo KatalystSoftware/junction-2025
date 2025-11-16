@@ -377,6 +377,14 @@ export interface AdvisorState {
   // NEW: Financial Simulation
   currentGameMonth: string; // Current game month in YYYY-MM format (session-based, not real-time)
   simulatedMonthsPassed: number; // Total months simulated since game start
+
+  // NEW: Boss Intervention State (for inline conversations)
+  activeIntervention?: {
+    threadId: string; // Which character thread has the intervention
+    originalMessage: string; // The bad advice that triggered intervention
+    severity: "warning" | "critical";
+    conversationHistory: Array<{ role: "boss" | "advisor"; content: string }>; // Intervention conversation
+  };
 }
 
 // ============================================================================
@@ -544,13 +552,25 @@ export interface GameResponse {
     | "god_boss_review"
     | "conversation_end"
     | "onboarding"
-    | "boss_checkin";
+    | "boss_checkin"
+    | "boss_intervention"
+    | "boss_intervention_message"; // NEW: Boss responding during intervention
 
   // For onboarding
   onboardingMessage?: BossOnboardingMessage;
 
   // For boss check-in
   checkinMessage?: BossCheckinMessage;
+
+  // For boss intervention (real-time)
+  interventionMessage?: {
+    severity: "warning" | "critical";
+    reason: string;
+    correctApproach: string;
+    topic: string;
+    canRevise: boolean; // Whether advisor can revise their message
+    interventionActive: boolean; // Whether user is currently in conversation with boss
+  };
 
   // For character messages
   threadId?: string;

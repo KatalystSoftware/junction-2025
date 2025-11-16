@@ -166,14 +166,14 @@ export const invokeCharacterTool = {
                     model: google(model),
                     prompt: translationPrompt,
                   });
-                }
+                },
               );
               return translationResponse.text || message;
             } catch (error) {
               console.error("Translation failed, using original:", error);
               return message;
             }
-          })
+          }),
         );
       }
 

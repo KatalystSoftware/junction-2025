@@ -75,7 +75,9 @@ export function ChatSidebar({
   // Get advisor stats
   const reputation = advisorState?.reputation ?? 0;
   const totalSessions = advisorState?.totalSessions ?? 0;
-  const lastReviewSession = advisorState?.sessionHistory?.[advisorState.sessionHistory.length - 1]?.sessionNumber ?? 0;
+  const lastReviewSession =
+    advisorState?.sessionHistory?.[advisorState.sessionHistory.length - 1]
+      ?.sessionNumber ?? 0;
 
   // Calculate boss review countdown
   const sessionsSinceLastReview = totalSessions - lastReviewSession;
@@ -129,10 +131,7 @@ export function ChatSidebar({
         >
           <div className="relative">
             <Avatar className="w-14 h-14">
-              <AvatarImage
-                src={playerAvatarUrl}
-                alt="Player Avatar"
-              />
+              <AvatarImage src={playerAvatarUrl} alt="Player Avatar" />
               <AvatarFallback
                 style={{
                   backgroundColor: "var(--primary)",
@@ -206,7 +205,14 @@ export function ChatSidebar({
                 <Star
                   className="w-3 h-3"
                   style={{
-                    color: reputation >= 80 ? "var(--chart-1)" : reputation >= 60 ? "var(--chart-4)" : reputation >= 40 ? "var(--chart-3)" : "var(--chart-2)",
+                    color:
+                      reputation >= 80
+                        ? "var(--chart-1)"
+                        : reputation >= 60
+                          ? "var(--chart-4)"
+                          : reputation >= 40
+                            ? "var(--chart-3)"
+                            : "var(--chart-2)",
                   }}
                 />
                 <span
@@ -226,7 +232,14 @@ export function ChatSidebar({
                 <TrendingUp
                   className="w-3 h-3"
                   style={{
-                    color: skillLevel >= 8 ? "var(--chart-1)" : skillLevel >= 6 ? "var(--chart-4)" : skillLevel >= 4 ? "var(--chart-3)" : "var(--chart-2)",
+                    color:
+                      skillLevel >= 8
+                        ? "var(--chart-1)"
+                        : skillLevel >= 6
+                          ? "var(--chart-4)"
+                          : skillLevel >= 4
+                            ? "var(--chart-3)"
+                            : "var(--chart-2)",
                   }}
                 />
                 <span

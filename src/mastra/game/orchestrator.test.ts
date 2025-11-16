@@ -30,4 +30,4 @@ describe("getSafeAverageDimensionScore", () => {
     });
     expect(avg).toBe(6.5);
   });
-}
+});

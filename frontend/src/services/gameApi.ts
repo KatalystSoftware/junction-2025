@@ -96,7 +96,9 @@ export interface GameResponse {
     | "god_boss_review"
     | "conversation_end"
     | "onboarding"
-    | "boss_checkin";
+    | "boss_checkin"
+    | "boss_intervention"
+    | "boss_intervention_message"; // NEW: Boss responding during intervention
 
   // Various response data
   onboardingMessage?: any;
@@ -106,6 +108,14 @@ export interface GameResponse {
     mainMessage: string;
     advice: string;
     closing: string;
+  };
+  interventionMessage?: {
+    severity: "warning" | "critical";
+    reason: string;
+    correctApproach: string;
+    topic: string;
+    canRevise: boolean;
+    interventionActive: boolean; // Whether user is currently in conversation with boss
   };
   threadId?: string;
   messages?: string[];

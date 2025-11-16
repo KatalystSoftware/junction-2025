@@ -9,6 +9,7 @@ import { fileURLToPath } from "url";
 import { gameMasterAgent } from "./agents/game-master.ts";
 import { godBossAgent } from "./agents/god-boss-agent.ts";
 import { evaluatorAgent } from "./agents/evaluator-agent.ts";
+import { bossInterventionAgent } from "./agents/boss-intervention-agent.ts";
 // Note: Character agents are created dynamically via character-agent-factory
 
 // Game Tools
@@ -57,6 +58,7 @@ export const mastra = new Mastra({
     gameMasterAgent,
     godBossAgent,
     evaluatorAgent,
+    bossInterventionAgent,
     // Character agents are created dynamically as needed
   },
   tools: {

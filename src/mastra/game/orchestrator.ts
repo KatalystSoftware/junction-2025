@@ -25,6 +25,8 @@ import {
   updateGoalProgress,
 } from "./earnings-calculator.ts";
 import { calculateProjectedOutcome } from "./financial-calculator.ts";
+import { checkForIntervention } from "./intervention-checker.ts";
+import { generateInterventionMessage } from "../agents/god-boss-agent.ts";
 import type {
   AdvisorState,
   GameMasterDecision,
@@ -600,6 +602,54 @@ export async function handleAdvisorResponse(
   // Get character memory (conversation history from previous sessions)
   const characterMemory = character.conversationHistory || [];
 
+  // CHECK FOR INTERVENTION: Boss evaluates advice (but doesn't block character response)
+  const interventionCheck = checkForIntervention(
+    advisorMessage,
+    scenario,
+    character,
+    advisorState.skillLevel,
+  );
+
+  let interventionMessage: any = undefined;
+
+  if (interventionCheck.shouldIntervene) {
+    // Boss will send a warning in parallel - but character still responds!
+    const language = userLanguage.startsWith("fi") ? "finnish" : "english";
+
+    const enhancedMessage = generateInterventionMessage(
+      interventionCheck.reason,
+      interventionCheck.correctApproach || "Rethink your approach.",
+      interventionCheck.topic || scenario.topic,
+      interventionCheck.severity,
+      language,
+    );
+
+    // Store intervention state so we know we're in an intervention conversation
+    advisorState.activeIntervention = {
+      threadId, // Which character thread triggered this
+      originalMessage: advisorMessage, // The bad advice
+      severity: interventionCheck.severity,
+      conversationHistory: [
+        {
+          role: "boss",
+          content: `${enhancedMessage.reason}\n\n${enhancedMessage.correctApproach}`,
+        },
+      ],
+    };
+
+    // Prepare intervention message to include in response
+    interventionMessage = {
+      severity: interventionCheck.severity,
+      reason: enhancedMessage.reason,
+      correctApproach: enhancedMessage.correctApproach,
+      topic: interventionCheck.topic || scenario.topic,
+      canRevise: true,
+      interventionActive: true,
+    };
+
+    // DON'T return here - continue to send message to character!
+  }
+
   // Invoke character agent (tool internally uses cachedGenerate with retry logic)
   const characterTool = mastra.getTool("invokeCharacterTool");
   if (!characterTool) {
@@ -1073,7 +1123,7 @@ export async function handleAdvisorResponse(
     achievementsUnlocked = (lastSession as any).achievementsUnlocked;
   }
 
-  return {
+  const response: any = {
     type: characterResponse.conversationEnding
       ? "conversation_end"
       : "character_message",
@@ -1093,6 +1143,163 @@ export async function handleAdvisorResponse(
       ? advisorState.sessionHistory[advisorState.sessionHistory.length - 1]
           ?.playerAdvice
       : undefined,
+  };
+
+  // Include intervention message if one was triggered (parallel to character response)
+  if (interventionMessage) {
+    response.interventionMessage = interventionMessage;
+  }
+
+  return response;
+}
+
+/**
+ * Handle advisor's response to boss during an intervention
+ * This is called when user sends a message to "boss-pinned" thread while activeIntervention exists
+ */
+export async function handleInterventionResponse(
+  advisorMessage: string,
+  currentState: AdvisorState,
+): Promise<GameResponse> {
+  const advisorState = { ...currentState };
+
+  if (!advisorState.activeIntervention) {
+    throw new Error("No active intervention found");
+  }
+
+  const { threadId, originalMessage, severity, conversationHistory } =
+    advisorState.activeIntervention;
+
+  // Add advisor's response to conversation history
+  conversationHistory.push({
+    role: "advisor",
+    content: advisorMessage,
+  });
+
+  // Get character context for intervention
+  const threadInfo = advisorState.activeThreads[threadId];
+  if (!threadInfo) {
+    throw new Error(`Thread ${threadId} not found`);
+  }
+
+  const character = characterPool.getCharacter(threadInfo.characterId);
+  const scenario = characterPool.getScenario(threadInfo.scenarioId);
+
+  if (!character || !scenario) {
+    throw new Error("Character or scenario not found");
+  }
+
+  // Invoke boss intervention agent
+  const bossAgent = mastra.getAgent("bossInterventionAgent");
+  if (!bossAgent) {
+    throw new Error("Boss intervention agent not found");
+  }
+
+  const interventionContext = {
+    originalAdvice: originalMessage,
+    characterName: character.name,
+    scenario: {
+      topic: scenario.topic,
+      situation: scenario.problemContext.currentSituation,
+    },
+    conversationHistory: conversationHistory.map((msg) => ({
+      role: msg.role,
+      message: msg.content,
+    })),
+  };
+
+  const interventionPrompt = `The advisor has responded to your intervention.
+
+**Intervention Context:**
+- Original bad advice: "${originalMessage}"
+- Character: ${character.name} (${character.age}, ${character.occupation})
+- Situation: ${scenario.problemContext.currentSituation}
+- Topic: ${scenario.topic}
+- Severity: ${severity}
+
+**Conversation so far:**
+${conversationHistory.map((msg) => `${msg.role.toUpperCase()}: ${msg.content}`).join("\n\n")}
+
+**Advisor's latest message:**
+"${advisorMessage}"
+
+Respond to the advisor. Decide if the intervention should end (they've revised well, you've approved their reasoning, or they're forcing it anyway) or continue the discussion.`;
+
+  const bossResponseRaw = await cachedGenerate(
+    "agent",
+    "bossIntervention_response",
+    interventionPrompt,
+    () => bossAgent.generate(interventionPrompt),
+  );
+
+  // Parse boss response
+  let bossResponse;
+  try {
+    bossResponse = JSON.parse(bossResponseRaw.text);
+  } catch (error) {
+    console.error("Failed to parse boss response:", error);
+    // Fallback response
+    bossResponse = {
+      message:
+        "Look, just think about what the client actually needs here and try again.",
+      shouldEndIntervention: false,
+      decision: "continue_discussion",
+    };
+  }
+
+  // Add boss response to conversation history
+  conversationHistory.push({
+    role: "boss",
+    content: bossResponse.message,
+  });
+
+  // Check if intervention should end
+  if (bossResponse.shouldEndIntervention) {
+    // Resolve intervention based on decision
+    const reputationChange = bossResponse.reputationChange || 0;
+    advisorState.reputation = clampValue(
+      advisorState.reputation + reputationChange,
+      0,
+      100,
+      50,
+    );
+
+    let resolvedMessage = originalMessage;
+
+    if (bossResponse.decision === "approved_revision") {
+      // User provided a revised message that boss approved
+      resolvedMessage = bossResponse.revisedMessage || advisorMessage;
+    } else if (bossResponse.decision === "approved_original") {
+      // Boss was convinced original was OK
+      resolvedMessage = originalMessage;
+    } else if (bossResponse.decision === "forced_send") {
+      // User insisted, send original with penalty
+      resolvedMessage = originalMessage;
+    }
+
+    // Clear intervention state
+    delete advisorState.activeIntervention;
+
+    // Now send the resolved message to the character
+    return handleAdvisorResponse(threadId, resolvedMessage, advisorState);
+  }
+
+  // Intervention continues
+  advisorState.activeIntervention.conversationHistory = conversationHistory;
+
+  return {
+    type: "boss_intervention_message",
+    threadId: "boss-pinned", // Boss messages go to boss thread
+    messages: [bossResponse.message],
+    interventionMessage: {
+      severity,
+      reason: bossResponse.message,
+      correctApproach: "",
+      topic: scenario.topic,
+      canRevise: true,
+      interventionActive: true,
+    },
+    stateUpdate: advisorState,
   };
 }
 

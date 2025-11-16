@@ -134,10 +134,12 @@ const translations: Record<Language, Translations> = {
       preferredLanguage: "Preferred Language",
       welcomeTitle: "Welcome to Gansos Finances!",
       welcomeSubtitle: "Your Financial Advisory Career Starts Here",
-      welcomeDescription: "You'll chat with clients via messaging, understand their situations, and provide thoughtful advice. Each interaction builds trust. Good advice transforms lives.",
+      welcomeDescription:
+        "You'll chat with clients via messaging, understand their situations, and provide thoughtful advice. Each interaction builds trust. Good advice transforms lives.",
       readyTitle: "Ready to Start?",
       readySubtitle: "Your First Client Awaits",
-      readyDescription: "Michael Scott is waiting in your inbox. He's your boss and has high hopes. Be empathetic, think critically, and provide advice that truly helps.",
+      readyDescription:
+        "Michael Scott is waiting in your inbox. He's your boss and has high hopes. Be empathetic, think critically, and provide advice that truly helps.",
       features: {
         chatNaturally: "Chat naturally with clients about their finances",
         buildTrust: "Build trust through quality, personalized advice",
@@ -246,21 +248,27 @@ const translations: Record<Language, Translations> = {
     onboarding: {
       chooseIdentity: "Valitse Identiteettisi",
       howDoYouWant: "Miten haluat tulla nähdyksi?",
-      pickAvatar: "Valitse avatar, joka edustaa sinua taloudellisena neuvonantajana.",
+      pickAvatar:
+        "Valitse avatar, joka edustaa sinua taloudellisena neuvonantajana.",
       yourName: "Nimesi",
       enterName: "Kirjoita nimesi",
       yourAvatar: "Avatarisi",
       preferredLanguage: "Ensisijainen Kieli",
       welcomeTitle: "Tervetuloa Gansos Financesiin!",
       welcomeSubtitle: "Taloudellinen Neuvonantaja-urasi Alkaa Tästä",
-      welcomeDescription: "Keskustelet asiakkaiden kanssa viestien kautta, ymmärrät heidän tilanteensa ja tarjoat harkittuja neuvoja. Jokainen vuorovaikutus rakentaa luottamusta. Hyvät neuvot muuttavat elämää.",
+      welcomeDescription:
+        "Keskustelet asiakkaiden kanssa viestien kautta, ymmärrät heidän tilanteensa ja tarjoat harkittuja neuvoja. Jokainen vuorovaikutus rakentaa luottamusta. Hyvät neuvot muuttavat elämää.",
       readyTitle: "Oletko Valmis Aloittamaan?",
       readySubtitle: "Ensimmäinen Asiakkaasi Odottaa",
-      readyDescription: "Michael Scott odottaa postilaatikossasi. Hän on pomosi ja hänellä on suuret odotukset. Ole empaattinen, ajattele kriittisesti ja tarjoa neuvoja, jotka todella auttavat.",
+      readyDescription:
+        "Michael Scott odottaa postilaatikossasi. Hän on pomosi ja hänellä on suuret odotukset. Ole empaattinen, ajattele kriittisesti ja tarjoa neuvoja, jotka todella auttavat.",
       features: {
-        chatNaturally: "Keskustele luonnollisesti asiakkaiden kanssa heidän talousasioistaan",
-        buildTrust: "Rakenna luottamusta laadukkaiden, henkilökohtaisten neuvojen kautta",
-        helpProgress: "Auta asiakkaita saavuttamaan todellista taloudellista edistystä",
+        chatNaturally:
+          "Keskustele luonnollisesti asiakkaiden kanssa heidän talousasioistaan",
+        buildTrust:
+          "Rakenna luottamusta laadukkaiden, henkilökohtaisten neuvojen kautta",
+        helpProgress:
+          "Auta asiakkaita saavuttamaan todellista taloudellista edistystä",
       },
       startJourney: "Aloita Matkasi",
       pressKeys: "Paina",
@@ -365,17 +373,20 @@ const translations: Record<Language, Translations> = {
     onboarding: {
       chooseIdentity: "Välj Din Identitet",
       howDoYouWant: "Hur vill du bli sedd?",
-      pickAvatar: "Välj en avatar som representerar dig som finansiell rådgivare.",
+      pickAvatar:
+        "Välj en avatar som representerar dig som finansiell rådgivare.",
       yourName: "Ditt Namn",
       enterName: "Ange ditt namn",
       yourAvatar: "Din Avatar",
       preferredLanguage: "Föredraget Språk",
       welcomeTitle: "Välkommen till Gansos Finances!",
       welcomeSubtitle: "Din Karriär Som Finansiell Rådgivare Börjar Här",
-      welcomeDescription: "Du kommer att chatta med klienter via meddelanden, förstå deras situationer och ge genomtänkta råd. Varje interaktion bygger förtroende. Goda råd förändrar liv.",
+      welcomeDescription:
+        "Du kommer att chatta med klienter via meddelanden, förstå deras situationer och ge genomtänkta råd. Varje interaktion bygger förtroende. Goda råd förändrar liv.",
       readyTitle: "Redo Att Börja?",
       readySubtitle: "Din Första Klient Väntar",
-      readyDescription: "Michael Scott väntar i din inkorg. Han är din chef och har höga förhoppningar. Var empatisk, tänk kritiskt och ge råd som verkligen hjälper.",
+      readyDescription:
+        "Michael Scott väntar i din inkorg. Han är din chef och har höga förhoppningar. Var empatisk, tänk kritiskt och ge råd som verkligen hjälper.",
       features: {
         chatNaturally: "Chatta naturligt med klienter om deras ekonomi",
         buildTrust: "Bygg förtroende genom kvalitativa, personliga råd",
@@ -482,7 +493,10 @@ export function getUserLanguage(): Language {
     const userProfileStr = localStorage.getItem("userProfile");
     if (userProfileStr) {
       const userProfile = JSON.parse(userProfileStr);
-      if (userProfile.language && ["en", "fi", "sv"].includes(userProfile.language)) {
+      if (
+        userProfile.language &&
+        ["en", "fi", "sv"].includes(userProfile.language)
+      ) {
         return userProfile.language as Language;
       }
     }

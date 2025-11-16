@@ -5,7 +5,7 @@
 // Reserved avatar IDs for player selection (excluded from NPCs)
 const RESERVED_PLAYER_AVATARS = {
   female: [12, 24, 36], // women/12, women/24, women/36
-  male: [15, 32, 48],   // men/15, men/32, men/48
+  male: [15, 32, 48], // men/15, men/32, men/48
 };
 
 /**

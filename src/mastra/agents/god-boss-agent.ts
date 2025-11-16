@@ -392,3 +392,90 @@ ${languageRule}
 
 // Legacy export for backward compatibility
 export const godBossAgent = createGodBossAgent();
+
+/**
+ * Generate real-time intervention message when advisor gives bad advice
+ * Boss interrupts BEFORE character receives the message
+ */
+export function generateInterventionMessage(
+  reason: string,
+  correctApproach: string,
+  topic: string,
+  severity: "warning" | "critical",
+  language: "finnish" | "english" = "english",
+): { reason: string; correctApproach: string } {
+  // Detect emotional intensity based on severity
+  const isCritical = severity === "critical";
+
+  // Language-specific templates with snarky, slightly angry tone
+  const templates = {
+    finnish: {
+      prefix: isCritical
+        ? [
+            "SEIS!?!?!",
+            "HETKI NYT!?!",
+            "STOP RIGHT THERE!?!?!",
+            "MITÄ HELVETTIÄ?!",
+          ]
+        : ["Hetkinen...", "Odota nyt hetki.", "Hei, hei, hei."],
+      suffix: isCritical
+        ? [
+            "Tää on perustason talousneuvo. PERUSTASON!?!?",
+            "Oletko edes kuunnellut mitä asiakas sanoi?!",
+            "Tämä on just se virhe mistä me puhuttiin.",
+            "Nyt keskitytään, kiitos.",
+          ]
+        : [
+            "Mietipä uudestaan.",
+            "Voisitko vähän tarkentaa tuota?",
+            "Keskity oleelliseen.",
+          ],
+    },
+    english: {
+      prefix: isCritical
+        ? [
+            "HOLD ON!?!?!",
+            "WAIT A SECOND!?!",
+            "STOP RIGHT THERE!?!?!",
+            "ARE YOU SERIOUS!?",
+          ]
+        : ["Hold on...", "Wait a moment.", "Hey, hey, hey."],
+      suffix: isCritical
+        ? [
+            "This is basic financial advice. BASIC!?!?",
+            "Did you even listen to what the client said?!",
+            "This is exactly the mistake we talked about.",
+            "Focus, please.",
+          ]
+        : [
+            "Think about that again.",
+            "Could you be more specific?",
+            "Focus on what matters.",
+          ],
+    },
+  };
+
+  const lang = templates[language];
+
+  // Random selection for variety (but deterministic based on reason length for consistency)
+  const prefixIndex = reason.length % lang.prefix.length;
+  const suffixIndex = correctApproach.length % lang.suffix.length;
+
+  const prefix = lang.prefix[prefixIndex];
+  const suffix = lang.suffix[suffixIndex];
+
+  // Add extra punctuation for critical issues
+  const enhancedReason = isCritical
+    ? `${prefix} ${reason} ${suffix}`
+    : `${prefix} ${reason}`;
+
+  // Add urgency markers to correct approach for critical issues
+  const enhancedCorrectApproach = isCritical
+    ? `${correctApproach}\n\n${language === "finnish" ? "Nyt uusiksi." : "Try again."}`
+    : correctApproach;
+
+  return {
+    reason: enhancedReason,
+    correctApproach: enhancedCorrectApproach,
+  };
+}

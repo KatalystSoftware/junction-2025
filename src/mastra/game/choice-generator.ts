@@ -496,12 +496,18 @@ function adaptAdviceToLiteracy(
     return "Set up automatic transfers to savings right after you get paid - this way you 'pay yourself first' before spending on other things. Even a small amount like 5-10% of your income adds up over time. Most banks let you schedule automatic transfers in their app.";
   }
 
-  if (lower.includes("goal") && (lower.includes("specific") || lower.includes("set"))) {
+  if (
+    lower.includes("goal") &&
+    (lower.includes("specific") || lower.includes("set"))
+  ) {
     return "Set a specific savings goal with a clear timeline and amount. For example: 'Save 1,000€ for travel in 6 months' or 'Build a 2,000€ emergency fund by end of year'. Having a concrete target makes it easier to stay motivated and track your progress.";
   }
 
   // Debt-related advice
-  if (lower.includes("debt") && (lower.includes("high") || lower.includes("interest"))) {
+  if (
+    lower.includes("debt") &&
+    (lower.includes("high") || lower.includes("interest"))
+  ) {
     return "Focus on paying off your highest interest rate debts first (like credit cards). Make minimum payments on everything, but put any extra money toward the debt with the highest APR. This saves you the most money in interest charges over time.";
   }
 
@@ -549,7 +555,10 @@ function adaptAdviceToLiteracy(
     return "Watch out for red flags: Pressure to act immediately, promises of 'guaranteed' high returns, requests for upfront payments, or offers that seem too good to be true. Legitimate investments have risks, and legitimate companies don't pressure you or ask for payment in gift cards or cryptocurrency.";
   }
 
-  if (lower.includes("research") && (lower.includes("investment") || lower.includes("opportunity"))) {
+  if (
+    lower.includes("research") &&
+    (lower.includes("investment") || lower.includes("opportunity"))
+  ) {
     return "Always research thoroughly before investing money anywhere. Check if the company is registered with Finnish Financial Supervisory Authority (FIN-FSA), read independent reviews, and ask yourself: 'How do they make money?' Legitimate businesses have clear, transparent business models.";
   }
 
@@ -569,20 +578,36 @@ function adaptAdviceToLiteracy(
 
   // Generic/fallback - still make it more actionable
   if (lower.includes("plan") || lower.includes("create")) {
-    return advicePoint + " Write down the specific steps you need to take, set deadlines for each step, and identify any resources or help you might need. Breaking it down into smaller actions makes it much more manageable.";
+    return (
+      advicePoint +
+      " Write down the specific steps you need to take, set deadlines for each step, and identify any resources or help you might need. Breaking it down into smaller actions makes it much more manageable."
+    );
   }
 
-  if (lower.includes("talk") || lower.includes("discuss") || lower.includes("contact")) {
-    return advicePoint + " Prepare what you want to say beforehand, write down any questions you have, and don't be afraid to ask for clarification if you don't understand something. It's their job to help you, so take advantage of their expertise.";
+  if (
+    lower.includes("talk") ||
+    lower.includes("discuss") ||
+    lower.includes("contact")
+  ) {
+    return (
+      advicePoint +
+      " Prepare what you want to say beforehand, write down any questions you have, and don't be afraid to ask for clarification if you don't understand something. It's their job to help you, so take advantage of their expertise."
+    );
   }
 
   if (lower.includes("calculate") || lower.includes("work out")) {
-    return advicePoint + " Use a calculator or spreadsheet to work through the numbers. Write down all the relevant figures so you can see the math clearly and verify that it makes sense for your situation.";
+    return (
+      advicePoint +
+      " Use a calculator or spreadsheet to work through the numbers. Write down all the relevant figures so you can see the math clearly and verify that it makes sense for your situation."
+    );
   }
 
   // Default: Add more context to make it actionable
   if (advicePoint.length < 100) {
-    return advicePoint + " Take this step by step, and don't worry if it feels overwhelming at first - everyone starts somewhere. The important thing is to start taking action now rather than waiting for the perfect moment.";
+    return (
+      advicePoint +
+      " Take this step by step, and don't worry if it feels overwhelming at first - everyone starts somewhere. The important thing is to start taking action now rather than waiting for the perfect moment."
+    );
   }
 
   return advicePoint;

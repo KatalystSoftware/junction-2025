@@ -441,7 +441,6 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 </motion.div>
               )}
 
-
               {/* CTA Button */}
               <motion.div
                 initial={{ opacity: 0, y: 10 }}

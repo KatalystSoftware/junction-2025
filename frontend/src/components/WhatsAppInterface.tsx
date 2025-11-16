@@ -133,7 +133,10 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       processedMessageResponse.current = game.lastMessageResponse;
     } else if (game.lastStartResponse && response === game.lastStartResponse) {
       processedStartResponse.current = game.lastStartResponse;
-    } else if (game.autoStartedConsultation && response === game.autoStartedConsultation) {
+    } else if (
+      game.autoStartedConsultation &&
+      response === game.autoStartedConsultation
+    ) {
       processedAutoStartResponse.current = game.autoStartedConsultation;
     }
 
@@ -218,6 +221,25 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       }, 3000);
     }
 
+    // Handle boss intervention (real-time correction of bad advice)
+    if (response.type === "boss_intervention" && response.interventionMessage) {
+      console.log("🚨 Boss intervention received!");
+
+      // Show notification that boss wants to talk
+      // User can manually switch to boss-pinned thread to see the intervention message
+      const severity = response.interventionMessage.severity;
+      const icon = severity === "critical" ? "🚨" : "⚠️";
+
+      // TODO: Show toast notification
+      // For now, just log it
+      console.log(
+        `${icon} Boss intervention: Check the boss chat to discuss this advice!`,
+      );
+
+      // Optionally, highlight the boss thread in the contact list
+      // The boss-pinned thread will have the intervention message already
+    }
+
     // Handle boss check-in
     if (response.type === "boss_checkin") {
       console.log("👔 Boss check-in received");
@@ -291,7 +313,11 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       setSelectedContactId("boss-pinned");
       setShowChat(true); // Show the chat window
     }
-  }, [game.lastStartResponse, game.lastMessageResponse, game.autoStartedConsultation]);
+  }, [
+    game.lastStartResponse,
+    game.lastMessageResponse,
+    game.autoStartedConsultation,
+  ]);
 
   // Auto-select first contact if none selected
   useEffect(() => {
@@ -320,6 +346,11 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
   const [currentMilestones, setCurrentMilestones] = useState<any[]>([]);
   const [currentAchievements, setCurrentAchievements] = useState<any[]>([]);
   const [currentQuiz, setCurrentQuiz] = useState<any>(null);
+
+  // Boss intervention state - removed modal, interventions now appear in boss chat
+
+  // Input state (lifted from ChatWindow for intervention revision support)
+  const [currentInputValue, setCurrentInputValue] = useState("");
 
   // Track which responses we've already processed to avoid duplicate processing
   const processedStartResponse = useRef<any>(null);
@@ -384,6 +415,9 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
   // Handle sending messages
   const handleSendMessage = (content: string) => {
     if (!selectedContactId) return;
+
+    // Clear input after sending
+    setCurrentInputValue("");
 
     // Special handling for boss messages with advice choices (onboarding or check-in)
     if (selectedContactId === "boss-pinned") {
@@ -589,6 +623,8 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
         adviceChoices={currentAdviceChoices}
         isThreadResolved={isThreadResolved}
         conversationEndData={conversationEndData}
+        inputValue={currentInputValue}
+        onInputChange={setCurrentInputValue}
       />
 
       {/* Modals - shown in sequence after consultation ends */}
@@ -627,6 +663,8 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
           }}
         />
       )}
+
+      {/* Boss interventions now appear in boss-pinned chat thread, no modal needed */}
     </div>
   );
 }

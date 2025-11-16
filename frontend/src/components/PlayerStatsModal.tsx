@@ -293,10 +293,7 @@ export function PlayerStatsModal({
               >
                 <div className="relative">
                   <Avatar className="w-24 h-24">
-                    <AvatarImage
-                      src={playerAvatarUrl}
-                      alt="Player Avatar"
-                    />
+                    <AvatarImage src={playerAvatarUrl} alt="Player Avatar" />
                     <AvatarFallback
                       style={{
                         backgroundColor: "var(--primary)",

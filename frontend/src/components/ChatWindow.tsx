@@ -58,6 +58,9 @@ interface ChatWindowProps {
     achievementsUnlocked?: any[];
     milestonesAchieved?: any[];
   };
+  // Controlled input support (for boss intervention revisions)
+  inputValue?: string;
+  onInputChange?: (value: string) => void;
 }
 
 // Helper functions to calculate financial data
@@ -127,9 +130,15 @@ export function ChatWindow({
   adviceChoices = [],
   isThreadResolved = false,
   conversationEndData,
+  inputValue: controlledInputValue,
+  onInputChange,
 }: ChatWindowProps) {
   const t = useTranslation();
-  const [inputValue, setInputValue] = useState("");
+  // Use controlled input from parent if provided, otherwise local state
+  const [localInputValue, setLocalInputValue] = useState("");
+  const inputValue =
+    controlledInputValue !== undefined ? controlledInputValue : localInputValue;
+  const setInputValue = onInputChange || setLocalInputValue;
   const [showCallDialog, setShowCallDialog] = useState(false);
   const [showVideoDialog, setShowVideoDialog] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);

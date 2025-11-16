@@ -626,15 +626,12 @@ export async function getCharacterInitialMessage(
     scenario.initialContact.method === "voice" ||
     scenario.initialContact.method === "call";
 
-  console.log(
-    `🎤 Initial contact for scenario ${scenario.scenarioId}:`,
-    {
-      method: scenario.initialContact.method,
-      isVoiceMethod,
-      hasCharacter: !!character,
-      visitCount: character?.relationshipState.visitCount,
-    },
-  );
+  console.log(`🎤 Initial contact for scenario ${scenario.scenarioId}:`, {
+    method: scenario.initialContact.method,
+    isVoiceMethod,
+    hasCharacter: !!character,
+    visitCount: character?.relationshipState.visitCount,
+  });
 
   let voiceConfig = scenario.initialContact.voiceMessage;
 
@@ -656,15 +653,19 @@ export async function getCharacterInitialMessage(
     // Determine scenario number for onboarding flow
     // Use advisor's total session count (not character visitCount, since each character is new)
     // This ensures: session 1 = no voice, session 2 = guaranteed voice, session 3+ = random
-    const scenarioNumber = totalSessions !== undefined
-      ? totalSessions + 1
-      : (character.relationshipState.visitCount ?? 0) + 1;
+    const scenarioNumber =
+      totalSessions !== undefined
+        ? totalSessions + 1
+        : (character.relationshipState.visitCount ?? 0) + 1;
 
     console.log(`🎤 Scenario number calculation:`, {
       totalSessions,
       visitCount: character.relationshipState.visitCount,
       scenarioNumber,
-      formula: totalSessions !== undefined ? `${totalSessions} + 1` : `${character.relationshipState.visitCount ?? 0} + 1`,
+      formula:
+        totalSessions !== undefined
+          ? `${totalSessions} + 1`
+          : `${character.relationshipState.visitCount ?? 0} + 1`,
     });
 
     const shouldGenerateVoice = shouldGenerateVoiceMessage(
@@ -673,10 +674,10 @@ export async function getCharacterInitialMessage(
       scenarioNumber,
     );
 
-    console.log(
-      `🎤 Voice decision for scenario ${scenarioNumber}:`,
-      { shouldGenerateVoice, emotionalState },
-    );
+    console.log(`🎤 Voice decision for scenario ${scenarioNumber}:`, {
+      shouldGenerateVoice,
+      emotionalState,
+    });
 
     if (shouldGenerateVoice) {
       voiceConfig = await generateVoiceMessage(
@@ -685,13 +686,10 @@ export async function getCharacterInitialMessage(
         emotionalState,
       );
 
-      console.log(
-        `🎤 Voice config result:`,
-        {
-          enabled: voiceConfig?.enabled,
-          hasAudio: !!voiceConfig?.audioUrl,
-        },
-      );
+      console.log(`🎤 Voice config result:`, {
+        enabled: voiceConfig?.enabled,
+        hasAudio: !!voiceConfig?.audioUrl,
+      });
 
       // Mark that this character has received a voice message
       if (voiceConfig?.enabled) {

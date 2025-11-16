@@ -10,6 +10,7 @@ import {
   createNewAdvisor,
   startNewConsultation,
   handleAdvisorResponse,
+  handleInterventionResponse,
 } from "../game/orchestrator.ts";
 import {
   saveSession,
@@ -135,7 +136,13 @@ interface InitResponse {
   isNewSession: boolean;
   threadHistories?: Record<
     string,
-    Array<{ role: "user" | "assistant"; content: string; isVoice?: boolean; audioUrl?: string; voiceUrgency?: string }>
+    Array<{
+      role: "user" | "assistant";
+      content: string;
+      isVoice?: boolean;
+      audioUrl?: string;
+      voiceUrgency?: string;
+    }>
   >;
   threadMetadata?: Record<string, ThreadMetadata>;
   autoStartedConsultation?: ClientSafeGameResponse; // Auto-started if no active threads
@@ -149,7 +156,13 @@ app.post("/init", async (c) => {
     let isNewSession = false;
     let threadHistories: Record<
       string,
-      Array<{ role: "user" | "assistant"; content: string; isVoice?: boolean; audioUrl?: string; voiceUrgency?: string }>
+      Array<{
+        role: "user" | "assistant";
+        content: string;
+        isVoice?: boolean;
+        audioUrl?: string;
+        voiceUrgency?: string;
+      }>
     > = {};
     let threadMetadata: Record<string, ThreadMetadata> = {};
 
@@ -201,18 +214,20 @@ app.post("/init", async (c) => {
 
     if (advisorState.hasCompletedOnboarding) {
       // Count active (non-resolved) threads
-      const activeThreadCount = Object.values(advisorState.activeThreads).filter(
-        (thread) => thread.status !== "resolved"
-      ).length;
+      const activeThreadCount = Object.values(
+        advisorState.activeThreads,
+      ).filter((thread) => thread.status !== "resolved").length;
 
       if (activeThreadCount === 0) {
-        console.log("🚨 SANITY CHECK: No active threads detected, auto-starting consultation...");
+        console.log(
+          "🚨 SANITY CHECK: No active threads detected, auto-starting consultation...",
+        );
 
         try {
           // Auto-start a new consultation
           const gameResponse = await startNewConsultation(
             advisorState.advisorId,
-            advisorState
+            advisorState,
           );
 
           // Convert to Maps for processing
@@ -224,13 +239,23 @@ app.post("/init", async (c) => {
             : new Map();
 
           // Process the consultation response (same logic as /start-consultation)
-          if (gameResponse.type === "character_message" && gameResponse.threadId && gameResponse.messages) {
+          if (
+            gameResponse.type === "character_message" &&
+            gameResponse.threadId &&
+            gameResponse.messages
+          ) {
             const threadId = gameResponse.threadId;
             const existingHistory = historiesMap.get(threadId) || [];
 
             // Add character's initial messages
             for (const msg of gameResponse.messages) {
-              const messageEntry: { role: "assistant"; content: string; isVoice?: boolean; audioUrl?: string; voiceUrgency?: string } = {
+              const messageEntry: {
+                role: "assistant";
+                content: string;
+                isVoice?: boolean;
+                audioUrl?: string;
+                voiceUrgency?: string;
+              } = {
                 role: "assistant" as const,
                 content: msg,
               };
@@ -246,12 +271,16 @@ app.post("/init", async (c) => {
             }
 
             historiesMap.set(threadId, existingHistory);
-            console.log(`💬 Auto-started: Saved initial message(s) to thread ${threadId.substring(0, 8)}...`);
+            console.log(
+              `💬 Auto-started: Saved initial message(s) to thread ${threadId.substring(0, 8)}...`,
+            );
 
             // Save character metadata if provided
             if (gameResponse.characterInfo) {
               metadataMap.set(threadId, gameResponse.characterInfo);
-              console.log(`👤 Auto-started: Saved character metadata for thread ${threadId.substring(0, 8)}...`);
+              console.log(
+                `👤 Auto-started: Saved character metadata for thread ${threadId.substring(0, 8)}...`,
+              );
             }
           }
 
@@ -260,7 +289,7 @@ app.post("/init", async (c) => {
             sessionId,
             gameResponse.stateUpdate,
             historiesMap,
-            metadataMap
+            metadataMap,
           );
 
           // Update our response data
@@ -300,7 +329,13 @@ interface StartConsultationRequest {
   advisorState: AdvisorState;
   threadHistories?: Record<
     string,
-    Array<{ role: "user" | "assistant"; content: string; isVoice?: boolean; audioUrl?: string; voiceUrgency?: string }>
+    Array<{
+      role: "user" | "assistant";
+      content: string;
+      isVoice?: boolean;
+      audioUrl?: string;
+      voiceUrgency?: string;
+    }>
   >;
   threadMetadata?: Record<string, ThreadMetadata>;
   userLanguage?: string; // User's preferred language: 'en', 'fi', or 'sv'
@@ -312,8 +347,13 @@ interface StartConsultationResponse extends ClientSafeGameResponse {
 
 app.post("/start-consultation", async (c) => {
   try {
-    const { sessionId, advisorState, threadHistories, threadMetadata, userLanguage } =
-      await c.req.json<StartConsultationRequest>();
+    const {
+      sessionId,
+      advisorState,
+      threadHistories,
+      threadMetadata,
+      userLanguage,
+    } = await c.req.json<StartConsultationRequest>();
 
     console.log(
       `🎬 Starting consultation for session: ${sessionId.substring(0, 8)}... (language: ${userLanguage || "en"})`,
@@ -362,32 +402,32 @@ app.post("/start-consultation", async (c) => {
 
       // Add character's initial messages
       for (const msg of gameResponse.messages) {
-        const messageEntry: { role: "assistant"; content: string; isVoice?: boolean; audioUrl?: string; voiceUrgency?: string } = {
+        const messageEntry: {
+          role: "assistant";
+          content: string;
+          isVoice?: boolean;
+          audioUrl?: string;
+          voiceUrgency?: string;
+        } = {
           role: "assistant" as const,
           content: msg,
         };
 
         // Include voice data if present
         if (gameResponse.voiceNeeded && gameResponse.voiceConfig) {
-          console.log(
-            `🎤 Voice message detected! Adding to history:`,
-            {
-              enabled: gameResponse.voiceConfig.enabled,
-              urgency: gameResponse.voiceConfig.urgency,
-              hasAudio: !!gameResponse.voiceConfig.audioUrl,
-            },
-          );
+          console.log(`🎤 Voice message detected! Adding to history:`, {
+            enabled: gameResponse.voiceConfig.enabled,
+            urgency: gameResponse.voiceConfig.urgency,
+            hasAudio: !!gameResponse.voiceConfig.audioUrl,
+          });
           messageEntry.isVoice = true;
           messageEntry.audioUrl = gameResponse.voiceConfig.audioUrl;
           messageEntry.voiceUrgency = gameResponse.voiceConfig.urgency;
         } else {
-          console.log(
-            `📝 Regular text message (no voice):`,
-            {
-              voiceNeeded: gameResponse.voiceNeeded,
-              hasVoiceConfig: !!gameResponse.voiceConfig,
-            },
-          );
+          console.log(`📝 Regular text message (no voice):`, {
+            voiceNeeded: gameResponse.voiceNeeded,
+            hasVoiceConfig: !!gameResponse.voiceConfig,
+          });
         }
 
         existingHistory.push(messageEntry);
@@ -419,6 +459,26 @@ app.post("/start-consultation", async (c) => {
       historiesMap.set("boss-pinned", bossHistory);
 
       console.log("👔 Saved boss check-in message to historiesMap");
+    }
+
+    // If this is a boss intervention, save it to boss threadHistories
+    if (
+      gameResponse.type === "boss_intervention" &&
+      gameResponse.interventionMessage
+    ) {
+      const msg = gameResponse.interventionMessage;
+      const bossHistory = historiesMap.get("boss-pinned") || [];
+
+      // Format the intervention message
+      const interventionContent = `🚨 ${msg.severity === "critical" ? "CRITICAL" : "WARNING"} INTERVENTION 🚨\n\n${msg.reason}\n\n✅ CORRECT APPROACH:\n${msg.correctApproach}`;
+
+      bossHistory.push({
+        role: "assistant" as const,
+        content: interventionContent,
+      });
+      historiesMap.set("boss-pinned", bossHistory);
+
+      console.log("🚨 Saved boss intervention message to boss threadHistories");
     }
 
     // Save updated state with histories and metadata
@@ -461,10 +521,22 @@ interface SendMessageRequest {
   threadId: string;
   message: string;
   advisorState: AdvisorState;
-  conversationHistory?: Array<{ role: "user" | "assistant"; content: string; isVoice?: boolean; audioUrl?: string; voiceUrgency?: string }>;
+  conversationHistory?: Array<{
+    role: "user" | "assistant";
+    content: string;
+    isVoice?: boolean;
+    audioUrl?: string;
+    voiceUrgency?: string;
+  }>;
   threadHistories?: Record<
     string,
-    Array<{ role: "user" | "assistant"; content: string; isVoice?: boolean; audioUrl?: string; voiceUrgency?: string }>
+    Array<{
+      role: "user" | "assistant";
+      content: string;
+      isVoice?: boolean;
+      audioUrl?: string;
+      voiceUrgency?: string;
+    }>
   >;
   threadMetadata?: Record<string, ThreadMetadata>;
   userLanguage?: string; // User's preferred language: 'en', 'fi', or 'sv'
@@ -501,64 +573,68 @@ app.post("/send-message", async (c) => {
       ? new Map(Object.entries(threadMetadata))
       : new Map();
 
-    // Special handling for boss messages (RAG-powered help)
+    // Special handling for boss messages
     if (threadId === "boss-pinned") {
-      console.log("👔 Boss message - using RAG help system");
+      // Check if there's an active intervention
+      if (advisorState.activeIntervention) {
+        console.log("🚨 Handling intervention response from advisor");
+        gameResponse = await handleInterventionResponse(message, advisorState);
+      } else {
+        console.log("👔 Boss message - using RAG help system");
 
-      // Get current consultation context if available
-      let currentConsultation = undefined;
-      const activeThread = Object.values(advisorState.activeThreads).find(
-        (t) => t.status === "awaiting_response",
-      );
-
-      if (activeThread) {
-        // Get scenario details from session history
-        const scenario = advisorState.sessionHistory.find(
-          (s) => s.scenarioId === activeThread.scenarioId,
+        // Get current consultation context if available
+        let currentConsultation = undefined;
+        const activeThread = Object.values(advisorState.activeThreads).find(
+          (t) => t.status === "awaiting_response",
         );
 
-        if (scenario) {
-          currentConsultation = {
-            characterName: scenario.characterName,
-            topic: scenario.topicsCovered[0] || ("general" as any),
-            scenarioSummary:
-              scenario.characterReactions[0] || "Client seeking advice",
-          };
+        if (activeThread) {
+          // Get scenario details from session history
+          const scenario = advisorState.sessionHistory.find(
+            (s) => s.scenarioId === activeThread.scenarioId,
+          );
+
+          if (scenario) {
+            currentConsultation = {
+              characterName: scenario.characterName,
+              topic: scenario.topicsCovered[0] || ("general" as any),
+              scenarioSummary:
+                scenario.characterReactions[0] || "Client seeking advice",
+            };
+          }
         }
+
+        // Invoke boss help agent with RAG
+        const { invokeBossHelpTool } = await import(
+          "../tools/invoke-boss-help-tool.ts"
+        );
+
+        const bossHistory = historiesMap.get("boss-pinned") || [];
+
+        const bossHelp = await invokeBossHelpTool({
+          userQuestion: message,
+          conversationHistory: bossHistory,
+          advisorState,
+          currentConsultationContext: currentConsultation,
+        });
+
+        gameResponse = {
+          type: "character_message" as const,
+          threadId: "boss-pinned",
+          messages: [bossHelp.response],
+          stateUpdate: advisorState,
+          citations: bossHelp.citations,
+          suggestedMaterials: bossHelp.suggestedMaterials,
+        };
+
+        // Add user message and boss response to threadHistories
+        bossHistory.push(
+          { role: "user" as const, content: message },
+          { role: "assistant" as const, content: bossHelp.response },
+        );
       }
 
-      // Invoke boss help agent with RAG
-      const { invokeBossHelpTool } = await import(
-        "../tools/invoke-boss-help-tool.ts"
-      );
-
-      const bossHistory = historiesMap.get("boss-pinned") || [];
-
-      const bossHelp = await invokeBossHelpTool({
-        userQuestion: message,
-        conversationHistory: bossHistory,
-        advisorState,
-        currentConsultationContext: currentConsultation,
-      });
-
-      gameResponse = {
-        type: "character_message" as const,
-        threadId: "boss-pinned",
-        messages: [bossHelp.response],
-        stateUpdate: advisorState,
-        citations: bossHelp.citations,
-        suggestedMaterials: bossHelp.suggestedMaterials,
-      };
-
-      // Add user message and boss response to threadHistories
-      bossHistory.push(
-        { role: "user" as const, content: message },
-        { role: "assistant" as const, content: bossHelp.response },
-      );
-      historiesMap.set("boss-pinned", bossHistory);
-      console.log(
-        `👔 Boss RAG help completed (${bossHelp.citations.length} citations, ${bossHelp.suggestedMaterials.length} materials)`,
-      );
+      historiesMap.set("boss-pinned", historiesMap.get("boss-pinned") || []);
     } else {
       // Process regular advisor response
       gameResponse = await handleAdvisorResponse(
@@ -578,7 +654,13 @@ app.post("/send-message", async (c) => {
       // Add character's response messages
       if (gameResponse.messages) {
         for (const msg of gameResponse.messages) {
-          const messageEntry: { role: "assistant"; content: string; isVoice?: boolean; audioUrl?: string; voiceUrgency?: string } = {
+          const messageEntry: {
+            role: "assistant";
+            content: string;
+            isVoice?: boolean;
+            audioUrl?: string;
+            voiceUrgency?: string;
+          } = {
             role: "assistant" as const,
             content: msg,
           };
@@ -598,6 +680,25 @@ app.post("/send-message", async (c) => {
       console.log(
         `💬 Saved conversation to thread ${threadId.substring(0, 8)}... (now ${threadHistory.length} messages)`,
       );
+
+      // ALSO save intervention message to boss thread if present (parallel notification)
+      if (gameResponse.interventionMessage) {
+        const msg = gameResponse.interventionMessage;
+        const bossHistory = historiesMap.get("boss-pinned") || [];
+
+        // Format the intervention message - keep it natural like a real boss
+        const interventionContent = `${msg.reason}\n\n---\n\n${msg.correctApproach}`;
+
+        bossHistory.push({
+          role: "assistant" as const,
+          content: interventionContent,
+        });
+        historiesMap.set("boss-pinned", bossHistory);
+
+        console.log(
+          "🚨 Saved parallel boss intervention message to boss threadHistories",
+        );
+      }
     }
 
     // Save updated state with message histories and metadata

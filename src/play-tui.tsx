@@ -289,6 +289,9 @@ function App() {
   const [milestones, setMilestones] = useState<Milestone[]>([]);
   const [newAchievements, setNewAchievements] = useState<Achievement[]>([]);
   const [miniFeedback, setMiniFeedback] = useState<string | null>(null);
+  const [bossInterventionActive, setBossInterventionActive] = useState(false);
+  const [lastMessageBeforeIntervention, setLastMessageBeforeIntervention] =
+    useState<string | null>(null);
 
   // Helper: Convert threads to format for saving (extract histories and metadata)
   const getThreadDataForSave = (
@@ -454,6 +457,7 @@ function App() {
     }
 
     // Toggle panels (s=stats, r=relationships, p=progress, a=achievements, ?=help)
+    // Note: 'r' is also used for revision during boss intervention, so skip panel toggle in that case
     const panelKeys: Record<
       string,
       "stats" | "relationships" | "progress" | "achievements" | "help"
@@ -465,7 +469,7 @@ function App() {
       "?": "help",
     };
 
-    if (panelKeys[input] && !inputValue) {
+    if (panelKeys[input] && !inputValue && !bossInterventionActive) {
       setActivePanel(
         activePanel === panelKeys[input] ? null : panelKeys[input],
       );
@@ -549,6 +553,30 @@ function App() {
       setCheckinMessage(null);
       setStatusMessage("Press 'n' for new consultation");
       return;
+    }
+
+    // Handle boss intervention actions (r=revise, c=continue anyway)
+    if (bossInterventionActive && !inputValue) {
+      if (input === "r") {
+        // Revise: Clear intervention state and reset input to last message
+        setBossInterventionActive(false);
+        setInputValue(lastMessageBeforeIntervention || "");
+        setLastMessageBeforeIntervention(null);
+        setStatusMessage("Type your revised advice (or clear to start fresh)");
+        return;
+      }
+
+      if (input === "c") {
+        // Continue anyway: Send original message bypassing intervention check
+        // TODO: This would require a flag to skip intervention check on retry
+        // For now, just clear intervention state and let user send new message
+        setBossInterventionActive(false);
+        setLastMessageBeforeIntervention(null);
+        setStatusMessage(
+          "⚠️ You chose to ignore the boss. This will be noted in your review. Type new message or retry.",
+        );
+        return;
+      }
     }
 
     if (bossReview && input === " ") {
@@ -1116,6 +1144,42 @@ function App() {
       if (sessionId) {
         const { histories, metadata } = getThreadDataForSave(updated);
         await saveSession(sessionId, response.stateUpdate, histories, metadata);
+      }
+
+      // BOSS INTERVENTION: Boss caught bad advice!
+      if (
+        response.type === "boss_intervention" &&
+        response.interventionMessage
+      ) {
+        const { severity, reason, correctApproach } =
+          response.interventionMessage;
+
+        // Add boss intervention message to thread (styled differently)
+        const bossMessage: Message = {
+          role: "system",
+          content: `🚨 BOSS INTERVENTION (${severity.toUpperCase()}):\n\n${reason}\n\n📋 CORRECT APPROACH:\n${correctApproach}`,
+          timestamp: new Date(),
+        };
+
+        const updatedWithBoss = new Map(threads);
+        updatedWithBoss.set(currentThreadId, {
+          ...thread,
+          messages: [...updatedMessages, bossMessage],
+        });
+        setThreads(updatedWithBoss);
+
+        // Store state for intervention handling
+        setBossInterventionActive(true);
+        setLastMessageBeforeIntervention(message);
+
+        // Update status with action prompt
+        setStatusMessage(
+          severity === "critical"
+            ? "⚠️ CRITICAL ERROR! Press 'r' to revise your advice, or 'c' to continue anyway (not recommended)"
+            : "⚠️ WARNING! Press 'r' to revise your advice, or 'c' to continue",
+        );
+
+        return; // Don't process as normal message
       }
 
       // Check if conversation ended

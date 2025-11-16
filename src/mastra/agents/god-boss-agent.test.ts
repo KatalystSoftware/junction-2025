@@ -47,4 +47,3 @@ describe("god-boss-agent", () => {
     );
   });
 });
-
