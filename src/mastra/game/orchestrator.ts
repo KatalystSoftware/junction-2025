@@ -659,6 +659,7 @@ Respond with ONLY valid JSON (NO markdown):
     advisorState.activeThreads[threadId] = {
       threadId,
       characterId: character.characterId,
+      characterName: character.name,
       scenarioId: scenario.scenarioId,
       status: "awaiting_response",
       createdAt: now,

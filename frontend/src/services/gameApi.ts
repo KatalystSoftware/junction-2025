@@ -40,6 +40,7 @@ export interface AdvisorState {
 export interface ThreadInfo {
   threadId: string;
   characterId: string;
+  characterName: string;
   scenarioId: string;
   status: "active" | "awaiting_response" | "resolved";
   createdAt: string;

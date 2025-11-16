@@ -351,6 +351,7 @@ export interface CompletedMaterial {
 export interface ThreadInfo {
   threadId: string;
   characterId: string;
+  characterName: string;
   scenarioId: string;
   status: ThreadStatus;
   createdAt: string;
