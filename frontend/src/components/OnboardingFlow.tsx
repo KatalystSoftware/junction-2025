@@ -12,6 +12,7 @@ import {
   User,
 } from "lucide-react";
 import bossImage from "figma:asset/98a682f9e6eea0635304bf1ceada7ac6a7758d54.png";
+import { FollowingEyes } from "./ui/FollowingEyes";
 import { PLAYER_AVATAR_OPTIONS } from "../utils/avatarUtils";
 import { getTranslation, type Language } from "../utils/translations";
 
@@ -189,22 +190,29 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 >
                   {currentScreenData.illustration}
                 </motion.div>
-                <Avatar
-                  className="w-12 h-12 border-2"
-                  style={{ borderColor: currentScreenData.color }}
+                <FollowingEyes
+                  eyeSize={8}
+                  pupilSize={3}
+                  eyeSpacing={0.6}
+                  eyeVerticalPosition={0.5}
                 >
-                  <AvatarImage src={bossImage} alt="Michael Scott" />
-                  <AvatarFallback
-                    style={{
-                      backgroundColor: currentScreenData.color,
-                      color: "var(--primary-foreground)",
-                      fontFamily: "Inter, sans-serif",
-                      fontWeight: "var(--font-weight-semibold)",
-                    }}
+                  <Avatar
+                    className="w-12 h-12 border-2"
+                    style={{ borderColor: currentScreenData.color }}
                   >
-                    MS
-                  </AvatarFallback>
-                </Avatar>
+                    <AvatarImage src={bossImage} alt="Michael Scott" />
+                    <AvatarFallback
+                      style={{
+                        backgroundColor: currentScreenData.color,
+                        color: "var(--primary-foreground)",
+                        fontFamily: "Inter, sans-serif",
+                        fontWeight: "var(--font-weight-semibold)",
+                      }}
+                    >
+                      MS
+                    </AvatarFallback>
+                  </Avatar>
+                </FollowingEyes>
                 <motion.p
                   initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}

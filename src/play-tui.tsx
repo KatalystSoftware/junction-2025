@@ -832,16 +832,111 @@ function App() {
         return;
       }
 
-      // Boss review
+      // Boss review - create interactive thread instead of modal
       if (consultation.type === "god_boss_review" && consultation.review) {
-        setBossReview(consultation.review);
+        const review = consultation.review;
+        const bossThreadId = "boss-pinned";
+
+        // Format review as conversation messages
+        const reviewMessages: Message[] = [
+          {
+            role: "system",
+            content: "👔 BOSS REVIEW SESSION",
+            timestamp: new Date(),
+          },
+          {
+            role: "assistant",
+            content: `Hey, got a minute?\n\nI've reviewed your recent consultations and wanted to share some feedback with you.`,
+            timestamp: new Date(),
+          },
+          {
+            role: "assistant",
+            content: `📈 **Overall Performance**: ${review.overallScore}/10`,
+            timestamp: new Date(),
+          },
+        ];
+
+        // Add strengths
+        if (
+          review.strengthsIdentified &&
+          review.strengthsIdentified.length > 0
+        ) {
+          reviewMessages.push({
+            role: "assistant",
+            content: `✅ **Your Strengths**:\n${review.strengthsIdentified.map((s: string) => `• ${s}`).join("\n")}`,
+            timestamp: new Date(),
+          });
+        }
+
+        // Add areas for improvement
+        if (
+          review.areasForImprovement &&
+          review.areasForImprovement.length > 0
+        ) {
+          reviewMessages.push({
+            role: "assistant",
+            content: `⚠️ **Areas to Work On**:\n${review.areasForImprovement.map((a: string) => `• ${a}`).join("\n")}`,
+            timestamp: new Date(),
+          });
+        }
+
+        // Add learning materials
+        if (review.learningMaterials && review.learningMaterials.length > 0) {
+          const materials = review.learningMaterials
+            .map((m: any) => {
+              const urlText = m.url ? ` - ${m.url}` : "";
+              return `• **${m.title}**: ${m.description}${urlText}`;
+            })
+            .join("\n");
+          reviewMessages.push({
+            role: "assistant",
+            content: `📚 **Learning Materials** (check these out):\n${materials}`,
+            timestamp: new Date(),
+          });
+        }
+
+        // Add encouraging message
+        if (review.encouragingMessage) {
+          reviewMessages.push({
+            role: "assistant",
+            content: `💬 "${review.encouragingMessage}"\n\nFeel free to ask me any questions about this feedback. When you're ready to continue, just type "done" or "continue".`,
+            timestamp: new Date(),
+          });
+        }
+
+        // Create or update boss thread
+        const bossThread: ThreadData = {
+          threadId: bossThreadId,
+          characterName: "👔 Your Boss",
+          messages: reviewMessages,
+          unreadCount: 0,
+          status: "active",
+        };
+
+        const updated = new Map(threads);
+        updated.set(bossThreadId, bossThread);
+        setThreads(updated);
+        setCurrentThreadId(bossThreadId);
         setAdvisorState(consultation.stateUpdate);
-        setStatusMessage("Boss review received! Press SPACE to continue");
+
+        // Store review in state so we can access quiz later
+        setBossReview(review);
+
+        // Set appropriate status message
+        if (review.quiz) {
+          setStatusMessage(
+            'Boss review! Ask questions or type "done" to start quiz',
+          );
+        } else {
+          setStatusMessage(
+            'Boss review! Ask questions or type "done" to continue',
+          );
+        }
         setIsLoading(false);
 
-        // Auto-save after boss review state update
+        // Auto-save after boss review
         if (sessionId) {
-          const { histories, metadata } = getThreadDataForSave(threads);
+          const { histories, metadata } = getThreadDataForSave(updated);
           await saveSession(
             sessionId,
             consultation.stateUpdate,
@@ -849,6 +944,7 @@ function App() {
             metadata,
           );
         }
+
         return;
       }
 
@@ -1083,8 +1179,45 @@ function App() {
     const thread = threads.get(currentThreadId);
     if (!thread) return;
 
-    setIsLoading(true);
-    setStatusMessage("Character is thinking...");
+    // Special handling for boss thread
+    if (currentThreadId === "boss-pinned") {
+      // Check if user wants to finish the review
+      const finishKeywords = ["done", "continue", "finish", "next", "ok"];
+      if (finishKeywords.some((kw) => message.toLowerCase().includes(kw))) {
+        // Close boss review thread
+        const updated = new Map(threads);
+        const bossThread = updated.get("boss-pinned");
+        if (bossThread) {
+          bossThread.status = "completed";
+          updated.set("boss-pinned", bossThread);
+          setThreads(updated);
+        }
+
+        // Check if there's a quiz to start
+        if (bossReview && bossReview.quiz) {
+          setQuiz(bossReview.quiz);
+          setCurrentQuestionIndex(0);
+          setQuizAnswers([]);
+          setShowQuizFeedback(false);
+          setLastQuizAnswer(null);
+          setBossReview(null);
+          setCurrentThreadId(null);
+          setStatusMessage("Quiz started! Select your answer (1-4)");
+        } else {
+          setBossReview(null);
+          setCurrentThreadId(null);
+          setStatusMessage("Review complete! Press 'n' for next consultation");
+        }
+        return;
+      }
+
+      // Otherwise, allow conversation with boss (will use API's boss-pinned route)
+      setIsLoading(true);
+      setStatusMessage("Boss is thinking...");
+    } else {
+      setIsLoading(true);
+      setStatusMessage("Character is thinking...");
+    }
 
     try {
       // Add user message
@@ -1293,8 +1426,9 @@ function App() {
     return <BossCheckinModal message={checkinMessage} />;
   }
 
-  // Boss review modal
-  if (bossReview) {
+  // Boss review modal (only if not using boss-pinned thread)
+  // If boss-pinned thread exists, show the conversation UI instead
+  if (bossReview && !threads.has("boss-pinned")) {
     return <BossReviewModal review={bossReview} />;
   }
 

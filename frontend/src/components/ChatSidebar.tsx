@@ -8,6 +8,7 @@ import logoImage from "figma:asset/28e39d27183eb9dbb848b6be8a7c7b00e841cd40.png"
 import { PlayerStatsModal } from "./PlayerStatsModal";
 import { getPlayerAvatarUrl } from "../utils/avatarUtils";
 import { useTranslation } from "../utils/translations";
+import { FollowingEyes } from "./ui/FollowingEyes";
 
 interface AdvisorState {
   advisorCoins: number;
@@ -328,22 +329,29 @@ export function ChatSidebar({
             }}
           >
             <div className="relative" style={{ flexShrink: 0 }}>
-              <Avatar className="w-12 h-12">
-                <AvatarImage
-                  src={bossContact.avatarImage}
-                  alt={bossContact.name}
-                />
-                <AvatarFallback
-                  style={{
-                    backgroundColor: "var(--primary)",
-                    color: "var(--primary-foreground)",
-                    fontFamily: "Inter, sans-serif",
-                    fontWeight: "var(--font-weight-medium)",
-                  }}
-                >
-                  {bossContact.avatar}
-                </AvatarFallback>
-              </Avatar>
+              <FollowingEyes
+                eyeSize={8}
+                pupilSize={3}
+                eyeSpacing={0.6}
+                eyeVerticalPosition={0.5}
+              >
+                <Avatar className="w-12 h-12">
+                  <AvatarImage
+                    src={bossContact.avatarImage}
+                    alt={bossContact.name}
+                  />
+                  <AvatarFallback
+                    style={{
+                      backgroundColor: "var(--primary)",
+                      color: "var(--primary-foreground)",
+                      fontFamily: "Inter, sans-serif",
+                      fontWeight: "var(--font-weight-medium)",
+                    }}
+                  >
+                    {bossContact.avatar}
+                  </AvatarFallback>
+                </Avatar>
+              </FollowingEyes>
               {bossContact.online && (
                 <div
                   className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2"

@@ -133,7 +133,8 @@ export function createBossHelpAgent(
   // Build context-aware instructions
   let contextSection = "";
   if (currentConsultationContext) {
-    const { characterName, topic, scenarioSummary } = currentConsultationContext;
+    const { characterName, topic, scenarioSummary } =
+      currentConsultationContext;
 
     if (language === "finnish") {
       contextSection = `

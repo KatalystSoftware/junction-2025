@@ -559,7 +559,9 @@ export async function generateVoiceMessage(
     // Return relative URL so it works through Vite proxy
     const audioUrl = `/api/game/audio/${audioId}`;
 
-    console.log(`🔊 Audio saved to disk: ${audioId}.mp3 (${audioBuffer.length} bytes)`);
+    console.log(
+      `🔊 Audio saved to disk: ${audioId}.mp3 (${audioBuffer.length} bytes)`,
+    );
 
     // Determine urgency from emotional state
     let urgency: "calm" | "concerned" | "urgent" | "excited" = "calm";

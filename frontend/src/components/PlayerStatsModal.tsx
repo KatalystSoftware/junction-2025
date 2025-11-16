@@ -79,7 +79,11 @@ export function PlayerStatsModal({
 
   // Handle restart game
   const handleRestartGame = () => {
-    if (confirm("Are you sure you want to restart the game? All progress will be lost.")) {
+    if (
+      confirm(
+        "Are you sure you want to restart the game? All progress will be lost.",
+      )
+    ) {
       localStorage.clear();
       window.location.reload();
     }

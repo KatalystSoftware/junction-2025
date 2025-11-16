@@ -9,6 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
+import { FollowingEyes } from "./ui/FollowingEyes";
 import {
   Send,
   MoreVertical,
@@ -34,7 +35,7 @@ import { useTranslation } from "../utils/translations";
 
 // Helper function to convert quality score (0-10) to quality level key
 function getQualityLevel(
-  score: number
+  score: number,
 ): "excellent" | "good" | "adequate" | "belowAverage" | "poor" {
   if (score >= 9) return "excellent";
   if (score >= 7) return "good";
@@ -286,19 +287,42 @@ export function ChatWindow({
             className="relative cursor-pointer"
             onClick={() => setShowProfileModal(true)}
           >
-            <Avatar className="w-10 h-10">
-              <AvatarImage src={contact.avatarImage} alt={contact.name} />
-              <AvatarFallback
-                style={{
-                  backgroundColor: "var(--primary)",
-                  color: "var(--primary-foreground)",
-                  fontFamily: "Inter, sans-serif",
-                  fontWeight: "var(--font-weight-medium)",
-                }}
+            {contact.id === "boss-pinned" ? (
+              <FollowingEyes
+                eyeSize={7}
+                pupilSize={3}
+                eyeSpacing={0.6}
+                eyeVerticalPosition={0.5}
               >
-                {contact.avatar}
-              </AvatarFallback>
-            </Avatar>
+                <Avatar className="w-10 h-10">
+                  <AvatarImage src={contact.avatarImage} alt={contact.name} />
+                  <AvatarFallback
+                    style={{
+                      backgroundColor: "var(--primary)",
+                      color: "var(--primary-foreground)",
+                      fontFamily: "Inter, sans-serif",
+                      fontWeight: "var(--font-weight-medium)",
+                    }}
+                  >
+                    {contact.avatar}
+                  </AvatarFallback>
+                </Avatar>
+              </FollowingEyes>
+            ) : (
+              <Avatar className="w-10 h-10">
+                <AvatarImage src={contact.avatarImage} alt={contact.name} />
+                <AvatarFallback
+                  style={{
+                    backgroundColor: "var(--primary)",
+                    color: "var(--primary-foreground)",
+                    fontFamily: "Inter, sans-serif",
+                    fontWeight: "var(--font-weight-medium)",
+                  }}
+                >
+                  {contact.avatar}
+                </AvatarFallback>
+              </Avatar>
+            )}
             {contact.online && (
               <div
                 className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2"
@@ -568,7 +592,9 @@ export function ChatWindow({
                         </p>
                       ),
                       strong: ({ children }) => (
-                        <strong style={{ fontWeight: "var(--font-weight-semibold)" }}>
+                        <strong
+                          style={{ fontWeight: "var(--font-weight-semibold)" }}
+                        >
                           {children}
                         </strong>
                       ),
@@ -606,9 +632,10 @@ export function ChatWindow({
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{
-                            color: message.role === "user"
-                              ? "var(--primary-foreground)"
-                              : "var(--primary)",
+                            color:
+                              message.role === "user"
+                                ? "var(--primary-foreground)"
+                                : "var(--primary)",
                             textDecoration: "underline",
                           }}
                         >
@@ -939,12 +966,14 @@ export function ChatWindow({
                     }}
                   >
                     <strong>{t.consultationEnd.quality}</strong>{" "}
-                    {t.qualityLevels[
-                      getQualityLevel(
-                        conversationEndData.financialResults.evaluation
-                          .qualityScore || 5
-                      )
-                    ]}
+                    {
+                      t.qualityLevels[
+                        getQualityLevel(
+                          conversationEndData.financialResults.evaluation
+                            .qualityScore || 5,
+                        )
+                      ]
+                    }
                   </p>
                 </div>
               )}
@@ -971,9 +1000,13 @@ export function ChatWindow({
                 <div className="space-y-1">
                   {conversationEndData.achievementsUnlocked.map(
                     (achievement: any, idx: number) => {
-                      const translatedAchievement = achievement.id && t.achievements[achievement.id]
-                        ? t.achievements[achievement.id]
-                        : { name: achievement.title || achievement.name, description: achievement.description };
+                      const translatedAchievement =
+                        achievement.id && t.achievements[achievement.id]
+                          ? t.achievements[achievement.id]
+                          : {
+                              name: achievement.title || achievement.name,
+                              description: achievement.description,
+                            };
 
                       return (
                         <div
