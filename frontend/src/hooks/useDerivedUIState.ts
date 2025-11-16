@@ -130,6 +130,7 @@ export function useDerivedUIState(
 
       return {
         id: thread.threadId,
+        characterId: thread.characterId,
         name: charInfo?.name || "Client",
         avatar: charInfo?.name ? getAvatarInitials(charInfo.name) : "CL",
         avatarImage: charInfo?.gender
