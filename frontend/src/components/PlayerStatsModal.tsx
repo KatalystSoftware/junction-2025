@@ -290,7 +290,7 @@ export function PlayerStatsModal({
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 min-h-0">
+        <ScrollArea className="flex-1 h-0">
           <Tabs defaultValue="stats" className="px-6 py-4">
             <TabsList className="grid grid-cols-4 w-full mb-6">
               <TabsTrigger value="stats">Stats</TabsTrigger>
