@@ -62,9 +62,9 @@ export function PlayerStatsModal({
 
   // Load player profile from localStorage
   useEffect(() => {
-    const userProfileStr = localStorage.getItem("userProfile");
-    if (userProfileStr) {
-      try {
+    try {
+      const userProfileStr = localStorage.getItem("userProfile");
+      if (userProfileStr) {
         const userProfile = JSON.parse(userProfileStr);
         if (userProfile.name) {
           setPlayerName(userProfile.name);
@@ -72,9 +72,10 @@ export function PlayerStatsModal({
         if (userProfile.avatar) {
           setPlayerAvatarUrl(getPlayerAvatarUrl(userProfile.avatar));
         }
-      } catch (e) {
-        console.error("Failed to parse userProfile:", e);
       }
+    } catch (e) {
+      console.warn("Failed to access localStorage or parse userProfile:", e);
+      // Fallback to defaults (already set in useState)
     }
   }, [open]); // Reload when modal opens
 
@@ -85,7 +86,11 @@ export function PlayerStatsModal({
         "Are you sure you want to restart the game? All progress will be lost.",
       )
     ) {
-      localStorage.clear();
+      try {
+        localStorage.clear();
+      } catch (e) {
+        console.warn("Failed to clear localStorage:", e);
+      }
       window.location.reload();
     }
   };
@@ -260,7 +265,7 @@ export function PlayerStatsModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-2xl max-h-[90vh] p-0 overflow-hidden"
+        className="max-w-2xl max-h-[calc(100dvh-4rem)] p-0 overflow-hidden"
         style={{
           backgroundColor: "var(--card)",
           borderColor: "var(--border)",
@@ -285,7 +290,7 @@ export function PlayerStatsModal({
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[calc(90vh-80px)]">
+        <ScrollArea className="max-h-[calc(100dvh-12rem)]">
           <Tabs defaultValue="stats" className="px-6 py-4">
             <TabsList className="grid grid-cols-4 w-full mb-6">
               <TabsTrigger value="stats">Stats</TabsTrigger>

@@ -54,9 +54,9 @@ export function ChatSidebar({
 
   // Load player profile from localStorage
   useEffect(() => {
-    const userProfileStr = localStorage.getItem("userProfile");
-    if (userProfileStr) {
-      try {
+    try {
+      const userProfileStr = localStorage.getItem("userProfile");
+      if (userProfileStr) {
         const userProfile = JSON.parse(userProfileStr);
         if (userProfile.name) {
           setPlayerName(userProfile.name);
@@ -64,9 +64,10 @@ export function ChatSidebar({
         if (userProfile.avatar) {
           setPlayerAvatarUrl(getPlayerAvatarUrl(userProfile.avatar));
         }
-      } catch (e) {
-        console.error("Failed to parse userProfile:", e);
       }
+    } catch (e) {
+      console.warn("Failed to access localStorage or parse userProfile:", e);
+      // Fallback to defaults (already set in useState)
     }
   }, []);
 

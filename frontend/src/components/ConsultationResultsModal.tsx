@@ -251,44 +251,59 @@ export function ConsultationResultsModal({
                   ✅ Actionable Items
                 </h3>
                 <div className="space-y-2">
-                  {extractedActions.map((action, idx) => {
-                    const icon = ACTION_ICONS[action.actionType] || "📝";
-                    let description = action.actionType
-                      .replace(/_/g, " ")
-                      .replace(/\b\w/g, (l) => l.toUpperCase());
+                  {extractedActions.length === 0 ? (
+                    <p
+                      style={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: "var(--text-sm)",
+                        color: "var(--muted-foreground)",
+                        textAlign: "center",
+                        padding: "var(--spacing-8)",
+                      }}
+                    >
+                      No specific actions identified. General financial guidance
+                      provided.
+                    </p>
+                  ) : (
+                    extractedActions.map((action, idx) => {
+                      const icon = ACTION_ICONS[action.actionType] || "📝";
+                      let description = action.actionType
+                        .replace(/_/g, " ")
+                        .replace(/\b\w/g, (l) => l.toUpperCase());
 
-                    if (action.specificSubscription) {
-                      description += `: ${action.specificSubscription}`;
-                    } else if (action.targetCategory) {
-                      description += ` in ${action.targetCategory}`;
-                    }
+                      if (action.specificSubscription) {
+                        description += `: ${action.specificSubscription}`;
+                      } else if (action.targetCategory) {
+                        description += ` in ${action.targetCategory}`;
+                      }
 
-                    if (action.reductionPercent) {
-                      description += ` by ${action.reductionPercent}%`;
-                    }
+                      if (action.reductionPercent) {
+                        description += ` by ${action.reductionPercent}%`;
+                      }
 
-                    return (
-                      <div
-                        key={idx}
-                        className="flex items-center gap-3 p-3 rounded-lg border"
-                        style={{
-                          backgroundColor: "var(--muted)",
-                          borderColor: "var(--border)",
-                        }}
-                      >
-                        <span style={{ fontSize: "1.5rem" }}>{icon}</span>
-                        <span
+                      return (
+                        <div
+                          key={idx}
+                          className="flex items-center gap-3 p-3 rounded-lg border"
                           style={{
-                            fontFamily: "Inter, sans-serif",
-                            fontSize: "var(--text-sm)",
-                            color: "var(--card-foreground)",
+                            backgroundColor: "var(--muted)",
+                            borderColor: "var(--border)",
                           }}
                         >
-                          {description}
-                        </span>
-                      </div>
-                    );
-                  })}
+                          <span style={{ fontSize: "1.5rem" }}>{icon}</span>
+                          <span
+                            style={{
+                              fontFamily: "Inter, sans-serif",
+                              fontSize: "var(--text-sm)",
+                              color: "var(--card-foreground)",
+                            }}
+                          >
+                            {description}
+                          </span>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
               </div>
             )}

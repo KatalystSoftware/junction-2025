@@ -80,17 +80,20 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
     };
   }, [game.threadHistories]);
 
-  // Auto-trigger onboarding on first load
+  // Auto-trigger onboarding on first load (with race condition protection)
+  const hasTriggeredOnboarding = useRef(false);
   useEffect(() => {
     if (
       game.advisorState &&
       !game.advisorState.hasCompletedOnboarding &&
-      !game.isStartingConsultation
+      !game.isStartingConsultation &&
+      !hasTriggeredOnboarding.current
     ) {
       console.log("👔 Starting onboarding...");
+      hasTriggeredOnboarding.current = true;
       game.startConsultation();
     }
-  }, [game.advisorState?.hasCompletedOnboarding]);
+  }, [game.advisorState?.hasCompletedOnboarding, game.isStartingConsultation]);
 
   // Handle responses from mutations
   useEffect(() => {
