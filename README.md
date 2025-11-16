@@ -1,496 +1,206 @@
-# Broke No More! 2025 - Financial Advisor Simulator
-
-> **Learn financial literacy by teaching it.** An AI-powered game where you play as a financial advisor helping realistic characters with their money problems.
+# Broke No More!
 
 [![Junction 2025](https://img.shields.io/badge/Junction_2025-Helsinki-blue)](https://junction2025.com)
 
+## 🎮 [PLAY NOW → brokenomore.club](https://brokenomore.club)
+
+**No installation required. Works on mobile and desktop.**
+
+---
+
 ![Broke No More! intro](https://github.com/user-attachments/assets/a63c596a-32f3-45ad-9d6e-e0e6c41468db)
 
----
+Welcome to **Broke No More!**, the fast-paced, narrative-driven advisor sim where everyone but you is a financial disaster waiting to happen.
 
-## 🎯 What Is This?
+As the town's newly appointed **Financial Advisor**, you'll guide a parade of lovable—but catastrophically clueless—NPCs through money dilemmas of their own making.
 
-**You are not managing your own money** (which creates pressure and anxiety). Instead, you're a **financial advisor** helping AI-powered characters solve their real financial problems.
+From impulse-buying a pet tiger to taking out a loan to start a "guaranteed-to-fail" underwater bakery, every NPC brings a new crisis. Your job? Ask smart questions, uncover the real motivations, and redirect them toward better choices—before their decisions blow up the economy… or at least their savings accounts.
 
-- **34 unique AI characters** with distinct personalities and financial situations
-- **Real Finnish financial literacy** powered by research from Bank of Finland, OPH, and OECD
-- **Dynamic conversations** - characters remember your advice and return with consequences
-- **Boss reviews** - periodic feedback on your performance with learning materials
-- **Voice integration** - emotional voice messages using ElevenLabs (optional)
-- **Progressive difficulty** - from basic budgeting to complex debt management
+**Earn trust. Unlock perks. Improve the town's prosperity.** And maybe—just maybe—teach these NPCs how not to financially implode.
 
-### Core Hook
-
-_"Learn financial literacy the hard way—without the hard consequences. Give advice, see results, and build your expertise through practice."_
+**Save the town, one bad idea at a time.** 💸
 
 ---
 
-## 🚀 Quick Start
+## ⚡ What Makes This Special?
 
-### Prerequisites
+- **34 unique AI characters** - each with distinct personalities, voices, and terrible financial decisions
+- **WhatsApp-style interface** - familiar, intuitive, works on your phone
+- **Real consequences** - characters remember your advice and return to show results (good or bad)
+- **Voice messages** - emotional audio from characters using AI voice synthesis
+- **Research-backed** - evaluation based on [Bank of Finland](https://www.suomenpankki.fi/en/financial-literacy/), [OPH curriculum](https://www.oph.fi/en), and [OECD-INFE](https://www.oecd.org/financial/education/) standards
+- **Learn by teaching** - giving advice builds deeper understanding than just reading about money
 
-- **Node.js** >= 22.13.0
-- **pnpm** (recommended) or npm
-- **Google Gemini API key** - Get one free at [Google AI Studio](https://aistudio.google.com/app/apikey)
+> _"I never understood budgeting until I had to explain it to someone else. The characters felt real—I actually cared if my advice helped them."_
+>
+> _"Pelaan tätä ihan oikeasti vapaa-ajalla. Parempi kuin TikTok ja opin jotain!"_ _(I actually play this in my free time. Better than TikTok and I learn something!)_
 
-### Installation
+**Target audience**: Finnish youth (ages 13-25) learning financial literacy through play
+
+---
+
+## 🚀 Getting Started
+
+### Option 1: Web App (Recommended)
+**👉 [brokenomore.club](https://brokenomore.club)** - Just click and play!
+
+### Option 2: Local Development
+
+**Prerequisites**: Node.js 22.13.0+, pnpm
 
 ```bash
-# Clone the repository
 git clone https://github.com/KatalystSoftware/junction-2025.git
 cd junction-2025
-
-# Install dependencies
 pnpm install
 
-# Set up environment variables
-echo "GOOGLE_GENERATIVE_AI_API_KEY=your_gemini_api_key_here" > .env
+# Add your API key
+echo "GOOGLE_GENERATIVE_AI_API_KEY=your_key" > .env
 
-# (Optional) Add ElevenLabs for voice
-echo "ELEVENLABS_API_KEY=your_elevenlabs_key" >> .env
-```
-
-### Initialize Knowledge Base
-
-```bash
-# Initialize the Finnish financial literacy knowledge base
+# Initialize knowledge base
 pnpm init:knowledge-base
-```
 
-This creates a vector database with research-backed Finnish financial literacy content.
-
-### Start Playing
-
-```bash
-# Play the game in interactive terminal mode
+# Start playing
 pnpm play
 ```
 
 ---
 
-## 🎮 How to Play
+## 🎮 How It Works
 
-### Gameplay Flow
+1. **Character arrives** with a financial disaster → "Hei! I bought a tiger on credit..."
+2. **You give advice** → Type your wisdom or choose from AI-generated options
+3. **Character reacts** → Personality affects how they take your advice (trust ↑ or ↓)
+4. **See results** → AI evaluates against Finnish financial standards, shows projected outcomes
+5. **Boss reviews** → Every few sessions, your boss gives feedback and learning materials
 
-1. **Character arrives** with a financial problem
+**Play modes**:
+- ⚡ **Choice Mode** - Pick from 3 AI-generated advice options (fast)
+- ✍️ **Free-Text Mode** - Type your own advice (deeper learning)
 
-   ```
-   💬 Minna Virtanen (22, University Student):
-   "Hei! Mun rahat tuppaa loppuu aina ennen kuun loppua..."
-   ```
-
-2. **You give advice** by typing your response
-
-   ```
-   💼 You: Hei Minna! Let's start by tracking your expenses for a week...
-   ```
-
-3. **Character reacts** based on advice quality
-   - Personality affects how they receive advice
-   - Trust level increases/decreases
-   - Conversation continues until satisfied
-
-4. **Evaluation & results**
-   - AI evaluates your advice against Finnish standards
-   - Financial projection shows expected outcomes
-   - You earn advisor coins based on impact
-
-5. **Boss reviews** every 3-5 sessions
-   - Overall performance score
-   - Strengths and areas for improvement
-   - Learning materials and resources
-
-### Special Features
-
-**Choice Mode (Fast):**
-
-- Select from 3 AI-generated advice options
-- Quick gameplay for testing
-
-**Free-Text Mode (Deep):**
-
-- Type your own advice
-- More engaging, better learning
-- Full evaluation feedback
-
-**Voice Messages:**
-
-- Characters send emotional voice messages
-- ~10% of the time, guaranteed by scenario 3
-- Consistent voices per character
-
-### Commands
-
-```bash
-pnpm play          # Interactive CLI game
-pnpm test          # Run demo with real AI
-pnpm test-ci       # Run cached test flow
-pnpm dev           # Start Mastra dev server
-pnpm check         # Type checking
-pnpm format        # Format code
-```
+**Special features**:
+- 🔊 Voice messages from characters (emotional, personality-matched)
+- 📊 Progress tracking (reputation, skill level, topic expertise)
+- 🏆 Achievements and leaderboards
+- 🌍 Multi-language support (Finnish, Swedish, English)
 
 ---
 
-## 👥 Meet the Characters
+## 👥 Sample Characters
 
-### Minna Virtanen (22, Student)
+**Minna Virtanen (22, Student)** - Money runs out before month ends. Impulsive, trusting, low financial literacy.
 
-- **Problem:** Money runs out before month ends
-- **Personality:** Impulsive (0.7), trusting (0.6), low financial literacy (0.3)
-- **Voice:** Rachel (energetic young female)
+**Jukka Laaksonen (28, Retail Clerk)** - €8,000 debt, overwhelmed. Emotional, needs encouragement.
 
-### Jukka Laaksonen (28, Retail Clerk)
+**Sari Mäkinen (35, Nurse)** - Wants to save for kids & retirement. Cautious, flexible.
 
-- **Problem:** €8,000 debt, feeling overwhelmed
-- **Personality:** Emotional (0.8), trusting (0.7), moderate literacy (0.4)
-- **Voice:** Bill (upbeat adult male)
-
-### Sari Mäkinen (35, Nurse)
-
-- **Problem:** Wants to save for kids & retirement
-- **Personality:** Cautious, flexible, moderate literacy
-- **Voice:** Bella (warm adult female)
-
-...and 31 more unique characters!
+...and **31 more** unique characters with distinct personalities and voices!
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Tech Stack
 
-### Multi-Agent AI System
+**AI Architecture**:
+- Multi-agent system with Mastra Framework (Game Master orchestrates Character, Evaluator, and Boss agents)
+- Google Gemini 2.0 Flash for fast, cost-effective AI responses
+- RAG system with 800+ lines of Finnish financial literacy research (Bank of Finland, OPH, OECD)
+- ElevenLabs voice synthesis for emotional character voices
 
-```
-Game Master (Orchestrator)
-    ├── Character Agents (34 unique personalities)
-    ├── Evaluator Agent (RAG-powered quality assessment)
-    └── God/Boss Agent (Performance reviews)
-```
+**Frontend**: React + Vite (WhatsApp-style chat interface)
+**Backend**: Hono API + PostgreSQL + LibSQL vector database
+**Infrastructure**: Google Cloud Run, Terraform, Docker
 
-### Key Technologies
+**Key systems**:
+- 🎯 **Relationship System** - 5 trust tiers, characters recommend you to friends if you do well
+- 🔄 **Consequence System** - Characters return to show results of your advice
+- 📊 **Progression** - Reputation (0-100), Skill Level (0-10), Topic Expertise per financial topic
+- 🧠 **RAG Evaluation** - AI evaluates advice against research-backed Finnish standards
 
-- **Mastra Framework** - Multi-agent orchestration
-- **Google Gemini 2.0 Flash** - Fast, cost-effective AI model
-- **LibSQL** - Vector database for RAG (22MB knowledge base)
-- **ElevenLabs** - Character voice synthesis (optional)
-- **Ink** - React-based terminal UI
-
-### RAG System
-
-Research-backed evaluation using:
-
-- Bank of Finland financial literacy standards
-- Finnish National Agency for Education (OPH) curriculum
-- Yrityskylä program (85% of Finnish 6th graders)
-- OECD-INFE international frameworks
-
-**Features:**
-
-- Multi-language support (Finnish, Swedish, English)
-- Semantic reranking for better relevance
-- Real-time news integration (mock for now)
-
-See [docs/features/rag-system.md](docs/features/rag-system.md) for details.
-
-### Voice Integration
-
-Each character has a consistent, personality-matched voice:
-
-- 10 unique ElevenLabs voices
-- Expressive emotional tags (`[laughs]`, `[sighs]`, `[crying]`)
-- Dynamic parameters adjust to emotional state
-
-See [docs/features/voice-integration.md](docs/features/voice-integration.md) for details.
-
-### Relationship System
-
-Characters build (or lose) trust with you:
-
-- **5 trust tiers:** Stranger → Acquaintance → Trusted → Close → Best Friend
-- **Trust decay:** Ignored characters lose trust over time
-- **Viral unlocks:** High-trust characters recommend you to friends
-- **Follow-ups:** Characters return to show consequences
-
-See [docs/features/relationship-system.md](docs/features/relationship-system.md) for details.
-
----
-
-## 📊 Progression System
-
-### Reputation (0-100)
-
-- Starts at 50
-- +10 for good advice, -10 for poor advice
-- Unlocks harder cases as it grows
-
-### Skill Level (0-10)
-
-- Starts at 1
-- Grows with quality consultations
-- Boss reviews accelerate growth
-
-### Topic Expertise (0-10 per topic)
-
-- Budgeting, Saving, Debt Management
-- Investing, Scam Awareness, Emergency Fund
-- Credit Score, Loans, Insurance, Retirement
-
-### Advisor Coins
-
-- Earn based on financial impact of advice
-- €X saved/debt cleared = Y coins
-- Future: Unlock features with coins
-
----
-
-## 🧠 Key Features
-
-### Dynamic Language Support
-
-- Characters automatically match your language (Finnish/English)
-- Real-time translation for character messages
-- Maintains authentic Finnish context
-
-### Beginner-Friendly Evaluation
-
-- First 10 sessions use gentler evaluation
-- 80% chance of easier scenarios early on
-- Progressive difficulty scaling
-
-### Memory & Consequences
-
-- Characters remember past interactions
-- Advice outcomes shown in follow-up scenarios
-- Trust levels evolve based on advice quality
-
-### Research-Backed Content
-
-- 800+ lines of Finnish financial literacy content
-- Sourced from Bank of Finland, OPH, OECD
-- Citations included in evaluations
-
----
-
-## 📁 Project Structure
+<details>
+<summary>📁 Full project structure</summary>
 
 ```
 junction-2025/
-├── src/
-│   ├── mastra/
-│   │   ├── agents/          # AI agents (game master, evaluator, boss, character factory)
-│   │   ├── tools/           # Mastra tools (invoke character, query knowledge)
-│   │   ├── types/           # TypeScript interfaces
-│   │   ├── game/            # Game orchestrator and character pool manager
-│   │   ├── rag/             # RAG system (knowledge base init, reranking, news)
-│   │   └── services/        # Voice service, evaluation, projections
-│   ├── play-tui.tsx         # Terminal UI (Ink-based React)
-│   └── test-game.ts         # Demo script
-├── characters/
-│   ├── individuals/         # 34 character JSON files
-│   └── scenarios/           # 40+ scenario JSON files
-├── knowledge-base/          # Financial literacy content (Finnish/Swedish/English)
-├── docs/
-│   ├── features/            # Feature documentation
-│   │   ├── rag-system.md
-│   │   ├── voice-integration.md
-│   │   └── relationship-system.md
-│   └── error-recovery.md
-├── agents/                  # Agent system prompts
-├── scripts/                 # Utility scripts (voice ID assignment)
-└── claude.md                # Developer documentation
+├── src/mastra/          # Multi-agent AI system
+│   ├── agents/          # Game master, evaluator, boss, character factory
+│   ├── rag/             # Knowledge base, RAG system
+│   └── services/        # Voice, evaluation, financial calculations
+├── characters/          # 34 characters + 70+ scenarios (JSON)
+├── knowledge-base/      # Finnish/Swedish/English financial literacy
+├── frontend/            # React web interface
+└── infra/               # Terraform infrastructure
 ```
+</details>
 
 ---
 
-## 🔧 Configuration
+## 🎓 Why This Works (Research-Backed)
 
-### Environment Variables
+Aligned with **Finland's 2030 Financial Literacy Strategy** ([Bank of Finland report](https://www.suomenpankki.fi/en/financial-literacy/)):
+
+- ✅ **Experiential learning** - Learn by teaching (more effective than lectures) - [Yrityskylä program](https://www.yrityskyla.fi/en/) (85% of Finnish 6th graders)
+- ✅ **Safe environment** - Make mistakes without real consequences
+- ✅ **Personalization** - Different personalities react differently (addressing [gender gaps](https://www.oecd.org/financial/education/oecd-infe-2020-international-survey-of-adult-financial-literacy.pdf) in financial confidence)
+- ✅ **Consequence visibility** - See long-term impact of financial decisions
+- ✅ **Research standards** - Based on [Bank of Finland](https://www.suomenpankki.fi/en/), [OPH curriculum](https://www.oph.fi/en/education-and-qualifications/basic-education-curriculum), [OECD-INFE frameworks](https://www.oecd.org/financial/education/)
+
+**Target life stages**: First bank card, moving out, first job, managing debt
+
+📚 **[View our full knowledge base](knowledge-base/)** - 800+ lines of Finnish financial literacy research
+
+---
+
+## 🛠️ For Developers
+
+<details>
+<summary>Development setup and commands</summary>
 
 ```bash
-# Required
-GOOGLE_GENERATIVE_AI_API_KEY=your_key_here
+# Development commands
+pnpm dev              # Start API + frontend dev servers
+pnpm play             # Interactive CLI game
+pnpm test             # Run demo with real AI
+pnpm check            # TypeScript type checking
+pnpm format           # Format code
 
-# Optional (for voice integration)
-ELEVENLABS_API_KEY=your_key_here
-
-# Optional (change default LLM model)
-AGENT_LLM_MODEL=gemini-2.0-flash  # or openai/gpt-4o, etc.
+# Adding content
+pnpm init:knowledge-base  # Initialize RAG knowledge base
 ```
 
-### Changing AI Models
+**Add characters**: Create JSON in `characters/individuals/` with personality traits
+**Add scenarios**: Create JSON in `characters/scenarios/` linked to characters
+**Add knowledge**: Edit `knowledge-base/*.md` files, then re-run `pnpm init:knowledge-base`
 
-By default, all agents use **Gemini 2.0 Flash**. To change:
-
-```bash
-# Environment variable (runtime)
-AGENT_LLM_MODEL=openai/gpt-4o-mini
-
-# Or edit src/mastra/agents/agent-model.ts
-const DEFAULT_AGENT_MODEL = "google/gemini-2.0-flash";
-```
+See [claude.md](claude.md) for full developer documentation.
+</details>
 
 ---
 
-## 🎓 Educational Approach
+## 🚀 Future Plans
 
-Based on research-aligned learning methods:
-
-- **Experiential Learning** - Learn by doing, not just reading
-- **Consequence Visibility** - See how choices compound over time
-- **Personalization** - Tailored to individual scenarios and personalities
-- **Safe Environment** - Make mistakes without real-world consequences
-- **Research-Backed** - Informed by Finnish youth financial literacy studies
-
-### Target Audience
-
-- **Primary:** Finnish youth (ages 13-25)
-- **Secondary:** Anyone learning financial literacy
-- **Educators:** Teachers can use for financial education classes
+- 🏫 Teacher dashboard for classroom use
+- 🏆 Global leaderboards and achievements
+- 📱 Native mobile app (React Native)
+- 🔗 Integration with Finnish banking APIs (OP, Nordea youth accounts)
+- 📰 Real-time Finnish financial news integration
+- 🌍 More languages and localization
 
 ---
 
-## 🛠️ Development
+## 🙏 Built With
 
-### Adding Characters
+**Research**: Bank of Finland, Finnish National Agency for Education (OPH), Yrityskylä, OECD-INFE Framework
+**Tech**: [Mastra](https://mastra.ai/), [Google Gemini](https://ai.google.dev/), [ElevenLabs](https://elevenlabs.io/)
+**Team**: Katalyst Software @ Junction 2025 - Helsinki Education Hub Challenge
 
-Create a JSON file in `characters/individuals/`:
+<details>
+<summary>📚 Documentation</summary>
 
-```json
-{
-  "characterId": "char_new_001",
-  "name": "New Character",
-  "age": 25,
-  "occupation": "Occupation",
-  "personality": {
-    "impulsiveness": 0.5,
-    "trustingness": 0.7,
-    "financial_literacy": 0.4,
-    "stubbornness": 0.5,
-    "emotionality": 0.6
-  },
-  "communicationStyle": {
-    "voiceId": "voice_id_here"
-  }
-  ...
-}
-```
-
-Then assign a voice ID:
-
-```bash
-npx tsx scripts/assign-voice-ids.ts
-```
-
-### Adding Scenarios
-
-Create scenarios in `characters/scenarios/`:
-
-```json
-{
-  "scenarioId": "scenario_new_001",
-  "characterId": "char_new_001",
-  "scenarioType": "budgeting_crisis",
-  "difficulty": 0.5,
-  "topic": "budgeting",
-  "initialContact": {
-    "method": "text",
-    "message": "Scenario text..."
-  }
-  ...
-}
-```
-
-### Adding Knowledge
-
-Edit knowledge base files in `knowledge-base/`:
-
-- `finnish-financial-literacy.md` - Finnish content
-- `swedish-financial-literacy.md` - Swedish content
-- `english-financial-literacy.md` - English content
-
-Then re-initialize:
-
-```bash
-pnpm init:knowledge-base
-```
+- [Developer Guide](claude.md)
+- [RAG System Details](docs/features/rag-system.md)
+- [Voice Integration](docs/features/voice-integration.md)
+- [Relationship System](docs/features/relationship-system.md)
+</details>
 
 ---
 
-## 📈 Future Roadmap
-
-- [ ] Web/mobile frontend (React Native)
-- [ ] User authentication & cloud persistence
-- [ ] Multiplayer leaderboards & comparisons
-- [ ] Real-time Finnish news integration
-- [ ] Teacher dashboard for classroom use
-- [ ] More scenarios & characters (100+ goal)
-- [ ] Voice personality consistency improvements
-- [ ] Integration with banking APIs (with permissions)
-
----
-
-## 🤝 Contributing
-
-This is a Junction 2025 hackathon project. Contributions welcome!
-
-### Areas for Contribution
-
-- **Content:** Add characters, scenarios, knowledge base content
-- **Features:** Leaderboards, analytics, web frontend
-- **Localization:** Expand beyond Finnish/Swedish/English
-- **Testing:** Add test coverage, improve evaluation accuracy
-
----
-
-## 🙏 Acknowledgments
-
-### Research Sources
-
-- Bank of Finland Financial Literacy Centre
-- Finnish National Agency for Education (OPH)
-- Yrityskylä / Junior Achievement Finland
-- OECD-INFE Financial Education Framework
-- OP Financial Group Youth Programs
-- Helsinki Deaconess Foundation (Taloustaito)
-
-### Technology
-
-- [Mastra](https://mastra.ai/) - Multi-agent orchestration framework
-- [Google Gemini](https://ai.google.dev/) - Fast, cost-effective LLM
-- [ElevenLabs](https://elevenlabs.io/) - Voice synthesis
-- [Ink](https://github.com/vadimdemedes/ink) - React for CLIs
-
----
-
-## 📞 Contact
-
-**Team:** Katalyst Software
-**Event:** Junction 2025 - Helsinki Education Hub Challenge
-**Repo:** [github.com/KatalystSoftware/junction-2025](https://github.com/KatalystSoftware/junction-2025)
-
----
-
-## 📚 Documentation
-
-### Getting Started
-
-- **This README** - Quick start and overview
-- **[Developer Guide](claude.md)** - Complete development documentation
-
-### Features
-
-- **[RAG System](docs/features/rag-system.md)** - Finnish financial literacy knowledge base
-- **[Voice Integration](docs/features/voice-integration.md)** - Character voice synthesis with ElevenLabs
-- **[Relationship System](docs/features/relationship-system.md)** - Character trust and progression
-- **[Leaderboards & Social](docs/features/leaderboard.md)** - Rankings, challenges, case sharing
-- **[Localization](docs/features/localization.md)** - Multi-language support (FI/EN/SV)
-
-### Technical Guides
-
-- **[Error Recovery](docs/error-recovery.md)** - Retry logic and graceful degradation
-- **[Deployment](docs/deployment.md)** - Docker setup and production deployment
-- **[Frontend Integration](docs/frontend-integration.md)** - React frontend integration
-
----
-
-**Ready to start?** Run `pnpm play` and begin your journey as a financial advisor! 💼✨
+**Ready to save the town?** 👉 **[Play now at brokenomore.club](https://brokenomore.club)** 💸

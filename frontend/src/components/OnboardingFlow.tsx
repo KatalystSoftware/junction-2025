@@ -29,7 +29,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const [userAvatar, setUserAvatar] = useState("");
   const [userLanguage, setUserLanguage] = useState("en"); // Default to English
 
-  const totalScreens = 3;
+  const totalScreens = 2;
 
   // Language options
   const languageOptions = [
@@ -98,22 +98,6 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       isForm: true,
     },
     {
-      id: "welcome",
-      icon: MessageSquare,
-      title: t.onboarding.welcomeTitle,
-      subtitle: t.onboarding.welcomeSubtitle,
-      description: t.onboarding.welcomeDescription,
-      illustration: "💼",
-      color: "var(--primary)",
-      gradient:
-        "linear-gradient(135deg, rgba(127, 86, 217, 0.1) 0%, rgba(105, 65, 198, 0.05) 100%)",
-      features: [
-        t.onboarding.features.chatNaturally,
-        t.onboarding.features.buildTrust,
-        t.onboarding.features.helpProgress,
-      ],
-    },
-    {
       id: "ready",
       icon: Sparkles,
       title: t.onboarding.readyTitle,
@@ -124,6 +108,11 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       gradient:
         "linear-gradient(135deg, rgba(127, 86, 217, 0.15) 0%, rgba(105, 65, 198, 0.08) 100%)",
       cta: t.onboarding.startJourney,
+      features: [
+        t.onboarding.features.chatNaturally,
+        t.onboarding.features.buildTrust,
+        t.onboarding.features.helpProgress,
+      ],
     },
   ];
 
