@@ -114,6 +114,15 @@ export interface CharacterRelationshipState {
   wasRecommended: boolean; // True if character was unlocked via recommendation
   hasReceivedVoiceMessage?: boolean; // Track if character has received a voice message
   currentScenarioNumber?: number; // Current scenario number in their story arc
+
+  // NEW: Per-character cumulative financial impact tracking
+  totalSavingsGenerated: number; // Total € saved from all consultations with this character
+  totalDebtCleared: number; // Total € debt reduced from all consultations with this character
+  projectedVsActual?: {
+    totalProjected: number; // Cumulative projected impact
+    totalActual: number; // Cumulative actual impact (from follow-ups)
+    accuracyRate: number; // Overall projection accuracy (0-1)
+  };
 }
 
 export interface CharacterConversationMemory {
@@ -363,6 +372,26 @@ export interface SessionGoal {
   createdAt: string;
 }
 
+export interface FinancialImpactHistoryEntry {
+  timestamp: string; // ISO date
+  sessionNumber: number; // Which session this was
+  characterId: string;
+  characterName: string;
+  scenarioId: string;
+  topic: FinancialTopic;
+  // Projected impact (calculated immediately after advice)
+  projectedSavings: number; // € expected to save
+  projectedDebtReduction: number; // € debt expected to reduce
+  categorySavings?: Record<string, number>; // Per-category breakdown
+  // Actual impact (populated when character returns with follow-up)
+  actualSavings?: number; // € actually saved (null until follow-up)
+  actualDebtReduction?: number; // € debt actually reduced (null until follow-up)
+  actualCategorySavings?: Record<string, number>; // Actual per-category (null until follow-up)
+  // Metadata
+  adviceQualityScore: number; // 0-10 evaluation score
+  wasFollowUp: boolean; // true if this entry is updating a previous projection with actual results
+}
+
 export interface AdvisorState {
   advisorId: string;
   reputation: number; // 0-100
@@ -407,6 +436,9 @@ export interface AdvisorState {
   isFired: boolean; // Whether the advisor has been fired
   fireReason?: string; // Reason for being fired
   criticalInterventionsForcedThrough: number; // Number of times critical interventions were forced through
+
+  // NEW: Financial Impact History (for visualization)
+  financialImpactHistory: FinancialImpactHistoryEntry[]; // Track all financial impacts over time
 }
 
 // ============================================================================
@@ -710,6 +742,22 @@ export interface GameResponse {
       reductionPercent?: number;
       confidence?: number;
     }>;
+  };
+
+  // NEW: Financial impact delta (for real-time visualization)
+  financialImpactUpdate?: {
+    savingsIncrement: number; // How much € added to portfolio this consultation
+    debtReductionIncrement: number; // How much € debt reduced this consultation
+    characterId: string; // Which character contributed this impact
+    characterName: string; // Character's name for notifications
+    isActual: boolean; // true = follow-up result (actual), false = projection
+    newLifetimeTotals: {
+      // Updated cumulative totals
+      savings: number;
+      debtCleared: number;
+    };
+    // Per-category breakdown
+    categorySavings?: Record<string, number>;
   };
 
   // NEW: Progress visualization

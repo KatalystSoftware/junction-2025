@@ -194,6 +194,84 @@ app.post("/init", async (c) => {
           `📊 Loaded ${Object.keys(threadMetadata).length} thread metadata`,
         );
 
+        // FALLBACK: Generate advice choices for threads that don't have them (old threads from before the fix)
+        let needsUpdate = false;
+        for (const [threadId, metadata] of Object.entries(threadMetadata)) {
+          if (!metadata.adviceChoices || metadata.adviceChoices.length === 0) {
+            console.log(
+              `🔧 Thread ${threadId.substring(0, 8)}... missing advice choices, generating fallback...`,
+            );
+
+            // Try to generate advice choices based on the scenario
+            try {
+              const threadInfo = advisorState.activeThreads[threadId];
+              if (threadInfo) {
+                const { characterPool } = await import(
+                  "../game/character-pool-manager.ts"
+                );
+                const { generateAdviceChoices } = await import(
+                  "../game/choice-generator.ts"
+                );
+
+                const character = characterPool.getCharacter(
+                  threadInfo.characterId,
+                );
+                const scenario = characterPool.getScenario(
+                  threadInfo.scenarioId,
+                );
+
+                if (character && scenario) {
+                  // Get conversation history for this thread to avoid repeating advice
+                  const history = threadHistories[threadId] || [];
+
+                  // Generate advice choices
+                  const choices = generateAdviceChoices(
+                    scenario,
+                    character.personality,
+                    history,
+                  );
+
+                  metadata.adviceChoices = choices;
+                  needsUpdate = true;
+
+                  console.log(
+                    `✅ Generated ${choices.length} advice choices for thread ${threadId.substring(0, 8)}...`,
+                  );
+                } else {
+                  console.log(
+                    `⚠️ Could not find character/scenario for thread ${threadId.substring(0, 8)}..., using empty array`,
+                  );
+                  metadata.adviceChoices = [];
+                  needsUpdate = true;
+                }
+              } else {
+                // Thread not in activeThreads, likely resolved - use empty array
+                metadata.adviceChoices = [];
+                needsUpdate = true;
+              }
+            } catch (error) {
+              console.error(
+                `❌ Failed to generate advice choices for thread ${threadId.substring(0, 8)}...:`,
+                error,
+              );
+              metadata.adviceChoices = [];
+              needsUpdate = true;
+            }
+          }
+        }
+
+        // Save updated metadata if any threads were fixed
+        if (needsUpdate) {
+          const metadataMap = new Map(Object.entries(threadMetadata));
+          await saveSession(
+            sessionId,
+            advisorState,
+            savedSession.threadHistories,
+            metadataMap,
+          );
+          console.log("💾 Saved updated threadMetadata with fallback choices");
+        }
+
         // Don't save - we just loaded this data, don't overwrite it
       } else {
         console.log(
@@ -283,10 +361,15 @@ app.post("/init", async (c) => {
             );
 
             // Save character metadata if provided
-            if (gameResponse.characterInfo) {
-              metadataMap.set(threadId, gameResponse.characterInfo);
+            if (gameResponse.characterInfo && threadId) {
+              const metadata: ThreadMetadata = {
+                characterName: gameResponse.characterInfo.name,
+                status: "active",
+                adviceChoices: gameResponse.adviceChoices || [],
+              };
+              metadataMap.set(threadId, metadata);
               console.log(
-                `👤 Auto-started: Saved character metadata for thread ${threadId.substring(0, 8)}...`,
+                `👤 Auto-started: Saved character metadata for thread ${threadId.substring(0, 8)}... (${metadata.adviceChoices?.length || 0} advice choices)`,
               );
             }
           }
@@ -446,10 +529,15 @@ app.post("/start-consultation", async (c) => {
       );
 
       // Save character metadata if provided
-      if (gameResponse.characterInfo) {
-        metadataMap.set(threadId, gameResponse.characterInfo);
+      if (gameResponse.characterInfo && threadId) {
+        const metadata: ThreadMetadata = {
+          characterName: gameResponse.characterInfo.name,
+          status: "active",
+          adviceChoices: gameResponse.adviceChoices || [],
+        };
+        metadataMap.set(threadId, metadata);
         console.log(
-          `👤 Saved character metadata for thread ${threadId.substring(0, 8)}...`,
+          `👤 Saved character metadata for thread ${threadId.substring(0, 8)}... (${metadata.adviceChoices?.length || 0} advice choices)`,
         );
       }
     }
