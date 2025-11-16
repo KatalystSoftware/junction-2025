@@ -12,24 +12,31 @@ import type {
 
 /**
  * Calculate global score for an advisor (used for overall ranking)
- * Weighted formula:
- * - Reputation: 30%
- * - Skill Level: 20%
- * - Average Advice Quality: 20%
- * - Financial Impact: 15%
- * - Achievements: 15%
+ * Primary driver is total financial impact (savings + debt cleared),
+ * with smaller bonuses for reputation, skill, advice quality and achievements.
+ * This keeps rankings mostly aligned with money saved.
  */
 export function calculateGlobalScore(entry: LeaderboardEntry): number {
-  const reputationScore = entry.reputation * 0.3; // Max 30
-  const skillScore = entry.skillLevel * 10 * 0.2; // Max 20
-  const adviceScore = entry.averageAdviceScore * 10 * 0.2; // Max 20
-  const impactScore =
-    ((entry.lifetimeSavingsGenerated + entry.lifetimeDebtCleared) / 1000) *
-    0.15; // €1000 = 0.15 points
-  const achievementScore = entry.achievementCount * 5 * 0.15; // 5 points per achievement * 15%
+  const totalImpact = Math.max(
+    0,
+    entry.lifetimeSavingsGenerated + entry.lifetimeDebtCleared,
+  );
+
+  // 1 point per €10 of impact (dominant term)
+  const impactScore = totalImpact / 10;
+
+  // Smaller bonuses so ordering mostly tracks totalImpact
+  const reputationBonus = Math.max(0, entry.reputation) * 2;
+  const skillBonus = Math.max(0, entry.skillLevel) * 5;
+  const adviceBonus = Math.max(0, entry.averageAdviceScore) * 5;
+  const achievementBonus = Math.max(0, entry.achievementCount) * 10;
 
   return (
-    reputationScore + skillScore + adviceScore + impactScore + achievementScore
+    impactScore +
+    reputationBonus +
+    skillBonus +
+    adviceBonus +
+    achievementBonus
   );
 }
 
@@ -47,21 +54,34 @@ export function calculateTierScore(advisorState: AdvisorState): {
     savingsImpact: number;
   };
 } {
+  const totalImpact = Math.max(
+    0,
+    advisorState.lifetimeSavingsGenerated + advisorState.lifetimeDebtCleared,
+  );
+
+  // Savings-driven score: impact dominates, other factors provide smaller boosts
+  const savingsImpact = totalImpact / 100; // 1 point per €100 saved/cleared
+  const reputation = advisorState.reputation * 0.5;
+  const skillLevel = advisorState.skillLevel * 5;
+  const clients = advisorState.totalClientsHelped;
+  const sessions = advisorState.totalSessions * 0.5;
+  const achievements = advisorState.achievementsUnlocked.length * 3;
+
   return {
     score:
-      advisorState.reputation +
-      advisorState.skillLevel * 10 +
-      advisorState.totalClientsHelped * 2 +
-      advisorState.totalSessions +
-      advisorState.achievementsUnlocked.length * 5 +
-      advisorState.lifetimeSavingsGenerated / 1000,
+      savingsImpact +
+      reputation +
+      skillLevel +
+      clients +
+      sessions +
+      achievements,
     breakdown: {
-      reputation: advisorState.reputation,
-      skillLevel: advisorState.skillLevel * 10,
-      clients: advisorState.totalClientsHelped * 2,
-      sessions: advisorState.totalSessions,
-      achievements: advisorState.achievementsUnlocked.length * 5,
-      savingsImpact: advisorState.lifetimeSavingsGenerated / 1000,
+      reputation,
+      skillLevel,
+      clients,
+      sessions,
+      achievements,
+      savingsImpact,
     },
   };
 }

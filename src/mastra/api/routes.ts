@@ -824,6 +824,25 @@ app.post("/send-message", async (c) => {
       }
     }
 
+    // Update leaderboard entry when a conversation (session) ends
+    if (gameResponse.stateUpdate && gameResponse.type === "conversation_end") {
+      try {
+        const { afterSessionComplete } = await import(
+          "../game/orchestrator-hooks.ts"
+        );
+        await afterSessionComplete(
+          gameResponse.stateUpdate,
+          gameResponse.stateUpdate.advisorId,
+          gameResponse,
+        );
+      } catch (error) {
+        console.error(
+          "❌ Failed to update leaderboard after conversation_end:",
+          error,
+        );
+      }
+    }
+
     // Save updated state with message histories and metadata
     await saveSession(
       sessionId,

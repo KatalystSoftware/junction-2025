@@ -105,13 +105,10 @@ export class LeaderboardService {
   }
 
   /**
-   * Calculate global score for ranking
-   * Weighted formula:
-   * - Reputation: 30%
-   * - Skill Level: 20%
-   * - Average Advice Quality: 20%
-   * - Financial Impact: 15%
-   * - Achievements: 15%
+   * Calculate global score for ranking.
+   * Primary driver is total financial impact (savings + debt cleared),
+   * with smaller bonuses for reputation, skill, advice quality and achievements.
+   * This keeps rankings mostly aligned with money saved.
    */
   private calculateGlobalScore(
     reputation: number,
@@ -121,20 +118,27 @@ export class LeaderboardService {
     lifetimeDebtCleared: number,
     achievementCount: number,
   ): number {
-    const reputationScore = reputation * 0.3; // Max 30
-    const skillScore = skillLevel * 10 * 0.2; // Max 20
-    const adviceScore = averageAdviceScore * 10 * 0.2; // Max 20
-    const impactScore =
-      ((lifetimeSavingsGenerated + lifetimeDebtCleared) / 1000) * 0.15;
-    const achievementScore = achievementCount * 5 * 0.15;
+    const totalImpact = Math.max(
+      0,
+      lifetimeSavingsGenerated + lifetimeDebtCleared,
+    );
+
+    // 1 point per €10 of impact (dominant term)
+    const impactScore = totalImpact / 10;
+
+    // Smaller bonuses so ordering mostly tracks totalImpact
+    const reputationBonus = Math.max(0, reputation) * 2;
+    const skillBonus = Math.max(0, skillLevel) * 5;
+    const adviceBonus = Math.max(0, averageAdviceScore) * 5;
+    const achievementBonus = Math.max(0, achievementCount) * 10;
 
     return Number(
       (
-        reputationScore +
-        skillScore +
-        adviceScore +
         impactScore +
-        achievementScore
+        reputationBonus +
+        skillBonus +
+        adviceBonus +
+        achievementBonus
       ).toFixed(2),
     );
   }

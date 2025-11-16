@@ -297,10 +297,28 @@ describe("Cash System, Advisor Leveling & Promotions Integration", () => {
 
       const result = calculateTierScore(advisorState);
 
-      // Score = reputation + (skillLevel * 10) + (clients * 2) + sessions + (achievements * 5) + (savings / 1000)
-      // Score = 50 + 50 + 30 + 30 + 15 + 25 = 200
       expect(result.score).toBeGreaterThan(0);
       expect(result.score).toBeGreaterThanOrEqual(200);
+    });
+
+    it("should reward money saved more than small reputation differences", () => {
+      const base = { ...advisorState };
+
+      base.reputation = 80;
+      base.skillLevel = 6;
+      base.totalClientsHelped = 10;
+      base.totalSessions = 20;
+      base.lifetimeSavingsGenerated = 20_000;
+      base.lifetimeDebtCleared = 0;
+
+      const moreSavingsLowerRep = { ...base };
+      moreSavingsLowerRep.reputation = 40;
+      moreSavingsLowerRep.lifetimeSavingsGenerated = 60_000;
+
+      const baseScore = calculateTierScore(base);
+      const highSavingsScore = calculateTierScore(moreSavingsLowerRep);
+
+      expect(highSavingsScore.score).toBeGreaterThan(baseScore.score);
     });
 
     it("should have tier 2 (Associate) with higher requirements", () => {
