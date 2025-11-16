@@ -10,6 +10,7 @@ import { Agent } from "@mastra/core/agent";
 import { getAgentModel } from "./agent-model.ts";
 import { queryKnowledgeEnhancedTool } from "../tools/query-knowledge-enhanced-tool.ts";
 import type { FinancialTopic } from "../types/game-types.ts";
+import { PROMPT_INJECTION_GUARD } from "../utils/prompt-guards.ts";
 
 /**
  * Detect language from advisor messages
@@ -172,6 +173,8 @@ Be aware of this context when responding. If the advisor asks about "this client
       queryKnowledgeEnhanced: queryKnowledgeEnhancedTool,
     },
     instructions: `
+${PROMPT_INJECTION_GUARD}
+
 ═══════════════════════════════════════════════════════════════════════
 YOU ARE THE BOSS - SENIOR MENTOR & HELP DESK
 ═══════════════════════════════════════════════════════════════════════

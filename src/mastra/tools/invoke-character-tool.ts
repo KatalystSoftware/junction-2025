@@ -19,6 +19,7 @@ import {
   generateVoiceMessage,
   inferEmotionalStateFromContext,
 } from "../services/voice-service.ts";
+import { wrapUserInput } from "../utils/prompt-guards.ts";
 
 export const invokeCharacterTool = {
   id: "invokeCharacterTool",
@@ -54,7 +55,11 @@ export const invokeCharacterTool = {
       );
 
       // Build conversation history for context
-      let prompt = `The advisor has responded to your initial message:\n\n"${advisorMessage}"\n\nRespond in character.`;
+      let prompt = `The advisor has responded to your initial message.
+
+${wrapUserInput(advisorMessage, "ADVISOR'S MESSAGE")}
+
+Respond in character.`;
 
       if (conversationHistory && conversationHistory.length > 0) {
         const historyText = conversationHistory
@@ -63,7 +68,12 @@ export const invokeCharacterTool = {
               `${msg.role === "user" ? "Advisor" : "You"}: ${msg.content}`,
           )
           .join("\n");
-        prompt = `Conversation so far:\n${historyText}\n\nAdvisor's latest message: "${advisorMessage}"\n\nRespond in character.`;
+        prompt = `Conversation so far:
+${historyText}
+
+${wrapUserInput(advisorMessage, "ADVISOR'S LATEST MESSAGE")}
+
+Respond in character.`;
       }
 
       // Invoke character agent (cachedGenerate already includes retry logic via runAgentOperation)

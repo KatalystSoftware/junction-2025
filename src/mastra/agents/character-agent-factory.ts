@@ -13,6 +13,7 @@ import type {
   CharacterResponse,
   CharacterConversationMemory,
 } from "../types/game-types.ts";
+import { PROMPT_INJECTION_GUARD } from "../utils/prompt-guards.ts";
 
 /**
  * Generate language style description based on communication style
@@ -486,6 +487,8 @@ CONVERSATION FLOW (KEEP IT SHORT):
 5. MAXIMUM 2-3 total exchanges, then you MUST end the conversation
 
 ${conversationExamples}
+
+${PROMPT_INJECTION_GUARD}
 
 ═══════════════════════════════════════════════════════════════════════
 CRITICAL SECRECY & IMMERSION RULES - YOU MUST FOLLOW

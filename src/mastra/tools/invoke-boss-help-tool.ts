@@ -7,6 +7,7 @@
 
 import { createBossHelpAgent } from "../agents/boss-help-agent.ts";
 import type { AdvisorState, FinancialTopic } from "../types/game-types.ts";
+import { wrapUserInput } from "../utils/prompt-guards.ts";
 
 export interface BossHelpContext {
   characterName: string;
@@ -155,8 +156,8 @@ export async function invokeBossHelpTool(params: {
 
   // Invoke agent with the question
   const prompt = conversationContext
-    ? `${conversationContext}\n\nAdvisor: ${userQuestion}`
-    : `Advisor: ${userQuestion}`;
+    ? `${conversationContext}\n\n${wrapUserInput(userQuestion, "ADVISOR'S QUESTION")}`
+    : wrapUserInput(userQuestion, "ADVISOR'S QUESTION");
 
   try {
     const result = await bossAgent.generate(prompt);

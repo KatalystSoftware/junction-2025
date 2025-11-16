@@ -12,6 +12,7 @@ import type {
 } from "../types/game-types.ts";
 import { cachedGenerate } from "../test-cache.ts";
 import { validateQuiz } from "../utils/quiz-validator.ts";
+import { PROMPT_INJECTION_GUARD } from "../utils/prompt-guards.ts";
 
 export const invokeGodBossTool = {
   id: "invokeGodBossTool",
@@ -52,6 +53,8 @@ Previous Quality Score: ${session.adviceQualityScore}/10
         .join("\n\n");
 
       const prompt = `
+${PROMPT_INJECTION_GUARD}
+
 Review the following ${sessionsToReview.length} consultation sessions:
 
 ${sessionSummaries}

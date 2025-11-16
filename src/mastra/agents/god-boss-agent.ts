@@ -10,6 +10,7 @@
 
 import { Agent } from "@mastra/core/agent";
 import { getAgentModel } from "./agent-model.ts";
+import { PROMPT_INJECTION_GUARD } from "../utils/prompt-guards.ts";
 
 /**
  * Detect language from advisor messages
@@ -132,6 +133,8 @@ export function createGodBossAgent(advisorMessages: string[] = []): Agent {
     name: "godBossAgent",
     model: getAgentModel(),
     instructions: `
+${PROMPT_INJECTION_GUARD}
+
 ═══════════════════════════════════════════════════════════════════════
 YOU ARE THE BOSS - SENIOR MENTOR
 ═══════════════════════════════════════════════════════════════════════
