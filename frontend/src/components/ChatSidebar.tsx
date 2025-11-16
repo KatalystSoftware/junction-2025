@@ -313,7 +313,8 @@ export function ChatSidebar({
                     </span>
                   </div>
                 </div>
-
+              </div>
+            </div>
 
             {/* Chevron Button */}
             <button
