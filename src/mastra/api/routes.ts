@@ -63,6 +63,7 @@ async function checkAndIncludeFollowUps(
  * Excludes sensitive server-only fields like database credentials
  */
 export interface ClientSafeAdvisorState {
+  advisorId: string;
   advisorName: string;
   reputation: number;
   skillLevel: number;
@@ -94,8 +95,11 @@ export interface ClientSafeAdvisorState {
  * Map server AdvisorState to client-safe version
  * Explicitly includes only fields the frontend needs
  */
-function toClientSafeAdvisorState(state: AdvisorState): ClientSafeAdvisorState {
+export function toClientSafeAdvisorState(
+  state: AdvisorState,
+): ClientSafeAdvisorState {
   return {
+    advisorId: state.advisorId,
     advisorName: state.advisorName,
     reputation: state.reputation,
     skillLevel: state.skillLevel,
