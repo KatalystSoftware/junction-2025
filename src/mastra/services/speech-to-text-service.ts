@@ -60,13 +60,12 @@ Please transcribe the following audio accurately. Return ONLY the transcribed te
     // Use configured Gemini model for transcription (supports audio input)
     const result = await generateText({
       model: google(getAgentModel()),
-      messages: [
+      prompt: transcriptionPrompt,
+      experimental_attachments: [
         {
-          role: "user",
-          content: [
-            { type: "text", text: transcriptionPrompt },
-            { type: "file", data: dataUrl, mimeType },
-          ],
+          name: "audio",
+          contentType: mimeType,
+          url: dataUrl,
         },
       ],
       temperature: 0.1, // Low temperature for accurate transcription
@@ -102,20 +101,16 @@ export async function transcribeAudioWithLanguageDetection(
 
     const result = await generateText({
       model: google(getAgentModel()),
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: `Please transcribe the following audio. First detect the language, then provide the transcription.
+      prompt: `Please transcribe the following audio. First detect the language, then provide the transcription.
 
 Format your response as:
 Language: [detected language]
 Transcription: [transcribed text]`,
-            },
-            { type: "file", data: dataUrl, mimeType },
-          ],
+      experimental_attachments: [
+        {
+          name: "audio",
+          contentType: mimeType,
+          url: dataUrl,
         },
       ],
       temperature: 0.1,

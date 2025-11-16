@@ -1299,8 +1299,8 @@ export function ChatWindow({
                     fontWeight: 500,
                   }}
                 >
-                  {isRecording ? "Recording..." : "Recording ready"} {Math.floor(recordingTime / 60)}:
-                  {String(recordingTime % 60).padStart(2, "0")}
+                  {isRecording ? "Recording..." : "Recording ready"}{" "}
+                  {Math.floor(recordingTime / 60)}:{String(recordingTime % 60).padStart(2, "0")}
                 </div>
 
                 {/* Actions */}
