@@ -583,7 +583,7 @@ app.post("/send-message", async (c) => {
         console.log("👔 Boss message - using RAG help system");
 
         // Get current consultation context if available
-        let currentConsultation = undefined;
+        let currentConsultation;
         const activeThread = Object.values(advisorState.activeThreads).find(
           (t) => t.status === "awaiting_response",
         );
@@ -1038,7 +1038,7 @@ app.get("/leaderboard/rank/:advisorId", async (c) => {
     const { leaderboardService } = await import(
       "../persistence/leaderboard-service.ts"
     );
-    const rank = await leaderboardService.getAdvisorRank(advisorId, category);
+    const rank = await leaderboardService.getAdvisorRank(advisorId);
 
     if (!rank) {
       return c.json({ error: "Advisor not found in leaderboard" }, 404);
@@ -1081,10 +1081,7 @@ app.get("/leaderboard/surrounding/:advisorId", async (c) => {
 
     return c.json(surrounding);
   } catch (error) {
-    console.error(
-      "❌ Error in /leaderboard/surrounding/:advisorId:",
-      error,
-    );
+    console.error("❌ Error in /leaderboard/surrounding/:advisorId:", error);
     return c.json({ error: "Failed to get surrounding advisors" }, 500);
   }
 });

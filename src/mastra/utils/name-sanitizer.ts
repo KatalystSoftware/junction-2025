@@ -57,7 +57,7 @@ Respond with ONLY one of these:
 
 Response:`,
       temperature: 0.1, // Low temperature for consistency
-      maxTokens: 10,
+      maxOutputTokens: 10,
     });
 
     const decision = result.text.trim().toUpperCase();

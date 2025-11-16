@@ -3,7 +3,11 @@
  * Integration points for global leaderboard
  */
 
-import type { AdvisorState, GameResponse, LeaderboardCategory } from "../types/game-types.ts";
+import type {
+  AdvisorState,
+  GameResponse,
+  LeaderboardCategory,
+} from "../types/game-types.ts";
 import { leaderboardService } from "../persistence/leaderboard-service.ts";
 
 /**
@@ -25,7 +29,7 @@ export async function initializeLeaderboard(): Promise<void> {
 export async function afterSessionComplete(
   advisorState: AdvisorState,
   advisorName: string,
-  gameResponse: GameResponse
+  gameResponse: GameResponse,
 ): Promise<GameResponse> {
   try {
     // Update leaderboard entry
@@ -50,14 +54,14 @@ export async function afterSessionComplete(
  */
 export async function getLeaderboardData(
   advisorId: string,
-  category: LeaderboardCategory = "global"
+  category: LeaderboardCategory = "global",
 ) {
   try {
-    const leaderboard = await leaderboardService.getLeaderboard(category, 100);
+    const leaderboard = await leaderboardService.getLeaderboard(100);
     const surroundingAdvisors = await leaderboardService.getSurroundingAdvisors(
       advisorId,
       category,
-      5
+      5,
     );
 
     return {
@@ -76,7 +80,7 @@ export async function getLeaderboardData(
  */
 export async function onAdvisorInit(
   advisorState: AdvisorState,
-  advisorName: string
+  advisorName: string,
 ): Promise<void> {
   try {
     // Create or update leaderboard entry
