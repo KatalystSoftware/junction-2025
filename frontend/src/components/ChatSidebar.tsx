@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import logoImage from "figma:asset/28e39d27183eb9dbb848b6be8a7c7b00e841cd40.png";
 import { PlayerStatsModal } from "./PlayerStatsModal";
 import { getPlayerAvatarUrl } from "../utils/avatarUtils";
+import { useTranslation } from "../utils/translations";
 
 interface AdvisorState {
   advisorCoins: number;
@@ -41,6 +42,7 @@ export function ChatSidebar({
   onLogoClick,
   advisorState,
 }: ChatSidebarProps) {
+  const t = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [showStatsModal, setShowStatsModal] = useState(false);
   const [playerName, setPlayerName] = useState("Player");
@@ -173,7 +175,7 @@ export function ChatSidebar({
                     fontWeight: "var(--font-weight-normal)",
                   }}
                 >
-                  Financial Advisor
+                  {t.chat.financialAdvisor}
                 </span>
               </div>
               <span
@@ -183,7 +185,7 @@ export function ChatSidebar({
                   color: "var(--muted-foreground)",
                 }}
               >
-                {xpProgress}/{xpForNextLevel} XP
+                {xpProgress}/{xpForNextLevel} {t.chat.xp}
               </span>
             </div>
             {/* Progress Bar */}
@@ -333,7 +335,7 @@ export function ChatSidebar({
                     backgroundColor: "var(--primary)",
                   }}
                 >
-                  player's boss
+                  {t.chat.playersBoss}
                 </span>
               </div>
 

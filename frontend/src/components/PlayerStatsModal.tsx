@@ -21,6 +21,7 @@ import {
 import { useState, useEffect } from "react";
 import type { Contact } from "./WhatsAppInterface";
 import { getPlayerAvatarUrl } from "../utils/avatarUtils";
+import { useTranslation } from "../utils/translations";
 
 interface AdvisorState {
   advisorCoins: number;
@@ -49,6 +50,7 @@ export function PlayerStatsModal({
   contacts,
   advisorState,
 }: PlayerStatsModalProps) {
+  const t = useTranslation();
   const [playerName, setPlayerName] = useState("Player");
   const [playerAvatarUrl, setPlayerAvatarUrl] = useState("");
 

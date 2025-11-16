@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import bossImage from "figma:asset/98a682f9e6eea0635304bf1ceada7ac6a7758d54.png";
 import { PLAYER_AVATAR_OPTIONS } from "../utils/avatarUtils";
+import { getTranslation, type Language } from "../utils/translations";
 
 interface OnboardingFlowProps {
   onComplete: () => void;
@@ -79,14 +80,16 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     }
   };
 
+  // Get translations for selected language
+  const t = getTranslation((userLanguage || "en") as Language);
+
   const screens = [
     {
       id: "profile",
       icon: User,
-      title: "Choose Your Identity",
-      subtitle: "How do you want to be seen?",
-      description:
-        "Pick an avatar that represents you as a financial advisor.",
+      title: t.onboarding.chooseIdentity,
+      subtitle: t.onboarding.howDoYouWant,
+      description: t.onboarding.pickAvatar,
       illustration: "👤",
       color: "var(--primary)",
       gradient:
@@ -96,32 +99,30 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     {
       id: "welcome",
       icon: MessageSquare,
-      title: "Welcome to Gansos Finances!",
-      subtitle: "Your Financial Advisory Career Starts Here",
-      description:
-        "You'll chat with clients via messaging, understand their situations, and provide thoughtful advice. Each interaction builds trust. Good advice transforms lives.",
+      title: t.onboarding.welcomeTitle,
+      subtitle: t.onboarding.welcomeSubtitle,
+      description: t.onboarding.welcomeDescription,
       illustration: "💼",
       color: "var(--primary)",
       gradient:
         "linear-gradient(135deg, rgba(127, 86, 217, 0.1) 0%, rgba(105, 65, 198, 0.05) 100%)",
       features: [
-        "Chat naturally with clients about their finances",
-        "Build trust through quality, personalized advice",
-        "Help clients achieve real financial progress",
+        t.onboarding.features.chatNaturally,
+        t.onboarding.features.buildTrust,
+        t.onboarding.features.helpProgress,
       ],
     },
     {
       id: "ready",
       icon: Sparkles,
-      title: "Ready to Start?",
-      subtitle: "Your First Client Awaits",
-      description:
-        "Michael Scott is waiting in your inbox. He's your boss and has high hopes. Be empathetic, think critically, and provide advice that truly helps.",
+      title: t.onboarding.readyTitle,
+      subtitle: t.onboarding.readySubtitle,
+      description: t.onboarding.readyDescription,
       illustration: "🚀",
       color: "var(--primary)",
       gradient:
         "linear-gradient(135deg, rgba(127, 86, 217, 0.15) 0%, rgba(105, 65, 198, 0.08) 100%)",
-      cta: "Start Your Journey",
+      cta: t.onboarding.startJourney,
     },
   ];
 
@@ -288,13 +289,13 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                         color: "var(--foreground)",
                       }}
                     >
-                      Your Name
+                      {t.onboarding.yourName}
                     </Label>
                     <Input
                       id="name"
                       value={userName}
                       onChange={(e) => setUserName(e.target.value)}
-                      placeholder="Enter your name"
+                      placeholder={t.onboarding.enterName}
                       style={{
                         backgroundColor: "var(--input-background)",
                         borderColor: "var(--border)",
@@ -319,7 +320,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                         color: "var(--foreground)",
                       }}
                     >
-                      Your Avatar
+                      {t.onboarding.yourAvatar}
                     </Label>
                     <div className="flex flex-wrap gap-4">
                       {PLAYER_AVATAR_OPTIONS.map((option) => (
@@ -361,7 +362,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                         color: "var(--foreground)",
                       }}
                     >
-                      Preferred Language
+                      {t.onboarding.preferredLanguage}
                     </Label>
                     <div className="flex gap-3">
                       {languageOptions.map((lang) => (
@@ -484,8 +485,8 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   />
                   <span className="relative flex items-center gap-2">
                     {currentScreen === totalScreens - 1
-                      ? currentScreenData.cta || "Let's Go!"
-                      : "Continue"}
+                      ? currentScreenData.cta
+                      : t.continue}
                     {currentScreen === totalScreens - 1 ? (
                       <Sparkles className="w-5 h-5" />
                     ) : (
@@ -507,7 +508,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   color: "var(--muted-foreground)",
                 }}
               >
-                Press{" "}
+                {t.onboarding.pressKeys}{" "}
                 <kbd
                   style={{
                     padding: "0.125rem 0.5rem",
@@ -520,7 +521,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                 >
                   Enter
                 </kbd>{" "}
-                or{" "}
+                {t.onboarding.or}{" "}
                 <kbd
                   style={{
                     padding: "0.125rem 0.5rem",
