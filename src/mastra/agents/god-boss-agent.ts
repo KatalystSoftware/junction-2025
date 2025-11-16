@@ -492,7 +492,7 @@ export async function generateFiringMessage(
     reputation: number;
     skillLevel: number;
   },
-  language: "finnish" | "english" = "english",
+  language: "finnish" | "english" | "swedish" = "english",
 ): Promise<{
   title: string;
   reason: string;
@@ -519,6 +519,16 @@ export async function generateFiringMessage(
         "This can't continue. Clients need better guidance.",
         "I hope you learn from this. Maybe next time will go better.",
         "This is a difficult decision, but necessary. Good luck going forward.",
+      ],
+    },
+    swedish: {
+      title: "Anställningen avslutas",
+      reasonPrefix: "Tyvärr måste jag avsluta din anställning. Orsak: ",
+      finalMessages: [
+        "Finansiell rådgivning kanske inte är för dig. Kanske prova något annat?",
+        "Detta kan inte fortsätta. Kunderna behöver bättre vägledning.",
+        "Jag hoppas du lär dig av detta. Kanske nästa gång går det bättre.",
+        "Detta är ett svårt beslut, men nödvändigt. Lycka till framöver.",
       ],
     },
   };

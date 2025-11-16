@@ -1028,7 +1028,11 @@ export async function handleAdvisorResponse(
       const { generateFiringMessage } = await import(
         "../agents/god-boss-agent.ts"
       );
-      const language = userLanguage.startsWith("fi") ? "finnish" : "english";
+      const language = userLanguage.startsWith("fi")
+        ? "finnish"
+        : userLanguage.startsWith("sv")
+          ? "swedish"
+          : "english";
 
       const firingMessage = await generateFiringMessage(
         advisorState.fireReason,
