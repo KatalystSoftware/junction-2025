@@ -4,6 +4,7 @@
  */
 
 import { generateText } from "ai";
+import { google } from "@ai-sdk/google";
 import { getAgentModel } from "../agents/agent-model.ts";
 
 const FALLBACK_NAME = "Player";
@@ -36,8 +37,13 @@ export async function sanitizePlayerName(rawName: string): Promise<string> {
 
   // Use AI to detect inappropriate content
   try {
+    const modelName = getAgentModel();
+    const model = modelName.startsWith("google/")
+      ? google(modelName.replace("google/", ""))
+      : google(modelName);
+
     const result = await generateText({
-      model: getAgentModel(),
+      model,
       prompt: `You are a content moderation system. Analyze the following player name and determine if it's appropriate for a financial education game.
 
 Player name: "${trimmedName}"
