@@ -394,6 +394,7 @@ export interface FinancialImpactHistoryEntry {
 
 export interface AdvisorState {
   advisorId: string;
+  advisorName: string; // User's chosen advisor name (from onboarding)
   reputation: number; // 0-100
   skillLevel: number; // 0-10 overall skill
   specializations: FinancialTopic[]; // Topics they're good at

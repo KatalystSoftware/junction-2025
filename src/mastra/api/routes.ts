@@ -29,12 +29,14 @@ import type {
   SessionGoal,
   CompletedMaterial,
 } from "../types/game-types.ts";
+import { onAdvisorInit } from "../game/orchestrator-hooks.ts";
 
 /**
  * Client-safe version of AdvisorState - only fields the frontend needs
  * Excludes sensitive server-only fields like database credentials
  */
 export interface ClientSafeAdvisorState {
+  advisorName: string;
   reputation: number;
   skillLevel: number;
   specializations: FinancialTopic[];
@@ -67,6 +69,7 @@ export interface ClientSafeAdvisorState {
  */
 function toClientSafeAdvisorState(state: AdvisorState): ClientSafeAdvisorState {
   return {
+    advisorName: state.advisorName,
     reputation: state.reputation,
     skillLevel: state.skillLevel,
     specializations: state.specializations,
@@ -135,6 +138,7 @@ app.use(
 
 interface InitRequest {
   sessionId?: string; // If provided, try to load existing session
+  advisorName?: string; // User's chosen name (from onboarding)
 }
 
 interface InitResponse {
@@ -277,21 +281,27 @@ app.post("/init", async (c) => {
         console.log(
           `⚠️ Session ${sessionId.substring(0, 8)}... not found, creating new`,
         );
-        advisorState = createNewAdvisor(sessionId);
+        advisorState = createNewAdvisor(sessionId, body.advisorName);
         isNewSession = true;
 
         // Save initial state for new session
         await saveSession(sessionId, advisorState);
+
+        // Initialize in leaderboard
+        await onAdvisorInit(advisorState, advisorState.advisorName);
       }
     } else {
       // Create brand new session
       sessionId = generateSessionId();
-      advisorState = createNewAdvisor(sessionId);
+      advisorState = createNewAdvisor(sessionId, body.advisorName);
       isNewSession = true;
       console.log(`✨ Created new session: ${sessionId.substring(0, 8)}...`);
 
       // Save initial state for new session
       await saveSession(sessionId, advisorState);
+
+      // Initialize in leaderboard
+      await onAdvisorInit(advisorState, advisorState.advisorName);
     }
 
     // SANITY CHECK: Auto-start consultation if onboarding is done and no active threads
