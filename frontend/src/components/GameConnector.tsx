@@ -12,6 +12,7 @@ import { useGame } from "../hooks/useGame";
 // Inferred Contact type from WhatsAppInterface
 interface Contact {
   id: string;
+  characterId?: string;
   name: string;
   avatar: string;
   avatarImage?: string;
@@ -58,6 +59,7 @@ export function GameConnector() {
 
       return {
         id: thread.threadId,
+        characterId: thread.characterId,
         name: thread.characterName || "Client",
         avatar: (thread.characterName || "CL").substring(0, 2).toUpperCase(),
         avatarImage: `https://api.dicebear.com/7.x/avataaars/svg?seed=${thread.characterId}`,

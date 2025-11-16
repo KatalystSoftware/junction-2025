@@ -58,6 +58,7 @@ export interface CharacterFinancialState {
 
 export interface Contact {
   id: string;
+  characterId?: string;
   name: string;
   avatar: string;
   avatarImage?: string;
