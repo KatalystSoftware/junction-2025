@@ -151,6 +151,35 @@ Aligned with **Finland's 2030 Financial Literacy Strategy** ([Bank of Finland re
 
 ---
 
+## 👥 User Testing & Feedback
+
+During development, we conducted user testing sessions with multiple groups and peers to validate the concept and improve the experience.
+
+### Testing Results
+
+**Participants**: Tested with peer groups including students and young adults
+**Key Finding**: Users enjoyed the game and found it engaging, with many reporting they had fun while learning
+
+### Feedback & Improvements
+
+Based on user feedback, we made several enhancements:
+- [Add specific improvements you made based on testing]
+- [E.g., "Simplified onboarding based on confusion in first sessions"]
+- [E.g., "Added voice messages after testers requested more personality"]
+- [E.g., "Adjusted difficulty curve when users found early scenarios too complex"]
+
+### User Quotes
+
+> _"[Add actual quote from your testers]"_
+
+> _"[Add another quote about engagement or learning]"_
+
+> _"[Add quote about specific feature they enjoyed]"_
+
+**Iterative Development**: The game evolved significantly through multiple testing rounds, with each session informing design decisions and feature refinements.
+
+---
+
 ## 🛠️ For Developers
 
 <details>
