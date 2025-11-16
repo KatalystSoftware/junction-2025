@@ -687,14 +687,17 @@ export function ChatWindow({
           </div>
 
           <div className="flex items-center gap-2">
-            {contact.id !== "boss-pinned" && contact.financialProfile && (
+            {contact.id !== "boss-pinned" && contact.characterId && contact.financialProfile && (
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => setShowFinancialDashboard(true)}
+                      onClick={() => {
+                        console.log("Opening financial dashboard for:", contact.characterId, contact.name);
+                        setShowFinancialDashboard(true);
+                      }}
                       style={{ borderRadius: "var(--radius-button)" }}
                     >
                       <BarChart3 className="w-5 h-5" />
@@ -2191,13 +2194,22 @@ export function ChatWindow({
       )}
 
       {/* Financial Dashboard Modal */}
-      {showFinancialDashboard && contact && contact.id !== "boss-pinned" && contact.characterId && (
-        <ClientFinancialDashboard
-          characterId={contact.characterId}
-          characterName={contact.name}
-          onClose={() => setShowFinancialDashboard(false)}
-        />
-      )}
+      {(() => {
+        const shouldShow = showFinancialDashboard && contact && contact.id !== "boss-pinned" && contact.characterId;
+        console.log("Financial Dashboard render check:", {
+          showFinancialDashboard,
+          contactId: contact?.id,
+          characterId: contact?.characterId,
+          shouldShow
+        });
+        return shouldShow ? (
+          <ClientFinancialDashboard
+            characterId={contact.characterId!}
+            characterName={contact.name}
+            onClose={() => setShowFinancialDashboard(false)}
+          />
+        ) : null;
+      })()}
     </div>
   );
 }
