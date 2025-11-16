@@ -22,9 +22,22 @@ export function useGameState() {
     refetch,
   } = useQuery({
     queryKey: ["game-state", sessionId],
-    queryFn: () => gameApi.initSession(sessionId),
+    queryFn: async () => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+
+      try {
+        const result = await gameApi.initSession(sessionId);
+        clearTimeout(timeoutId);
+        return result;
+      } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+      }
+    },
     staleTime: Infinity, // We manage updates via mutations
     retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
   });
 
   // Mutation: Start new consultation
