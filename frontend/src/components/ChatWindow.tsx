@@ -310,11 +310,11 @@ export function ChatWindow({
       if (recordingTimerRef.current) {
         clearInterval(recordingTimerRef.current);
       }
-      if (mediaRecorderRef.current && isRecording) {
+      if (mediaRecorderRef.current) {
         mediaRecorderRef.current.stop();
       }
     };
-  }, [isRecording]);
+  }, []); // Empty deps - only run on mount/unmount
 
   // Get multiple choice options from backend (if provided)
   // Keep the full choice objects to display actionText + projectedOutcome

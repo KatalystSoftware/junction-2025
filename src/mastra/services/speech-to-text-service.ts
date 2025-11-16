@@ -42,7 +42,6 @@ export async function transcribeAudio(
   try {
     // Convert buffer to base64 for Gemini API
     const base64Audio = audioBuffer.toString("base64");
-    const dataUrl = `data:${mimeType};base64,${base64Audio}`;
 
     // Prepare the transcription prompt
     const languageHint = options?.language
@@ -60,12 +59,13 @@ Please transcribe the following audio accurately. Return ONLY the transcribed te
     // Use configured Gemini model for transcription (supports audio input)
     const result = await generateText({
       model: google(getAgentModel()),
-      prompt: transcriptionPrompt,
-      experimental_attachments: [
+      messages: [
         {
-          name: "audio",
-          contentType: mimeType,
-          url: dataUrl,
+          role: "user",
+          content: [
+            { type: "text", text: transcriptionPrompt },
+            { type: "file", data: base64Audio, mimeType },
+          ],
         },
       ],
       temperature: 0.1, // Low temperature for accurate transcription
@@ -97,20 +97,23 @@ export async function transcribeAudioWithLanguageDetection(
 ): Promise<TranscriptionResult> {
   try {
     const base64Audio = audioBuffer.toString("base64");
-    const dataUrl = `data:${mimeType};base64,${base64Audio}`;
 
     const result = await generateText({
       model: google(getAgentModel()),
-      prompt: `Please transcribe the following audio. First detect the language, then provide the transcription.
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: `Please transcribe the following audio. First detect the language, then provide the transcription.
 
 Format your response as:
 Language: [detected language]
 Transcription: [transcribed text]`,
-      experimental_attachments: [
-        {
-          name: "audio",
-          contentType: mimeType,
-          url: dataUrl,
+            },
+            { type: "file", data: base64Audio, mimeType },
+          ],
         },
       ],
       temperature: 0.1,
