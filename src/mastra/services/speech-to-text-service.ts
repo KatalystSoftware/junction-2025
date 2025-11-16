@@ -62,7 +62,7 @@ Please transcribe the following audio accurately. Return ONLY the transcribed te
           role: "user",
           content: [
             { type: "text", text: transcriptionPrompt },
-            { type: "file", mimeType, data: audioBuffer },
+            { type: "file", mediaType: mimeType, data: audioBuffer },
           ],
         },
       ],
@@ -109,7 +109,7 @@ Format your response as:
 Language: [detected language]
 Transcription: [transcribed text]`,
             },
-            { type: "file", mimeType, data: audioBuffer },
+            { type: "file", mediaType: mimeType, data: audioBuffer },
           ],
         },
       ],
