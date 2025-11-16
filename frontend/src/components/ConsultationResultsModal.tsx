@@ -169,7 +169,7 @@ export function ConsultationResultsModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-3xl h-[90vh] max-h-[90vh] p-0 flex flex-col gap-0"
+        className="max-w-3xl h-[90vh] max-h-[90vh] p-0 flex flex-col gap-0 overflow-hidden"
         style={{
           backgroundColor: "var(--card)",
           borderColor: "var(--border)",
@@ -194,7 +194,10 @@ export function ConsultationResultsModal({
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 min-h-0 overflow-y-auto">
+        <ScrollArea 
+          className="flex-1 min-h-0" 
+          style={{ maxHeight: "calc(90vh - 80px)" }}
+        >
           <div className="px-6 py-4 space-y-5 pb-6">
             {/* Your Advice Section */}
             {adviceGiven && (
