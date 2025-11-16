@@ -11,6 +11,7 @@ import { mastra } from "./mastra/index.ts";
 import { gameRoutes } from "./mastra/api/routes.ts";
 import { checkPostgresHealth } from "./mastra/config/postgres-health.ts";
 import { initializeLeaderboard } from "./mastra/game/orchestrator-hooks.ts";
+import { startPortfolioImpactWorker } from "./mastra/services/portfolio-impact-worker.ts";
 
 const app = new Hono();
 
@@ -60,6 +61,9 @@ console.log(`🌐 Frontend available at http://localhost:${port}`);
 initializeLeaderboard().catch((error) => {
   console.error("Failed to initialize leaderboard on startup:", error);
 });
+
+// Start portfolio impact background worker
+startPortfolioImpactWorker();
 
 serve({
   fetch: app.fetch,

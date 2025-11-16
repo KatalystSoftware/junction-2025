@@ -16,6 +16,28 @@ interface RealPortfolioImpact {
   projectedDebtCleared: number;
 }
 
+interface PortfolioGrowthData {
+  portfolioImpact: {
+    savings: number;
+    debtCleared: number;
+    total: number;
+  };
+  growth: {
+    perMinute: number;
+    perHour: number;
+    perDay: number;
+    recentGrowth: number;
+  };
+  activeClients: number;
+  stats: {
+    totalSessions: number;
+    totalClientsHelped: number;
+    totalCoins: number;
+    careerTier: number;
+  };
+  timestamp: number;
+}
+
 interface PortfolioImpactCardProps {
   lifetimeSavings: number;
   lifetimeDebtCleared: number;
@@ -42,6 +64,7 @@ export function PortfolioImpactCard({
   const [showRecentInline, setShowRecentInline] = useState(false);
   const [realImpact, setRealImpact] = useState<RealPortfolioImpact | null>(null);
   const [showRealData, setShowRealData] = useState(false);
+  const [growthData, setGrowthData] = useState<PortfolioGrowthData | null>(null);
 
   // Fetch real portfolio impact data
   useEffect(() => {
@@ -65,6 +88,34 @@ export function PortfolioImpactCard({
       return () => clearInterval(interval);
     }
   }, [sessionId]);
+
+  // Fetch portfolio growth data (real-time updates)
+  useEffect(() => {
+    if (sessionId) {
+      const fetchGrowthData = async () => {
+        try {
+          const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+          const response = await fetch(`${API_URL}/portfolio-impact/${sessionId}`);
+          if (response.ok) {
+            const data = await response.json();
+            setGrowthData(data);
+            // Update displayed values from server data for real-time sync
+            if (!showRealData) {
+              setDisplaySavings(data.portfolioImpact.savings);
+              setDisplayDebt(data.portfolioImpact.debtCleared);
+            }
+          }
+        } catch (error) {
+          console.error("Failed to fetch portfolio growth data:", error);
+        }
+      };
+
+      fetchGrowthData();
+      // Refresh every 10 seconds for real-time feel
+      const interval = setInterval(fetchGrowthData, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [sessionId, showRealData]);
 
   // Animate numbers when they change
   useEffect(() => {
@@ -245,6 +296,35 @@ export function PortfolioImpactCard({
           </div>
         )}
       </div>
+
+      {/* Growth Rate Indicator */}
+      {growthData && growthData.growth.perMinute > 0 && (
+        <div
+          className="mb-3 p-2 rounded text-xs"
+          style={{
+            backgroundColor: "rgba(34, 197, 94, 0.1)",
+            borderLeft: "3px solid var(--chart-1)",
+          }}
+        >
+          <div className="flex items-center justify-between">
+            <span style={{ color: "var(--muted-foreground)" }}>
+              <TrendingUp className="w-3 h-3 inline mr-1" style={{ color: "var(--chart-1)" }} />
+              Growing:
+            </span>
+            <span className="font-semibold" style={{ color: "var(--chart-1)" }}>
+              +{formatCurrency(growthData.growth.perMinute)}/min
+            </span>
+          </div>
+          <div className="flex items-center justify-between mt-1">
+            <span style={{ color: "var(--muted-foreground)" }}>
+              Projected daily:
+            </span>
+            <span className="font-medium" style={{ color: "var(--muted-foreground)" }}>
+              {formatCurrency(growthData.growth.perDay)}
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Accuracy Indicator - Show when real data exists */}
       {realImpact && !showRealData && (

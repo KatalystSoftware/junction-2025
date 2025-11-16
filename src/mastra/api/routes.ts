@@ -1512,6 +1512,64 @@ app.get("/real-portfolio-impact/:sessionId", async (c) => {
 });
 
 // ============================================================================
+// ROUTE: Get Portfolio Impact with Real-Time Growth Data
+// ============================================================================
+app.get("/portfolio-impact/:sessionId", async (c) => {
+  try {
+    const sessionId = c.req.param("sessionId");
+
+    const savedSession = await loadSession(sessionId);
+    if (!savedSession) {
+      return c.json({ error: "Session not found" }, 404);
+    }
+
+    const { advisorState } = savedSession;
+
+    // Get growth rate and recent deltas
+    const { getGrowthSummary, updateGrowthRate } = await import(
+      "../services/portfolio-impact-service.ts"
+    );
+
+    // Ensure growth rate is calculated for this session
+    updateGrowthRate(sessionId, advisorState);
+
+    // Get growth summary
+    const summary = getGrowthSummary(sessionId);
+
+    return c.json({
+      sessionId,
+      portfolioImpact: {
+        savings: Math.round(advisorState.lifetimeSavingsGenerated),
+        debtCleared: Math.round(advisorState.lifetimeDebtCleared),
+        total: Math.round(
+          advisorState.lifetimeSavingsGenerated + advisorState.lifetimeDebtCleared,
+        ),
+      },
+      growth: {
+        perMinute: summary.currentRate?.totalPerMinute || 0,
+        perHour: summary.projectedHourly,
+        perDay: summary.projectedDaily,
+        recentGrowth: summary.recentGrowth,
+      },
+      activeClients: summary.currentRate?.activeClients || 0,
+      stats: {
+        totalSessions: advisorState.totalSessions,
+        totalClientsHelped: advisorState.totalClientsHelped,
+        totalCoins: advisorState.advisorCoins,
+        careerTier: advisorState.careerTier,
+      },
+      timestamp: Date.now(),
+    });
+  } catch (error) {
+    console.error("❌ Error in /portfolio-impact/:sessionId:", error);
+    return c.json(
+      { error: "Failed to get portfolio impact" },
+      500,
+    );
+  }
+});
+
+// ============================================================================
 // ROUTE: Get Client Financial Details (Full Dashboard Data)
 // ============================================================================
 app.get("/client-financial-details/:characterId", async (c) => {
