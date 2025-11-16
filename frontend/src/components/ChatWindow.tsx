@@ -1260,7 +1260,7 @@ export function ChatWindow({
               : "0px 4px 12px 0px rgba(10, 13, 18, 0.15), 0 0 20px 2px rgba(var(--primary-rgb, 59, 130, 246), 0.1)",
             borderRadius: "9999px",
             borderColor: isInputFocused ? "var(--primary)" : "transparent",
-            zIndex: 200,
+            zIndex: 40,
           }}
         >
           <TooltipProvider>
