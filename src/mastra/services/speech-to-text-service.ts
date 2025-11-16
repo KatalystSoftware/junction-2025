@@ -7,6 +7,7 @@
 
 import { google } from "@ai-sdk/google";
 import { generateText } from "ai";
+import { getAgentModel } from "../agents/agent-model.ts";
 
 /**
  * Supported audio formats for Gemini
@@ -56,9 +57,9 @@ export async function transcribeAudio(
 
 Please transcribe the following audio accurately. Return ONLY the transcribed text, nothing else.`;
 
-    // Use Gemini Flash for transcription (supports audio input)
+    // Use configured Gemini model for transcription (supports audio input)
     const result = await generateText({
-      model: google("gemini-2.0-flash-exp"),
+      model: google(getAgentModel()),
       messages: [
         {
           role: "user",
@@ -100,7 +101,7 @@ export async function transcribeAudioWithLanguageDetection(
     const dataUrl = `data:${mimeType};base64,${base64Audio}`;
 
     const result = await generateText({
-      model: google("gemini-2.0-flash-exp"),
+      model: google(getAgentModel()),
       messages: [
         {
           role: "user",
