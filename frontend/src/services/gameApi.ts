@@ -349,6 +349,46 @@ class GameAPI {
 
     return response.json();
   }
+
+  /**
+   * Transcribe audio to text using Gemini
+   */
+  async transcribeAudio(
+    audioBlob: Blob,
+    language?: string
+  ): Promise<{ transcription: string; detectedLanguage?: string }> {
+    // Convert blob to base64
+    const base64Audio = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result as string;
+        // Remove the data URL prefix (e.g., "data:audio/webm;base64,")
+        const base64Data = base64.split(",")[1];
+        resolve(base64Data);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(audioBlob);
+    });
+
+    const response = await fetch(`${this.baseUrl}/transcribe-audio`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        audioData: base64Audio,
+        mimeType: audioBlob.type,
+        language,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.details || `Failed to transcribe audio: ${response.statusText}`
+      );
+    }
+
+    return response.json();
+  }
 }
 
 export const gameApi = new GameAPI();
