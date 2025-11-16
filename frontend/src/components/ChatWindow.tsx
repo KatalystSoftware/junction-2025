@@ -1385,6 +1385,7 @@ export function ChatWindow({
                 style={{
                   borderRadius: "9999px",
                   backgroundColor: "transparent",
+                  cursor: "text",
                 }}
                 onFocus={() => setIsInputFocused(true)}
                 onBlur={() => setIsInputFocused(false)}
