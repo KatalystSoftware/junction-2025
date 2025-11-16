@@ -1,0 +1,238 @@
+{
+  "characterId": "char_jukka_002",
+  "characterName": "Jukka Laaksonen",
+  "storyArcName": "Debt Crisis to Real Estate Empire",
+  "description": "Jukka's journey from €8k debt and retail worker to multi-property investor",
+  "stages": [
+    {
+      "stage": 0,
+      "stageName": "Crisis - Drowning in Debt",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_jukka_debt_crisis_001",
+          "order": 1,
+          "type": "core",
+          "description": "€8000 debt, feeling overwhelmed, needs help"
+        },
+        {
+          "scenarioId": "scenario_jukka_debt_consolidation",
+          "order": 2,
+          "type": "core",
+          "description": "Considering debt consolidation loan - good idea or trap?"
+        }
+      ],
+      "milestones": [
+        "Face the debt honestly",
+        "Create debt payment plan",
+        "Stop debt from growing"
+      ]
+    },
+    {
+      "stage": 1,
+      "stageName": "Instability - Paying Down Debt",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_jukka_debt_progress",
+          "order": 1,
+          "type": "follow_up_success",
+          "description": "Paying down debt successfully, down to €5k"
+        },
+        {
+          "scenarioId": "scenario_jukka_unexpected_expense",
+          "order": 2,
+          "type": "setback",
+          "description": "Car repair €1200 - emergency fund or more debt?"
+        },
+        {
+          "scenarioId": "scenario_jukka_side_income",
+          "order": 3,
+          "type": "opportunity",
+          "description": "Overtime opportunity - worth the stress?"
+        }
+      ],
+      "milestones": [
+        "Reduce debt to <€5k",
+        "Avoid new debt during emergencies",
+        "Increase income (overtime, side work)"
+      ]
+    },
+    {
+      "stage": 2,
+      "stageName": "Stability - Debt Free & Building Savings",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_jukka_debt_free_celebration",
+          "order": 1,
+          "type": "milestone",
+          "description": "Paid off all debt! What's next?"
+        },
+        {
+          "scenarioId": "scenario_jukka_emergency_fund",
+          "order": 2,
+          "type": "core",
+          "description": "Building emergency fund €5k goal"
+        },
+        {
+          "scenarioId": "scenario_jukka_promotion",
+          "order": 3,
+          "type": "opportunity",
+          "description": "Store manager position - more money but more stress"
+        }
+      ],
+      "milestones": [
+        "Become completely debt-free",
+        "Build €5k emergency fund",
+        "Get promotion or better job"
+      ]
+    },
+    {
+      "stage": 3,
+      "stageName": "Saving & Early Investing",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_jukka_first_property_idea",
+          "order": 1,
+          "type": "path_selection",
+          "description": "Friend suggests buying rental property - is that realistic for me?"
+        },
+        {
+          "scenarioId": "scenario_jukka_saving_for_downpayment",
+          "order": 2,
+          "type": "real_estate_path",
+          "description": "Saving for first rental property down payment"
+        },
+        {
+          "scenarioId": "scenario_jukka_stock_alternative",
+          "order": 2,
+          "type": "investor_path",
+          "description": "Alternative: Start with index funds instead of real estate"
+        }
+      ],
+      "milestones": [
+        "Net worth €30k+",
+        "Choose investment path (real estate vs stocks)",
+        "Begin building wealth actively"
+      ]
+    },
+    {
+      "stage": 4,
+      "stageName": "Active Investing - First Rental Property",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_jukka_first_rental_purchase",
+          "order": 1,
+          "type": "real_estate_path",
+          "description": "Buying first studio apartment as rental - numbers make sense?"
+        },
+        {
+          "scenarioId": "scenario_jukka_tenant_issues",
+          "order": 2,
+          "type": "real_estate_path",
+          "description": "Nightmare tenant not paying rent - what are my options?"
+        },
+        {
+          "scenarioId": "scenario_jukka_property_two",
+          "order": 3,
+          "type": "real_estate_path",
+          "description": "Second property or focus on paying off first mortgage?"
+        }
+      ],
+      "milestones": [
+        "Purchase first rental property",
+        "Handle tenant management challenges",
+        "Achieve positive cash flow"
+      ]
+    },
+    {
+      "stage": 5,
+      "stageName": "Prosperity - Multi-Property Portfolio",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_jukka_portfolio_growth",
+          "order": 1,
+          "type": "real_estate_path",
+          "description": "Now own 3 properties - portfolio optimization strategies"
+        },
+        {
+          "scenarioId": "scenario_jukka_quit_job_decision",
+          "order": 2,
+          "type": "real_estate_path",
+          "description": "Rental income = €2500/month - can I quit my job?"
+        },
+        {
+          "scenarioId": "scenario_jukka_commercial_property",
+          "order": 3,
+          "type": "real_estate_path",
+          "description": "Commercial property opportunity - different game than residential"
+        }
+      ],
+      "milestones": [
+        "Own 3-4 rental properties",
+        "Passive income approaching job income",
+        "Consider full-time real estate investing"
+      ]
+    },
+    {
+      "stage": 6,
+      "stageName": "Wealth - Real Estate Mogul",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_jukka_empire_management",
+          "order": 1,
+          "type": "real_estate_path",
+          "description": "Managing 6 properties + commercial building - hire property manager?"
+        },
+        {
+          "scenarioId": "scenario_jukka_guilt_about_wealth",
+          "order": 2,
+          "type": "billionaire_track",
+          "description": "From €8k debt to €50M net worth - feeling guilt about wealth (Nordic culture)"
+        }
+      ],
+      "milestones": [
+        "Net worth €1M-10M",
+        "Large property portfolio",
+        "Passive income >>  old job income"
+      ]
+    },
+    {
+      "stage": 7,
+      "stageName": "Extreme Success - Philanthropist (Optional)",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_jukka_foundation",
+          "order": 1,
+          "type": "billionaire_track",
+          "description": "Should I start a foundation? How to structure giving?"
+        }
+      ],
+      "milestones": [
+        "Net worth €10M+ (if exceptional success)",
+        "Legacy and philanthropy planning"
+      ]
+    }
+  ],
+  "notes": {
+    "successPaths": [
+      {
+        "path": "real_estate_investor",
+        "probability": 0.6,
+        "description": "Primary path - builds property portfolio",
+        "stages": "0 → 1 → 2 → 3 → 4 (real estate) → 5 → 6"
+      },
+      {
+        "path": "comfortable_stability",
+        "probability": 0.3,
+        "description": "Alternative - stable retail management, modest savings",
+        "stages": "0 → 1 → 2 → 3 (plateau at comfortable job)"
+      },
+      {
+        "path": "stock_market_investor",
+        "probability": 0.1,
+        "description": "Rare - chooses stocks over real estate",
+        "stages": "0 → 1 → 2 → 3 → 4 (stocks) → 5"
+      }
+    ],
+    "characterNotes": "Starts in debt crisis (Stage 0). High emotionality means financial stress affects him deeply. Trusting nature means he'll follow good advice. References back to €8k debt and retail job in later stages to show growth. Nordic guilt about wealth is a key theme at Stage 6+."
+  }
+}

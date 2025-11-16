@@ -639,6 +639,217 @@ export function PlayerStatsModal({
                 </div>
               </div>
 
+              {/* Client Financial Progress Section */}
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <TrendingUp
+                    className="w-5 h-5"
+                    style={{ color: "var(--primary)" }}
+                  />
+                  <h3
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: "var(--text-lg)",
+                      fontWeight: "var(--font-weight-semibold)",
+                      color: "var(--card-foreground)",
+                    }}
+                  >
+                    Client Financial Progress
+                  </h3>
+                </div>
+
+                {/* Calculate aggregate stats from contacts */}
+                {(() => {
+                  const stageNames = [
+                    "Crisis",
+                    "Instability",
+                    "Stability",
+                    "Saving",
+                    "Active Investing",
+                    "Prosperity",
+                    "Wealth",
+                    "Extreme Success",
+                  ];
+
+                  // Group contacts by financial stage (mock data for now)
+                  const stageDistribution = contacts.reduce(
+                    (acc, contact) => {
+                      // Estimate stage based on trust level for now
+                      // TODO: Get real financial stage from character data
+                      const estimatedStage =
+                        contact.trust <= 20
+                          ? 0
+                          : contact.trust <= 40
+                            ? 1
+                            : contact.trust <= 60
+                              ? 2
+                              : contact.trust <= 80
+                                ? 3
+                                : 4;
+                      acc[estimatedStage] = (acc[estimatedStage] || 0) + 1;
+                      return acc;
+                    },
+                    {} as Record<number, number>,
+                  );
+
+                  return (
+                    <div className="space-y-4">
+                      {/* Stage Distribution Chart */}
+                      <div
+                        className="p-4 rounded-lg border"
+                        style={{
+                          backgroundColor: "var(--muted)",
+                          borderColor: "var(--border)",
+                        }}
+                      >
+                        <p
+                          style={{
+                            fontFamily: "Inter, sans-serif",
+                            fontSize: "var(--text-sm)",
+                            fontWeight: "var(--font-weight-medium)",
+                            color: "var(--muted-foreground)",
+                            marginBottom: "var(--spacing-3)",
+                          }}
+                        >
+                          Client Financial Stages
+                        </p>
+                        <div className="space-y-2">
+                          {Object.entries(stageDistribution)
+                            .sort(([a], [b]) => Number(b) - Number(a))
+                            .map(([stage, count]) => (
+                              <div
+                                key={stage}
+                                className="flex items-center gap-3"
+                              >
+                                <div className="flex-1">
+                                  <div className="flex justify-between mb-1">
+                                    <span
+                                      style={{
+                                        fontSize: "var(--text-xs)",
+                                        fontWeight: "var(--font-weight-medium)",
+                                        color: "var(--card-foreground)",
+                                      }}
+                                    >
+                                      {stageNames[Number(stage)]}
+                                    </span>
+                                    <span
+                                      style={{
+                                        fontSize: "var(--text-xs)",
+                                        color: "var(--muted-foreground)",
+                                      }}
+                                    >
+                                      {count}{" "}
+                                      {count === 1 ? "client" : "clients"}
+                                    </span>
+                                  </div>
+                                  <div
+                                    className="w-full h-2 rounded-full"
+                                    style={{ backgroundColor: "var(--card)" }}
+                                  >
+                                    <div
+                                      className="h-full rounded-full transition-all"
+                                      style={{
+                                        width: `${(count / contacts.length) * 100}%`,
+                                        backgroundColor:
+                                          Number(stage) >= 5
+                                            ? "var(--chart-1)"
+                                            : Number(stage) >= 3
+                                              ? "var(--chart-3)"
+                                              : "var(--chart-2)",
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+
+                      {/* Top Performing Clients */}
+                      <div>
+                        <p
+                          style={{
+                            fontFamily: "Inter, sans-serif",
+                            fontSize: "var(--text-sm)",
+                            fontWeight: "var(--font-weight-medium)",
+                            color: "var(--muted-foreground)",
+                            marginBottom: "var(--spacing-2)",
+                          }}
+                        >
+                          Recent Clients
+                        </p>
+                        <div className="space-y-2">
+                          {contacts.slice(0, 5).map((contact) => {
+                            const estimatedStage =
+                              contact.trust <= 20
+                                ? 0
+                                : contact.trust <= 40
+                                  ? 1
+                                  : contact.trust <= 60
+                                    ? 2
+                                    : contact.trust <= 80
+                                      ? 3
+                                      : 4;
+                            return (
+                              <div
+                                key={contact.id}
+                                className="p-3 rounded-lg"
+                                style={{ backgroundColor: "var(--muted)" }}
+                              >
+                                <div className="flex justify-between items-center">
+                                  <div>
+                                    <p
+                                      style={{
+                                        fontSize: "var(--text-sm)",
+                                        fontWeight: "var(--font-weight-medium)",
+                                        color: "var(--card-foreground)",
+                                      }}
+                                    >
+                                      {contact.name}
+                                    </p>
+                                    <p
+                                      style={{
+                                        fontSize: "var(--text-xs)",
+                                        color: "var(--muted-foreground)",
+                                      }}
+                                    >
+                                      {stageNames[estimatedStage]}
+                                    </p>
+                                  </div>
+                                  <div className="text-right">
+                                    <p
+                                      style={{
+                                        fontSize: "var(--text-xs)",
+                                        color: "var(--muted-foreground)",
+                                      }}
+                                    >
+                                      Trust: {contact.trust}%
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        {contacts.length === 0 && (
+                          <p
+                            style={{
+                              fontSize: "var(--text-sm)",
+                              color: "var(--muted-foreground)",
+                              textAlign: "center",
+                              padding: "var(--spacing-8)",
+                            }}
+                          >
+                            No client data yet. Complete consultations to track
+                            progress.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+
               {/* Achievements Section */}
               <div>
                 <div className="flex items-center gap-2 mb-4">

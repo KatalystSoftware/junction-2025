@@ -1,0 +1,193 @@
+{
+  "characterId": "char_sari_003",
+  "characterName": "Sari Mäkinen",
+  "storyArcName": "Nurse to Medical Innovation Leader",
+  "description": "Sari's journey from stable nurse to medical device startup founder via angel investing",
+  "stages": [
+    {
+      "stage": 2,
+      "stageName": "Stability - Comfortable Nurse",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_sari_retirement_basics",
+          "order": 1,
+          "type": "core",
+          "description": "Want to save for kids' education and retirement - where to start?"
+        },
+        {
+          "scenarioId": "scenario_sari_investment_allocation",
+          "order": 2,
+          "type": "core",
+          "description": "First €10k to invest - how to allocate wisely?"
+        }
+      ],
+      "milestones": [
+        "Start retirement savings (TyEL + ASP-tili)",
+        "Begin investing basics",
+        "Set financial goals for family"
+      ]
+    },
+    {
+      "stage": 3,
+      "stageName": "Saving & Early Investing",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_sari_portfolio_growth",
+          "order": 1,
+          "type": "core",
+          "description": "€50k portfolio - rebalancing and diversification"
+        },
+        {
+          "scenarioId": "scenario_sari_house_vs_invest",
+          "order": 2,
+          "type": "core",
+          "description": "Buy bigger house or invest the difference?"
+        },
+        {
+          "scenarioId": "scenario_sari_medical_device_opportunity",
+          "order": 3,
+          "type": "path_selection",
+          "description": "Colleague's medical device startup wants angel investors - intriguing?"
+        }
+      ],
+      "milestones": [
+        "Build €50k+ investment portfolio",
+        "Make strategic home ownership decision",
+        "Learn about angel investing opportunity"
+      ]
+    },
+    {
+      "stage": 4,
+      "stageName": "Active Investing - Angel Investor",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_sari_angel_investment",
+          "order": 1,
+          "type": "entrepreneur_path",
+          "description": "€50k angel investment in medical device startup - risk assessment"
+        },
+        {
+          "scenarioId": "scenario_sari_diversification",
+          "order": 2,
+          "type": "investor_path",
+          "description": "Don't put all eggs in one basket - diversify angel investments?"
+        },
+        {
+          "scenarioId": "scenario_sari_advisory_role",
+          "order": 3,
+          "type": "entrepreneur_path",
+          "description": "Startup wants me on advisory board - time commitment vs equity"
+        }
+      ],
+      "milestones": [
+        "Make first angel investment",
+        "Learn startup investing fundamentals",
+        "Balance job + advisory roles"
+      ]
+    },
+    {
+      "stage": 5,
+      "stageName": "Prosperity - Startup Success & Career Pivot",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_sari_ipo_windfall",
+          "order": 1,
+          "type": "entrepreneur_path",
+          "description": "Medical device company IPO - my €50k is now €800k!"
+        },
+        {
+          "scenarioId": "scenario_sari_full_time_offer",
+          "order": 2,
+          "type": "entrepreneur_path",
+          "description": "Startup offers me Chief Medical Officer role - leave nursing?"
+        },
+        {
+          "scenarioId": "scenario_sari_tax_planning",
+          "order": 3,
+          "type": "core",
+          "description": "Sudden wealth - capital gains tax planning"
+        }
+      ],
+      "milestones": [
+        "Angel investment pays off 15x",
+        "Major career decision point",
+        "Net worth €300k-1M"
+      ]
+    },
+    {
+      "stage": 6,
+      "stageName": "Wealth - Medical Innovation Executive",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_sari_executive_compensation",
+          "order": 1,
+          "type": "entrepreneur_path",
+          "description": "Stock options, RSUs, performance bonuses - how to optimize?"
+        },
+        {
+          "scenarioId": "scenario_sari_second_company",
+          "order": 2,
+          "type": "entrepreneur_path",
+          "description": "Co-found my own medical tech company - leverage my nursing expertise"
+        },
+        {
+          "scenarioId": "scenario_sari_portfolio_angel",
+          "order": 3,
+          "type": "investor_path",
+          "description": "Angel investing in 5 more healthcare startups - portfolio approach"
+        }
+      ],
+      "milestones": [
+        "Become medical tech executive",
+        "Net worth €1M-10M",
+        "Active in healthcare innovation ecosystem"
+      ]
+    },
+    {
+      "stage": 7,
+      "stageName": "Extreme Success - Healthcare Billionaire",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_sari_private_island",
+          "order": 1,
+          "type": "billionaire_track",
+          "description": "Private island in Greece for €8M - tax implications? (absurdist humor)"
+        },
+        {
+          "scenarioId": "scenario_sari_medical_foundation",
+          "order": 2,
+          "type": "billionaire_track",
+          "description": "€100M medical research foundation - structure for impact"
+        }
+      ],
+      "milestones": [
+        "Company exit or IPO creates €100M+ wealth",
+        "Philanthropic healthcare focus",
+        "Net worth €10M+"
+      ]
+    }
+  ],
+  "notes": {
+    "successPaths": [
+      {
+        "path": "corporate_career + entrepreneur",
+        "probability": 0.4,
+        "description": "Primary path - angel investor → executive → founder",
+        "stages": "2 → 3 → 4 (angel) → 5 → 6 (executive/founder) → 7"
+      },
+      {
+        "path": "stock_market_investor",
+        "probability": 0.4,
+        "description": "Alternative - steady index fund investor, early retirement",
+        "stages": "2 → 3 → 4 (stocks) → 5 → 6 (FIRE)"
+      },
+      {
+        "path": "comfortable_stability",
+        "probability": 0.2,
+        "description": "Baseline - comfortable nurse career, good retirement",
+        "stages": "2 → 3 (plateau at nursing career)"
+      }
+    ],
+    "characterNotes": "Starts at Stage 2 (already stable). Cautious but flexible personality means she'll carefully consider angel investing. Moderate financial literacy grows significantly. Healthcare expertise becomes valuable asset. References back to €2000/month nurse salary in later stages."
+  }
+}

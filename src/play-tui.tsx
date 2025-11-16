@@ -89,6 +89,65 @@ function saveVoiceAudio(
   }
 }
 
+/**
+ * Generate simple ASCII graph for progression data
+ */
+function generateASCIIGraph(
+  data: Array<{ date: string; amount: number }>,
+  maxWidth: number = 30,
+  maxHeight: number = 6,
+): string[] {
+  if (!data || data.length === 0) return ["No data"];
+
+  // Get min and max values
+  const values = data.map((d) => d.amount);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 1; // Avoid division by zero
+
+  // Generate graph lines
+  const lines: string[] = [];
+
+  // Y-axis labels and bars
+  for (let row = maxHeight - 1; row >= 0; row--) {
+    const threshold = min + (range * row) / (maxHeight - 1);
+    const label = `€${(threshold / 1000).toFixed(0)}k`.padStart(6);
+
+    let barLine = "";
+    for (let i = 0; i < Math.min(data.length, maxWidth); i++) {
+      const value = data[Math.floor((i * data.length) / maxWidth)]?.amount || 0;
+      const normalized = (value - min) / range;
+      const barHeight = Math.floor(normalized * (maxHeight - 1));
+
+      if (barHeight >= row) {
+        barLine += "█";
+      } else if (barHeight === row - 1) {
+        barLine += "▄";
+      } else {
+        barLine += " ";
+      }
+    }
+
+    lines.push(`${label} ┤${barLine}`);
+  }
+
+  // X-axis
+  const xAxis = "      └" + "─".repeat(Math.min(data.length, maxWidth));
+  lines.push(xAxis);
+
+  // X-axis labels (first and last date)
+  if (data.length > 0) {
+    const firstDate = data[0].date.slice(0, 7); // YYYY-MM
+    const lastDate = data[data.length - 1].date.slice(0, 7);
+    const spacing = " ".repeat(
+      Math.max(0, maxWidth - firstDate.length - lastDate.length),
+    );
+    lines.push(`       ${firstDate}${spacing}${lastDate}`);
+  }
+
+  return lines;
+}
+
 // ============================================================================
 // Types
 // ============================================================================
@@ -905,11 +964,12 @@ function App() {
         }
 
         // Create or update boss thread
+        // Show unread indicator if user is viewing a different thread
         const bossThread: ThreadData = {
           threadId: bossThreadId,
           characterName: "👔 Your Boss",
           messages: reviewMessages,
-          unreadCount: 0,
+          unreadCount: currentThreadId !== bossThreadId ? 1 : 0,
           status: "active",
         };
 
@@ -1819,15 +1879,191 @@ function ConversationPanel({ thread }: { thread: ThreadData }) {
 // ============================================================================
 
 function StatsPanel({ advisorState }: { advisorState: AdvisorState }) {
+  // Get all characters the advisor has helped
+  const relationships = characterPool.getCharacterRelationships();
+  const helpedCharacters = relationships.filter((rel) => rel.visitCount > 0);
+
+  // Calculate aggregate stats from character progressions
+  let totalNetWorthManaged = 0;
+  let totalIncomeChange = 0;
+  let charactersWithProgression = 0;
+
+  helpedCharacters.forEach((rel) => {
+    const character = characterPool.getCharacter(rel.characterId);
+    if (character?.financialState) {
+      charactersWithProgression++;
+      totalNetWorthManaged += character.financialState.netWorth;
+
+      // Calculate income change from history
+      if (character.financialState.incomeHistory.length > 1) {
+        const firstIncome = character.financialState.incomeHistory[0].amount;
+        const currentIncome = character.financialState.monthlyIncome;
+        totalIncomeChange += currentIncome - firstIncome;
+      }
+    }
+  });
+
   return (
     <Box flexDirection="column">
       <Text bold color="yellow">
         📊 Stats [Press s to close]
       </Text>
-      <Text dimColor>Rep: {advisorState.reputation}/100</Text>
-      <Text dimColor>Skill: {advisorState.skillLevel.toFixed(1)}/10</Text>
-      <Text dimColor>Sessions: {advisorState.totalSessions}</Text>
-      <Text dimColor>Clients: {advisorState.totalClientsHelped}</Text>
+      <Text dimColor> </Text>
+
+      {/* Advisor Stats */}
+      <Text bold color="cyan">
+        Your Performance
+      </Text>
+      <Text dimColor>Reputation: {advisorState.reputation}/100</Text>
+      <Text dimColor>Skill Level: {advisorState.skillLevel.toFixed(1)}/10</Text>
+      <Text dimColor>Total Sessions: {advisorState.totalSessions}</Text>
+      <Text dimColor>Clients Helped: {advisorState.totalClientsHelped}</Text>
+      <Text dimColor> </Text>
+
+      {/* Character Progression Summary */}
+      {charactersWithProgression > 0 && (
+        <>
+          <Text bold color="cyan">
+            Client Financial Impact
+          </Text>
+          <Text dimColor>
+            Total Net Worth Managed: €
+            {totalNetWorthManaged.toLocaleString("fi-FI")}
+          </Text>
+          {totalIncomeChange !== 0 && (
+            <Text dimColor color={totalIncomeChange > 0 ? "green" : "red"}>
+              Total Income Change: {totalIncomeChange > 0 ? "+" : ""}€
+              {totalIncomeChange.toLocaleString("fi-FI")}/month
+            </Text>
+          )}
+          <Text dimColor>
+            Clients with Progress: {charactersWithProgression}
+          </Text>
+          <Text dimColor> </Text>
+
+          {/* Individual Character Progress */}
+          <Text bold color="cyan">
+            Client Progress (Detailed Metrics)
+          </Text>
+          {helpedCharacters.slice(0, 5).map((rel) => {
+            const character = characterPool.getCharacter(rel.characterId);
+            if (!character?.financialState) return null;
+
+            const { financialState } = character;
+            const stageNames = [
+              "Crisis",
+              "Instability",
+              "Stability",
+              "Saving",
+              "Active Investing",
+              "Prosperity",
+              "Wealth",
+              "Extreme Success",
+            ];
+            const stageName =
+              stageNames[financialState.currentStage] || "Unknown";
+
+            // Success path info
+            const successPathNames: Record<string, string> = {
+              comfortable_stability: "Comfortable Stability",
+              corporate_career: "Corporate Career",
+              tech_entrepreneur: "Tech Entrepreneur",
+              real_estate_investor: "Real Estate Investor",
+              small_business_owner: "Small Business Owner",
+              stock_market_investor: "Stock Market Investor",
+            };
+            const pathName = financialState.selectedSuccessPath
+              ? successPathNames[financialState.selectedSuccessPath]
+              : "Exploring options";
+
+            // Calculate net worth growth
+            const initialNetWorth =
+              financialState.netWorthHistory?.[0]?.amount || 0;
+            const currentNetWorth = financialState.netWorth;
+            const netWorthGrowth = currentNetWorth - initialNetWorth;
+            const growthPercentage =
+              initialNetWorth > 0
+                ? ((netWorthGrowth / initialNetWorth) * 100).toFixed(1)
+                : "N/A";
+
+            // Progress bar for stage readiness
+            const progressBar =
+              financialState.readyForNextStage ||
+              financialState.currentStage === 7
+                ? "██████████ 100% Ready!"
+                : "████░░░░░░ " +
+                  (financialState.monthsInCurrentStage * 10).toString() +
+                  "% in progress";
+
+            // Major events summary
+            const recentEvents =
+              financialState.majorEvents
+                ?.slice(-3)
+                .map((e) => e.name)
+                .join(", ") || "None";
+
+            // Generate net worth graph if we have history
+            const netWorthGraph =
+              financialState.netWorthHistory &&
+              financialState.netWorthHistory.length > 1
+                ? generateASCIIGraph(financialState.netWorthHistory, 25, 5)
+                : null;
+
+            return (
+              <Box key={character.characterId} flexDirection="column">
+                <Text dimColor bold>
+                  {character.name} - {stageName}
+                </Text>
+                <Text dimColor>
+                  {"  "}Net Worth: €
+                  {financialState.netWorth.toLocaleString("fi-FI")}
+                  {netWorthGrowth !== 0 && (
+                    <Text color={netWorthGrowth > 0 ? "green" : "red"}>
+                      {" "}
+                      ({netWorthGrowth > 0 ? "+" : ""}€
+                      {netWorthGrowth.toLocaleString("fi-FI")},{" "}
+                      {growthPercentage}
+                      %)
+                    </Text>
+                  )}
+                </Text>
+                {netWorthGraph && (
+                  <Box flexDirection="column" marginLeft={2}>
+                    {netWorthGraph.map((line, idx) => (
+                      <Text key={idx} dimColor>
+                        {line}
+                      </Text>
+                    ))}
+                  </Box>
+                )}
+                <Text dimColor>
+                  {"  "}Income: €
+                  {financialState.monthlyIncome.toLocaleString("fi-FI")}/month
+                </Text>
+                {financialState.selectedSuccessPath && (
+                  <Text dimColor color="blue">
+                    {"  "}Path: {pathName}
+                  </Text>
+                )}
+                <Text dimColor>
+                  {"  "}Progress: {progressBar}
+                </Text>
+                {recentEvents !== "None" && (
+                  <Text dimColor color="yellow">
+                    {"  "}Events: {recentEvents}
+                  </Text>
+                )}
+                <Text dimColor> </Text>
+              </Box>
+            );
+          })}
+          {helpedCharacters.length > 5 && (
+            <Text dimColor>
+              ... and {helpedCharacters.length - 5} more clients
+            </Text>
+          )}
+        </>
+      )}
     </Box>
   );
 }

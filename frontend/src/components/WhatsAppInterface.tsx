@@ -30,11 +30,17 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
   // Translations
   const t = useTranslation();
 
+  // Track last read message count for each thread to properly show unread indicators
+  const [lastReadMessageCounts, setLastReadMessageCounts] = useState<{
+    [threadId: string]: number;
+  }>({});
+
   // Derived UI state - no storage, just computation
   const { contacts, messagesByThread } = useDerivedUIState(
     game.advisorState,
     game.threadHistories,
     game.threadMetadata,
+    lastReadMessageCounts,
   );
 
   // UI-only state (persisted in URL)
@@ -72,6 +78,13 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
         ? bossHistory[bossHistory.length - 1].content
         : "Welcome to your new job as a financial advisor!";
 
+    // Show unread indicator if there are new messages since last read
+    const lastReadCount = lastReadMessageCounts["boss-pinned"] || 0;
+    const hasUnreadBossMessage =
+      bossHistory.length > 0 &&
+      bossHistory[bossHistory.length - 1].role === "assistant" &&
+      bossHistory.length > lastReadCount;
+
     return {
       id: "boss-pinned",
       name: "Michael Scott",
@@ -79,12 +92,12 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       lastMessage: lastBossMessage,
       timestamp: "Pinned",
       lastMessageTime: new Date(),
-      unreadCount: 0,
+      unreadCount: hasUnreadBossMessage ? 1 : 0,
       online: true,
       avatarImage: michaelScottImage,
       trust: 100,
     };
-  }, [game.threadHistories]);
+  }, [game.threadHistories, lastReadMessageCounts]);
 
   // Auto-trigger onboarding on first load (with race condition protection)
   const hasTriggeredOnboarding = useRef(false);
@@ -207,13 +220,19 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
         const characterInfo =
           response.characterInfo || game.threadMetadata?.[response.threadId];
 
+        // Get the actual advisor advice and character response from thread history
+        const threadHistory = game.threadHistories?.[response.threadId] || [];
+        const adviceGiven = response.advisorAdvice?.join(" ") || undefined;
+        const lastCharacterMessage =
+          threadHistory.length > 0
+            ? threadHistory[threadHistory.length - 1]?.content
+            : undefined;
+
         setCurrentResultsData({
           characterName: characterInfo?.name || "Client",
-          adviceGiven: response.financialResults.extractedActions
-            ? "Your advice to the client" // TODO: Get actual advice text
-            : undefined,
+          adviceGiven,
           extractedActions: response.financialResults.extractedActions,
-          characterResponse: "Thank you for your help!", // TODO: Get actual response
+          characterResponse: lastCharacterMessage || "Thank you for your help!",
           projection: response.financialResults.projection,
           evaluation: response.financialResults.evaluation,
           coinsEarned: response.financialResults.coinsEarned,
@@ -420,6 +439,13 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
   const handleSelectContact = (contactId: string) => {
     setSelectedContactId(contactId);
     setShowChat(true);
+
+    // Mark the chat as read by storing current message count
+    const currentMessages = game.threadHistories[contactId]?.length || 0;
+    setLastReadMessageCounts((prev) => ({
+      ...prev,
+      [contactId]: currentMessages,
+    }));
   };
 
   const handleBackToContacts = () => {

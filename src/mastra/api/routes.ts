@@ -581,8 +581,29 @@ app.post("/send-message", async (c) => {
 
     // Special handling for boss messages
     if (threadId === "boss-pinned") {
-      // Check if there's an active intervention
-      if (advisorState.activeIntervention) {
+      const bossHistory = historiesMap.get("boss-pinned") || [];
+
+      // Check if this is onboarding acknowledgment (simple response, no RAG needed)
+      const isOnboardingAck =
+        !advisorState.hasCompletedOnboarding &&
+        bossHistory.length === 1 &&
+        bossHistory[0].role === "assistant";
+
+      if (isOnboardingAck) {
+        console.log("👋 Boss onboarding acknowledgment - skipping RAG help");
+
+        // Simple acknowledgment, no boss help needed
+        gameResponse = {
+          type: "character_message" as const,
+          threadId: "boss-pinned",
+          messages: [], // No response needed, next consultation will come from frontend auto-start
+          stateUpdate: advisorState,
+        };
+
+        // Just save user's acknowledgment
+        bossHistory.push({ role: "user" as const, content: message });
+        historiesMap.set("boss-pinned", bossHistory);
+      } else if (advisorState.activeIntervention) {
         console.log("🚨 Handling intervention response from advisor");
         gameResponse = await handleInterventionResponse(message, advisorState);
       } else {
@@ -615,8 +636,6 @@ app.post("/send-message", async (c) => {
           "../tools/invoke-boss-help-tool.ts"
         );
 
-        const bossHistory = historiesMap.get("boss-pinned") || [];
-
         const bossHelp = await invokeBossHelpTool({
           userQuestion: message,
           conversationHistory: bossHistory,
@@ -638,9 +657,8 @@ app.post("/send-message", async (c) => {
           { role: "user" as const, content: message },
           { role: "assistant" as const, content: bossHelp.response },
         );
+        historiesMap.set("boss-pinned", bossHistory);
       }
-
-      historiesMap.set("boss-pinned", historiesMap.get("boss-pinned") || []);
     } else {
       // Process regular advisor response
       gameResponse = await handleAdvisorResponse(

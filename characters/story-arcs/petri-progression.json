@@ -1,0 +1,209 @@
+{
+  "characterId": "char_petri_004",
+  "characterName": "Petri Koskinen",
+  "storyArcName": "Teen Gamer to Gaming Mogul",
+  "description": "Petri's journey from scam-vulnerable teen to gaming company founder",
+  "stages": [
+    {
+      "stage": 1,
+      "stageName": "Instability - High School Student",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_petri_crypto_scam_001",
+          "order": 1,
+          "type": "core",
+          "description": "Friends hyping crypto, confused about investment scams"
+        },
+        {
+          "scenarioId": "scenario_petri_first_job",
+          "order": 2,
+          "type": "core",
+          "description": "First summer job - how to manage money?"
+        },
+        {
+          "scenarioId": "scenario_petri_peer_pressure",
+          "order": 3,
+          "type": "core",
+          "description": "Friends spending on games/skins - FOMO and budgeting"
+        }
+      ],
+      "milestones": [
+        "Learn scam awareness",
+        "First job and income management",
+        "Resist peer pressure spending"
+      ]
+    },
+    {
+      "stage": 2,
+      "stageName": "Stability - College Student & Part-time Streamer",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_petri_streaming_income",
+          "order": 1,
+          "type": "opportunity",
+          "description": "Twitch streaming bringing in €500/month - treat as business?"
+        },
+        {
+          "scenarioId": "scenario_petri_gaming_cafe_idea",
+          "order": 2,
+          "type": "path_selection",
+          "description": "Dream of opening gaming café - realistic business plan?"
+        },
+        {
+          "scenarioId": "scenario_petri_education_vs_business",
+          "order": 3,
+          "type": "core",
+          "description": "Finish degree or drop out to focus on streaming/business?"
+        }
+      ],
+      "milestones": [
+        "Develop side income stream",
+        "Learn business fundamentals",
+        "Make education decision"
+      ]
+    },
+    {
+      "stage": 3,
+      "stageName": "Saving & Early Investing - Gaming Café Owner",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_petri_cafe_launch",
+          "order": 1,
+          "type": "small_business_path",
+          "description": "Opening gaming café - financing, business loan, cash flow"
+        },
+        {
+          "scenarioId": "scenario_petri_cafe_struggles",
+          "order": 2,
+          "type": "small_business_path",
+          "description": "First year struggles - adjust or quit?"
+        },
+        {
+          "scenarioId": "scenario_petri_game_dev_alternative",
+          "order": 2,
+          "type": "tech_entrepreneur_path",
+          "description": "Alternative: Join indie game dev studio instead of café"
+        }
+      ],
+      "milestones": [
+        "Launch small business",
+        "Survive first year challenges",
+        "Achieve profitability or pivot"
+      ]
+    },
+    {
+      "stage": 4,
+      "stageName": "Active Investing - Expanding to Game Development",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_petri_game_studio_pivot",
+          "order": 1,
+          "type": "tech_entrepreneur_path",
+          "description": "Café profitable, now starting game dev studio on the side"
+        },
+        {
+          "scenarioId": "scenario_petri_first_game_release",
+          "order": 2,
+          "type": "tech_entrepreneur_path",
+          "description": "Indie game launch - Steam release, marketing budget"
+        },
+        {
+          "scenarioId": "scenario_petri_viral_success",
+          "order": 3,
+          "type": "tech_entrepreneur_path",
+          "description": "Game goes viral - 100k copies sold! Now what?"
+        }
+      ],
+      "milestones": [
+        "Successfully run gaming café",
+        "Launch first indie game",
+        "Achieve viral success"
+      ]
+    },
+    {
+      "stage": 5,
+      "stageName": "Prosperity - Successful Game Studio",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_petri_publisher_deal",
+          "order": 1,
+          "type": "tech_entrepreneur_path",
+          "description": "Major publisher wants to acquire studio for €2M"
+        },
+        {
+          "scenarioId": "scenario_petri_sequel_funding",
+          "order": 2,
+          "type": "tech_entrepreneur_path",
+          "description": "Fund sequel myself or take VC money?"
+        }
+      ],
+      "milestones": [
+        "Multiple successful game releases",
+        "Major exit opportunity",
+        "Net worth €300k-1M"
+      ]
+    },
+    {
+      "stage": 6,
+      "stageName": "Wealth - Gaming Company Founder",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_petri_studio_sale",
+          "order": 1,
+          "type": "tech_entrepreneur_path",
+          "description": "Sold studio for €80M - wealth management fundamentals"
+        },
+        {
+          "scenarioId": "scenario_petri_fc_lahti",
+          "order": 2,
+          "type": "billionaire_track",
+          "description": "Want to buy FC Lahti football team for €15M - emotional vs rational"
+        }
+      ],
+      "milestones": [
+        "Major company exit (€80M)",
+        "Wealth preservation challenges",
+        "Net worth €1M-10M"
+      ]
+    },
+    {
+      "stage": 7,
+      "stageName": "Extreme Success - Gaming Billionaire (Rare)",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_petri_esports_empire",
+          "order": 1,
+          "type": "billionaire_track",
+          "description": "Building esports empire - teams, tournaments, streaming platform"
+        }
+      ],
+      "milestones": [
+        "Second company even bigger success",
+        "Net worth €10M+ (rare for this character)"
+      ]
+    }
+  ],
+  "notes": {
+    "successPaths": [
+      {
+        "path": "tech_entrepreneur",
+        "probability": 0.5,
+        "description": "Primary path - gaming café → game studio → exit",
+        "stages": "1 → 2 → 3 → 4 (entrepreneur) → 5 → 6"
+      },
+      {
+        "path": "small_business_owner",
+        "probability": 0.3,
+        "description": "Alternative - successful gaming café owner, plateau",
+        "stages": "1 → 2 → 3 (small business) → 4 (plateau)"
+      },
+      {
+        "path": "comfortable_stability",
+        "probability": 0.2,
+        "description": "Baseline - gets regular job in game industry",
+        "stages": "1 → 2 → 3 (plateau)"
+      }
+    ],
+    "characterNotes": "Starts young (19). Low financial literacy but learns fast. Skeptical personality helps avoid scams (important early scenario). Gaming passion becomes viable career. References back to crypto scam awareness and first summer job. FC Lahti scenario plays on hometown loyalty and emotional vs rational investing."
+  }
+}

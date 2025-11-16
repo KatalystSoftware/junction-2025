@@ -107,6 +107,7 @@ export interface CharacterRelationshipState {
   trustTier: TrustTier; // Calculated from trustLevel
   visitCount: number;
   lastVisit: string | null; // ISO date
+  lastVisitSession: number; // Session number when character last visited (for cooldown)
   adviceFollowedHistory: AdviceOutcome[];
   progressionHistory: RelationshipProgression[]; // Track trust changes over time
   decayApplied: number; // Total decay applied
@@ -139,6 +140,7 @@ export interface Character {
   background: string;
   gender: "male" | "female"; // For avatar generation
   personality: CharacterPersonality;
+  personalityTraits: CharacterPersonality; // Alias for progression system compatibility
   financialProfile: CharacterFinancialProfile;
   communicationStyle: CharacterCommunicationStyle;
   relationshipState: CharacterRelationshipState;
@@ -150,6 +152,21 @@ export interface Character {
     monthlyIncomeDay: number; // Day of month salary arrives (15-25)
     hasSimulationHistory: boolean; // Whether initial 6-month history has been generated
   };
+
+  // NEW: Progression System (Phase 1)
+  financialState?: import("./progression-types.ts").CharacterFinancialState;
+  completedScenarios?: Array<{
+    scenarioId: string;
+    timestamp: string;
+    outcome: "positive" | "negative" | "neutral";
+    difficulty?: number;
+  }>;
+  adviceHistory?: Array<{
+    timestamp: string;
+    adviceGiven: string;
+    outcome: "positive" | "negative" | "neutral";
+    scenarioId: string;
+  }>;
 }
 
 // ============================================================================

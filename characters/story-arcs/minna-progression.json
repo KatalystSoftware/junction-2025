@@ -1,0 +1,225 @@
+{
+  "characterId": "char_minna_001",
+  "characterName": "Minna Virtanen",
+  "storyArcName": "Student to Tech Entrepreneur",
+  "description": "Minna's journey from struggling student to potential tech billionaire",
+  "stages": [
+    {
+      "stage": 1,
+      "stageName": "Instability - Student Struggling",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_minna_budget_001",
+          "order": 1,
+          "type": "core",
+          "description": "First consultation - budgeting basics"
+        },
+        {
+          "scenarioId": "scenario_minna_budget_success_002",
+          "order": 2,
+          "type": "follow_up_success",
+          "description": "Successfully implementing budget, social spending question"
+        },
+        {
+          "scenarioId": "scenario_minna_budget_struggle_003",
+          "order": 2,
+          "type": "follow_up_struggle",
+          "description": "Alternative path - struggling with budgeting"
+        }
+      ],
+      "milestones": [
+        "Learn basic budgeting",
+        "Track expenses successfully",
+        "Build small emergency fund (€500-1000)"
+      ]
+    },
+    {
+      "stage": 2,
+      "stageName": "Stability - First Real Job",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_minna_first_job",
+          "order": 1,
+          "type": "core",
+          "description": "Graduated, got first developer job, questions about 401k and benefits"
+        },
+        {
+          "scenarioId": "scenario_minna_debt_payoff",
+          "order": 2,
+          "type": "core",
+          "description": "Paying off student credit card debt strategically"
+        },
+        {
+          "scenarioId": "scenario_minna_emergency_fund",
+          "order": 3,
+          "type": "core",
+          "description": "Building 3-6 month emergency fund"
+        }
+      ],
+      "milestones": [
+        "Graduate from university",
+        "Land first developer job (€2800/month)",
+        "Pay off credit card debt",
+        "Build full emergency fund (€10-15k)"
+      ]
+    },
+    {
+      "stage": 3,
+      "stageName": "Saving & Early Investing",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_minna_first_investment",
+          "order": 1,
+          "type": "core",
+          "description": "First €5k to invest - index funds vs individual stocks"
+        },
+        {
+          "scenarioId": "scenario_minna_apartment_decision",
+          "order": 2,
+          "type": "core",
+          "description": "Should I buy an apartment or keep renting?"
+        },
+        {
+          "scenarioId": "scenario_minna_side_project",
+          "order": 3,
+          "type": "path_selection",
+          "description": "Side project idea - budgeting app for students (entrepreneur path begins)"
+        }
+      ],
+      "milestones": [
+        "Net worth €30k+",
+        "Start investing regularly",
+        "Make home ownership decision",
+        "Begin side project (potential entrepreneur path)"
+      ]
+    },
+    {
+      "stage": 4,
+      "stageName": "Active Investing - Side Hustle Growing",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_minna_startup_decision",
+          "order": 1,
+          "type": "path_selection",
+          "description": "Side project has 10k users - quit job to go full-time?"
+        },
+        {
+          "scenarioId": "scenario_minna_funding_round",
+          "order": 2,
+          "type": "entrepreneur_path",
+          "description": "Angel investor offering €250k - should I take it? What equity?"
+        },
+        {
+          "scenarioId": "scenario_minna_corporate_alternative",
+          "order": 2,
+          "type": "corporate_path",
+          "description": "Alternative: Senior developer role with stock options"
+        }
+      ],
+      "milestones": [
+        "Net worth €100-300k",
+        "Choose success path (entrepreneur vs corporate)",
+        "Major career decision point"
+      ]
+    },
+    {
+      "stage": 5,
+      "stageName": "Prosperity - Startup Success",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_minna_scaling_challenges",
+          "order": 1,
+          "type": "entrepreneur_path",
+          "description": "100k users, hiring team, scaling challenges"
+        },
+        {
+          "scenarioId": "scenario_minna_acquisition_offer",
+          "order": 2,
+          "type": "entrepreneur_path",
+          "description": "€5M acquisition offer - should I take it or keep growing?"
+        }
+      ],
+      "milestones": [
+        "Net worth €300k-1M",
+        "Successful product-market fit",
+        "Major exit decision"
+      ]
+    },
+    {
+      "stage": 6,
+      "stageName": "Wealth - Post-Exit Angel Investor",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_minna_post_exit",
+          "order": 1,
+          "type": "entrepreneur_path",
+          "description": "Sold company for €5M, what to do with the money?"
+        },
+        {
+          "scenarioId": "scenario_minna_angel_investing",
+          "order": 2,
+          "type": "entrepreneur_path",
+          "description": "Friend's startup wants €200k - angel investing basics"
+        }
+      ],
+      "milestones": [
+        "Net worth €1M-10M",
+        "Post-exit wealth management",
+        "Begin angel investing"
+      ]
+    },
+    {
+      "stage": 7,
+      "stageName": "Extreme Success - Tech Billionaire",
+      "scenarios": [
+        {
+          "scenarioId": "scenario_minna_second_startup",
+          "order": 1,
+          "type": "billionaire_track",
+          "description": "Started second company, scaling to unicorn status"
+        },
+        {
+          "scenarioId": "scenario_minna_rockets_or_cars",
+          "order": 2,
+          "type": "billionaire_track",
+          "description": "€500M to allocate - rockets or electric cars? (absurdist humor)"
+        },
+        {
+          "scenarioId": "scenario_minna_philanthropy",
+          "order": 3,
+          "type": "billionaire_track",
+          "description": "€50M charity bet with another tech founder"
+        }
+      ],
+      "milestones": [
+        "Net worth €10M+",
+        "Second successful exit or IPO",
+        "Billionaire status achieved",
+        "Absurdist scenarios unlocked"
+      ]
+    }
+  ],
+  "notes": {
+    "successPaths": [
+      {
+        "path": "tech_entrepreneur",
+        "probability": 0.3,
+        "description": "Primary path - builds budgeting app startup",
+        "stages": "1 → 2 → 3 → 4 (entrepreneur) → 5 → 6 → 7"
+      },
+      {
+        "path": "corporate_career",
+        "probability": 0.2,
+        "description": "Alternative - climbs corporate ladder as senior dev/architect",
+        "stages": "1 → 2 → 3 → 4 (corporate) → 5 (executive)"
+      },
+      {
+        "path": "comfortable_stability",
+        "probability": 0.5,
+        "description": "Most likely - comfortable dev job, good work-life balance",
+        "stages": "1 → 2 → 3 (plateau at comfortable income)"
+      }
+    ],
+    "characterNotes": "High impulsiveness may lead to startup risk-taking. Low financial literacy improves over sessions. References back to €185 credit card debt and €800/month student job in later stages."
+  }
+}

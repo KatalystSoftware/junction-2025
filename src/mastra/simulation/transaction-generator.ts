@@ -22,9 +22,25 @@ import type {
 } from "./simulation-types.ts";
 import { selectMerchant, getRandomMerchant } from "./merchant-database.ts";
 
-let transactionCounter = 0;
-
 export class TransactionGenerator {
+  private txnCounterMap: Map<string, number> = new Map();
+
+  /**
+   * Generate unique transaction ID that includes date for uniqueness
+   */
+  private generateTxnId(
+    characterId: string,
+    year: number,
+    month: number,
+    day: number,
+  ): string {
+    const dateKey = `${characterId}_${year}_${month}_${day}`;
+    const counter = (this.txnCounterMap.get(dateKey) || 0) + 1;
+    this.txnCounterMap.set(dateKey, counter);
+
+    return `txn_${characterId}_${year}_${month}_${day}_${counter}`;
+  }
+
   /**
    * Generate all transactions for a single month
    */
@@ -228,7 +244,7 @@ export class TransactionGenerator {
   ): Transaction {
     const amount = character.financialProfile.typicalMonthlyIncome;
     return {
-      id: `txn_${character.characterId}_${transactionCounter++}`,
+      id: this.generateTxnId(character.characterId, year, month, day),
       characterId: character.characterId,
       date: `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
       type: "income",
@@ -262,7 +278,7 @@ export class TransactionGenerator {
     const effectiveAmount = newBalance < -200 ? currentBalance + 200 : amount;
 
     return {
-      id: `txn_${character.characterId}_${transactionCounter++}`,
+      id: this.generateTxnId(character.characterId, year, month, day),
       characterId: character.characterId,
       date: `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
       type: "expense",
@@ -286,7 +302,7 @@ export class TransactionGenerator {
     currentBalance: number,
   ): Transaction {
     return {
-      id: `txn_${character.characterId}_${transactionCounter++}`,
+      id: this.generateTxnId(character.characterId, year, month, day),
       characterId: character.characterId,
       date: `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
       type: "subscription",
@@ -310,7 +326,7 @@ export class TransactionGenerator {
     currentBalance: number,
   ): Transaction {
     return {
-      id: `txn_${character.characterId}_${transactionCounter++}`,
+      id: this.generateTxnId(character.characterId, year, month, day),
       characterId: character.characterId,
       date: `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
       type: "debt_payment",
@@ -604,7 +620,7 @@ export class TransactionGenerator {
         : getRandomMerchant();
 
     return {
-      id: `txn_${character.characterId}_${transactionCounter++}`,
+      id: this.generateTxnId(character.characterId, year, month, day),
       characterId: character.characterId,
       date: `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`,
       type: "impulse_purchase",

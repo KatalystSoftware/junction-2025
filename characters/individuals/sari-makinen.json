@@ -111,5 +111,49 @@
     "visitCount": 0,
     "lastVisit": null,
     "adviceFollowedHistory": []
-  }
+  },
+  "personalityTraits": {
+    "impulsiveness": 0.3,
+    "trustingness": 0.8,
+    "financial_literacy": 0.5,
+    "stubbornness": 0.3,
+    "emotionality": 0.5
+  },
+  "financialState": {
+    "currentStage": 2,
+    "netWorth": 3729.1015328625513,
+    "monthlyIncome": 2800,
+    "monthlyExpenses": 2240,
+    "totalDebt": 0,
+    "liquidSavings": 7994.1531744691,
+    "investmentPortfolio": 0,
+    "realEstateValue": 0,
+    "currentOccupation": "Nurse",
+    "stageEntryDate": "2025-11-16",
+    "monthsInCurrentStage": 0,
+    "readyForNextStage": false,
+    "netWorthHistory": [
+      {
+        "date": "2025-11-16",
+        "amount": 3729.1015328625513
+      }
+    ],
+    "incomeHistory": [
+      {
+        "date": "2025-11-16",
+        "amount": 2800
+      }
+    ],
+    "majorEvents": []
+  },
+  "successPathWeights": {
+    "comfortable_stability": 0.3,
+    "corporate_career": 0.15,
+    "tech_entrepreneur": 0.1,
+    "real_estate_investor": 0.15,
+    "small_business_owner": 0.15,
+    "stock_market_investor": 0.15
+  },
+  "completedScenarios": [],
+  "adviceHistory": []
 }

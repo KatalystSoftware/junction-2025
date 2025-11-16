@@ -73,5 +73,49 @@
     "visitCount": 0,
     "lastVisit": null,
     "adviceFollowedHistory": []
-  }
+  },
+  "personalityTraits": {
+    "impulsiveness": 0.3,
+    "trustingness": 0.5,
+    "financial_literacy": 0.4,
+    "stubbornness": 0.4,
+    "emotionality": 0.7
+  },
+  "financialState": {
+    "currentStage": 2,
+    "netWorth": 491.8693148320716,
+    "monthlyIncome": 2400,
+    "monthlyExpenses": 1920,
+    "totalDebt": 0,
+    "liquidSavings": 343.72967733158765,
+    "investmentPortfolio": 0,
+    "realEstateValue": 0,
+    "currentOccupation": "Single Mother, Administrative Assistant",
+    "stageEntryDate": "2025-11-16",
+    "monthsInCurrentStage": 0,
+    "readyForNextStage": false,
+    "netWorthHistory": [
+      {
+        "date": "2025-11-16",
+        "amount": 491.8693148320716
+      }
+    ],
+    "incomeHistory": [
+      {
+        "date": "2025-11-16",
+        "amount": 2400
+      }
+    ],
+    "majorEvents": []
+  },
+  "successPathWeights": {
+    "comfortable_stability": 0.3,
+    "corporate_career": 0.15,
+    "tech_entrepreneur": 0.1,
+    "real_estate_investor": 0.15,
+    "small_business_owner": 0.15,
+    "stock_market_investor": 0.15
+  },
+  "completedScenarios": [],
+  "adviceHistory": []
 }

@@ -89,5 +89,49 @@
     "visitCount": 0,
     "lastVisit": null,
     "adviceFollowedHistory": []
-  }
+  },
+  "personalityTraits": {
+    "impulsiveness": 0.3,
+    "trustingness": 0.6,
+    "financial_literacy": 0.6,
+    "stubbornness": 0.4,
+    "emotionality": 0.3
+  },
+  "financialState": {
+    "currentStage": 3,
+    "netWorth": 11525.291961563604,
+    "monthlyIncome": 3400,
+    "monthlyExpenses": 2720,
+    "totalDebt": 0,
+    "liquidSavings": 15548.76892711451,
+    "investmentPortfolio": 0,
+    "realEstateValue": 0,
+    "currentOccupation": "Marketing Manager",
+    "stageEntryDate": "2025-11-16",
+    "monthsInCurrentStage": 0,
+    "readyForNextStage": false,
+    "netWorthHistory": [
+      {
+        "date": "2025-11-16",
+        "amount": 11525.291961563604
+      }
+    ],
+    "incomeHistory": [
+      {
+        "date": "2025-11-16",
+        "amount": 3400
+      }
+    ],
+    "majorEvents": []
+  },
+  "successPathWeights": {
+    "comfortable_stability": 0.3,
+    "corporate_career": 0.15,
+    "tech_entrepreneur": 0.1,
+    "real_estate_investor": 0.15,
+    "small_business_owner": 0.15,
+    "stock_market_investor": 0.15
+  },
+  "completedScenarios": [],
+  "adviceHistory": []
 }

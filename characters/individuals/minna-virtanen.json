@@ -84,5 +84,49 @@
     "visitCount": 0,
     "lastVisit": null,
     "adviceFollowedHistory": []
-  }
+  },
+  "personalityTraits": {
+    "impulsiveness": 0.7,
+    "trustingness": 0.6,
+    "financial_literacy": 0.3,
+    "stubbornness": 0.4,
+    "emotionality": 0.6
+  },
+  "financialState": {
+    "currentStage": 1,
+    "netWorth": 252.67625337592236,
+    "monthlyIncome": 800,
+    "monthlyExpenses": 640,
+    "totalDebt": 0,
+    "liquidSavings": 545.881845072778,
+    "investmentPortfolio": 0,
+    "realEstateValue": 0,
+    "currentOccupation": "University Student",
+    "stageEntryDate": "2025-11-16",
+    "monthsInCurrentStage": 0,
+    "readyForNextStage": false,
+    "netWorthHistory": [
+      {
+        "date": "2025-11-16",
+        "amount": 252.67625337592236
+      }
+    ],
+    "incomeHistory": [
+      {
+        "date": "2025-11-16",
+        "amount": 800
+      }
+    ],
+    "majorEvents": []
+  },
+  "successPathWeights": {
+    "comfortable_stability": 0.5,
+    "corporate_career": 0.15,
+    "tech_entrepreneur": 0.05,
+    "real_estate_investor": 0.15,
+    "small_business_owner": 0.15,
+    "stock_market_investor": 0.1
+  },
+  "completedScenarios": [],
+  "adviceHistory": []
 }

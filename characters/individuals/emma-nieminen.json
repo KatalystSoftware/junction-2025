@@ -81,5 +81,49 @@
     "visitCount": 0,
     "lastVisit": null,
     "adviceFollowedHistory": []
-  }
+  },
+  "personalityTraits": {
+    "impulsiveness": 0.4,
+    "trustingness": 0.6,
+    "financial_literacy": 0.35,
+    "stubbornness": 0.4,
+    "emotionality": 0.6
+  },
+  "financialState": {
+    "currentStage": 1,
+    "netWorth": 7606.240666523697,
+    "monthlyIncome": 1800,
+    "monthlyExpenses": 1440,
+    "totalDebt": 0,
+    "liquidSavings": 9897.86915173172,
+    "investmentPortfolio": 0,
+    "realEstateValue": 0,
+    "currentOccupation": "Gap Year (Working at Clothing Store)",
+    "stageEntryDate": "2025-11-16",
+    "monthsInCurrentStage": 0,
+    "readyForNextStage": false,
+    "netWorthHistory": [
+      {
+        "date": "2025-11-16",
+        "amount": 7606.240666523697
+      }
+    ],
+    "incomeHistory": [
+      {
+        "date": "2025-11-16",
+        "amount": 1800
+      }
+    ],
+    "majorEvents": []
+  },
+  "successPathWeights": {
+    "comfortable_stability": 0.3,
+    "corporate_career": 0.15,
+    "tech_entrepreneur": 0.1,
+    "real_estate_investor": 0.15,
+    "small_business_owner": 0.15,
+    "stock_market_investor": 0.15
+  },
+  "completedScenarios": [],
+  "adviceHistory": []
 }
