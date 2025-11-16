@@ -4,7 +4,6 @@
  */
 
 import type { AdvisorState } from "../types/game-types.ts";
-import { createClient } from "@libsql/client";
 import pg from "pg";
 import { sanitizePlayerName } from "../utils/name-sanitizer.ts";
 
@@ -35,74 +34,94 @@ export interface LeaderboardRanking {
 }
 
 export class LeaderboardService {
-  private pgPool: pg.Pool | null = null;
-  private libsqlClient: any = null;
+  private pgPool: pg.Pool;
   private initialized = false;
-  private usePostgres: boolean;
 
   constructor() {
-    this.usePostgres = !!process.env.DATABASE_URL;
+    const databaseUrl = process.env.DATABASE_URL;
 
-    if (this.usePostgres) {
-      this.pgPool = new Pool({
-        connectionString: process.env.DATABASE_URL,
-      });
-      console.log("✅ Leaderboard using Postgres");
-    } else {
-      this.libsqlClient = createClient({
-        url: "file:../elamapeli.db",
-      });
-      console.log("ℹ️ Leaderboard using LibSQL (dev mode)");
+    if (!databaseUrl) {
+      throw new Error(
+        "DATABASE_URL environment variable is required for leaderboard service"
+      );
     }
+
+    this.pgPool = new Pool({
+      connectionString: databaseUrl,
+    });
+    console.log("✅ Leaderboard using Postgres");
   }
 
   /**
-   * Initialize database schema (LibSQL only - Postgres uses migrations)
+   * Initialize database schema (idempotent - safe to run multiple times)
    */
   async initialize(): Promise<void> {
     if (this.initialized) return;
 
-    // For Postgres, migrations handle schema
-    if (this.usePostgres) {
-      this.initialized = true;
-      return;
-    }
-
-    // For LibSQL, create schema inline
-    if (this.libsqlClient) {
-      await this.libsqlClient.execute(`
+    const client = await this.pgPool.connect();
+    try {
+      // Create leaderboard_entries table
+      await client.query(`
         CREATE TABLE IF NOT EXISTS leaderboard_entries (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          id SERIAL PRIMARY KEY,
           advisor_id TEXT NOT NULL UNIQUE,
           advisor_name TEXT NOT NULL,
           reputation INTEGER DEFAULT 0,
-          skill_level REAL DEFAULT 0,
+          skill_level NUMERIC(4,2) DEFAULT 0,
           total_sessions INTEGER DEFAULT 0,
           total_clients_helped INTEGER DEFAULT 0,
-          lifetime_savings_generated REAL DEFAULT 0,
-          lifetime_debt_cleared REAL DEFAULT 0,
+          lifetime_savings_generated NUMERIC(12,2) DEFAULT 0,
+          lifetime_debt_cleared NUMERIC(12,2) DEFAULT 0,
           advisor_coins INTEGER DEFAULT 0,
-          average_advice_score REAL DEFAULT 0,
+          average_advice_score NUMERIC(4,2) DEFAULT 0,
           achievement_count INTEGER DEFAULT 0,
           global_rank INTEGER,
-          global_score REAL DEFAULT 0,
-          first_session_date TEXT NOT NULL,
-          last_updated TEXT NOT NULL,
-          created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-          updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )
+          global_score NUMERIC(10,2) DEFAULT 0,
+          first_session_date TIMESTAMP NOT NULL,
+          last_updated TIMESTAMP NOT NULL,
+          created_at TIMESTAMP DEFAULT NOW(),
+          updated_at TIMESTAMP DEFAULT NOW()
+        );
       `);
 
-      await this.libsqlClient.execute(
-        `CREATE INDEX IF NOT EXISTS idx_leaderboard_global_rank ON leaderboard_entries(global_rank)`
-      );
-      await this.libsqlClient.execute(
-        `CREATE INDEX IF NOT EXISTS idx_leaderboard_global_score ON leaderboard_entries(global_score DESC)`
-      );
-    }
+      // Create indexes
+      await client.query(`
+        CREATE INDEX IF NOT EXISTS idx_leaderboard_global_rank ON leaderboard_entries(global_rank);
+      `);
+      await client.query(`
+        CREATE INDEX IF NOT EXISTS idx_leaderboard_global_score ON leaderboard_entries(global_score DESC);
+      `);
+      await client.query(`
+        CREATE INDEX IF NOT EXISTS idx_leaderboard_advisor_id ON leaderboard_entries(advisor_id);
+      `);
 
-    this.initialized = true;
-    console.log("✅ Leaderboard database initialized");
+      // Create trigger function for updated_at
+      await client.query(`
+        CREATE OR REPLACE FUNCTION update_leaderboard_updated_at()
+        RETURNS TRIGGER AS $$
+        BEGIN
+          NEW.updated_at = NOW();
+          RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+      `);
+
+      // Create trigger
+      await client.query(`
+        DROP TRIGGER IF EXISTS leaderboard_updated_at ON leaderboard_entries;
+      `);
+      await client.query(`
+        CREATE TRIGGER leaderboard_updated_at
+          BEFORE UPDATE ON leaderboard_entries
+          FOR EACH ROW
+          EXECUTE FUNCTION update_leaderboard_updated_at();
+      `);
+
+      this.initialized = true;
+      console.log("✅ Leaderboard database schema initialized");
+    } finally {
+      client.release();
+    }
   }
 
   /**
@@ -178,9 +197,8 @@ export class LeaderboardService {
 
     const now = new Date().toISOString();
 
-    if (this.usePostgres && this.pgPool) {
-      await this.pgPool.query(
-        `
+    await this.pgPool.query(
+      `
         INSERT INTO leaderboard_entries (
           advisor_id, advisor_name, reputation, skill_level,
           total_sessions, total_clients_helped, lifetime_savings_generated,
@@ -201,64 +219,23 @@ export class LeaderboardService {
           global_score = EXCLUDED.global_score,
           last_updated = EXCLUDED.last_updated
       `,
-        [
-          advisorState.advisorId,
-          advisorName,
-          advisorState.reputation,
-          advisorState.skillLevel,
-          advisorState.totalSessions,
-          advisorState.totalClientsHelped,
-          advisorState.lifetimeSavingsGenerated,
-          advisorState.lifetimeDebtCleared,
-          advisorState.advisorCoins,
-          averageAdviceScore,
-          advisorState.achievementsUnlocked.length,
-          globalScore,
-          firstSessionDate,
-          now,
-        ]
-      );
-    } else if (this.libsqlClient) {
-      await this.libsqlClient.execute({
-        sql: `
-          INSERT INTO leaderboard_entries (
-            advisor_id, advisor_name, reputation, skill_level,
-            total_sessions, total_clients_helped, lifetime_savings_generated,
-            lifetime_debt_cleared, advisor_coins, average_advice_score,
-            achievement_count, global_score, first_session_date, last_updated
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-          ON CONFLICT(advisor_id) DO UPDATE SET
-            advisor_name = excluded.advisor_name,
-            reputation = excluded.reputation,
-            skill_level = excluded.skill_level,
-            total_sessions = excluded.total_sessions,
-            total_clients_helped = excluded.total_clients_helped,
-            lifetime_savings_generated = excluded.lifetime_savings_generated,
-            lifetime_debt_cleared = excluded.lifetime_debt_cleared,
-            advisor_coins = excluded.advisor_coins,
-            average_advice_score = excluded.average_advice_score,
-            achievement_count = excluded.achievement_count,
-            global_score = excluded.global_score,
-            last_updated = excluded.last_updated
-        `,
-        args: [
-          advisorState.advisorId,
-          advisorName,
-          advisorState.reputation,
-          advisorState.skillLevel,
-          advisorState.totalSessions,
-          advisorState.totalClientsHelped,
-          advisorState.lifetimeSavingsGenerated,
-          advisorState.lifetimeDebtCleared,
-          advisorState.advisorCoins,
-          averageAdviceScore,
-          advisorState.achievementsUnlocked.length,
-          globalScore,
-          firstSessionDate,
-          now,
-        ],
-      });
-    }
+      [
+        advisorState.advisorId,
+        advisorName,
+        advisorState.reputation,
+        advisorState.skillLevel,
+        advisorState.totalSessions,
+        advisorState.totalClientsHelped,
+        advisorState.lifetimeSavingsGenerated,
+        advisorState.lifetimeDebtCleared,
+        advisorState.advisorCoins,
+        averageAdviceScore,
+        advisorState.achievementsUnlocked.length,
+        globalScore,
+        firstSessionDate,
+        now,
+      ]
+    );
   }
 
   /**
@@ -267,26 +244,15 @@ export class LeaderboardService {
   async recalculateRankings(): Promise<void> {
     await this.initialize();
 
-    if (this.usePostgres && this.pgPool) {
-      await this.pgPool.query(`
-        UPDATE leaderboard_entries
-        SET global_rank = subquery.rank
-        FROM (
-          SELECT id, ROW_NUMBER() OVER (ORDER BY global_score DESC) as rank
-          FROM leaderboard_entries
-        ) AS subquery
-        WHERE leaderboard_entries.id = subquery.id
-      `);
-    } else if (this.libsqlClient) {
-      await this.libsqlClient.execute(`
-        UPDATE leaderboard_entries
-        SET global_rank = (
-          SELECT COUNT(*) + 1
-          FROM leaderboard_entries AS e2
-          WHERE e2.global_score > leaderboard_entries.global_score
-        )
-      `);
-    }
+    await this.pgPool.query(`
+      UPDATE leaderboard_entries
+      SET global_rank = subquery.rank
+      FROM (
+        SELECT id, ROW_NUMBER() OVER (ORDER BY global_score DESC) as rank
+        FROM leaderboard_entries
+      ) AS subquery
+      WHERE leaderboard_entries.id = subquery.id
+    `);
   }
 
   /**
@@ -295,35 +261,18 @@ export class LeaderboardService {
   async getLeaderboard(limit = 100): Promise<LeaderboardRanking> {
     await this.initialize();
 
-    let rows: any[] = [];
-    let totalParticipants = 0;
+    const result = await this.pgPool.query(
+      `SELECT * FROM leaderboard_entries ORDER BY global_score DESC LIMIT $1`,
+      [limit]
+    );
 
-    if (this.usePostgres && this.pgPool) {
-      const result = await this.pgPool.query(
-        `SELECT * FROM leaderboard_entries ORDER BY global_score DESC LIMIT $1`,
-        [limit]
-      );
-      rows = result.rows;
-
-      const countResult = await this.pgPool.query(
-        `SELECT COUNT(*) as count FROM leaderboard_entries`
-      );
-      totalParticipants = Number(countResult.rows[0].count);
-    } else if (this.libsqlClient) {
-      const result = await this.libsqlClient.execute({
-        sql: `SELECT * FROM leaderboard_entries ORDER BY global_score DESC LIMIT ?`,
-        args: [limit],
-      });
-      rows = result.rows;
-
-      const countResult = await this.libsqlClient.execute(
-        `SELECT COUNT(*) as count FROM leaderboard_entries`
-      );
-      totalParticipants = Number(countResult.rows[0].count);
-    }
+    const countResult = await this.pgPool.query(
+      `SELECT COUNT(*) as count FROM leaderboard_entries`
+    );
+    const totalParticipants = Number(countResult.rows[0].count);
 
     return {
-      entries: rows.map((row, index) => this.mapRowToEntry(row, index + 1)),
+      entries: result.rows.map((row: any, index: number) => this.mapRowToEntry(row, index + 1)),
       lastUpdated: new Date().toISOString(),
       totalParticipants,
     };
@@ -335,21 +284,11 @@ export class LeaderboardService {
   async getAdvisorRank(advisorId: string): Promise<number | null> {
     await this.initialize();
 
-    if (this.usePostgres && this.pgPool) {
-      const result = await this.pgPool.query(
-        `SELECT global_rank FROM leaderboard_entries WHERE advisor_id = $1`,
-        [advisorId]
-      );
-      return result.rows[0]?.global_rank || null;
-    } else if (this.libsqlClient) {
-      const result = await this.libsqlClient.execute({
-        sql: `SELECT global_rank FROM leaderboard_entries WHERE advisor_id = ?`,
-        args: [advisorId],
-      });
-      return result.rows[0]?.global_rank || null;
-    }
-
-    return null;
+    const result = await this.pgPool.query(
+      `SELECT global_rank FROM leaderboard_entries WHERE advisor_id = $1`,
+      [advisorId]
+    );
+    return result.rows[0]?.global_rank || null;
   }
 
   /**
@@ -379,10 +318,7 @@ export class LeaderboardService {
    * Close database connection
    */
   async close(): Promise<void> {
-    if (this.pgPool) {
-      await this.pgPool.end();
-    }
-    // LibSQL client doesn't need explicit closing
+    await this.pgPool.end();
   }
 }
 
