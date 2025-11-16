@@ -566,34 +566,45 @@ IMPORTANT:
  * Helper to format character's initial message for the thread
  */
 /**
- * Translate Finnish text to English using simple AI call
+ * Translate text using AI
  */
-async function translateToEnglish(finnishText: string): Promise<string> {
+async function translateMessage(
+  text: string,
+  targetLanguage: string,
+): Promise<string> {
   try {
     const { generateText } = await import("ai");
     const { google } = await import("@ai-sdk/google");
 
+    const languageNames: Record<string, string> = {
+      en: "English",
+      fi: "Finnish",
+      sv: "Swedish",
+    };
+    const targetLangName = languageNames[targetLanguage] || "English";
+
     const result = await generateText({
       model: google("gemini-2.0-flash-exp"),
-      prompt: `Translate this Finnish message to casual English. Keep the same tone and style. Only output the English translation, nothing else:\n\n${finnishText}`,
+      prompt: `Translate this message to ${targetLangName}. Keep the same tone, emotion, and style. Only output the ${targetLangName} translation, nothing else:\n\n${text}`,
     });
 
     return result.text.trim();
   } catch (error) {
     console.error("Translation failed:", error);
     // Fallback: return original if translation fails
-    return finnishText;
+    return text;
   }
 }
 
 /**
- * Get character's initial message, optionally translated to match advisor language
+ * Get character's initial message, translated to match user's language preference
  * Also generates voice messages for emotional initial contacts
  */
 export async function getCharacterInitialMessage(
   scenario: Scenario,
-  advisorLanguage?: "finnish" | "english",
+  userLanguage?: string,
   character?: Character,
+  totalSessions?: number,
 ): Promise<{
   message: string;
   isVoice: boolean;
@@ -601,12 +612,9 @@ export async function getCharacterInitialMessage(
 }> {
   let message = scenario.initialContact.message;
 
-  // If advisor is using English and message is in Finnish, translate it
-  if (advisorLanguage === "english") {
-    // Simple detection: if message contains ä or ö, it's likely Finnish
-    if (/[äö]/i.test(message)) {
-      message = await translateToEnglish(message);
-    }
+  // Translate message if user language is not English
+  if (userLanguage && userLanguage !== "en") {
+    message = await translateMessage(message, userLanguage);
   }
 
   // Check if initial contact should have voice
@@ -614,10 +622,21 @@ export async function getCharacterInitialMessage(
     scenario.initialContact.method === "voice" ||
     scenario.initialContact.method === "call";
 
+  console.log(
+    `🎤 Initial contact for scenario ${scenario.scenarioId}:`,
+    {
+      method: scenario.initialContact.method,
+      isVoiceMethod,
+      hasCharacter: !!character,
+      visitCount: character?.relationshipState.visitCount,
+    },
+  );
+
   let voiceConfig = scenario.initialContact.voiceMessage;
 
-  // Generate voice message if it's a voice method and character is provided
-  if (isVoiceMethod && character && !voiceConfig?.audioUrl) {
+  // Generate voice message if character is provided
+  // Check shouldGenerateVoiceMessage to determine if we should generate
+  if (character && !voiceConfig?.audioUrl) {
     // Import voice service
     const {
       shouldGenerateVoiceMessage,
@@ -630,12 +649,29 @@ export async function getCharacterInitialMessage(
       scenario.problemContext.emotionalState,
     );
 
-    // Determine scenario number (visitCount + 1, since first visit is visitCount=0)
-    const scenarioNumber = (character.relationshipState.visitCount ?? 0) + 1;
+    // Determine scenario number for onboarding flow
+    // Use advisor's total session count (not character visitCount, since each character is new)
+    // This ensures: session 1 = no voice, session 2 = guaranteed voice, session 3+ = random
+    const scenarioNumber = totalSessions !== undefined
+      ? totalSessions + 1
+      : (character.relationshipState.visitCount ?? 0) + 1;
+
+    console.log(`🎤 Scenario number calculation:`, {
+      totalSessions,
+      visitCount: character.relationshipState.visitCount,
+      scenarioNumber,
+      formula: totalSessions !== undefined ? `${totalSessions} + 1` : `${character.relationshipState.visitCount ?? 0} + 1`,
+    });
+
     const shouldGenerateVoice = shouldGenerateVoiceMessage(
       character,
       emotionalState,
       scenarioNumber,
+    );
+
+    console.log(
+      `🎤 Voice decision for scenario ${scenarioNumber}:`,
+      { shouldGenerateVoice, emotionalState },
     );
 
     if (shouldGenerateVoice) {
@@ -643,6 +679,14 @@ export async function getCharacterInitialMessage(
         character,
         message,
         emotionalState,
+      );
+
+      console.log(
+        `🎤 Voice config result:`,
+        {
+          enabled: voiceConfig?.enabled,
+          hasAudio: !!voiceConfig?.audioUrl,
+        },
       );
 
       // Mark that this character has received a voice message
