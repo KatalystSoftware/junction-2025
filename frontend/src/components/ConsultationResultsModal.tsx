@@ -883,6 +883,63 @@ export function ConsultationResultsModal({
               </div>
             )}
 
+            {/* Research Insight */}
+            {evaluation && evaluation.qualityScore >= 6 && (
+              <div
+                className="p-4 rounded-lg border-l-4"
+                style={{
+                  backgroundColor: "rgba(127, 86, 217, 0.05)",
+                  borderColor: "var(--primary)",
+                  borderLeft: "4px solid var(--primary)",
+                }}
+              >
+                <div className="flex items-start gap-3">
+                  <span style={{ fontSize: "1.5rem" }}>📚</span>
+                  <div className="flex-1">
+                    <h4
+                      className="mb-2"
+                      style={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: "var(--text-sm)",
+                        fontWeight: "var(--font-weight-semibold)",
+                        color: "var(--primary)",
+                      }}
+                    >
+                      Research Insight
+                    </h4>
+                    <p
+                      className="mb-3"
+                      style={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: "var(--text-sm)",
+                        color: "var(--muted-foreground)",
+                        lineHeight: "1.5",
+                      }}
+                    >
+                      Your advice aligns with Finnish financial literacy
+                      standards from the Bank of Finland and OECD-INFE
+                      frameworks. Young adults who receive quality financial
+                      guidance build emergency funds 3x faster than peers.
+                    </p>
+                    <a
+                      href="https://www.suomenpankki.fi/en/financial-literacy/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: "var(--text-sm)",
+                        fontWeight: "var(--font-weight-medium)",
+                        color: "var(--primary)",
+                        textDecoration: "underline",
+                      }}
+                    >
+                      Learn more about Finnish financial literacy research →
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Coins Earned */}
             {coinsEarned !== undefined && (
               <div

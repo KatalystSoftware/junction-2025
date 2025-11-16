@@ -369,6 +369,55 @@ export function LandingPage({ onStartGame }: LandingPageProps) {
                     </span>
                   </Button>
                 </motion.div>
+
+                {/* Research Badge */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8, duration: 0.6 }}
+                  className="mt-6 flex items-center justify-center gap-2 px-4 py-2 rounded-full"
+                  style={{
+                    backgroundColor: "rgba(255, 255, 255, 0.2)",
+                    backdropFilter: "blur(10px)",
+                  }}
+                >
+                  <span style={{ fontSize: "1rem" }}>📚</span>
+                  <span
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: "var(--text-sm)",
+                      color: "rgba(255, 255, 255, 0.9)",
+                      fontWeight: "var(--font-weight-medium)",
+                    }}
+                  >
+                    Research-backed by
+                  </span>
+                  <a
+                    href="https://www.suomenpankki.fi/en/financial-literacy/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: "var(--text-sm)",
+                      color: "white",
+                      fontWeight: "var(--font-weight-semibold)",
+                      textDecoration: "underline",
+                      textUnderlineOffset: "2px",
+                    }}
+                  >
+                    Bank of Finland
+                  </a>
+                  <span
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: "var(--text-sm)",
+                      color: "rgba(255, 255, 255, 0.9)",
+                      fontWeight: "var(--font-weight-medium)",
+                    }}
+                  >
+                    & OECD
+                  </span>
+                </motion.div>
               </motion.div>
             </div>
           </motion.div>

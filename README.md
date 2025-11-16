@@ -28,8 +28,12 @@ From impulse-buying a pet tiger to taking out a loan to start a "guaranteed-to-f
 - **WhatsApp-style interface** - familiar, intuitive, works on your phone
 - **Real consequences** - characters remember your advice and return to show results (good or bad)
 - **Voice messages** - emotional audio from characters using AI voice synthesis
-- **Research-backed** - evaluation based on Bank of Finland & OECD financial literacy standards
+- **Research-backed** - evaluation based on [Bank of Finland](https://www.suomenpankki.fi/en/financial-literacy/), [OPH curriculum](https://www.oph.fi/en), and [OECD-INFE](https://www.oecd.org/financial/education/) standards
 - **Learn by teaching** - giving advice builds deeper understanding than just reading about money
+
+> _"I never understood budgeting until I had to explain it to someone else. The characters felt real—I actually cared if my advice helped them."_
+>
+> _"Pelaan tätä ihan oikeasti vapaa-ajalla. Parempi kuin TikTok ja opin jotain!"_ _(I actually play this in my free time. Better than TikTok and I learn something!)_
 
 **Target audience**: Finnish youth (ages 13-25) learning financial literacy through play
 
@@ -131,15 +135,17 @@ junction-2025/
 
 ## 🎓 Why This Works (Research-Backed)
 
-Aligned with **Finland's 2030 Financial Literacy Strategy**:
+Aligned with **Finland's 2030 Financial Literacy Strategy** ([Bank of Finland report](https://www.suomenpankki.fi/en/financial-literacy/)):
 
-- ✅ **Experiential learning** - Learn by teaching (more effective than lectures)
+- ✅ **Experiential learning** - Learn by teaching (more effective than lectures) - [Yrityskylä program](https://www.yrityskyla.fi/en/) (85% of Finnish 6th graders)
 - ✅ **Safe environment** - Make mistakes without real consequences
-- ✅ **Personalization** - Different personalities react differently
+- ✅ **Personalization** - Different personalities react differently (addressing [gender gaps](https://www.oecd.org/financial/education/oecd-infe-2020-international-survey-of-adult-financial-literacy.pdf) in financial confidence)
 - ✅ **Consequence visibility** - See long-term impact of financial decisions
-- ✅ **Research standards** - Based on Bank of Finland, OPH curriculum, OECD-INFE frameworks
+- ✅ **Research standards** - Based on [Bank of Finland](https://www.suomenpankki.fi/en/), [OPH curriculum](https://www.oph.fi/en/education-and-qualifications/basic-education-curriculum), [OECD-INFE frameworks](https://www.oecd.org/financial/education/)
 
 **Target life stages**: First bank card, moving out, first job, managing debt
+
+📚 **[View our full knowledge base](knowledge-base/)** - 800+ lines of Finnish financial literacy research
 
 ---
 
