@@ -573,6 +573,7 @@ async function translateMessage(
   targetLanguage: string,
 ): Promise<string> {
   try {
+    const modelName = getAgentModel();
     const { generateText } = await import("ai");
     const { google } = await import("@ai-sdk/google");
 
@@ -583,8 +584,11 @@ async function translateMessage(
     };
     const targetLangName = languageNames[targetLanguage] || "English";
 
+    // Extract just the model name without the provider prefix
+    const model = modelName.replace(/^google\//, "");
+
     const result = await generateText({
-      model: google("gemini-2.0-flash-exp"),
+      model: google(model),
       prompt: `Translate this message to ${targetLangName}. Keep the same tone, emotion, and style. Only output the ${targetLangName} translation, nothing else:\n\n${text}`,
     });
 

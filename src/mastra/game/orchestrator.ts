@@ -52,8 +52,13 @@ async function translateAdviceChoices(
   const targetLangName = languageNames[targetLanguage];
   if (!targetLangName) return choices;
 
+  const { getAgentModel } = await import("../agents/agent-model.ts");
+  const modelName = getAgentModel();
   const { generateText } = await import("ai");
   const { google } = await import("@ai-sdk/google");
+
+  // Extract just the model name without the provider prefix
+  const model = modelName.replace(/^google\//, "");
 
   const translatedChoices = await Promise.all(
     choices.map(async (choice) => {
@@ -61,14 +66,14 @@ async function translateAdviceChoices(
         // Translate actionText
         const actionPrompt = `Translate this financial advisor action text to ${targetLangName}. Keep it concise and professional. Only output the ${targetLangName} translation:\n\n${choice.actionText}`;
         const actionResult = await generateText({
-          model: google("gemini-2.0-flash-exp"),
+          model: google(model),
           prompt: actionPrompt,
         });
 
         // Translate projectedOutcome
         const outcomePrompt = `Translate this financial outcome description to ${targetLangName}. Keep it brief and clear. Only output the ${targetLangName} translation:\n\n${choice.projectedOutcome}`;
         const outcomeResult = await generateText({
-          model: google("gemini-2.0-flash-exp"),
+          model: google(model),
           prompt: outcomePrompt,
         });
 
@@ -77,7 +82,7 @@ async function translateAdviceChoices(
         if (fullAdviceText) {
           const fullPrompt = `Translate this financial advice to ${targetLangName}. Keep the tone professional and empathetic. Only output the ${targetLangName} translation:\n\n${fullAdviceText}`;
           const fullResult = await generateText({
-            model: google("gemini-2.0-flash-exp"),
+            model: google(model),
             prompt: fullPrompt,
           });
           fullAdviceText = fullResult.text.trim();
