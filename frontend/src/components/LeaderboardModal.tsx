@@ -16,6 +16,7 @@ interface LeaderboardEntry {
   skillLevel: number;
   totalSessions: number;
   totalClientsHelped: number;
+   totalMessagesSent?: number;
   lifetimeSavingsGenerated: number;
   lifetimeDebtCleared: number;
   advisorCoins: number;
@@ -68,7 +69,7 @@ export function LeaderboardModal({
 
       try {
         const response = await fetch(
-          `/api/game/leaderboard?category=global&limit=100`,
+          `/api/game/leaderboard?category=impact&limit=100`,
         );
 
         if (!response.ok) {
@@ -146,7 +147,11 @@ export function LeaderboardModal({
                             currentUserEntry.lifetimeSavingsGenerated +
                               currentUserEntry.lifetimeDebtCleared,
                           )}{" "}
-                          impact • {currentUserEntry.globalScore.toFixed(0)} pts
+                          impact •{" "}
+                          {currentUserEntry.advisorCoins.toLocaleString()}{" "}
+                          coins • {currentUserEntry.achievementCount} achievements
+                          {" • "}
+                          {currentUserEntry.globalScore.toFixed(0)} pts
                         </div>
                       </div>
                     </div>
@@ -186,7 +191,9 @@ export function LeaderboardModal({
                               entry.lifetimeDebtCleared,
                           )}{" "}
                           impact • {entry.totalSessions} sessions •{" "}
-                          {entry.totalClientsHelped} clients
+                          {entry.totalClientsHelped} clients •{" "}
+                          {entry.advisorCoins.toLocaleString()} coins •{" "}
+                          {entry.achievementCount} achievements
                         </div>
                       </div>
 

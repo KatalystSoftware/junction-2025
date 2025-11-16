@@ -50,6 +50,7 @@ export class LeaderboardService {
           skill_level NUMERIC(4,2) DEFAULT 0,
           total_sessions INTEGER DEFAULT 0,
           total_clients_helped INTEGER DEFAULT 0,
+          total_messages_sent INTEGER DEFAULT 0,
           lifetime_savings_generated NUMERIC(12,2) DEFAULT 0,
           lifetime_debt_cleared NUMERIC(12,2) DEFAULT 0,
           advisor_coins INTEGER DEFAULT 0,
@@ -165,6 +166,11 @@ export class LeaderboardService {
         ? totalScores / advisorState.sessionHistory.length
         : 0;
 
+    const totalMessagesSent = advisorState.sessionHistory.reduce(
+      (sum, session) => sum + (session.duration || 0),
+      0,
+    );
+
     const firstSessionDate =
       advisorState.sessionHistory.length > 0
         ? advisorState.sessionHistory[0].timestamp
@@ -185,16 +191,18 @@ export class LeaderboardService {
       `
         INSERT INTO leaderboard_entries (
           advisor_id, advisor_name, reputation, skill_level,
-          total_sessions, total_clients_helped, lifetime_savings_generated,
-          lifetime_debt_cleared, advisor_coins, average_advice_score,
-          achievement_count, global_score, first_session_date, last_updated
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+          total_sessions, total_clients_helped, total_messages_sent,
+          lifetime_savings_generated, lifetime_debt_cleared, advisor_coins,
+          average_advice_score, achievement_count, global_score,
+          first_session_date, last_updated
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
         ON CONFLICT(advisor_id) DO UPDATE SET
           advisor_name = EXCLUDED.advisor_name,
           reputation = EXCLUDED.reputation,
           skill_level = EXCLUDED.skill_level,
           total_sessions = EXCLUDED.total_sessions,
           total_clients_helped = EXCLUDED.total_clients_helped,
+          total_messages_sent = EXCLUDED.total_messages_sent,
           lifetime_savings_generated = EXCLUDED.lifetime_savings_generated,
           lifetime_debt_cleared = EXCLUDED.lifetime_debt_cleared,
           advisor_coins = EXCLUDED.advisor_coins,
@@ -210,6 +218,7 @@ export class LeaderboardService {
         advisorState.skillLevel,
         advisorState.totalSessions,
         advisorState.totalClientsHelped,
+        totalMessagesSent,
         advisorState.lifetimeSavingsGenerated,
         advisorState.lifetimeDebtCleared,
         advisorState.advisorCoins,
@@ -249,7 +258,8 @@ export class LeaderboardService {
       | "impact"
       | "expertise"
       | "coins"
-      | "achievements" = "global",
+      | "achievements"
+      | "messages" = "global",
     limit = 100,
   ): Promise<LeaderboardRanking> {
     await this.initialize();
@@ -272,6 +282,9 @@ export class LeaderboardService {
         break;
       case "achievements":
         orderByClause = "achievement_count DESC, global_score DESC";
+        break;
+      case "messages":
+        orderByClause = "total_messages_sent DESC, global_score DESC";
         break;
       case "global":
       default:
@@ -310,7 +323,8 @@ export class LeaderboardService {
       | "impact"
       | "expertise"
       | "coins"
-      | "achievements" = "global",
+      | "achievements"
+      | "messages" = "global",
   ): Promise<{
     rank: number;
     totalParticipants: number;
@@ -336,6 +350,9 @@ export class LeaderboardService {
         break;
       case "achievements":
         orderByClause = "achievement_count DESC, global_score DESC";
+        break;
+      case "messages":
+        orderByClause = "total_messages_sent DESC, global_score DESC";
         break;
       case "global":
       default:
@@ -387,7 +404,8 @@ export class LeaderboardService {
       | "impact"
       | "expertise"
       | "coins"
-      | "achievements" = "global",
+      | "achievements"
+      | "messages" = "global",
     range = 5,
   ): Promise<LeaderboardRanking> {
     await this.initialize();
@@ -425,6 +443,9 @@ export class LeaderboardService {
       case "achievements":
         orderByClause = "achievement_count DESC, global_score DESC";
         break;
+      case "messages":
+        orderByClause = "total_messages_sent DESC, global_score DESC";
+        break;
       case "global":
       default:
         orderByClause = "global_score DESC";
@@ -461,6 +482,9 @@ export class LeaderboardService {
       skillLevel: Number(row.skill_level),
       totalSessions: Number(row.total_sessions),
       totalClientsHelped: Number(row.total_clients_helped),
+      totalMessagesSent: row.total_messages_sent
+        ? Number(row.total_messages_sent)
+        : 0,
       lifetimeSavingsGenerated: Number(row.lifetime_savings_generated),
       lifetimeDebtCleared: Number(row.lifetime_debt_cleared),
       advisorCoins: Number(row.advisor_coins),

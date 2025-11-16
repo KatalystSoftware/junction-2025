@@ -815,6 +815,7 @@ export interface LeaderboardEntry {
   skillLevel: number;
   totalSessions: number;
   totalClientsHelped: number;
+  totalMessagesSent?: number;
 
   // Financial Impact
   lifetimeSavingsGenerated: number;
@@ -879,7 +880,8 @@ export type LeaderboardCategory =
   | "impact" // By financial impact (savings + debt cleared)
   | "expertise" // By skill level and advice quality
   | "coins" // By advisor coins earned
-  | "achievements"; // By achievement count
+  | "achievements" // By achievement count
+  | "messages"; // By total messages sent
 
 /**
  * Leaderboard ranking response

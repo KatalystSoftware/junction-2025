@@ -15,7 +15,6 @@ import {
   Phone,
   Video,
   ArrowLeft,
-  ArrowDown,
   PhoneOff,
   VideoOff,
   Mic,
@@ -34,7 +33,6 @@ import logoImage from "figma:asset/601ef144d16bf6e001c5324689cdddb5a7ea7f74.png"
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useTranslation } from "../utils/translations";
-import { shouldShowChatInputTip } from "@backend/chatOnboarding";
 
 // Helper function to convert quality score (0-10) to quality level key
 function getQualityLevel(
@@ -65,8 +63,6 @@ interface ChatWindowProps {
   // Controlled input support (for boss intervention revisions)
   inputValue?: string;
   onInputChange?: (value: string) => void;
-  // Global onboarding state: has the player ever sent a message
-  hasAnyUserMessages?: boolean;
 }
 
 // Helper functions to calculate financial data
@@ -138,7 +134,6 @@ export function ChatWindow({
   conversationEndData,
   inputValue: controlledInputValue,
   onInputChange,
-  hasAnyUserMessages,
 }: ChatWindowProps) {
   const t = useTranslation();
   // Use controlled input from parent if provided, otherwise local state
@@ -333,18 +328,6 @@ export function ChatWindow({
   // Get multiple choice options from backend (if provided)
   // Keep the full choice objects to display actionText + projectedOutcome
   const multipleChoiceOptions = adviceChoices.length > 0 ? adviceChoices : [];
-
-  const hasUserMessages =
-    typeof hasAnyUserMessages === "boolean"
-      ? hasAnyUserMessages
-      : messages.some((message) => message.role === "user");
-  const isInputActive =
-    isInputFocused || isRecording || audioBlob !== null || isTranscribing;
-
-  const showChatInputTip = shouldShowChatInputTip({
-    hasUserMessages,
-    isInputActive,
-  });
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -704,14 +687,17 @@ export function ChatWindow({
           </div>
 
           <div className="flex items-center gap-2">
-            {contact.id !== "boss-pinned" && contact.financialProfile && (
+            {contact.id !== "boss-pinned" && contact.characterId && contact.financialProfile && (
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => setShowFinancialDashboard(true)}
+                      onClick={() => {
+                        console.log("Opening financial dashboard for:", contact.characterId, contact.name);
+                        setShowFinancialDashboard(true);
+                      }}
                       style={{ borderRadius: "var(--radius-button)" }}
                     >
                       <BarChart3 className="w-5 h-5" />
@@ -2211,13 +2197,22 @@ export function ChatWindow({
       )}
 
       {/* Financial Dashboard Modal */}
-      {showFinancialDashboard && contact && contact.id !== "boss-pinned" && contact.characterId && (
-        <ClientFinancialDashboard
-          characterId={contact.characterId}
-          characterName={contact.name}
-          onClose={() => setShowFinancialDashboard(false)}
-        />
-      )}
+      {(() => {
+        const shouldShow = showFinancialDashboard && contact && contact.id !== "boss-pinned" && contact.characterId;
+        console.log("Financial Dashboard render check:", {
+          showFinancialDashboard,
+          contactId: contact?.id,
+          characterId: contact?.characterId,
+          shouldShow
+        });
+        return shouldShow ? (
+          <ClientFinancialDashboard
+            characterId={contact.characterId!}
+            characterName={contact.name}
+            onClose={() => setShowFinancialDashboard(false)}
+          />
+        ) : null;
+      })()}
     </div>
   );
 }
