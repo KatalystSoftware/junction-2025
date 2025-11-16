@@ -1,6 +1,7 @@
 import { Mastra } from "@mastra/core/mastra";
 import { PinoLogger } from "@mastra/loggers";
 import { LibSQLStore } from "@mastra/libsql";
+import { PostgresStore } from "@mastra/pg";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -28,12 +29,28 @@ import {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const databaseUrl = process.env.DATABASE_URL;
+const mastraSchema = process.env.MASTRA_SCHEMA ?? "mastra";
+
 // Create storage instance (shared between mastra and session store)
-export const storage = new LibSQLStore({
-  id: "mastra-agent-store",
-  // Use file storage for persistence
-  url: "file:../elamapeli.db",
-});
+export const storage = databaseUrl
+  ? new PostgresStore({
+      connectionString: databaseUrl,
+      schemaName: mastraSchema,
+    })
+  : new LibSQLStore({
+      id: "mastra-agent-store",
+      // Use file storage for persistence (dev/local fallback)
+      url: "file:../elamapeli.db",
+    });
+
+if (databaseUrl) {
+  console.log("✅ Using PostgreSQL storage for Mastra resources");
+} else {
+  console.log(
+    "ℹ️ DATABASE_URL not set - using local LibSQL storage at ../elamapeli.db",
+  );
+}
 
 export const mastra = new Mastra({
   agents: {

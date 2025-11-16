@@ -44,6 +44,7 @@
     "@mastra/libsql": "1.0.0-beta.0",
     "@mastra/loggers": "1.0.0-beta.0",
     "@mastra/memory": "1.0.0-beta.0",
+    "@mastra/pg": "1.0.0-beta.0",
     "@mastra/voice-elevenlabs": "^0.11.12",
     "ai": "^5.0.93",
     "hono": "^4.10.6",
