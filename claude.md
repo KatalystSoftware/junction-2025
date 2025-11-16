@@ -31,6 +31,10 @@ Instead of managing your own money (which can create pressure), you act as a **p
 
 ## ⚙️ Development Workflow - READ THIS FIRST
 
+This is a **monorepo** containing:
+- **Backend** (root): Mastra-based game orchestrator and API
+- **Frontend** (`frontend/`): React + Vite WhatsApp-style UI
+
 ### Critical Commands
 
 **WE USE `pnpm`, NOT `npm`!**
@@ -39,20 +43,36 @@ Instead of managing your own money (which can create pressure), you act as a **p
 # Play the game (interactive CLI)
 pnpm play
 
+# Run full stack (backend API + frontend dev server)
+pnpm dev
+
+# Run backend only (API on port 4111)
+pnpm dev:api
+
+# Run frontend only (UI on port 3000)
+pnpm dev:frontend
+
 # Run tests/demo (real AI, updates cache)
 pnpm test
 
 # Run cached CI-style test flow (no env / credits)
 pnpm test-ci
 
-# Start Mastra dev server
-pnpm dev
-
 # BEFORE EVERY COMMIT - MANDATORY
 pnpm format      # Format code with Prettier
 pnpm check       # TypeScript type checking
 pnpm test-ci     # Validate cached game flow still makes sense
+
+# Build for production
+pnpm build:all   # Build both backend and frontend
+pnpm build:frontend  # Frontend only (outputs to public/)
 ```
+
+### Ports & Services
+
+- **Backend API**: http://localhost:4111
+- **Frontend Dev**: http://localhost:3000
+- **Frontend (production)**: Served from backend's `/public` directory
 
 ### Important Technical Notes
 
@@ -702,6 +722,24 @@ This game teaches Finnish financial literacy through:
 6. **Incremental Difficulty**: Start easy, progress to complex cases
 
 **Target Audience**: Finnish young adults learning financial literacy in an engaging, game-like environment.
+
+---
+
+## 📚 Additional Documentation
+
+For specific topics, see the following documentation files:
+
+### Features
+- **[RAG System](docs/features/rag-system.md)** - Finnish financial literacy knowledge base and evaluation
+- **[Voice Integration](docs/features/voice-integration.md)** - ElevenLabs character voice synthesis
+- **[Relationship System](docs/features/relationship-system.md)** - Character trust and progression
+- **[Leaderboards & Social Features](docs/features/leaderboard.md)** - Rankings, challenges, case sharing
+- **[Localization](docs/features/localization.md)** - Multi-language support (Finnish/Swedish/English)
+
+### Technical
+- **[Error Recovery](docs/error-recovery.md)** - Retry logic and graceful degradation
+- **[Deployment Guide](docs/deployment.md)** - Docker setup and production deployment
+- **[Frontend Integration](docs/frontend-integration.md)** - React frontend integration guide
 
 ---
 

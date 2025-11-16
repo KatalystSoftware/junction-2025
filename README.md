@@ -472,12 +472,21 @@ This is a Junction 2025 hackathon project. Contributions welcome!
 
 ## 📚 Documentation
 
-- **Getting Started:** This README
-- **Developer Guide:** [claude.md](claude.md)
-- **RAG System:** [docs/features/rag-system.md](docs/features/rag-system.md)
-- **Voice Integration:** [docs/features/voice-integration.md](docs/features/voice-integration.md)
-- **Relationship System:** [docs/features/relationship-system.md](docs/features/relationship-system.md)
-- **Error Recovery:** [docs/error-recovery.md](docs/error-recovery.md)
+### Getting Started
+- **This README** - Quick start and overview
+- **[Developer Guide](claude.md)** - Complete development documentation
+
+### Features
+- **[RAG System](docs/features/rag-system.md)** - Finnish financial literacy knowledge base
+- **[Voice Integration](docs/features/voice-integration.md)** - Character voice synthesis with ElevenLabs
+- **[Relationship System](docs/features/relationship-system.md)** - Character trust and progression
+- **[Leaderboards & Social](docs/features/leaderboard.md)** - Rankings, challenges, case sharing
+- **[Localization](docs/features/localization.md)** - Multi-language support (FI/EN/SV)
+
+### Technical Guides
+- **[Error Recovery](docs/error-recovery.md)** - Retry logic and graceful degradation
+- **[Deployment](docs/deployment.md)** - Docker setup and production deployment
+- **[Frontend Integration](docs/frontend-integration.md)** - React frontend integration
 
 ---
 
