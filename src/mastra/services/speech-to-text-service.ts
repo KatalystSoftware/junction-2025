@@ -61,10 +61,11 @@ export async function transcribeAudio(
     const transcriptionPrompt = `${contextPrompt}${languageHint}
 
 Please transcribe the following audio accurately. Return ONLY the transcribed text, nothing else.`;
+    const model = getAgentModel().replace(/^google\//, "");
 
     // Use configured Gemini model for transcription (supports audio input)
     const result = await generateText({
-      model: google(getAgentModel()),
+      model: google(model),
       messages: [
         {
           role: "user",
@@ -103,9 +104,10 @@ export async function transcribeAudioWithLanguageDetection(
   try {
     const base64Audio = audioBuffer.toString("base64");
     const dataUrl = `data:${mimeType};base64,${base64Audio}`;
+    const model = getAgentModel().replace(/^google\//, "");
 
     const result = await generateText({
-      model: google(getAgentModel()),
+      model: google(model),
       messages: [
         {
           role: "user",
