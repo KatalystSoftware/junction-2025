@@ -97,6 +97,15 @@ export interface Translations {
     achievementsUnlocked: string;
   };
 
+  // Quality Levels
+  qualityLevels: {
+    excellent: string;     // 9-10
+    good: string;          // 7-8
+    adequate: string;      // 5-6
+    belowAverage: string;  // 3-4
+    poor: string;          // 0-2
+  };
+
   // Achievements
   achievements: {
     [key: string]: {
@@ -191,6 +200,14 @@ const translations: Record<Language, Translations> = {
       firstSteps: "First Steps",
       firstStepsDesc: "Help your first client",
       achievementsUnlocked: "Achievements Unlocked",
+    },
+
+    qualityLevels: {
+      excellent: "Excellent advice",
+      good: "Good advice",
+      adequate: "Adequate advice",
+      belowAverage: "Below average advice",
+      poor: "Poor advice",
     },
 
     achievements: {
@@ -304,6 +321,14 @@ const translations: Record<Language, Translations> = {
       achievementsUnlocked: "Avatut Saavutukset",
     },
 
+    qualityLevels: {
+      excellent: "Erinomainen neuvo",
+      good: "Hyvä neuvo",
+      adequate: "Riittävä neuvo",
+      belowAverage: "Keskitason alapuolella oleva neuvo",
+      poor: "Heikko neuvo",
+    },
+
     achievements: {
       first_client: { name: "Ensimmäiset Askeleet", description: "Auta ensimmäistä asiakastasi" },
       ten_clients: { name: "Kasvava Käytäntö", description: "Auta 10 asiakasta" },
@@ -413,6 +438,14 @@ const translations: Record<Language, Translations> = {
       firstSteps: "Första Stegen",
       firstStepsDesc: "Hjälp din första klient",
       achievementsUnlocked: "Upplåsta Prestationer",
+    },
+
+    qualityLevels: {
+      excellent: "Utmärkt råd",
+      good: "Bra råd",
+      adequate: "Tillräckligt råd",
+      belowAverage: "Under genomsnittligt råd",
+      poor: "Dåligt råd",
     },
 
     achievements: {

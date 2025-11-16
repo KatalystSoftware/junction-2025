@@ -35,6 +35,17 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useTranslation } from "../utils/translations";
 
+// Helper function to convert quality score (0-10) to quality level key
+function getQualityLevel(
+  score: number
+): "excellent" | "good" | "adequate" | "belowAverage" | "poor" {
+  if (score >= 9) return "excellent";
+  if (score >= 7) return "good";
+  if (score >= 5) return "adequate";
+  if (score >= 3) return "belowAverage";
+  return "poor";
+}
+
 interface ChatWindowProps {
   contact: Contact | undefined;
   messages: Message[];
@@ -776,8 +787,12 @@ export function ChatWindow({
                     }}
                   >
                     <strong>{t.consultationEnd.quality}</strong>{" "}
-                    {conversationEndData.financialResults.evaluation
-                      .qualityDescription || "Good advice"}
+                    {t.qualityLevels[
+                      getQualityLevel(
+                        conversationEndData.financialResults.evaluation
+                          .qualityScore || 5
+                      )
+                    ]}
                   </p>
                 </div>
               )}
