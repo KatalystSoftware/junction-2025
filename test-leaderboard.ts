@@ -73,7 +73,10 @@ async function testLeaderboard() {
       careerTier: 3,
     };
 
-    await leaderboardService.upsertLeaderboardEntry(testAdvisor, "Test Advisor");
+    await leaderboardService.upsertLeaderboardEntry(
+      testAdvisor,
+      "Test Advisor",
+    );
     console.log("✅ Test advisor created\n");
 
     // 4. Get career tiers
@@ -81,15 +84,18 @@ async function testLeaderboard() {
     const tiers = await leaderboardService.getCareerTiers();
     console.log(`✅ Found ${tiers.length} career tiers:`);
     tiers.forEach((tier) => {
-      console.log(`   ${tier.tierEmoji} ${tier.tierName} - Min Rep: ${tier.minReputation}`);
+      console.log(
+        `   ${tier.tierEmoji} ${tier.tierName} - Min Rep: ${tier.minReputation}`,
+      );
     });
     console.log();
 
     // 5. Calculate advisor tier
     console.log("5️⃣ Calculating advisor tier...");
-    const advisorTier = await leaderboardService.calculateAdvisorTier(testAdvisor);
+    const advisorTier =
+      await leaderboardService.calculateAdvisorTier(testAdvisor);
     console.log(
-      `✅ Test advisor tier: ${advisorTier.tierEmoji} ${advisorTier.tierName}\n`
+      `✅ Test advisor tier: ${advisorTier.tierEmoji} ${advisorTier.tierName}\n`,
     );
 
     // 6. Get next tier progress
@@ -98,7 +104,11 @@ async function testLeaderboard() {
     console.log(`✅ Current: ${progress.currentTier.tierName}`);
     if (progress.nextTier) {
       console.log(`   Next: ${progress.nextTier.tierName}`);
-      console.log(`   Progress: ${Object.entries(progress.progress).map(([k, v]) => `${k}=${Math.round(v * 100)}%`).join(", ")}`);
+      console.log(
+        `   Progress: ${Object.entries(progress.progress)
+          .map(([k, v]) => `${k}=${Math.round(v * 100)}%`)
+          .join(", ")}`,
+      );
     } else {
       console.log("   Maximum tier reached!");
     }
@@ -110,7 +120,7 @@ async function testLeaderboard() {
     console.log(`✅ Found ${challenges.length} active challenges:`);
     challenges.forEach((c) => {
       console.log(
-        `   ${c.badgeEmoji} ${c.challengeName} (${c.challengeType}) - ${c.targetValue} ${c.metricType}`
+        `   ${c.badgeEmoji} ${c.challengeName} (${c.challengeType}) - ${c.targetValue} ${c.metricType}`,
       );
     });
     console.log();
@@ -119,11 +129,11 @@ async function testLeaderboard() {
     console.log("8️⃣ Fetching global leaderboard...");
     const leaderboard = await leaderboardService.getLeaderboard("global", 10);
     console.log(
-      `✅ Leaderboard (${leaderboard.totalParticipants} participants):`
+      `✅ Leaderboard (${leaderboard.totalParticipants} participants):`,
     );
     leaderboard.entries.forEach((entry) => {
       console.log(
-        `   #${entry.globalRank || "?"} ${entry.advisorName} - Rep: ${entry.reputation}, Skill: ${entry.skillLevel}`
+        `   #${entry.globalRank || "?"} ${entry.advisorName} - Rep: ${entry.reputation}, Skill: ${entry.skillLevel}`,
       );
     });
     console.log();

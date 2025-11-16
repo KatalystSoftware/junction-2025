@@ -71,7 +71,7 @@ export function calculateTierScore(advisorState: AdvisorState): {
  */
 export function calculateChallengeProgress(
   challenge: CommunityChallenge,
-  advisorState: AdvisorState
+  advisorState: AdvisorState,
 ): number {
   switch (challenge.metricType) {
     case "sessions":
@@ -114,10 +114,7 @@ export function calculateChallengeProgress(
 /**
  * Generate community challenges for the current period
  */
-export function generateWeeklyChallenges(): Omit<
-  CommunityChallenge,
-  "id"
->[] {
+export function generateWeeklyChallenges(): Omit<CommunityChallenge, "id">[] {
   const now = new Date();
   const weekStart = new Date(now);
   weekStart.setHours(0, 0, 0, 0);
@@ -179,10 +176,7 @@ export function generateWeeklyChallenges(): Omit<
 /**
  * Generate monthly challenges
  */
-export function generateMonthlyChallenges(): Omit<
-  CommunityChallenge,
-  "id"
->[] {
+export function generateMonthlyChallenges(): Omit<CommunityChallenge, "id">[] {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
@@ -292,7 +286,7 @@ export function getTierDisplay(tierLevel: number): {
  */
 export function calculatePercentile(
   rank: number,
-  totalParticipants: number
+  totalParticipants: number,
 ): number {
   if (totalParticipants === 0) return 100;
   return Math.round(((totalParticipants - rank + 1) / totalParticipants) * 100);
@@ -303,7 +297,7 @@ export function calculatePercentile(
  */
 export function getMotivationalMessage(
   rank: number,
-  totalParticipants: number
+  totalParticipants: number,
 ): string {
   const percentile = calculatePercentile(rank, totalParticipants);
 
@@ -330,7 +324,7 @@ export function getMotivationalMessage(
 export function getProgressBar(
   current: number,
   target: number,
-  width = 20
+  width = 20,
 ): string {
   const percentage = Math.min(1, current / target);
   const filled = Math.round(percentage * width);
@@ -343,7 +337,7 @@ export function getProgressBar(
  * Get challenge difficulty color
  */
 export function getChallengeDifficultyColor(
-  difficulty: "easy" | "medium" | "hard" | "extreme"
+  difficulty: "easy" | "medium" | "hard" | "extreme",
 ): string {
   switch (difficulty) {
     case "easy":

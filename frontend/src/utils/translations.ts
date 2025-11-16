@@ -751,8 +751,7 @@ const translations: Record<Language, Translations> = {
       fromFinancialAdvice: "Taloudellisista neuvoista",
       achievements: "Saavutukset",
       loadingAnalytics: "Ladataan analytiikkaa...",
-      completeMoreSessions:
-        "Suorita lisää istuntoja nähdäksesi analytiikan",
+      completeMoreSessions: "Suorita lisää istuntoja nähdäksesi analytiikan",
       performanceOverview: "Suorituskyvyn Yleiskatsaus",
       successRate: "Onnistumisprosentti",
       avgQuality: "Keskim. Laatu",

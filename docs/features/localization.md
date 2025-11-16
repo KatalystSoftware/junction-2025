@@ -3,6 +3,7 @@
 ## Overview
 
 The Financial Advisor Simulator supports three languages with comprehensive localization:
+
 - **Finnish** (fi) - Primary language
 - **English** (en) - Secondary language
 - **Swedish** (sv) - Additional support
@@ -27,17 +28,17 @@ Character Responses
 
 ## Translation Coverage
 
-| Area | Coverage | Details |
-|------|----------|---------|
-| **User Language Preference** | ✅ 100% | Stored, retrieved, passed correctly |
-| **Static UI Text** | ✅ 90% | translations.ts with 1000+ lines |
-| **Character Scenarios** | ✅ 100% | Scenarios in English, translated at runtime |
-| **Character Dialogue** | ✅ 100% | AI translates to user's language |
-| **Advice Choices** | ✅ 100% | AI translates actionText, projectedOutcome, fullAdviceText |
-| **Audio Generation** | ✅ 100% | Multilingual TTS model, no language parameter needed |
-| **Boss Onboarding** | ✅ 100% | Language-aware with Finnish/English support |
-| **Boss Help** | ✅ 100% | Language detection + RAG in correct language |
-| **Boss Check-in** | ✅ 100% | Language detection from advisor messages |
+| Area                         | Coverage | Details                                                    |
+| ---------------------------- | -------- | ---------------------------------------------------------- |
+| **User Language Preference** | ✅ 100%  | Stored, retrieved, passed correctly                        |
+| **Static UI Text**           | ✅ 90%   | translations.ts with 1000+ lines                           |
+| **Character Scenarios**      | ✅ 100%  | Scenarios in English, translated at runtime                |
+| **Character Dialogue**       | ✅ 100%  | AI translates to user's language                           |
+| **Advice Choices**           | ✅ 100%  | AI translates actionText, projectedOutcome, fullAdviceText |
+| **Audio Generation**         | ✅ 100%  | Multilingual TTS model, no language parameter needed       |
+| **Boss Onboarding**          | ✅ 100%  | Language-aware with Finnish/English support                |
+| **Boss Help**                | ✅ 100%  | Language detection + RAG in correct language               |
+| **Boss Check-in**            | ✅ 100%  | Language detection from advisor messages                   |
 
 ## Frontend Translation System
 
@@ -48,6 +49,7 @@ Character Responses
 **Supported Languages:** `"en" | "fi" | "sv"`
 
 **Sections:**
+
 - `common`: General UI elements
 - `onboarding`: Welcome flow
 - `chat`: Chat interface (41 fields)
@@ -91,7 +93,7 @@ export const translations = {
       offline: "Offline",
       typeMessage: "Type a message...",
       // ... 38+ more fields
-    }
+    },
   },
   fi: {
     stats: {
@@ -105,8 +107,8 @@ export const translations = {
       offline: "Poissa",
       typeMessage: "Kirjoita viesti...",
       // ... 38+ more fields
-    }
-  }
+    },
+  },
 };
 ```
 
@@ -117,6 +119,7 @@ export const translations = {
 **Function:** `translateMessage()` in `character-agent-factory.ts`
 
 **Used for:**
+
 - Character messages
 - Advice choices
 - Dynamic content
@@ -130,7 +133,7 @@ export const translations = {
 const languageMap = {
   fi: "finnish",
   en: "english",
-  sv: "swedish"
+  sv: "swedish",
 };
 ```
 
@@ -141,7 +144,7 @@ const languageMap = {
 const translatedMessage = await translateMessage(
   originalMessage,
   userLanguage,
-  character.name
+  character.name,
 );
 ```
 
@@ -157,6 +160,7 @@ const translatedMessage = await translateMessage(
 ### Voices Assigned
 
 10 ElevenLabs voices mapped to character demographics:
+
 - Age-appropriate voices (young/adult/mature)
 - Gender-matched voices
 - Personality-matched emotional range
@@ -168,7 +172,7 @@ const translatedMessage = await translateMessage(
 const audioBuffer = await generateVoice({
   text: "Hei! Mun rahat loppuu aina ennen kuun loppua...", // Finnish
   voiceId: character.communicationStyle.voiceId,
-  emotionalState: "anxious"
+  emotionalState: "anxious",
 });
 ```
 
@@ -179,6 +183,7 @@ const audioBuffer = await generateVoice({
 All character dialogue is translated at runtime based on user's language preference:
 
 **Process:**
+
 1. Character scenario stored in English
 2. User makes request with `userLanguage` parameter
 3. Backend translates character response via AI
@@ -234,19 +239,19 @@ const knowledgeResults = await queryKnowledge(question, detectedLanguage);
 export const translations = {
   en: {
     newSection: {
-      newKey: "English text"
-    }
+      newKey: "English text",
+    },
   },
   fi: {
     newSection: {
-      newKey: "Suomenkielinen teksti"
-    }
+      newKey: "Suomenkielinen teksti",
+    },
   },
   sv: {
     newSection: {
-      newKey: "Svensk text"
-    }
-  }
+      newKey: "Svensk text",
+    },
+  },
 };
 ```
 
@@ -310,6 +315,7 @@ const t = useTranslation();
 ### Issue: Text appears in wrong language
 
 **Solution:**
+
 - Check `localStorage.userProfile.language`
 - Verify `userLanguage` parameter is passed to API
 - Check backend translation logic
@@ -317,6 +323,7 @@ const t = useTranslation();
 ### Issue: Hardcoded text not translating
 
 **Solution:**
+
 - Add translation key to `translations.ts`
 - Update component to use `t.section.key`
 - Test in all languages
@@ -324,6 +331,7 @@ const t = useTranslation();
 ### Issue: Audio in wrong language
 
 **Solution:**
+
 - ElevenLabs automatically detects language from text
 - Ensure translated text is passed to voice service
 - Check that voice service isn't using hardcoded text

@@ -8,7 +8,12 @@ interface FollowingEyesProps {
   eyeVerticalPosition?: number; // Vertical position multiplier (default 0.8)
 }
 
-type EyebrowExpression = 'neutral' | 'angry' | 'relaxed' | 'curious' | 'concerned';
+type EyebrowExpression =
+  | "neutral"
+  | "angry"
+  | "relaxed"
+  | "curious"
+  | "concerned";
 
 export function FollowingEyes({
   children,
@@ -24,7 +29,8 @@ export function FollowingEyes({
     left: { amount: 0, angle: 0 },
     right: { amount: 0, angle: 0 },
   });
-  const [eyebrowExpression, setEyebrowExpression] = useState<EyebrowExpression>('neutral');
+  const [eyebrowExpression, setEyebrowExpression] =
+    useState<EyebrowExpression>("neutral");
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -97,10 +103,17 @@ export function FollowingEyes({
 
   // Randomly change eyebrow expression every 3-8 seconds
   useEffect(() => {
-    const expressions: EyebrowExpression[] = ['neutral', 'angry', 'relaxed', 'curious', 'concerned'];
+    const expressions: EyebrowExpression[] = [
+      "neutral",
+      "angry",
+      "relaxed",
+      "curious",
+      "concerned",
+    ];
 
     const changeExpression = () => {
-      const randomExpression = expressions[Math.floor(Math.random() * expressions.length)];
+      const randomExpression =
+        expressions[Math.floor(Math.random() * expressions.length)];
       setEyebrowExpression(randomExpression);
 
       // Schedule next change with random interval (3-8 seconds)
@@ -113,7 +126,7 @@ export function FollowingEyes({
   }, []);
 
   // Get eyebrow style based on expression
-  const getEyebrowStyle = (side: 'left' | 'right') => {
+  const getEyebrowStyle = (side: "left" | "right") => {
     const baseWidth = eyeSize * 1.3;
     const baseHeight = eyeSize * 0.4; // Increased from 0.15 to 0.4 to make more visible
     const baseTop = eyeSize * eyeVerticalPosition + eyeSize * 0.9; // Move up by increasing from 0.7 to 0.9
@@ -122,24 +135,24 @@ export function FollowingEyes({
     let verticalOffset = 0;
 
     switch (eyebrowExpression) {
-      case 'angry':
+      case "angry":
         // Angled downward toward center (furrowed brow)
-        rotation = side === 'left' ? 15 : -15;
+        rotation = side === "left" ? 15 : -15;
         verticalOffset = -eyeSize * 0.1;
         break;
-      case 'relaxed':
+      case "relaxed":
         // Slightly curved upward
-        rotation = side === 'left' ? -5 : 5;
+        rotation = side === "left" ? -5 : 5;
         verticalOffset = eyeSize * 0.1;
         break;
-      case 'curious':
+      case "curious":
         // One raised, one normal
-        rotation = side === 'left' ? -8 : 3;
-        verticalOffset = side === 'left' ? -eyeSize * 0.15 : 0;
+        rotation = side === "left" ? -8 : 3;
+        verticalOffset = side === "left" ? -eyeSize * 0.15 : 0;
         break;
-      case 'concerned':
+      case "concerned":
         // Both angled upward (worried look)
-        rotation = side === 'left' ? -10 : 10;
+        rotation = side === "left" ? -10 : 10;
         verticalOffset = -eyeSize * 0.05;
         break;
       default: // neutral
@@ -225,7 +238,7 @@ export function FollowingEyes({
           <div
             className="absolute rounded-full transition-all duration-500 ease-in-out"
             style={{
-              ...getEyebrowStyle('left'),
+              ...getEyebrowStyle("left"),
               left: `calc(50% - ${eyeSize / 2}px - ${eyeSize * eyeSpacing}px)`,
               backgroundColor: "rgba(0, 0, 0, 0.7)",
             }}
@@ -235,7 +248,7 @@ export function FollowingEyes({
           <div
             className="absolute rounded-full transition-all duration-500 ease-in-out"
             style={{
-              ...getEyebrowStyle('right'),
+              ...getEyebrowStyle("right"),
               left: `calc(50% - ${eyeSize / 2}px + ${eyeSize * eyeSpacing}px)`,
               backgroundColor: "rgba(0, 0, 0, 0.7)",
             }}

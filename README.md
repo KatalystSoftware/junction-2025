@@ -473,10 +473,12 @@ This is a Junction 2025 hackathon project. Contributions welcome!
 ## 📚 Documentation
 
 ### Getting Started
+
 - **This README** - Quick start and overview
 - **[Developer Guide](claude.md)** - Complete development documentation
 
 ### Features
+
 - **[RAG System](docs/features/rag-system.md)** - Finnish financial literacy knowledge base
 - **[Voice Integration](docs/features/voice-integration.md)** - Character voice synthesis with ElevenLabs
 - **[Relationship System](docs/features/relationship-system.md)** - Character trust and progression
@@ -484,6 +486,7 @@ This is a Junction 2025 hackathon project. Contributions welcome!
 - **[Localization](docs/features/localization.md)** - Multi-language support (FI/EN/SV)
 
 ### Technical Guides
+
 - **[Error Recovery](docs/error-recovery.md)** - Retry logic and graceful degradation
 - **[Deployment](docs/deployment.md)** - Docker setup and production deployment
 - **[Frontend Integration](docs/frontend-integration.md)** - React frontend integration

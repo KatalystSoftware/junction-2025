@@ -7,7 +7,14 @@ import {
 } from "./ui/dialog";
 import { ScrollArea } from "./ui/scroll-area";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
-import { Trophy, TrendingUp, DollarSign, Award, Star, Sparkles } from "lucide-react";
+import {
+  Trophy,
+  TrendingUp,
+  DollarSign,
+  Award,
+  Star,
+  Sparkles,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 
 interface LeaderboardEntry {
@@ -47,7 +54,9 @@ export function LeaderboardModal({
   advisorId,
 }: LeaderboardModalProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("global");
-  const [leaderboard, setLeaderboard] = useState<LeaderboardRanking | null>(null);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardRanking | null>(
+    null,
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -61,7 +70,7 @@ export function LeaderboardModal({
 
       try {
         const response = await fetch(
-          `/api/game/leaderboard?category=${selectedCategory}&limit=100`
+          `/api/game/leaderboard?category=${selectedCategory}&limit=100`,
         );
 
         if (!response.ok) {
@@ -83,7 +92,7 @@ export function LeaderboardModal({
 
   // Get current user's rank
   const currentUserEntry = leaderboard?.entries.find(
-    (entry) => entry.advisorId === advisorId
+    (entry) => entry.advisorId === advisorId,
   );
 
   const getCategoryIcon = (category: string) => {
@@ -171,7 +180,10 @@ export function LeaderboardModal({
               <DollarSign className="w-3 h-3" />
               <span className="hidden sm:inline">Coins</span>
             </TabsTrigger>
-            <TabsTrigger value="achievements" className="flex items-center gap-1">
+            <TabsTrigger
+              value="achievements"
+              className="flex items-center gap-1"
+            >
               <Award className="w-3 h-3" />
               <span className="hidden sm:inline">Awards</span>
             </TabsTrigger>
@@ -197,11 +209,18 @@ export function LeaderboardModal({
                   <div className="mb-4 p-4 bg-primary/10 rounded-lg border-2 border-primary">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <span className="text-2xl">{getRankBadge(currentUserEntry.globalRank || 0)}</span>
+                        <span className="text-2xl">
+                          {getRankBadge(currentUserEntry.globalRank || 0)}
+                        </span>
                         <div>
-                          <div className="font-bold">{currentUserEntry.advisorName} (You)</div>
+                          <div className="font-bold">
+                            {currentUserEntry.advisorName} (You)
+                          </div>
                           <div className="text-sm text-muted-foreground">
-                            {getCategoryValue(currentUserEntry, selectedCategory)}
+                            {getCategoryValue(
+                              currentUserEntry,
+                              selectedCategory,
+                            )}
                           </div>
                         </div>
                       </div>
@@ -236,7 +255,8 @@ export function LeaderboardModal({
                             {isCurrentUser && " (You)"}
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            {entry.totalSessions} sessions • {entry.totalClientsHelped} clients
+                            {entry.totalSessions} sessions •{" "}
+                            {entry.totalClientsHelped} clients
                           </div>
                         </div>
 
@@ -247,7 +267,8 @@ export function LeaderboardModal({
                           </div>
                           {selectedCategory === "global" && (
                             <div className="text-xs text-muted-foreground">
-                              Rep: {entry.reputation} • Skill: {entry.skillLevel.toFixed(1)}
+                              Rep: {entry.reputation} • Skill:{" "}
+                              {entry.skillLevel.toFixed(1)}
                             </div>
                           )}
                         </div>
@@ -267,7 +288,8 @@ export function LeaderboardModal({
         </Tabs>
 
         <div className="text-xs text-muted-foreground text-center pt-2 border-t">
-          {leaderboard && `Last updated: ${new Date(leaderboard.lastUpdated).toLocaleString()}`}
+          {leaderboard &&
+            `Last updated: ${new Date(leaderboard.lastUpdated).toLocaleString()}`}
         </div>
       </DialogContent>
     </Dialog>

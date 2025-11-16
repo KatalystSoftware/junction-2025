@@ -7,6 +7,7 @@ This guide explains how to integrate the React frontend with the Mastra backend 
 ## Project Structure
 
 This is a **monorepo** containing:
+
 - **Backend** (root): Mastra-based game orchestrator and API
 - **Frontend** (`frontend/`): React + Vite WhatsApp-style UI
 
@@ -88,6 +89,7 @@ const game = useGameState();
 ```
 
 **Features:**
+
 - TanStack Query for data fetching/caching
 - Optimistic updates for messages (instant UI, rollback on error)
 - Automatic cache invalidation
@@ -110,6 +112,7 @@ const { contacts, messagesByThread } = useDerivedUIState(
 ```
 
 **Features:**
+
 - Memoized computations (React.useMemo)
 - Converts server format to UI format
 - No state storage - just pure functions
@@ -123,11 +126,11 @@ import { useGameSession } from "./hooks/useGameSession";
 
 function MyComponent() {
   const {
-    sessionId,          // Current session UUID
-    advisorState,       // Current game state
-    isLoading,          // Initial load state
-    startConsultation,  // Start new consultation
-    isStarting,         // Starting state
+    sessionId, // Current session UUID
+    advisorState, // Current game state
+    isLoading, // Initial load state
+    startConsultation, // Start new consultation
+    isStarting, // Starting state
     updateAdvisorState, // Manual state update
   } = useGameSession();
 
@@ -226,7 +229,9 @@ function WhatsAppInterface() {
   );
 
   // UI-only state
-  const [selectedContactId, setSelectedContactId] = useState<string | null>(null);
+  const [selectedContactId, setSelectedContactId] = useState<string | null>(
+    null,
+  );
 
   // Send message with optimistic update
   const handleSend = (message: string) => {
@@ -364,6 +369,7 @@ To reset: `localStorage.clear()` or use `clearSession()` from `sessionManager`.
 **From 733 lines to ~200 lines!**
 
 **Removed:**
+
 - ❌ `useState` for messages, contacts, characterInfo
 - ❌ `convertMessagesToThreadHistories` helper
 - ❌ Complex useEffect chains syncing states
@@ -371,6 +377,7 @@ To reset: `localStorage.clear()` or use `clearSession()` from `sessionManager`.
 - ❌ Manual state updates on responses
 
 **Kept:**
+
 - ✅ UI-only state (selectedContactId, showChat)
 - ✅ Temporary state for advice choices (not persisted)
 - ✅ Response handling (simpler, mutation-based)
@@ -433,21 +440,25 @@ function Game() {
 ## Benefits of Server-First Approach
 
 ### 1. Reload Resilience
+
 - No more "character names lost on reload"
 - No more state inconsistencies
 - Server always has the latest state
 
 ### 2. Optimistic Updates
+
 - Messages appear instantly
 - Automatic rollback on errors
 - Better UX
 
 ### 3. Simplified Code
+
 - ~60% less code in WhatsAppInterface
 - No manual state synchronization
 - Easier to reason about
 
 ### 4. Type Safety
+
 - Shared types in `/types/ui.ts`
 - Consistent interfaces across components
 - Ready for server/client type sharing
@@ -493,14 +504,17 @@ function Game() {
 ## Files Overview
 
 ### New Files
+
 - `src/hooks/useGameState.ts` - Server state management
 - `src/hooks/useDerivedUIState.ts` - UI derivation
 - `src/types/ui.ts` - Shared types
 
 ### Modified Files
+
 - `src/components/WhatsAppInterface.tsx` - Simplified (now uses server-first state)
 
 ### Legacy Files (can be removed)
+
 - `src/hooks/useGameSession.ts` - Old session management
 - `src/hooks/useGame.ts` - Old game hook
 

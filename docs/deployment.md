@@ -68,6 +68,7 @@ docker-compose up -d  # Podman supports docker-compose command
 ```
 
 This will:
+
 - Start PostgreSQL 16 on port 5432
 - Create the database and user
 - Set up persistent volumes for data
@@ -170,6 +171,7 @@ docker compose exec -T postgres psql -U junction_user -d junction2025 < backup.s
 The database schema is **automatically created by the application** on first connection using `CREATE TABLE IF NOT EXISTS` statements.
 
 The application creates:
+
 - 4 tables: `character_states`, `transactions`, `advice_effects`, `monthly_summaries`
 - 6 indexes for query optimization
 - Foreign key constraints
@@ -186,17 +188,17 @@ docker compose up -d
 
 ### Environment Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `POSTGRES_DB` | junction2025 | Database name |
-| `POSTGRES_USER` | junction_user | Database user |
-| `POSTGRES_PASSWORD` | junction_dev_password | Database password |
-| `POSTGRES_HOST` | localhost | Database host (for app) |
-| `POSTGRES_PORT` | 5432 | PostgreSQL port |
-| `DATABASE_URL` | postgresql://... | Full connection string |
-| `PGADMIN_EMAIL` | admin@junction.local | pgAdmin login email |
-| `PGADMIN_PASSWORD` | admin | pgAdmin password |
-| `PGADMIN_PORT` | 5050 | pgAdmin web UI port |
+| Variable            | Default               | Description             |
+| ------------------- | --------------------- | ----------------------- |
+| `POSTGRES_DB`       | junction2025          | Database name           |
+| `POSTGRES_USER`     | junction_user         | Database user           |
+| `POSTGRES_PASSWORD` | junction_dev_password | Database password       |
+| `POSTGRES_HOST`     | localhost             | Database host (for app) |
+| `POSTGRES_PORT`     | 5432                  | PostgreSQL port         |
+| `DATABASE_URL`      | postgresql://...      | Full connection string  |
+| `PGADMIN_EMAIL`     | admin@junction.local  | pgAdmin login email     |
+| `PGADMIN_PASSWORD`  | admin                 | pgAdmin password        |
+| `PGADMIN_PORT`      | 5050                  | pgAdmin web UI port     |
 
 ## Production Deployment
 
@@ -220,6 +222,7 @@ The project includes a Dockerfile for containerized deployment.
 #### Dockerfile Configuration
 
 The Dockerfile:
+
 - Copies workspace config (`pnpm-workspace.yaml`)
 - Installs both root and frontend dependencies
 - Runs `pnpm run build:frontend` to build frontend
@@ -229,6 +232,7 @@ The Dockerfile:
 #### .dockerignore Updates
 
 Excludes from build context:
+
 - `public/`, `dist/`, `node_modules/`
 - Includes `knowledge-base.db` (pre-generated data)
 
@@ -302,6 +306,7 @@ docker compose logs postgres
 ```
 
 Common issues:
+
 - Port already in use
 - Invalid environment variables
 - Corrupted volume data (try `docker compose down -v`)
@@ -309,6 +314,7 @@ Common issues:
 ### Cannot Connect from Application
 
 Ensure:
+
 1. PostgreSQL is running: `docker compose ps`
 2. Port is correct in `.env`
 3. Connection string matches `.env` settings
@@ -319,6 +325,7 @@ Ensure:
 **Issue:** Frontend build fails
 
 **Solution:**
+
 ```bash
 # Clean install
 rm -rf node_modules frontend/node_modules
@@ -329,6 +336,7 @@ pnpm build:frontend
 **Issue:** TypeScript errors
 
 **Solution:**
+
 ```bash
 # Check types
 pnpm check
@@ -340,6 +348,7 @@ pnpm format
 ## Podman-Specific Notes
 
 Podman works almost identically to Docker but:
+
 - Use `podman-compose` instead of `docker compose` (or install podman-docker for compatibility)
 - Rootless containers are default (more secure)
 - Pods instead of networks (abstracted away by compose)

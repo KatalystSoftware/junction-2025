@@ -12,6 +12,7 @@ Comprehensive leaderboard and social features for the Financial Advisor Simulato
 ## Implementation Status
 
 ✅ **Backend - Completed:**
+
 - Core leaderboard logic and calculations
 - TypeScript types for all social features
 - Leaderboard calculator utilities
@@ -23,6 +24,7 @@ Comprehensive leaderboard and social features for the Financial Advisor Simulato
 - Leaderboard service (PostgreSQL-only, schema auto-created)
 
 ⏳ **Frontend - In Progress:**
+
 - React components (LeaderboardModal, ChallengesModal, CareerProgressModal)
 - Data hooks (useLeaderboard, useChallenges, useCareerProgress)
 - UI integration with WhatsAppInterface
@@ -41,6 +43,7 @@ Track your performance across multiple categories:
 - **Achievements**: Total achievements unlocked
 
 Each leaderboard shows:
+
 - Top 10 advisors
 - Your rank and percentile
 - Surrounding advisors (contextual view)
@@ -50,15 +53,16 @@ Each leaderboard shows:
 
 Five career tiers with increasing requirements:
 
-| Tier | Name | Requirements | Coin Bonus |
-|------|------|--------------|------------|
-| 1 🌱 | Junior Advisor | Starting tier | 0 |
-| 2 📈 | Associate Advisor | 25 rep, 3 skill, 5 clients, 10 sessions | 100 |
-| 3 💼 | Senior Advisor | 50 rep, 5 skill, 15 clients, 30 sessions | 250 |
-| 4 🏆 | Expert Advisor | 75 rep, 7 skill, 35 clients, 60 sessions | 500 |
-| 5 👑 | Master Advisor | 90 rep, 9 skill, 75 clients, 120 sessions | 1000 |
+| Tier | Name              | Requirements                              | Coin Bonus |
+| ---- | ----------------- | ----------------------------------------- | ---------- |
+| 1 🌱 | Junior Advisor    | Starting tier                             | 0          |
+| 2 📈 | Associate Advisor | 25 rep, 3 skill, 5 clients, 10 sessions   | 100        |
+| 3 💼 | Senior Advisor    | 50 rep, 5 skill, 15 clients, 30 sessions  | 250        |
+| 4 🏆 | Expert Advisor    | 75 rep, 7 skill, 35 clients, 60 sessions  | 500        |
+| 5 👑 | Master Advisor    | 90 rep, 9 skill, 75 clients, 120 sessions | 1000       |
 
 Each tier tracks progress across 6 dimensions:
+
 - Reputation
 - Skill Level
 - Clients Helped
@@ -69,16 +73,19 @@ Each tier tracks progress across 6 dimensions:
 ### 3. Community Challenges
 
 #### Weekly Challenges
+
 - **Session Marathon**: Complete 10 sessions (500 coins)
 - **Financial Hero**: Help clients save €5,000 (1000 coins)
 - **Perfect Streak**: Maintain 5 high-quality sessions (1500 coins)
 
 #### Monthly Challenges
+
 - **Master Advisor**: Help 50 unique clients (5000 coins)
 - **Debt Destroyer**: Eliminate €25,000 in client debt (10000 coins)
 - **Topic Expert**: Reach expertise level 8 in any topic (3000 coins)
 
 Each challenge shows:
+
 - Progress bar
 - Time remaining
 - Current progress vs. target
@@ -89,6 +96,7 @@ Each challenge shows:
 Share your best consultation cases with the community:
 
 **Features:**
+
 - Share high-quality sessions (score 7+)
 - Auto-generated titles and summaries
 - Privacy options (public/private, anonymize client)
@@ -96,6 +104,7 @@ Share your best consultation cases with the community:
 - Browse popular and recent cases
 
 **Shareable Cases Must Have:**
+
 - Advice quality score ≥ 7
 - Financial projection with impact ≥ €100
 - Complete evaluation data
@@ -116,6 +125,7 @@ Share your best consultation cases with the community:
 ### Database Implementation
 
 **Auto-Schema Creation:**
+
 - Schema created automatically on service initialization
 - File: `src/mastra/persistence/leaderboard-service.ts`
 - Idempotent creation (safe to run multiple times)
@@ -219,14 +229,17 @@ CREATE TABLE challenge_participations (
 ### Architecture
 
 **Storage Layer:**
+
 - **Production:** Postgres with Mastra's PostgresStore
 - **Development:** LibSQL or Postgres
 
 **UI Layer:**
+
 - React with shadcn/ui components
 - TanStack Query for state management
 
 **API Layer:**
+
 - HTTP API endpoints via Hono
 
 ### API Endpoints
@@ -248,16 +261,19 @@ POST /api/cases/:caseId/react
 ### React Components
 
 **LeaderboardModal.tsx**
+
 - Shows top 10 + user's rank
 - Tabs for different categories (Global, Reputation, Impact, etc.)
 - Table with: Rank, Avatar, Name, Tier Badge, Primary Stat
 
 **ChallengesModal.tsx**
+
 - Lists active challenges with progress bars
 - Shows time remaining and coin rewards
 - Section for completed challenges
 
 **CareerProgressModal.tsx**
+
 - Shows current tier with emoji/badge
 - Progress bars for all 6 requirements
 - Overall progress percentage
@@ -323,7 +339,11 @@ await initializeSocialFeatures();
 await onAdvisorInit(advisorState, advisorName);
 
 // After each session
-gameResponse = await afterSessionComplete(advisorState, advisorName, gameResponse);
+gameResponse = await afterSessionComplete(
+  advisorState,
+  advisorName,
+  gameResponse,
+);
 ```
 
 ## Performance Considerations
@@ -374,6 +394,7 @@ pnpm play
 ## Future Enhancements
 
 Potential additions:
+
 - Friend lists and private leaderboards
 - Team challenges
 - Mentor system for top advisors
@@ -386,16 +407,19 @@ Potential additions:
 ## Troubleshooting
 
 **Database not initializing?**
+
 - Check file permissions for database
 - Ensure database client is properly configured
 - Check console for initialization errors
 
 **Leaderboard not updating?**
+
 - Verify `afterSessionComplete` hook is called
 - Check that advisor ID is consistent
 - Ensure session data is complete
 
 **Challenges not appearing?**
+
 - Run `initializeChallenges()` manually
 - Check date ranges in challenge definitions
 - Verify database has challenge data

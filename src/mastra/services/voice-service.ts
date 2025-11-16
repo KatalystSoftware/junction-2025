@@ -296,7 +296,8 @@ export function enhanceTextWithVoiceTags(
       // Add whisper tag without hardcoded text - let the translated message speak for itself
       const sentences = enhancedText.split(". ");
       if (sentences.length > 1) {
-        sentences[sentences.length - 1] = `[whispers] ${sentences[sentences.length - 1]}`;
+        sentences[sentences.length - 1] =
+          `[whispers] ${sentences[sentences.length - 1]}`;
         enhancedText = sentences.join(". ");
       }
     }

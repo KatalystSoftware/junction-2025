@@ -32,6 +32,7 @@ Instead of managing your own money (which can create pressure), you act as a **p
 ## ⚙️ Development Workflow - READ THIS FIRST
 
 This is a **monorepo** containing:
+
 - **Backend** (root): Mastra-based game orchestrator and API
 - **Frontend** (`frontend/`): React + Vite WhatsApp-style UI
 
@@ -730,6 +731,7 @@ This game teaches Finnish financial literacy through:
 For specific topics, see the following documentation files:
 
 ### Features
+
 - **[RAG System](docs/features/rag-system.md)** - Finnish financial literacy knowledge base and evaluation
 - **[Voice Integration](docs/features/voice-integration.md)** - ElevenLabs character voice synthesis
 - **[Relationship System](docs/features/relationship-system.md)** - Character trust and progression
@@ -737,6 +739,7 @@ For specific topics, see the following documentation files:
 - **[Localization](docs/features/localization.md)** - Multi-language support (Finnish/Swedish/English)
 
 ### Technical
+
 - **[Error Recovery](docs/error-recovery.md)** - Retry logic and graceful degradation
 - **[Deployment Guide](docs/deployment.md)** - Docker setup and production deployment
 - **[Frontend Integration](docs/frontend-integration.md)** - React frontend integration guide
