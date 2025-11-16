@@ -86,11 +86,9 @@ export function ChatSidebar({
     }
   }, []);
 
-  // Calculate level and XP from advisorState
+  // Calculate level from advisorState
   const skillLevel = advisorState?.skillLevel || 0;
   const level = Math.floor(skillLevel) + 1; // Convert 0-10 to 1-11
-  const xpProgress = Math.round((skillLevel % 1) * 100); // Get decimal part as percentage
-  const xpForNextLevel = 100;
 
   // Level-up detection
   const previousLevelRef = useRef(level);
@@ -235,7 +233,7 @@ export function ChatSidebar({
                   color: "var(--muted-foreground)",
                 }}
               >
-                {xpProgress}/{xpForNextLevel} {t.chat.xp}
+                Level {level}
               </span>
             </div>
 
@@ -314,22 +312,6 @@ export function ChatSidebar({
               </div>
             </div>
 
-            {/* Progress Bar */}
-            <div
-              className="w-full h-2 rounded-full overflow-hidden"
-              style={{
-                backgroundColor: "var(--muted)",
-                filter: "brightness(0.7)",
-              }}
-            >
-              <div
-                className="h-full transition-all duration-300"
-                style={{
-                  width: `${xpProgress}%`,
-                  backgroundColor: "var(--primary)",
-                }}
-              />
-            </div>
           </div>
         </div>
 

@@ -46,7 +46,6 @@ export interface Translations {
     financialAdvisor: string;
     playersBoss: string;
     level: string;
-    xp: string;
     // Status and labels
     online: string;
     offline: string;
@@ -119,7 +118,6 @@ export interface Translations {
     // Profile section
     financialAdvisor: string;
     currentLevel: string;
-    xpToLevel: string;
 
     // Stats section
     statistics: string;
@@ -165,7 +163,6 @@ export interface Translations {
     coins: string;
     savingsGenerated: string;
     level: string;
-    xp: string;
     restartGame: string;
     restartGameConfirm: string;
   };
@@ -328,7 +325,6 @@ const translations: Record<Language, Translations> = {
       financialAdvisor: "Financial Advisor",
       playersBoss: "player's boss",
       level: "Level",
-      xp: "XP",
       online: "Online",
       offline: "Offline",
       selectConversation: "Select a conversation to start messaging",
@@ -396,7 +392,6 @@ const translations: Record<Language, Translations> = {
       progress: "Progress",
       financialAdvisor: "Financial Advisor",
       currentLevel: "Current Level",
-      xpToLevel: "XP to Level",
       statistics: "Statistics",
       coinsEarned: "Coins Earned",
       messagesSent: "Messages Sent",
@@ -432,7 +427,6 @@ const translations: Record<Language, Translations> = {
       coins: "Advisor Coins",
       savingsGenerated: "Savings Generated",
       level: "Level",
-      xp: "XP",
       restartGame: "Restart Game",
       restartGameConfirm:
         "Are you sure you want to restart the game? All progress will be lost.",
@@ -664,7 +658,6 @@ const translations: Record<Language, Translations> = {
       financialAdvisor: "Taloudellinen Neuvonantaja",
       playersBoss: "pelaajan pomo",
       level: "Taso",
-      xp: "KP",
       online: "Paikalla",
       offline: "Poissa",
       selectConversation: "Valitse keskustelu aloittaaksesi viestittelyn",
@@ -732,7 +725,6 @@ const translations: Record<Language, Translations> = {
       progress: "Edistyminen",
       financialAdvisor: "Taloudellinen Neuvonantaja",
       currentLevel: "Nykyinen Taso",
-      xpToLevel: "KP Tasolle",
       statistics: "Tilastot",
       coinsEarned: "Ansaitut Kolikot",
       messagesSent: "Lähetetyt Viestit",
@@ -768,7 +760,6 @@ const translations: Record<Language, Translations> = {
       coins: "Neuvonantajan Kolikot",
       savingsGenerated: "Tuotetut Säästöt",
       level: "Taso",
-      xp: "KP",
       restartGame: "Aloita Peli Uudelleen",
       restartGameConfirm:
         "Haluatko varmasti aloittaa pelin alusta? Kaikki edistyminen menetetään.",
@@ -1000,7 +991,6 @@ const translations: Record<Language, Translations> = {
       financialAdvisor: "Finansiell Rådgivare",
       playersBoss: "spelarens chef",
       level: "Nivå",
-      xp: "XP",
     },
 
     quickResponses: {
@@ -1036,7 +1026,6 @@ const translations: Record<Language, Translations> = {
       debtCleared: "Betalda Skulder",
       achievements: "Prestationer",
       level: "Nivå",
-      xp: "XP",
       restartGame: "Starta Om Spelet",
     },
 
