@@ -194,69 +194,111 @@ app.post("/init", async (c) => {
           `📊 Loaded ${Object.keys(threadMetadata).length} thread metadata`,
         );
 
-        // FALLBACK: Generate advice choices for threads that don't have them (old threads from before the fix)
+        // FALLBACK: Generate advice choices and populate missing character data for old threads
         let needsUpdate = false;
         for (const [threadId, metadata] of Object.entries(threadMetadata)) {
-          if (!metadata.adviceChoices || metadata.adviceChoices.length === 0) {
-            console.log(
-              `🔧 Thread ${threadId.substring(0, 8)}... missing advice choices, generating fallback...`,
-            );
+          let threadNeedsUpdate = false;
 
-            // Try to generate advice choices based on the scenario
+          // Check if thread is missing character data fields
+          const missingCharacterData =
+            !metadata.name || !metadata.age || !metadata.occupation || !metadata.gender;
+
+          if (missingCharacterData || !metadata.adviceChoices || metadata.adviceChoices.length === 0) {
+            if (missingCharacterData) {
+              console.log(
+                `🔧 Thread ${threadId.substring(0, 8)}... missing character data, populating from character pool...`,
+              );
+            }
+            if (!metadata.adviceChoices || metadata.adviceChoices.length === 0) {
+              console.log(
+                `🔧 Thread ${threadId.substring(0, 8)}... missing advice choices, generating fallback...`,
+              );
+            }
+
+            // Try to get character data and generate advice choices based on the scenario
             try {
               const threadInfo = advisorState.activeThreads[threadId];
               if (threadInfo) {
                 const { characterPool } = await import(
                   "../game/character-pool-manager.ts"
                 );
-                const { generateAdviceChoices } = await import(
-                  "../game/choice-generator.ts"
-                );
 
                 const character = characterPool.getCharacter(
                   threadInfo.characterId,
                 );
-                const scenario = characterPool.getScenario(
-                  threadInfo.scenarioId,
-                );
 
-                if (character && scenario) {
-                  // Get conversation history for this thread to avoid repeating advice
-                  const history = threadHistories[threadId] || [];
+                if (character) {
+                  // Populate missing character data
+                  if (missingCharacterData) {
+                    metadata.name = character.name;
+                    metadata.age = character.age;
+                    metadata.occupation = character.occupation;
+                    metadata.gender = character.gender;
+                    metadata.financialProfile = character.financialProfile;
+                    threadNeedsUpdate = true;
+                    console.log(
+                      `✅ Populated character data for thread ${threadId.substring(0, 8)}...`,
+                    );
+                  }
 
-                  // Generate advice choices
-                  const choices = generateAdviceChoices(
-                    scenario,
-                    character.personality,
-                    history,
-                  );
+                  // Generate advice choices if missing
+                  if (!metadata.adviceChoices || metadata.adviceChoices.length === 0) {
+                    const { generateAdviceChoices } = await import(
+                      "../game/choice-generator.ts"
+                    );
+                    const scenario = characterPool.getScenario(
+                      threadInfo.scenarioId,
+                    );
 
-                  metadata.adviceChoices = choices;
-                  needsUpdate = true;
+                    if (scenario) {
+                      // Get conversation history for this thread to avoid repeating advice
+                      const history = threadHistories[threadId] || [];
 
-                  console.log(
-                    `✅ Generated ${choices.length} advice choices for thread ${threadId.substring(0, 8)}...`,
-                  );
+                      // Generate advice choices
+                      const choices = generateAdviceChoices(
+                        scenario,
+                        character.personality,
+                        history,
+                      );
+
+                      metadata.adviceChoices = choices;
+                      threadNeedsUpdate = true;
+
+                      console.log(
+                        `✅ Generated ${choices.length} advice choices for thread ${threadId.substring(0, 8)}...`,
+                      );
+                    } else {
+                      console.log(
+                        `⚠️ Could not find scenario for thread ${threadId.substring(0, 8)}..., using empty array`,
+                      );
+                      metadata.adviceChoices = [];
+                      threadNeedsUpdate = true;
+                    }
+                  }
                 } else {
                   console.log(
-                    `⚠️ Could not find character/scenario for thread ${threadId.substring(0, 8)}..., using empty array`,
+                    `⚠️ Could not find character for thread ${threadId.substring(0, 8)}...`,
                   );
-                  metadata.adviceChoices = [];
-                  needsUpdate = true;
+                  metadata.adviceChoices = metadata.adviceChoices || [];
+                  threadNeedsUpdate = true;
                 }
               } else {
                 // Thread not in activeThreads, likely resolved - use empty array
                 metadata.adviceChoices = [];
-                needsUpdate = true;
+                threadNeedsUpdate = true;
               }
             } catch (error) {
               console.error(
-                `❌ Failed to generate advice choices for thread ${threadId.substring(0, 8)}...:`,
+                `❌ Failed to populate thread data for ${threadId.substring(0, 8)}...:`,
                 error,
               );
-              metadata.adviceChoices = [];
-              needsUpdate = true;
+              metadata.adviceChoices = metadata.adviceChoices || [];
+              threadNeedsUpdate = true;
             }
+          }
+
+          if (threadNeedsUpdate) {
+            needsUpdate = true;
           }
         }
 
@@ -363,8 +405,13 @@ app.post("/init", async (c) => {
             // Save character metadata if provided
             if (gameResponse.characterInfo && threadId) {
               const metadata: ThreadMetadata = {
-                characterName: gameResponse.characterInfo.name,
+                characterName: gameResponse.characterInfo.name, // Backwards compatibility
+                name: gameResponse.characterInfo.name,
+                age: gameResponse.characterInfo.age,
+                occupation: gameResponse.characterInfo.occupation,
+                gender: gameResponse.characterInfo.gender,
                 status: "active",
+                financialProfile: gameResponse.characterInfo.financialProfile,
                 adviceChoices: gameResponse.adviceChoices || [],
               };
               metadataMap.set(threadId, metadata);
@@ -531,8 +578,13 @@ app.post("/start-consultation", async (c) => {
       // Save character metadata if provided
       if (gameResponse.characterInfo && threadId) {
         const metadata: ThreadMetadata = {
-          characterName: gameResponse.characterInfo.name,
+          characterName: gameResponse.characterInfo.name, // Backwards compatibility
+          name: gameResponse.characterInfo.name,
+          age: gameResponse.characterInfo.age,
+          occupation: gameResponse.characterInfo.occupation,
+          gender: gameResponse.characterInfo.gender,
           status: "active",
+          financialProfile: gameResponse.characterInfo.financialProfile,
           adviceChoices: gameResponse.adviceChoices || [],
         };
         metadataMap.set(threadId, metadata);
