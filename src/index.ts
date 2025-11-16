@@ -12,7 +12,6 @@ import { gameRoutes } from "./mastra/api/routes.ts";
 import { checkPostgresHealth } from "./mastra/config/postgres-health.ts";
 import { initializeLeaderboard } from "./mastra/game/orchestrator-hooks.ts";
 import { startPortfolioImpactWorker } from "./mastra/services/portfolio-impact-worker.ts";
-import { initializeLiveCallWebSocket } from "./mastra/api/live-call-websocket.ts";
 
 const app = new Hono();
 
@@ -66,13 +65,11 @@ initializeLeaderboard().catch((error) => {
 // Start portfolio impact background worker
 startPortfolioImpactWorker();
 
-// Initialize WebSocket server for live calls
-const server = serve({
+serve({
   fetch: app.fetch,
   port,
 });
 
-const liveCallWss = initializeLiveCallWebSocket(server);
 console.log(
   `🎙️ Live Call WebSocket available at ws://localhost:${port}/api/game/live-call`
 );
