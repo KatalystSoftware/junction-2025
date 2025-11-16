@@ -14,7 +14,7 @@ export const invokeBossOnboardingTool = {
   description:
     "Generates a welcoming onboarding message from the boss for new advisors.",
   execute: async (context: {
-    language?: "finnish" | "english";
+    language?: "finnish" | "english" | "swedish";
   }): Promise<BossOnboardingMessage> => {
     try {
       const { language = "english" } = context;
@@ -74,6 +74,20 @@ Create a comprehensive onboarding message following your instructions.
             encouragement:
               "Älä huoli, jos et tiedä kaikkea - opimme tekemällä. Olen täällä tukemassa!",
             readyMessage: "Ensimmäinen asiakas odottaa. Onnea! 🚀",
+          };
+        } else if (language === "swedish") {
+          parsed = {
+            welcomeTitle: "Välkommen till teamet!",
+            introduction: "Hej! Jag är din seniorådgivare. Välkommen ombord!",
+            roleExplanation:
+              "Du är nu en del av vårt finansiella konsultteam. Ditt jobb är att hjälpa kunder med deras ekonomi.",
+            howItWorks:
+              "Du kommer att träffa olika kunder. Lyssna noga och ge personlig rådgivning.",
+            expectations:
+              "Jag kommer att kolla in regelbundet och ge feedback på ditt arbete.",
+            encouragement:
+              "Oroa dig inte om du inte kan allt - vi lär oss genom att göra. Jag finns här för att hjälpa!",
+            readyMessage: "Din första kund väntar. Lycka till! 🚀",
           };
         } else {
           parsed = {

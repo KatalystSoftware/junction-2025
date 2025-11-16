@@ -1454,10 +1454,18 @@ export async function handleAdviceChoice(
     Math.min(100, advisorState.reputation + reputationChange),
   );
 
-  // Update skill level gradually
-  if (adviceEvaluation.qualityScore >= 8) {
-    advisorState.skillLevel = Math.min(10, advisorState.skillLevel + 0.1);
+  // Update skill level gradually - IMPROVED PACING
+  // Base gain for any session
+  let skillGain = 0.2; // Base gain increased from 0.1
+
+  // Bonus for excellent advice
+  if (adviceEvaluation.qualityScore >= 9) {
+    skillGain = 0.5; // Excellent sessions give bigger boost
+  } else if (adviceEvaluation.qualityScore >= 8) {
+    skillGain = 0.3; // Good sessions still rewarding
   }
+
+  advisorState.skillLevel = Math.min(10, advisorState.skillLevel + skillGain);
 
   // Mark character as helped
   if (!advisorState.totalClientsHelped) {
