@@ -12,6 +12,10 @@ export interface Translations {
   delete: string;
   edit: string;
   close: string;
+  answer: string;
+  decline: string;
+  bossIncomingCall: string;
+  isCalling: string;
 
   // Onboarding
   onboarding: {
@@ -291,6 +295,10 @@ const translations: Record<Language, Translations> = {
     delete: "Delete",
     edit: "Edit",
     close: "Close",
+    answer: "Answer",
+    decline: "Decline",
+    bossIncomingCall: "Incoming Call",
+    isCalling: "is calling",
 
     onboarding: {
       chooseIdentity: "Choose Your Identity",
@@ -624,6 +632,10 @@ const translations: Record<Language, Translations> = {
     delete: "Poista",
     edit: "Muokkaa",
     close: "Sulje",
+    answer: "Vastaa",
+    decline: "Hylkää",
+    bossIncomingCall: "Saapuva puhelu",
+    isCalling: "soittaa",
 
     onboarding: {
       chooseIdentity: "Valitse Identiteettisi",
@@ -957,6 +969,10 @@ const translations: Record<Language, Translations> = {
     delete: "Radera",
     edit: "Redigera",
     close: "Stäng",
+    answer: "Svara",
+    decline: "Avvisa",
+    bossIncomingCall: "Inkommande samtal",
+    isCalling: "ringer",
 
     onboarding: {
       chooseIdentity: "Välj Din Identitet",

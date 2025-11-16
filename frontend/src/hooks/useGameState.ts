@@ -64,6 +64,11 @@ export function useGameState() {
       );
     },
     onSuccess: (response: any) => {
+      console.log("\n🎮 ========== START CONSULTATION RESPONSE ==========");
+      console.log("📦 Response type:", response.type);
+      console.log("📋 Full response:", response);
+      console.log("🎮 ==================================================\n");
+
       // Update the cache with response data (includes threadHistories and threadMetadata)
       queryClient.setQueryData(["game-state", sessionId], (old: any) => {
         const updated = {

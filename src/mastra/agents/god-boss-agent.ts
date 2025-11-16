@@ -423,6 +423,7 @@ export function generateInterventionMessage(
             "HETKI NYT!?!",
             "STOP RIGHT THERE!?!?!",
             "MITÄ HELVETTIÄ?!",
+            "CALL ME RIGHT NOW!?!?!",
           ]
         : ["Hetkinen...", "Odota nyt hetki.", "Hei, hei, hei."],
       suffix: isCritical
@@ -445,6 +446,7 @@ export function generateInterventionMessage(
             "WAIT A SECOND!?!",
             "STOP RIGHT THERE!?!?!",
             "ARE YOU SERIOUS!?",
+            "CALL ME RIGHT NOW!?!?!",
           ]
         : ["Hold on...", "Wait a moment.", "Hey, hey, hey."],
       suffix: isCritical

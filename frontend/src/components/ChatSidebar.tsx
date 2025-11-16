@@ -1,7 +1,16 @@
 import { Input } from "./ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ScrollArea } from "./ui/scroll-area";
-import { Search, Pin, Star, TrendingUp, Briefcase, Trophy, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  Search,
+  Pin,
+  Star,
+  TrendingUp,
+  Briefcase,
+  Trophy,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 import type { Contact } from "./WhatsAppInterface";
 import { useState, useEffect, useRef } from "react";
 import logoImage from "figma:asset/28e39d27183eb9dbb848b6be8a7c7b00e841cd40.png";
@@ -231,15 +240,6 @@ export function ChatSidebar({
                       {t.chat.financialAdvisor}
                     </span>
                   </div>
-                  <span
-                    style={{
-                      fontFamily: "Inter, sans-serif",
-                      fontSize: "var(--text-xs)",
-                      color: "var(--muted-foreground)",
-                    }}
-                  >
-                    {xpProgress}/{xpForNextLevel} {t.chat.xp}
-                  </span>
                 </div>
 
                 {/* Stats Row */}
@@ -316,26 +316,9 @@ export function ChatSidebar({
                     </span>
                   </div>
                 </div>
-
-                {/* Progress Bar */}
-                <div
-                  className="w-full h-2 rounded-full overflow-hidden"
-                  style={{
-                    backgroundColor: "var(--muted)",
-                    filter: "brightness(0.7)",
-                  }}
-                >
-                  <div
-                    className="h-full transition-all duration-300"
-                    style={{
-                      width: `${xpProgress}%`,
-                      backgroundColor: "var(--primary)",
-                    }}
-                  />
-                </div>
               </div>
             </div>
-            
+
             {/* Chevron Button */}
             <button
               onClick={() => setIsProfileExpanded(!isProfileExpanded)}
