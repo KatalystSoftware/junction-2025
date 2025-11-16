@@ -586,6 +586,8 @@ export function ChatWindow({
                         ? "var(--primary-foreground)"
                         : "var(--card-foreground)",
                     boxShadow: "var(--elevation-sm)",
+                    wordBreak: "break-word",
+                    overflowWrap: "anywhere",
                   }}
                 >
                   <ReactMarkdown
