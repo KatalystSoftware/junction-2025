@@ -93,8 +93,7 @@ export function PortfolioImpactCard({
     if (sessionId) {
       const fetchGrowthData = async () => {
         try {
-          const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
-          const response = await fetch(`${API_URL}/portfolio-impact/${sessionId}`);
+          const response = await fetch(`/api/game/portfolio-impact/${sessionId}`);
           if (response.ok) {
             const data = await response.json();
             setGrowthData(data);
