@@ -746,6 +746,42 @@ export interface LeaderboardEntry {
 }
 
 /**
+ * Community Challenge
+ */
+export interface CommunityChallenge {
+  id?: string;
+  challengeName: string;
+  challengeNameFi: string;
+  challengeDescription: string;
+  challengeDescriptionFi: string;
+  challengeType: "weekly" | "monthly";
+  metricType: "sessions" | "savings" | "clients" | "streak" | "expertise";
+  targetValue: number;
+  difficulty: "easy" | "medium" | "hard" | "extreme";
+  coinReward: number;
+  achievementId?: string;
+  badgeEmoji: string;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+}
+
+/**
+ * Challenge Participation
+ */
+export interface ChallengeParticipation {
+  participationId: string;
+  advisorId: string;
+  challengeId: string;
+  currentProgress: number;
+  isCompleted: boolean;
+  completedAt?: string;
+  coinsEarned: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
  * Leaderboard categories for different ranking views
  */
 export type LeaderboardCategory =

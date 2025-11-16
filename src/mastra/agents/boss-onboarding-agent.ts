@@ -9,18 +9,20 @@ import { Agent } from "@mastra/core/agent";
 import { getAgentModel } from "./agent-model.ts";
 
 /**
- * Detect language preference (defaults to English, supports Finnish)
+ * Detect language preference (defaults to English, supports Finnish and Swedish)
  */
 function detectLanguage(
-  preferredLanguage?: "finnish" | "english",
-): "finnish" | "english" {
+  preferredLanguage?: "finnish" | "english" | "swedish",
+): "finnish" | "english" | "swedish" {
   return preferredLanguage || "english";
 }
 
 /**
  * Get language-specific instructions for onboarding
  */
-function getLanguageInstructions(language: "finnish" | "english"): {
+function getLanguageInstructions(
+  language: "finnish" | "english" | "swedish",
+): {
   languageRule: string;
   exampleOutput: any;
 } {
@@ -43,10 +45,29 @@ function getLanguageInstructions(language: "finnish" | "english"): {
         readyMessage: "Ensimmäinen asiakas odottaa jo. Onnea! 🚀",
       },
     };
+  } else if (language === "swedish") {
+    return {
+      languageRule:
+        "- **CRITICAL**: You MUST respond ONLY in Swedish. ALL text must be in Swedish. DO NOT use English or Finnish under any circumstances.",
+      exampleOutput: {
+        welcomeTitle: "Välkommen till teamet!",
+        introduction:
+          "Hej där! Jag är din seniorådgivare här på kontoret. Välkommen ombord!",
+        roleExplanation:
+          "Du är nu en del av vårt finansiella konsultteam. Ditt jobb är att hjälpa kunder med deras finansiella frågor - budgetering, sparande, skuldhantering och investeringar.",
+        howItWorks:
+          "Du kommer att träffa olika kunder, var och en med sina egna utmaningar. Lyssna på dem noggrant och ge råd som passar deras specifika situation.",
+        expectations:
+          "Jag kommer att kolla in på ditt arbete regelbundet, var 3-5:e kund. Jag ger dig feedback på vad du gör bra och var du kan förbättra dig.",
+        encouragement:
+          "Oroa dig inte om du inte vet allt direkt - vi lär oss alla genom att göra. Jag finns här för att stödja dig. Du klarar det här!",
+        readyMessage: "Din första kund väntar redan. Lycka till! 🚀",
+      },
+    };
   } else {
     return {
       languageRule:
-        "- **CRITICAL**: You MUST respond ONLY in English. ALL text must be in English. DO NOT use Finnish under any circumstances.",
+        "- **CRITICAL**: You MUST respond ONLY in English. ALL text must be in English. DO NOT use Finnish or Swedish under any circumstances.",
       exampleOutput: {
         welcomeTitle: "Welcome to the Team!",
         introduction:
@@ -69,7 +90,7 @@ function getLanguageInstructions(language: "finnish" | "english"): {
  * Create Boss Onboarding agent with dynamic language support
  */
 export function createBossOnboardingAgent(
-  language: "finnish" | "english" = "english",
+  language: "finnish" | "english" | "swedish" = "english",
 ): Agent {
   const { languageRule, exampleOutput } = getLanguageInstructions(language);
 
