@@ -3,10 +3,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ScrollArea } from "./ui/scroll-area";
 import { Search, Pin, Star, TrendingUp, Briefcase, Trophy } from "lucide-react";
 import type { Contact } from "./WhatsAppInterface";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import logoImage from "figma:asset/28e39d27183eb9dbb848b6be8a7c7b00e841cd40.png";
 import { PlayerStatsModal } from "./PlayerStatsModal";
 import { LeaderboardModal } from "./LeaderboardModal";
+import { LevelUpModal } from "./LevelUpModal";
 import { getPlayerAvatarUrl } from "../utils/avatarUtils";
 import { useTranslation } from "../utils/translations";
 import { FollowingEyes } from "./ui/FollowingEyes";
@@ -51,6 +52,8 @@ export function ChatSidebar({
   const [showLeaderboardModal, setShowLeaderboardModal] = useState(false);
   const [playerName, setPlayerName] = useState("Player");
   const [playerAvatarUrl, setPlayerAvatarUrl] = useState("");
+  const [showLevelUpModal, setShowLevelUpModal] = useState(false);
+  const [newLevel, setNewLevel] = useState(0);
 
   // Load player profile from localStorage
   useEffect(() => {
@@ -76,6 +79,27 @@ export function ChatSidebar({
   const level = Math.floor(skillLevel) + 1; // Convert 0-10 to 1-11
   const xpProgress = Math.round((skillLevel % 1) * 100); // Get decimal part as percentage
   const xpForNextLevel = 100;
+
+  // Level-up detection
+  const previousLevelRef = useRef(level);
+  useEffect(() => {
+    if (level > previousLevelRef.current && previousLevelRef.current > 0) {
+      // Level up detected!
+      setNewLevel(level);
+      setShowLevelUpModal(true);
+
+      // Try to play sound if available
+      try {
+        const audio = new Audio('/sounds/level-up.mp3');
+        audio.play().catch(() => {
+          // Ignore if sound fails to play
+        });
+      } catch (e) {
+        // Sound not available
+      }
+    }
+    previousLevelRef.current = level;
+  }, [level]);
 
   // Get advisor stats
   const reputation = advisorState?.reputation ?? 0;
@@ -337,6 +361,13 @@ export function ChatSidebar({
           open={showLeaderboardModal}
           onOpenChange={setShowLeaderboardModal}
           advisorId={advisorState?.advisorId}
+        />
+
+        {/* Level Up Celebration Modal */}
+        <LevelUpModal
+          open={showLevelUpModal}
+          onOpenChange={setShowLevelUpModal}
+          level={newLevel}
         />
       </div>
 
