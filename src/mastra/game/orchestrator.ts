@@ -40,6 +40,7 @@ import {
   applyLifeEvent,
   getEventDialogueHook,
 } from "./life-events.ts";
+import { afterSessionComplete } from "./orchestrator-hooks.ts";
 import type {
   AdvisorState,
   GameMasterDecision,
@@ -156,9 +157,13 @@ function getSafeAverageDimensionScore(
 /**
  * Initialize a new advisor with default state
  */
-export function createNewAdvisor(advisorId: string): AdvisorState {
+export function createNewAdvisor(
+  advisorId: string,
+  advisorName?: string,
+): AdvisorState {
   return {
     advisorId,
+    advisorName: advisorName || "Advisor", // Default name if not provided
     reputation: 70, // Start higher to give more buffer for early mistakes
     skillLevel: 0, // Beginner (level 1 when displayed as Math.floor(0) + 1)
     specializations: [],
@@ -1403,7 +1408,7 @@ export async function handleAdvisorResponse(
     achievementsUnlocked = (lastSession as any).achievementsUnlocked;
   }
 
-  const response: any = {
+  let response: any = {
     type: characterResponse.conversationEnding
       ? "conversation_end"
       : "character_message",
@@ -1430,6 +1435,15 @@ export async function handleAdvisorResponse(
   // Include intervention message if one was triggered (parallel to character response)
   if (interventionMessage) {
     response.interventionMessage = interventionMessage;
+  }
+
+  // Update leaderboard when session completes
+  if (characterResponse.conversationEnding) {
+    response = await afterSessionComplete(
+      advisorState,
+      advisorState.advisorName,
+      response,
+    );
   }
 
   return response;

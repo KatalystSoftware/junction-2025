@@ -10,6 +10,7 @@ import { Hono } from "hono";
 import { mastra } from "./mastra/index.ts";
 import { gameRoutes } from "./mastra/api/routes.ts";
 import { checkPostgresHealth } from "./mastra/config/postgres-health.ts";
+import { initializeLeaderboard } from "./mastra/game/orchestrator-hooks.ts";
 
 const app = new Hono();
 
@@ -54,6 +55,11 @@ const port = process.env.PORT ? parseInt(process.env.PORT) : 4111;
 console.log(`🚀 Server starting on port ${port}`);
 console.log(`📡 Game API available at http://localhost:${port}/api/game`);
 console.log(`🌐 Frontend available at http://localhost:${port}`);
+
+// Initialize leaderboard system on startup
+initializeLeaderboard().catch((error) => {
+  console.error("Failed to initialize leaderboard on startup:", error);
+});
 
 serve({
   fetch: app.fetch,
