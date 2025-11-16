@@ -12,7 +12,7 @@ import type { Contact, Message } from "../types/ui";
 import michaelScottImage from "figma:asset/98a682f9e6eea0635304bf1ceada7ac6a7758d54.png";
 import { useGameState } from "../hooks/useGameState";
 import { useDerivedUIState } from "../hooks/useDerivedUIState";
-import { useTranslation } from "../utils/translations";
+import { useTranslation, getUserLanguage } from "../utils/translations";
 import { ConsultationResultsModal } from "./ConsultationResultsModal";
 import { MilestoneModal } from "./MilestoneModal";
 import { AchievementUnlockModal } from "./AchievementUnlockModal";
@@ -20,6 +20,10 @@ import { QuizModal } from "./QuizModal";
 import { GameOverModal } from "./GameOverModal";
 import { ImpactDashboardModal } from "./ImpactDashboardModal";
 import { shouldPollForUpdates } from "@backend/gamePolling";
+import { LiveCallDialog } from "./LiveCallDialog";
+import { Button } from "./ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Phone, PhoneOff } from "lucide-react";
 
 interface WhatsAppInterfaceProps {
   onLogoClick: () => void;
@@ -42,7 +46,7 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
     game.advisorState,
     game.threadHistories,
     game.threadMetadata,
-    lastReadMessageCounts,
+    lastReadMessageCounts
   );
 
   // UI-only state (persisted in URL)
@@ -51,7 +55,7 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       // Initialize from URL hash on mount
       const hash = window.location.hash.slice(1); // Remove the #
       return hash || null;
-    },
+    }
   );
   const [showChat, setShowChat] = useState(() => {
     // Show chat if there's a hash in URL
@@ -150,8 +154,51 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
 
     if (!response) return;
 
+    // DEBUG: Log which response source we're using
+    const responseSource = isFromMessage
+      ? "lastMessageResponse"
+      : response === game.lastStartResponse
+        ? "lastStartResponse"
+        : "autoStartedConsultation";
+    console.log(`\n🔍 ===== PROCESSING RESPONSE FROM: ${responseSource} =====`);
+    console.log(`📦 Response type: ${response.type}`);
+    console.log(`🔍 ============================================\n`);
+
     console.log("📥 Got response:", response.type);
     console.log("📥 Full response:", response);
+
+    // PRIORITY: Handle boss voice call FIRST before anything else
+    if (response.type === "boss_voice_call_incoming") {
+      console.log("\n📞 ========== FRONTEND: BOSS VOICE CALL ==========");
+      console.log("📞 Boss is calling! Showing incoming call modal");
+      console.log("📋 Review data received:", response.review);
+      console.log("🎯 Setting showBossCallingModal to TRUE");
+
+      // Mark as processed immediately
+      if (isFromMessage) {
+        processedMessageResponse.current = game.lastMessageResponse;
+      } else if (
+        game.lastStartResponse &&
+        response === game.lastStartResponse
+      ) {
+        processedStartResponse.current = game.lastStartResponse;
+      } else if (
+        game.autoStartedConsultation &&
+        response === game.autoStartedConsultation
+      ) {
+        processedAutoStartResponse.current = game.autoStartedConsultation;
+      }
+
+      setBossCallReviewData(response.review);
+      setShowBossCallingModal(true);
+
+      if (response.review?.quiz) {
+        console.log("📝 Quiz found in review, storing for later");
+        setCurrentQuiz(response.review.quiz);
+      }
+      console.log("📞 ================================================\n");
+      return; // Exit early
+    }
 
     // Mark this response as processed
     if (isFromMessage) {
@@ -172,7 +219,7 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
         "👤 Got character info for thread",
         response.threadId,
         ":",
-        response.threadMetadata,
+        response.threadMetadata
       );
     }
 
@@ -191,7 +238,7 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       if (response.financialImpactUpdate) {
         console.log(
           "💰 Financial impact update:",
-          response.financialImpactUpdate,
+          response.financialImpactUpdate
         );
         setRecentImpact({
           savings: response.financialImpactUpdate.savingsIncrement,
@@ -249,10 +296,12 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       }
 
       // Auto-trigger next consultation after modals are dismissed
+      // BUT ONLY if this wasn't a boss voice call (boss calls are handled separately)
       setTimeout(() => {
         console.log("🚀 Auto-triggering next consultation...");
         game.startConsultation();
       }, 3000);
+      return; // Don't process further if we just showed results
     }
 
     // Handle boss intervention (real-time correction of bad advice)
@@ -267,7 +316,7 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       // TODO: Show toast notification
       // For now, just log it
       console.log(
-        `${icon} Boss intervention: Check the boss chat to discuss this advice!`,
+        `${icon} Boss intervention: Check the boss chat to discuss this advice!`
       );
 
       // Optionally, highlight the boss thread in the contact list
@@ -336,7 +385,7 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
     // Handle onboarding - select boss chat
     if (response.type === "onboarding") {
       console.log(
-        "👋 Onboarding message received - boss message is in threadHistories",
+        "👋 Onboarding message received - boss message is in threadHistories"
       );
 
       // Clear any existing timeout
@@ -346,7 +395,7 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
 
       // Show typing indicator first, then reveal message after delay
       setBossIsTypingOnboarding(true);
-      
+
       // Select boss chat (acknowledgment choices will be derived from state)
       setSelectedContactId("boss-pinned");
       setShowChat(true); // Show the chat window
@@ -393,6 +442,9 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
   const [showQuizModal, setShowQuizModal] = useState(false);
   const [showGameOverModal, setShowGameOverModal] = useState(false);
   const [showImpactDashboard, setShowImpactDashboard] = useState(false);
+  const [showBossCallingModal, setShowBossCallingModal] = useState(false);
+  const [showBossCallDialog, setShowBossCallDialog] = useState(false);
+  const [bossCallReviewData, setBossCallReviewData] = useState<any>(null);
   const [gameOverData, setGameOverData] = useState<any>(null);
   const [currentResultsData, setCurrentResultsData] = useState<any>(null);
   const [currentMilestones, setCurrentMilestones] = useState<any[]>([]);
@@ -436,7 +488,7 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
         shouldPollForUpdates(
           { lastCheckAt: lastPollTimeRef.current, isActive },
           now,
-          10_000,
+          10_000
         )
       ) {
         lastPollTimeRef.current = now;
@@ -562,7 +614,7 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       if (hasAdviceChoices) {
         // This is either onboarding or check-in acknowledgment
         console.log(
-          "👔 Boss message acknowledged! Starting next consultation...",
+          "👔 Boss message acknowledged! Starting next consultation..."
         );
 
         // Send acknowledgment to boss (will be saved to threadHistories)
@@ -619,7 +671,7 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
     // Add any voice messages that don't have a server match yet (optimistic UI)
     const serverContents = new Set(serverMessages.map((m) => m.content));
     const newVoiceMessages = voiceMessages.filter(
-      (vm) => !serverContents.has(vm.content),
+      (vm) => !serverContents.has(vm.content)
     );
 
     let allMessages = [...mergedMessages, ...newVoiceMessages];
@@ -635,7 +687,12 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
     }
 
     return allMessages;
-  }, [selectedContactId, messagesByThread, pendingVoiceMessages, bossIsTypingOnboarding]);
+  }, [
+    selectedContactId,
+    messagesByThread,
+    pendingVoiceMessages,
+    bossIsTypingOnboarding,
+  ]);
 
   // Get advice choices: boss uses local state, characters use cached game state
   const currentAdviceChoices =
@@ -661,7 +718,7 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
       console.log("🔍 conversationEndData:", conversationEndData);
       console.log(
         "🔍 conversationEndDataByThread:",
-        conversationEndDataByThread,
+        conversationEndDataByThread
       );
     }
   }, [
@@ -805,6 +862,7 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
         conversationEndData={conversationEndData}
         inputValue={currentInputValue}
         onInputChange={setCurrentInputValue}
+        sessionId={game.sessionId}
       />
 
       {/* Modals - shown in sequence after consultation ends */}
@@ -828,7 +886,7 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
         achievements={currentAchievements}
         totalCoins={currentAchievements.reduce(
           (sum, ach) => sum + (ach.coinReward || 0),
-          0,
+          0
         )}
       />
 
@@ -856,6 +914,169 @@ export function WhatsAppInterface({ onLogoClick }: WhatsAppInterfaceProps) {
           window.location.reload();
         }}
       />
+
+      {/* Boss Calling Modal - global popup that appears in any chat */}
+      {showBossCallingModal && (
+        <div
+          className="fixed inset-0 flex items-center justify-center z-50"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
+          onClick={(e) => {
+            // Close modal if clicking outside
+            if (e.target === e.currentTarget) {
+              setShowBossCallingModal(false);
+            }
+          }}
+        >
+          <div
+            className="p-8 rounded-lg shadow-xl max-w-md w-full mx-4"
+            style={{
+              backgroundColor: "var(--card)",
+              borderColor: "var(--border)",
+              borderWidth: "1px",
+              borderStyle: "solid",
+            }}
+          >
+            <div className="flex flex-col items-center">
+              <Avatar className="w-24 h-24 mb-4">
+                <AvatarImage src={michaelScottImage} alt="Michael Scott" />
+                <AvatarFallback
+                  style={{
+                    backgroundColor: "var(--primary)",
+                    color: "var(--primary-foreground)",
+                    fontFamily: "Inter, sans-serif",
+                    fontWeight: "var(--font-weight-medium)",
+                    fontSize: "2rem",
+                  }}
+                >
+                  MS
+                </AvatarFallback>
+              </Avatar>
+
+              <Phone
+                className="w-16 h-16 mb-4 animate-pulse"
+                style={{ color: "#10b981" }}
+              />
+
+              <h2
+                className="mb-2 text-center"
+                style={{
+                  fontFamily: "Inter, sans-serif",
+                  fontSize: "var(--text-2xl)",
+                  fontWeight: "var(--font-weight-semibold)",
+                  color: "var(--foreground)",
+                }}
+              >
+                {t ? t("bossIncomingCall") : "Incoming Call"}
+              </h2>
+
+              <p
+                className="mb-6 text-center"
+                style={{
+                  fontFamily: "Inter, sans-serif",
+                  fontSize: "var(--text-base)",
+                  color: "var(--muted-foreground)",
+                }}
+              >
+                Michael Scott {t ? t("isCalling") : "is calling"}
+              </p>
+
+              <div className="flex gap-4 w-full">
+                <Button
+                  onClick={() => {
+                    console.log(
+                      "📞 Boss call declined - converting to text review"
+                    );
+                    setShowBossCallingModal(false);
+
+                    // Show the review as a quiz modal instead (existing UI)
+                    if (bossCallReviewData) {
+                      // If there's a quiz, show it
+                      if (bossCallReviewData.quiz) {
+                        setShowQuizModal(true);
+                      }
+                      // Select boss chat and show text acknowledgment
+                      setSelectedContactId("boss-pinned");
+                      setShowChat(true);
+
+                      // Add acknowledgment choices for the declined call
+                      setAdviceChoicesByThread((prev) => ({
+                        ...prev,
+                        "boss-pinned": [
+                          {
+                            choiceId: "declined_call_1",
+                            actionText: "Acknowledge (via text)",
+                            icon: "📝",
+                            projectedOutcome:
+                              "Respond to review professionally",
+                            fullAdviceText:
+                              "Thanks for the feedback. I understand the points you've made and I'll work on improving those areas.",
+                          },
+                          {
+                            choiceId: "declined_call_2",
+                            actionText: "Apologize for missing call",
+                            icon: "🙏",
+                            projectedOutcome: "Show respect for boss's time",
+                            fullAdviceText:
+                              "Sorry I missed your call. I've reviewed your feedback and I appreciate you taking the time to help me improve.",
+                          },
+                        ],
+                      }));
+                    }
+                    setBossCallReviewData(null);
+                  }}
+                  variant="outline"
+                  size="lg"
+                  className="flex-1"
+                  style={{
+                    borderColor: "var(--destructive)",
+                    color: "var(--destructive)",
+                  }}
+                >
+                  <PhoneOff className="w-5 h-5 mr-2" />
+                  {t ? t("decline") : "Decline"}
+                </Button>
+
+                <Button
+                  onClick={() => {
+                    setShowBossCallingModal(false);
+                    setShowBossCallDialog(true);
+                  }}
+                  size="lg"
+                  className="flex-1"
+                  style={{ backgroundColor: "#10b981", color: "white" }}
+                >
+                  <Phone className="w-5 h-5 mr-2" />
+                  {t ? t("answer") : "Answer"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Boss Call Dialog - actual voice call interface */}
+      {showBossCallDialog && (
+        <LiveCallDialog
+          contact={bossContact}
+          sessionId={game.sessionId}
+          isVideoCall={false}
+          reviewData={bossCallReviewData}
+          language={getUserLanguage()}
+          onClose={(duration) => {
+            console.log("📞 Boss call ended, duration:", duration);
+            setShowBossCallDialog(false);
+            setBossCallReviewData(null); // Clear review data
+
+            // Trigger next consultation after call ends
+            setTimeout(() => {
+              console.log(
+                "🚀 Auto-triggering next consultation after boss call..."
+              );
+              game.startConsultation();
+            }, 2000);
+          }}
+        />
+      )}
 
       {/* Boss interventions now appear in boss-pinned chat thread, no modal needed */}
 

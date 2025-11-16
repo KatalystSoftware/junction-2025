@@ -33,10 +33,11 @@ import logoImage from "figma:asset/601ef144d16bf6e001c5324689cdddb5a7ea7f74.png"
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useTranslation } from "../utils/translations";
+import { LiveCallDialog } from "./LiveCallDialog";
 
 // Helper function to convert quality score (0-10) to quality level key
 function getQualityLevel(
-  score: number,
+  score: number
 ): "excellent" | "good" | "adequate" | "belowAverage" | "poor" {
   if (score >= 9) return "excellent";
   if (score >= 7) return "good";
@@ -63,6 +64,8 @@ interface ChatWindowProps {
   // Controlled input support (for boss intervention revisions)
   inputValue?: string;
   onInputChange?: (value: string) => void;
+  // Session ID for live calls
+  sessionId?: string;
 }
 
 // Helper functions to calculate financial data
@@ -71,7 +74,7 @@ function calculateTotalBalance(contact: Contact): number {
 
   const bankBalance = contact.financialProfile.bankAccounts.reduce(
     (sum, acc) => sum + acc.balance,
-    0,
+    0
   );
 
   return bankBalance;
@@ -92,12 +95,12 @@ function calculateTotalDebt(contact: Contact): number {
 
   const creditCardDebt = contact.financialProfile.creditCards.reduce(
     (sum, card) => sum + card.balance,
-    0,
+    0
   );
 
   const otherDebt = contact.financialProfile.debts.reduce(
     (sum, debt) => sum + debt.remainingAmount,
-    0,
+    0
   );
 
   return creditCardDebt + otherDebt;
@@ -116,7 +119,7 @@ function calculateTotalMonthlyExpenses(contact: Contact): number {
 
   const subscriptions = contact.financialProfile.subscriptions.reduce(
     (sum, sub) => sum + sub.monthlyCost,
-    0,
+    0
   );
 
   return fixedExpenses + subscriptions;
@@ -134,6 +137,7 @@ export function ChatWindow({
   conversationEndData,
   inputValue: controlledInputValue,
   onInputChange,
+  sessionId,
 }: ChatWindowProps) {
   const t = useTranslation();
   // Use controlled input from parent if provided, otherwise local state
@@ -143,6 +147,7 @@ export function ChatWindow({
   const setInputValue = onInputChange || setLocalInputValue;
   const [showCallDialog, setShowCallDialog] = useState(false);
   const [showVideoDialog, setShowVideoDialog] = useState(false);
+  const [showIncomingCall, setShowIncomingCall] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showFinancialDashboard, setShowFinancialDashboard] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
@@ -292,7 +297,7 @@ export function ChatWindow({
       // Transcribe audio
       const { transcription } = await gameApi.transcribeAudio(
         audioBlob,
-        userLanguage,
+        userLanguage
       );
 
       console.log("Transcription:", transcription);
@@ -307,7 +312,7 @@ export function ChatWindow({
     } catch (error) {
       console.error("Failed to transcribe audio:", error);
       alert(
-        "Failed to transcribe audio. Please try again or type your message.",
+        "Failed to transcribe audio. Please try again or type your message."
       );
       setIsTranscribing(false);
     }
@@ -556,78 +561,78 @@ export function ChatWindow({
                   >
                     •
                   </span>
+                  <span
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: "var(--text-xs)",
+                      color: "var(--muted-foreground)",
+                    }}
+                  >
                     <span
                       style={{
-                        fontFamily: "Inter, sans-serif",
-                        fontSize: "var(--text-xs)",
-                        color: "var(--muted-foreground)",
+                        fontWeight: "var(--font-weight-semibold)",
+                        color: "var(--chart-1)",
                       }}
                     >
-                      <span
-                        style={{
-                          fontWeight: "var(--font-weight-semibold)",
-                          color: "var(--chart-1)",
-                        }}
-                      >
-                        {formatCurrency(calculateTotalBalance(contact))}
-                      </span>{" "}
-                      bal
-                    </span>
+                      {formatCurrency(calculateTotalBalance(contact))}
+                    </span>{" "}
+                    bal
+                  </span>
+                  <span
+                    style={{
+                      color: "var(--border)",
+                      fontSize: "var(--text-sm)",
+                    }}
+                  >
+                    •
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: "var(--text-xs)",
+                      color: "var(--muted-foreground)",
+                    }}
+                  >
                     <span
                       style={{
-                        color: "var(--border)",
-                        fontSize: "var(--text-sm)",
+                        fontWeight: "var(--font-weight-semibold)",
+                        color:
+                          calculateTotalDebt(contact) > 0
+                            ? "var(--chart-2)"
+                            : "var(--muted-foreground)",
                       }}
                     >
-                      •
-                    </span>
+                      {formatCurrency(calculateTotalDebt(contact))}
+                    </span>{" "}
+                    debt
+                  </span>
+                  <span
+                    style={{
+                      color: "var(--border)",
+                      fontSize: "var(--text-sm)",
+                    }}
+                  >
+                    •
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "Inter, sans-serif",
+                      fontSize: "var(--text-xs)",
+                      color: "var(--muted-foreground)",
+                    }}
+                  >
                     <span
                       style={{
-                        fontFamily: "Inter, sans-serif",
-                        fontSize: "var(--text-xs)",
-                        color: "var(--muted-foreground)",
+                        fontWeight: "var(--font-weight-semibold)",
+                        color: "var(--card-foreground)",
                       }}
                     >
-                      <span
-                        style={{
-                          fontWeight: "var(--font-weight-semibold)",
-                          color:
-                            calculateTotalDebt(contact) > 0
-                              ? "var(--chart-2)"
-                              : "var(--muted-foreground)",
-                        }}
-                      >
-                        {formatCurrency(calculateTotalDebt(contact))}
-                      </span>{" "}
-                      debt
+                      {formatCurrency(
+                        contact.financialProfile?.typicalMonthlyIncome || 0
+                      )}
                     </span>
-                    <span
-                      style={{
-                        color: "var(--border)",
-                        fontSize: "var(--text-sm)",
-                      }}
-                    >
-                      •
-                    </span>
-                    <span
-                      style={{
-                        fontFamily: "Inter, sans-serif",
-                        fontSize: "var(--text-xs)",
-                        color: "var(--muted-foreground)",
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontWeight: "var(--font-weight-semibold)",
-                          color: "var(--card-foreground)",
-                        }}
-                      >
-                        {formatCurrency(
-                          contact.financialProfile?.typicalMonthlyIncome || 0,
-                        )}
-                      </span>
-                      /mo
-                    </span>
+                    /mo
+                  </span>
                 </div>
               )}
             </div>
@@ -687,47 +692,41 @@ export function ChatWindow({
           </div>
 
           <div className="flex items-center gap-2">
-            {contact.id !== "boss-pinned" && contact.characterId && contact.financialProfile && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setShowFinancialDashboard(true)}
-                      style={{ borderRadius: "var(--radius-button)" }}
-                    >
-                      <BarChart3 className="w-5 h-5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>View Financial Details</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+            {contact.id !== "boss-pinned" &&
+              contact.characterId &&
+              contact.financialProfile && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setShowFinancialDashboard(true)}
+                        style={{ borderRadius: "var(--radius-button)" }}
+                      >
+                        <BarChart3 className="w-5 h-5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>View Financial Details</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            {/* Voice call only available for boss */}
+            {contact.id === "boss-pinned" && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  // Show incoming call notification for boss
+                  setShowIncomingCall(true);
+                }}
+                style={{ borderRadius: "var(--radius-button)" }}
+              >
+                <Phone className="w-5 h-5" />
+              </Button>
             )}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={async () => {
-                await requestCameraAndMicPermissions();
-                setShowVideoDialog(true);
-              }}
-              style={{ borderRadius: "var(--radius-button)" }}
-            >
-              <Video className="w-5 h-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={async () => {
-                await requestMicPermission();
-                setShowCallDialog(true);
-              }}
-              style={{ borderRadius: "var(--radius-button)" }}
-            >
-              <Phone className="w-5 h-5" />
-            </Button>
           </div>
         </div>
       </div>
@@ -1089,7 +1088,8 @@ export function ChatWindow({
           className="absolute bottom-4 left-4 right-4 px-6 py-4 space-y-4"
           style={{
             backgroundColor: "var(--card)",
-            boxShadow: "0px 8px 32px 0px rgba(127, 86, 217, 0.3), 0px 4px 16px 0px rgba(10, 13, 18, 0.2)",
+            boxShadow:
+              "0px 8px 32px 0px rgba(127, 86, 217, 0.3), 0px 4px 16px 0px rgba(10, 13, 18, 0.2)",
             borderRadius: "var(--radius-card)",
             border: "2px solid var(--primary)",
             maxHeight: "80%",
@@ -1177,7 +1177,7 @@ export function ChatWindow({
                       t.qualityLevels[
                         getQualityLevel(
                           conversationEndData.financialResults.evaluation
-                            .qualityScore || 5,
+                            .qualityScore || 5
                         )
                       ]
                     }
@@ -1249,7 +1249,7 @@ export function ChatWindow({
                           </div>
                         </div>
                       );
-                    },
+                    }
                   )}
                 </div>
               </div>
@@ -1456,184 +1456,106 @@ export function ChatWindow({
         </div>
       )}
 
-      {/* Call Dialog */}
-      {showCallDialog && (
+      {/* Incoming Call Notification */}
+      {showIncomingCall && contact && (
         <div
           className="fixed inset-0 flex items-center justify-center z-50"
           style={{
-            backgroundColor: "rgba(0, 0, 0, 0.8)",
+            backgroundColor: "rgba(0, 0, 0, 0.7)",
           }}
         >
           <div
-            className="w-full max-w-md mx-4 p-8 flex flex-col items-center"
+            className="p-8 rounded-lg shadow-xl max-w-md w-full mx-4"
             style={{
               backgroundColor: "var(--card)",
-              borderRadius: "var(--radius-card)",
-              boxShadow: "0px 8px 24px 0px rgba(10, 13, 18, 0.25)",
+              borderColor: "var(--border)",
+              borderWidth: "1px",
+              borderStyle: "solid",
             }}
           >
-            <div className="mb-6">
-              <Avatar className="w-64 h-64">
-                <AvatarImage src={contact.avatarImage} alt={contact.name} />
-                <AvatarFallback
-                  style={{
-                    backgroundColor: "var(--primary)",
-                    color: "var(--primary-foreground)",
-                    fontFamily: "Inter, sans-serif",
-                    fontWeight: "var(--font-weight-medium)",
-                    fontSize: "4rem",
-                  }}
-                >
-                  {contact.avatar}
-                </AvatarFallback>
-              </Avatar>
-            </div>
-
-            <h3
-              className="mb-2"
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "var(--text-xl)",
-                fontWeight: "var(--font-weight-semibold)",
-                color: "var(--card-foreground)",
-              }}
-            >
-              {contact.name}
-            </h3>
-
-            <p
-              className="mb-6"
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "var(--text-lg)",
-                color: "var(--muted-foreground)",
-                fontWeight: "var(--font-weight-medium)",
-              }}
-            >
-              {formatCallDuration(callDuration)}
-            </p>
-
-            <div className="flex items-center gap-4 mb-4">
-              <div
-                className="w-3 h-3 rounded-full animate-pulse"
-                style={{
-                  backgroundColor: "var(--chart-1)",
-                }}
-              />
-              <p
+            <div className="text-center">
+              <div className="mb-4">
+                <Phone
+                  className="w-16 h-16 mx-auto animate-pulse"
+                  style={{ color: "#10b981" }}
+                />
+              </div>
+              <h2
+                className="text-2xl font-bold mb-2"
                 style={{
                   fontFamily: "Inter, sans-serif",
-                  fontSize: "var(--text-sm)",
+                  color: "var(--card-foreground)",
+                }}
+              >
+                {contact.name} is calling...
+              </h2>
+              <p
+                className="mb-6"
+                style={{
+                  fontFamily: "Inter, sans-serif",
                   color: "var(--muted-foreground)",
                 }}
               >
-                Call in progress...
+                Incoming voice call
               </p>
+              <div className="flex gap-4 justify-center">
+                <Button
+                  variant="destructive"
+                  onClick={() => setShowIncomingCall(false)}
+                  className="flex-1"
+                >
+                  Decline
+                </Button>
+                <Button
+                  variant="default"
+                  onClick={async () => {
+                    await requestMicPermission();
+                    setShowIncomingCall(false);
+                    setShowCallDialog(true);
+                  }}
+                  className="flex-1"
+                  style={{
+                    backgroundColor: "#10b981",
+                  }}
+                >
+                  Answer
+                </Button>
+              </div>
             </div>
-
-            <Button
-              onClick={() => setShowCallDialog(false)}
-              variant="destructive"
-              size="lg"
-              className="mt-4 w-16 h-16"
-              style={{
-                borderRadius: "9999px",
-              }}
-            >
-              <PhoneOff className="w-6 h-6" />
-            </Button>
           </div>
         </div>
       )}
 
-      {/* Video Dialog */}
-      {showVideoDialog && (
-        <div
-          className="fixed inset-0 flex items-center justify-center z-50"
-          style={{
-            backgroundColor: "rgba(0, 0, 0, 0.8)",
+      {/* Live Call Dialog - Voice */}
+      {showCallDialog && contact && sessionId && (
+        <LiveCallDialog
+          contact={contact}
+          sessionId={sessionId}
+          isVideoCall={false}
+          onClose={(duration) => {
+            setShowCallDialog(false);
+            // Add call record to chat
+            if (duration && duration > 0) {
+              const minutes = Math.floor(duration / 60);
+              const seconds = duration % 60;
+              const timeStr =
+                minutes > 0 ? `${minutes}m ${seconds}s` : `${seconds}s`;
+
+              // Add system message to chat
+              onSendMessage?.(`📞 Call with ${contact.name} (${timeStr})`);
+            }
           }}
-        >
-          <div
-            className="w-full max-w-md mx-4 p-8 flex flex-col items-center"
-            style={{
-              backgroundColor: "var(--card)",
-              borderRadius: "var(--radius-card)",
-              boxShadow: "0px 8px 24px 0px rgba(10, 13, 18, 0.25)",
-            }}
-          >
-            <div className="mb-6">
-              <Avatar className="w-64 h-64">
-                <AvatarImage src={contact.avatarImage} alt={contact.name} />
-                <AvatarFallback
-                  style={{
-                    backgroundColor: "var(--primary)",
-                    color: "var(--primary-foreground)",
-                    fontFamily: "Inter, sans-serif",
-                    fontWeight: "var(--font-weight-medium)",
-                    fontSize: "4rem",
-                  }}
-                >
-                  {contact.avatar}
-                </AvatarFallback>
-              </Avatar>
-            </div>
+        />
+      )}
 
-            <h3
-              className="mb-2"
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "var(--text-xl)",
-                fontWeight: "var(--font-weight-semibold)",
-                color: "var(--card-foreground)",
-              }}
-            >
-              {contact.name}
-            </h3>
-
-            <p
-              className="mb-6"
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "var(--text-lg)",
-                color: "var(--muted-foreground)",
-                fontWeight: "var(--font-weight-medium)",
-              }}
-            >
-              {formatVideoDuration(videoDuration)}
-            </p>
-
-            <div className="flex items-center gap-4 mb-4">
-              <div
-                className="w-3 h-3 rounded-full animate-pulse"
-                style={{
-                  backgroundColor: "var(--chart-1)",
-                }}
-              />
-              <p
-                style={{
-                  fontFamily: "Inter, sans-serif",
-                  fontSize: "var(--text-sm)",
-                  color: "var(--muted-foreground)",
-                }}
-              >
-                Video call in progress...
-              </p>
-            </div>
-
-            <Button
-              onClick={() => setShowVideoDialog(false)}
-              variant="destructive"
-              size="lg"
-              className="mt-4 w-16 h-16"
-              style={{
-                borderRadius: "9999px",
-              }}
-            >
-              <VideoOff className="w-6 h-6" />
-            </Button>
-          </div>
-        </div>
+      {/* Live Call Dialog - Video */}
+      {showVideoDialog && contact && sessionId && (
+        <LiveCallDialog
+          contact={contact}
+          sessionId={sessionId}
+          isVideoCall={true}
+          onClose={() => setShowVideoDialog(false)}
+        />
       )}
 
       {/* Profile Modal */}
@@ -2153,7 +2075,7 @@ export function ChatWindow({
                         }}
                       >
                         {formatCurrency(
-                          contact.financialProfile?.typicalMonthlyIncome || 0,
+                          contact.financialProfile?.typicalMonthlyIncome || 0
                         )}
                       </p>
                     </div>
@@ -2194,13 +2116,16 @@ export function ChatWindow({
       )}
 
       {/* Financial Dashboard Modal */}
-      {showFinancialDashboard && contact && contact.id !== "boss-pinned" && contact.characterId && (
-        <ClientFinancialDashboard
-          characterId={contact.characterId}
-          characterName={contact.name}
-          onClose={() => setShowFinancialDashboard(false)}
-        />
-      )}
+      {showFinancialDashboard &&
+        contact &&
+        contact.id !== "boss-pinned" &&
+        contact.characterId && (
+          <ClientFinancialDashboard
+            characterId={contact.characterId}
+            characterName={contact.name}
+            onClose={() => setShowFinancialDashboard(false)}
+          />
+        )}
     </div>
   );
 }

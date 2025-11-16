@@ -174,6 +174,79 @@ app.use(
 );
 
 // ============================================================================
+// ElevenLabs Signed URL Endpoint (for boss voice calls)
+// ============================================================================
+
+app.post("/elevenlabs-signed-url", async (c) => {
+  try {
+    const BOSS_AGENT_ID = "agent_7201ka5kvscgevbvc4kkpvvzee5c";
+    const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY || "";
+
+    if (!ELEVENLABS_API_KEY) {
+      console.error("❌ ELEVENLABS_API_KEY not configured");
+      return c.json({ error: "ELEVENLABS_API_KEY not configured" }, 500);
+    }
+
+    // Get review data from request body (optional)
+    const body = await c.req.json().catch(() => ({}));
+    const { review, language } = body;
+
+    console.log("🔑 Requesting signed URL for boss agent...");
+
+    // Prepare custom variables for ElevenLabs agent
+    const customVariables: Record<string, string> = {};
+
+    if (review) {
+      // Pass review data as variables the agent can reference
+      customVariables.overall_score = String(review.overallScore || "N/A");
+      customVariables.strengths = Array.isArray(review.strengthsIdentified)
+        ? review.strengthsIdentified.join(", ")
+        : "N/A";
+      customVariables.areas_for_improvement = Array.isArray(review.areasForImprovement)
+        ? review.areasForImprovement.join(", ")
+        : "N/A";
+      customVariables.encouraging_message = review.encouragingMessage || "Keep up the good work!";
+      customVariables.reputation_change = String(review.reputationChange || 0);
+      customVariables.skill_level_change = String(review.skillLevelChange || 0);
+    }
+
+    if (language) {
+      customVariables.language = language; // User's preferred language
+    }
+
+    const response = await fetch(
+      `https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id=${BOSS_AGENT_ID}`,
+      {
+        method: "GET",
+        headers: {
+          "xi-api-key": ELEVENLABS_API_KEY,
+          "Content-Type": "application/json",
+        },
+        ...(Object.keys(customVariables).length > 0 && {
+          body: JSON.stringify({ variables: customVariables }),
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      console.error("❌ Failed to get signed URL:", response.statusText);
+      return c.json({ error: `Failed to get signed URL: ${response.statusText}` }, 500);
+    }
+
+    const data = await response.json();
+    console.log("✅ Generated ElevenLabs signed URL for boss call");
+    if (review) {
+      console.log("📊 Passed review data as custom variables:", customVariables);
+    }
+
+    return c.json({ signedUrl: data.signed_url });
+  } catch (error) {
+    console.error("❌ Error getting signed URL:", error);
+    return c.json({ error: "Internal server error" }, 500);
+  }
+});
+
+// ============================================================================
 // ROUTE 1: Initialize or Load Session
 // ============================================================================
 

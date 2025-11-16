@@ -411,14 +411,45 @@ export async function startNewConsultation(
   // Check if we should trigger God/Boss review
   const sessionsSinceReview =
     advisorState.totalSessions - advisorState.lastReviewSession;
-  const shouldReview = sessionsSinceReview >= 3 && sessionsSinceReview <= 5;
 
+  // Get last session performance (if any)
+  const lastSession = advisorState.sessionHistory.length > 0
+    ? advisorState.sessionHistory[advisorState.sessionHistory.length - 1]
+    : null;
+  const lastSessionScore = lastSession?.adviceQualityScore || 10;
+
+  // Trigger review if:
+  // 1. ANY negative performance (score < 6) - DEMO MODE for immediate feedback, OR
+  // 2. Regular timing (every 2-3 sessions for ongoing check-ins)
+  const hasNegativePerformance = lastSessionScore < 6;
+
+  // DEMO MODE: Trigger on ANY negative performance (don't check lastReviewSession)
+  // This ensures boss calls you immediately after any poor session
+  const isNegativePerformanceTrigger = hasNegativePerformance;
+
+  // More frequent regular reviews for demo (2-3 sessions instead of 3-5)
+  const isRegularReviewTime = sessionsSinceReview >= 2 && sessionsSinceReview <= 3;
+
+  // TEMPORARY DEBUG: Force trigger if ANY completed session exists
+  const forceDebugTrigger = advisorState.totalSessions > 0;
+
+  const shouldReview = isNegativePerformanceTrigger || isRegularReviewTime || forceDebugTrigger;
+
+  console.log(`\n🔍 ========== VOICE CALL TRIGGER CHECK ==========`);
   console.log(`📊 Review timing check:`, {
     totalSessions: advisorState.totalSessions,
     lastReviewSession: advisorState.lastReviewSession,
     sessionsSinceReview,
+    lastSessionScore,
+    hasNegativePerformance,
+    isNegativePerformanceTrigger,
+    isRegularReviewTime,
+    forceDebugTrigger,
     shouldReview,
   });
+  console.log(`📞 Should trigger voice call? ${shouldReview ? "YES ✅" : "NO ❌"}`);
+  console.log(`🔍 Reason: ${forceDebugTrigger ? "DEBUG: Forcing trigger for any completed session" : isNegativePerformanceTrigger ? "Negative performance (score < 6)" : isRegularReviewTime ? "Regular check-in (2-3 sessions)" : "None"}`);
+  console.log(`🔍 ============================================\n`);
 
   // Get pool stats
   const poolStats = characterPool.getPoolStats();
@@ -441,7 +472,8 @@ ADVISOR STATE:
     .join("; ")}
 
 REVIEW TIMING:
-- Should trigger review now: ${shouldReview ? "YES - It's time for a performance review (3-5 sessions have passed)" : "NO - Too soon for another review"}
+- Should trigger review now: ${shouldReview ? "YES - Performance review needed" : "NO - Not time for review yet"}
+- Reason: ${isNegativePerformanceTrigger ? "Negative performance detected (score < 6) - intervention needed NOW" : isRegularReviewTime ? "Regular check-in time (2-3 sessions passed)" : "Not applicable"}
 - IMPORTANT: You must respect this timing. Only trigger god_boss_review if shouldReview is YES.
 
 AVAILABLE CHARACTERS:
@@ -519,6 +551,8 @@ Respond with ONLY valid JSON (NO markdown):
 
   // Handle decision
   if (decision.action === "god_boss_review") {
+    console.log(`\n🎯 Game Master decided: god_boss_review`);
+
     // Hard enforcement: Only allow review if it's actually time
     if (!shouldReview) {
       console.warn(
@@ -1971,6 +2005,13 @@ function generateHesitantResponse(
 async function triggerGodBossReview(
   advisorState: AdvisorState,
 ): Promise<GameResponse> {
+  console.log(`\n📞 ========== TRIGGERING BOSS VOICE CALL ==========`);
+  console.log(`📊 Advisor state:`, {
+    totalSessions: advisorState.totalSessions,
+    lastReviewSession: advisorState.lastReviewSession,
+    sessionHistoryLength: advisorState.sessionHistory.length,
+  });
+
   // Get sessions to review (last 3-5)
   const sessionsToReview = advisorState.sessionHistory.slice(-5);
 
@@ -2051,9 +2092,14 @@ async function triggerGodBossReview(
   // Update last review session
   advisorState.lastReviewSession = advisorState.totalSessions;
 
+  // Trigger voice call for boss intervention
+  console.log(`✅ Returning boss_voice_call_incoming response`);
+  console.log(`📋 Review data:`, JSON.stringify(review, null, 2));
+  console.log(`📞 ==============================================\n`);
+
   return {
-    type: "god_boss_review",
-    review,
+    type: "boss_voice_call_incoming",
+    review, // Include review data for reference (will be discussed in call)
     stateUpdate: advisorState,
   };
 }

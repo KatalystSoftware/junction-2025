@@ -45,7 +45,7 @@ app.use(
   "/*",
   serveStatic({
     root: "./public",
-  }),
+  })
 );
 
 // SPA fallback - serve index.html for all non-API routes
@@ -69,6 +69,12 @@ serve({
   fetch: app.fetch,
   port,
 });
+
+console.log(
+  `🎙️ Live Call WebSocket available at ws://localhost:${port}/api/game/live-call`
+);
+
+console.log(`✅ Server running on http://localhost:${port}`);
 
 // Export for Mastra CLI compatibility
 export { mastra };
