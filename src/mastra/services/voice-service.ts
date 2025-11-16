@@ -56,6 +56,8 @@ function getVoiceForEmotion(
     const lowerEmotion = emotionalState.toLowerCase();
 
     // Adjust voice parameters based on emotional state
+    // v3 stability must be 0.0 (Creative), 0.5 (Natural), or 1.0 (Robust)
+
     // Scared/anxious states
     if (
       lowerEmotion.includes("scared") ||
@@ -65,7 +67,7 @@ function getVoiceForEmotion(
     ) {
       return {
         voiceId: character.communicationStyle.voiceId,
-        stability: 0.3, // More variation for anxiety
+        stability: 0.0, // Creative - More variation for anxiety
         similarityBoost: 0.5,
         style: 0.7, // High style for emotional expression
       };
@@ -81,7 +83,7 @@ function getVoiceForEmotion(
     ) {
       return {
         voiceId: character.communicationStyle.voiceId,
-        stability: 0.2, // Very emotional, unstable
+        stability: 0.0, // Creative - Very emotional, unstable
         similarityBoost: 0.6,
         style: 0.8, // Maximum emotion
       };
@@ -96,7 +98,7 @@ function getVoiceForEmotion(
     ) {
       return {
         voiceId: character.communicationStyle.voiceId,
-        stability: 0.4,
+        stability: 0.5, // Natural - Balanced expression
         similarityBoost: 0.6,
         style: 0.7,
       };
@@ -112,7 +114,7 @@ function getVoiceForEmotion(
     ) {
       return {
         voiceId: character.communicationStyle.voiceId,
-        stability: 0.5,
+        stability: 0.5, // Natural - Balanced excitement
         similarityBoost: 0.7,
         style: 0.6,
       };
@@ -126,7 +128,7 @@ function getVoiceForEmotion(
     ) {
       return {
         voiceId: character.communicationStyle.voiceId,
-        stability: 0.5,
+        stability: 0.5, // Natural - Moderate concern
         similarityBoost: 0.7,
         style: 0.5,
       };
@@ -135,7 +137,7 @@ function getVoiceForEmotion(
     // Default: Calm or neutral with character's voice
     return {
       voiceId: character.communicationStyle.voiceId,
-      stability: 0.7, // More stable for calm states
+      stability: 1.0, // Robust - More stable for calm states
       similarityBoost: 0.8,
       style: 0.3,
     };
@@ -156,7 +158,7 @@ function getVoiceForEmotion(
         character.age < 25
           ? VOICE_PERSONALITIES.scared_young
           : VOICE_PERSONALITIES.scared_anxious,
-      stability: 0.3, // More variation for anxiety
+      stability: 0.0, // Creative - More variation for anxiety
       similarityBoost: 0.5,
       style: 0.7, // High style for emotional expression
     };
@@ -172,7 +174,7 @@ function getVoiceForEmotion(
   ) {
     return {
       voiceId: VOICE_PERSONALITIES.crying_upset,
-      stability: 0.2, // Very emotional, unstable
+      stability: 0.0, // Creative - Very emotional, unstable
       similarityBoost: 0.6,
       style: 0.8, // Maximum emotion
     };
@@ -187,7 +189,7 @@ function getVoiceForEmotion(
   ) {
     return {
       voiceId: VOICE_PERSONALITIES.upset_frustrated,
-      stability: 0.4,
+      stability: 0.5, // Natural - Balanced expression
       similarityBoost: 0.6,
       style: 0.7,
     };
@@ -206,7 +208,7 @@ function getVoiceForEmotion(
         character.personality.emotionality > 0.6
           ? VOICE_PERSONALITIES.excited_happy
           : VOICE_PERSONALITIES.happy_optimistic,
-      stability: 0.5,
+      stability: 0.5, // Natural - Balanced excitement
       similarityBoost: 0.7,
       style: 0.6,
     };
@@ -220,7 +222,7 @@ function getVoiceForEmotion(
   ) {
     return {
       voiceId: VOICE_PERSONALITIES.emotional_concerned,
-      stability: 0.5,
+      stability: 0.5, // Natural - Moderate concern
       similarityBoost: 0.7,
       style: 0.5,
     };
@@ -232,7 +234,7 @@ function getVoiceForEmotion(
       character.personality.emotionality > 0.5
         ? VOICE_PERSONALITIES.calm_friendly
         : VOICE_PERSONALITIES.calm_professional,
-    stability: 0.7, // More stable for calm states
+    stability: 1.0, // Robust - More stable for calm states
     similarityBoost: 0.8,
     style: 0.3,
   };
