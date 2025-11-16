@@ -330,10 +330,10 @@ export function ChatSidebar({
           >
             <div className="relative" style={{ flexShrink: 0 }}>
               <FollowingEyes
-                eyeSize={8}
+                eyeSize={6}
                 pupilSize={3}
-                eyeSpacing={0.6}
-                eyeVerticalPosition={0.5}
+                eyeSpacing={0.7}
+                eyeVerticalPosition={0.6}
               >
                 <Avatar className="w-12 h-12">
                   <AvatarImage

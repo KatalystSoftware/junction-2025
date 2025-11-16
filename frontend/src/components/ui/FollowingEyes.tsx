@@ -10,7 +10,7 @@ interface FollowingEyesProps {
 
 export function FollowingEyes({
   children,
-  eyeSize = 8,
+  eyeSize = 6,
   pupilSize = 3,
   eyeSpacing = 1.2,
   eyeVerticalPosition = 0.8,
