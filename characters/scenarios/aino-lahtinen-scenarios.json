@@ -33,29 +33,24 @@
       }
     },
     "idealAdvice": [
-      "Welcome to working life! This is super common confusion with first job",
-      "Your employer didn't mess up - this is how Finland's tax system works",
-      "They withheld 18% based on your tax card (verokortti)",
-      "Good news: You'll likely get most of this back!",
-      "Here's why: Annual tax-free amount in Finland is ~14,000€",
-      "At 400€/month, you'll earn ~4,800€/year - well under the limit",
-      "But employer doesn't know you're only working part-time, so they withhold 'just in case'",
-      "Next year (after you file tax return in spring), you'll get refund of most taxes withheld",
-      "What to do:",
-      "1. Get proper tax card from vero.fi showing you're under yearly limit",
-      "2. Give updated tax card to employer - they'll withhold less going forward",
-      "3. Keep all payslips for next year's tax return",
-      "With part-time work, you should have tax card showing 0-5% withholding, not 18%",
-      "This is actually good problem - means you're earning money and learning the system!",
-      "Many Finnish teens get nice tax refund in spring from part-time work - might be €500-1000 back!"
+      "This is standard tax withholding based on your tax card (verokortti) - 18% in your case",
+      "You'll get most of this back as a tax refund",
+      "Why: Annual tax-free amount in Finland is ~14,000€",
+      "At 400€/month, you'll earn ~4,800€/year - well under the tax-free limit",
+      "The employer withholds based on your tax card, which assumes full-time work",
+      "After you file your tax return next spring, you'll receive a refund for excess taxes withheld",
+      "Action plan:",
+      "1. Get correct tax card from vero.fi that reflects your part-time status and income level",
+      "2. Submit updated tax card to employer - this reduces future withholding to 0-5%",
+      "3. Keep all payslips for tax return filing",
+      "Expected refund from part-time work: €500-1000 when you file next year's taxes"
     ],
     "commonMistakes": [
       "Not explaining tax refund system clearly",
       "Making tax system sound more complicated than necessary",
       "Not giving actionable advice (get updated tax card)",
-      "Failing to reassure that employer didn't make mistake",
-      "Missing opportunity to teach about annual vs monthly taxation",
-      "Not validating this is confusing for first-time workers"
+      "Failing to explain that employer didn't make mistake",
+      "Missing opportunity to teach about annual vs monthly taxation"
     ],
     "followUpScenarios": [
       {
@@ -98,34 +93,27 @@
       }
     },
     "idealAdvice": [
-      "Having savings goal at 17 = you're already ahead of most people!",
-      "Let's build a realistic plan that lets you save AND enjoy life:",
+      "Let's build a realistic budget:",
       "Income: 400€/month",
-      "Living at home (no rent/food): Huge advantage - use it!",
+      "Living at home (no rent/food): Use this advantage",
       "Suggested split: 60% save (240€), 40% spend (160€) = 2,880€ saved per year",
       "In 18 months until lukio graduation: 4,320€ + current 850€ = ~5,200€",
-      "That's solid for 6 months abroad! (Spain budget: 800-1000€/month)",
+      "Spain budget: 800-1000€/month for 6 months = you'll have enough",
       "160€/month to spend = 40€/week for going out, clothes, fun",
-      "Is this 'boring'? Absolutely not:",
-      "You're making a choice: Short-term stuff vs life-changing experience abroad",
-      "Your friends spending everything: Will they have 5k€ for Spain trip? Probably not",
-      "You can still go out, just more intentionally - host movie nights instead of expensive bars",
-      "Being 17: Should involve some fun spending! 40€/week is reasonable",
-      "Tips to make it work:",
+      "Reality check: Your friends spending everything won't have 5k€ for Spain trip",
+      "You're making a choice: Short-term purchases vs life-changing experience",
+      "Implementation:",
       "1. Automatic transfer 240€ to savings on payday - 'pay yourself first'",
-      "2. Track where your 160€ goes - see what actually makes you happy",
-      "3. Free/cheap fun: Parks, beaches, friend hangouts at home, student events",
-      "4. Tell close friends about Spain goal - real friends will support you",
-      "Future you at 19 in Spain: Will thank 17-year-old you SO much for saving",
-      "This isn't boring - this is having goals and making them happen!"
+      "2. Track where your 160€ goes - identify actual value vs waste",
+      "3. Lower-cost alternatives: Host gatherings instead of expensive bars",
+      "4. Discipline now pays off: Future you at 19 in Spain benefits from current choices"
     ],
     "commonMistakes": [
-      "Telling her to save 100% and never have fun",
-      "Dismissing peer pressure and social needs as unimportant",
+      "Recommending 100% savings rate (unrealistic)",
       "Not giving specific number recommendations",
-      "Failing to validate that her goal is ambitious and mature",
       "Missing opportunity to teach 'pay yourself first' principle",
-      "Not addressing the FOMO directly"
+      "Failing to show concrete math for achieving the goal",
+      "Not addressing the spending vs saving tradeoff directly"
     ]
   },
   {
@@ -161,38 +149,35 @@
       }
     },
     "idealAdvice": [
-      "Both you and your mom have valid points - let's break this down",
-      "Your mom's concern is REAL: Credit cards can be dangerous if misused",
-      "Your aunt's experience in 90s: High interest rates (15-20%), easy to spiral into debt",
-      "But credit cards can also be safe tools IF used correctly",
-      "Critical question: Can you treat credit card exactly like debit card?",
-      "Safe credit card use: Only spend money you already have, pay full balance monthly",
-      "Dangerous use: Spending money you don't have, carrying balance, paying interest",
-      "For your situation (18, part-time work, living at home, good saver):",
-      "Pros of having credit card:",
-      "- Builds payment history (helpful for future apartment rental, not loans in Finland)",
+      "Credit cards are high-risk financial tools that require strict discipline",
+      "Your mom's concern is based on real experience: Credit card debt at 15-20% interest compounds fast",
+      "Credit cards work safely ONLY if: You spend money you already have and pay full balance monthly",
+      "Dangerous pattern: Spending money you don't have, carrying balances, paying interest",
+      "Assessment for your situation (18, part-time work, €400/month):",
+      "Pros:",
+      "- Builds payment history for future apartment rental",
       "- Better fraud protection than debit card",
-      "- Useful for online purchases and travel",
-      "Cons/risks:",
-      "- Temptation to spend more than you have",
-      "- If you carry balance: 15-20% interest is devastating",
-      "- Can damage credit score if you miss payments",
-      "Honest assessment: You seem responsible (saving for Spain, asking for advice)",
-      "IF you get credit card:",
-      "1. Set limit to 500€ maximum (not 1,000€) - less risk",
-      "2. Set up automatic full payment from checking account",
-      "3. Use for specific things only (gas, online purchases) not daily spending",
-      "4. NEVER carry a balance - if you can't pay full amount, you've overspent",
-      "Alternative: Wait until you're in university and have more stable income",
-      "Respect your mom's concern - she's protecting you from real danger she witnessed"
+      "- Useful for online purchases",
+      "Risks:",
+      "- Temptation to overspend beyond actual cash available",
+      "- 15-20% interest rate if you carry any balance",
+      "- Damaged credit score from missed payments",
+      "If you proceed with credit card:",
+      "1. Set limit to 500€ maximum (reject the 1,000€ offer) - limits potential damage",
+      "2. Set up automatic full payment from checking account monthly",
+      "3. Use only for specific categories (online purchases), not daily spending",
+      "4. NEVER carry a balance - inability to pay full amount = you overspent",
+      "5. Track every purchase immediately",
+      "Alternative: Wait until university with more stable income - this is financially safer",
+      "Your mom witnessed real financial damage - that experience is valid data"
     ],
     "commonMistakes": [
-      "Dismissing mom's concerns as old-fashioned",
-      "Encouraging credit card without serious warnings",
+      "Dismissing mom's concerns as outdated",
+      "Encouraging credit card without emphasizing risks",
       "Not explaining difference between safe and dangerous use clearly",
-      "Failing to validate family's painful history with debt",
-      "Not suggesting lower credit limit",
-      "Missing that waiting is also a valid choice"
+      "Not quantifying the interest rate risk (15-20%)",
+      "Not suggesting lower credit limit than offered",
+      "Missing that delaying is the financially safer choice"
     ]
   }
 ]
