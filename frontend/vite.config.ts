@@ -76,6 +76,7 @@ export default defineConfig({
       "/api": {
         target: "http://localhost:4111",
         changeOrigin: true,
+        ws: true, // Enable WebSocket proxying
         // Don't rewrite - backend expects /api/game/* paths
       },
     },

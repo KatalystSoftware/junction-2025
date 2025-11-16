@@ -31,11 +31,16 @@ export interface CallSession {
 }
 
 export interface HangUpReason {
-  reason: "duration_exceeded" | "problem_solved" | "off_rails" | "character_choice";
+  reason:
+    | "duration_exceeded"
+    | "problem_solved"
+    | "off_rails"
+    | "character_choice";
   message: string;
 }
 
-const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+const GOOGLE_API_KEY =
+  process.env.GOOGLE_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
 
 // Configuration constants
 const MAX_CALL_DURATION_SECONDS = 300; // 5 minutes max
@@ -79,7 +84,15 @@ ${scenario.problemContext.emotionalState}
 CRITICAL: LIVE CALL BEHAVIOR
 ═══════════════════════════════════════════════════════════════════════
 
-This is a LIVE VOICE CALL, not a text chat. You must behave naturally:
+This is a LIVE VOICE CALL, not a text chat. You are RECEIVING a call from your financial advisor.
+
+IMPORTANT: You answer the phone and greet them first! Start with a natural greeting like:
+- "Hei, tässä ${character.name}!" (Hello, this is ${character.name})
+- "Moi! Kiitos kun soitit!" (Hi! Thanks for calling!)
+- "Joo hei!" (Yeah hi!)
+Then briefly mention why you called or what you need help with.
+
+You must behave naturally:
 
 SPEAKING STYLE:
 - Speak naturally like in a real phone conversation
@@ -140,7 +153,8 @@ function buildPersonalityDescription(character: Character): string {
   let desc = "YOUR PERSONALITY TRAITS:\n";
 
   if (personality.impulsiveness > 0.7) {
-    desc += "- Very impulsive: You make quick decisions, might interrupt with ideas\n";
+    desc +=
+      "- Very impulsive: You make quick decisions, might interrupt with ideas\n";
   } else if (personality.impulsiveness > 0.4) {
     desc += "- Moderately impulsive: You sometimes act on impulse\n";
   } else {
@@ -181,9 +195,13 @@ function buildPersonalityDescription(character: Character): string {
 /**
  * Build hang-up guidelines for the character
  */
-function buildHangUpGuidelines(character: Character, session: CallSession): string {
+function buildHangUpGuidelines(
+  character: Character,
+  session: CallSession
+): string {
   const elapsedMinutes = Math.floor((Date.now() - session.startTime) / 60000);
-  const remainingMinutes = Math.floor(MAX_CALL_DURATION_SECONDS / 60) - elapsedMinutes;
+  const remainingMinutes =
+    Math.floor(MAX_CALL_DURATION_SECONDS / 60) - elapsedMinutes;
 
   return `
 ═══════════════════════════════════════════════════════════════════════
@@ -247,13 +265,16 @@ function detectHangUpIntent(responseText: string): boolean {
     /soitan toiselle/i, // "I'll call someone else"
   ];
 
-  return hangUpPhrases.some(pattern => pattern.test(responseText));
+  return hangUpPhrases.some((pattern) => pattern.test(responseText));
 }
 
 /**
  * Check if problem seems solved based on conversation
  */
-function checkProblemSolved(character: Character, recentResponses: string[]): boolean {
+function checkProblemSolved(
+  character: Character,
+  recentResponses: string[]
+): boolean {
   if (recentResponses.length < 2) return false;
 
   // Look for satisfaction indicators in recent responses
@@ -269,13 +290,16 @@ function checkProblemSolved(character: Character, recentResponses: string[]): bo
   ];
 
   const lastFewResponses = recentResponses.slice(-3).join(" ");
-  return satisfactionPhrases.some(pattern => pattern.test(lastFewResponses));
+  return satisfactionPhrases.some((pattern) => pattern.test(lastFewResponses));
 }
 
 /**
  * Check if conversation is going off-rails
  */
-function checkOffRails(character: Character, recentExchanges: string[]): boolean {
+function checkOffRails(
+  character: Character,
+  recentExchanges: string[]
+): boolean {
   if (recentExchanges.length < 4) return false;
 
   // Look for frustration or confusion patterns
@@ -288,7 +312,7 @@ function checkOffRails(character: Character, recentExchanges: string[]): boolean
   ];
 
   const recentText = recentExchanges.slice(-4).join(" ");
-  return offRailsIndicators.some(pattern => pattern.test(recentText));
+  return offRailsIndicators.some((pattern) => pattern.test(recentText));
 }
 
 /**
@@ -296,7 +320,7 @@ function checkOffRails(character: Character, recentExchanges: string[]): boolean
  */
 export async function createLiveSession(
   character: Character,
-  scenario: Scenario,
+  scenario: Scenario
 ): Promise<{ sessionId: string; config: LiveAPIConfig }> {
   if (!GOOGLE_API_KEY) {
     throw new Error("GOOGLE_API_KEY is required for Gemini Live API");
@@ -321,7 +345,7 @@ export async function createLiveSession(
   );
 
   const config: LiveAPIConfig = {
-    model: "gemini-2.0-flash-exp", // Using Gemini 2.0 Flash for live audio
+    model: "gemini-2.5-flash-live", // Using Gemini 2.5 Flash Live for real-time audio
     systemInstruction,
     generationConfig: {
       temperature: 0.9, // Higher temp for natural conversation
@@ -341,7 +365,7 @@ export function shouldCharacterHangUp(
   session: CallSession,
   character: Character,
   recentResponses: string[],
-  recentExchanges: string[],
+  recentExchanges: string[]
 ): HangUpReason | null {
   const currentDuration = Math.floor((Date.now() - session.startTime) / 1000);
 
@@ -371,9 +395,10 @@ export function shouldCharacterHangUp(
 
   // 4. Check if going off-rails
   if (checkOffRails(character, recentExchanges)) {
-    const message = character.personality.stubbornness > 0.6
-      ? "En tiedä, tämä ei oikein toimi. Mä soitan ehkä toiselle. Moi."
-      : "Hmm, en ole ihan varma. Kiitos kuitenkin, hei hei!";
+    const message =
+      character.personality.stubbornness > 0.6
+        ? "En tiedä, tämä ei oikein toimi. Mä soitan ehkä toiselle. Moi."
+        : "Hmm, en ole ihan varma. Kiitos kuitenkin, hei hei!";
 
     return {
       reason: "off_rails",
@@ -382,7 +407,10 @@ export function shouldCharacterHangUp(
   }
 
   // 5. Soft duration hint for character personality
-  if (currentDuration >= TYPICAL_CALL_DURATION_SECONDS && session.problemSolved) {
+  if (
+    currentDuration >= TYPICAL_CALL_DURATION_SECONDS &&
+    session.problemSolved
+  ) {
     // Hint that it's natural to wrap up
     return {
       reason: "duration_exceeded",
@@ -392,9 +420,10 @@ export function shouldCharacterHangUp(
 
   // 6. Too many turns without resolution
   if (session.conversationTurns >= MAX_CONVERSATION_TURNS) {
-    const message = character.personality.impulsiveness > 0.6
-      ? "Ok, tää menee liian pitkäksi. Kiitos, moi!"
-      : "Kiitos avusta, mä mietin tätä. Hei hei!";
+    const message =
+      character.personality.impulsiveness > 0.6
+        ? "Ok, tää menee liian pitkäksi. Kiitos, moi!"
+        : "Kiitos avusta, mä mietin tätä. Hei hei!";
 
     return {
       reason: "duration_exceeded",

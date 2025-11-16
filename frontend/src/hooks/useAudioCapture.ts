@@ -83,38 +83,40 @@ export function useAudioCapture(options: UseAudioCaptureOptions = {}): UseAudioC
 
       const stream = streamRef.current!;
 
-      // Create MediaRecorder
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus', // Opus codec for efficient streaming
-      });
+      // Create AudioContext for raw PCM processing
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({
+          sampleRate: sampleRate,
+        });
+      }
 
-      mediaRecorderRef.current = mediaRecorder;
+      const audioContext = audioContextRef.current;
 
-      // Handle audio chunks
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0 && onAudioChunk) {
-          // Convert Blob to ArrayBuffer
-          event.data.arrayBuffer().then((arrayBuffer) => {
-            onAudioChunk(arrayBuffer);
-          });
+      // Load AudioWorklet module
+      await audioContext.audioWorklet.addModule('/audio-processor.js');
+      console.log('✅ AudioWorklet module loaded');
+
+      // Create worklet node
+      const workletNode = new AudioWorkletNode(audioContext, 'audio-capture-processor');
+
+      // Listen for audio data from worklet
+      workletNode.port.onmessage = (event) => {
+        if (onAudioChunk && event.data) {
+          console.log('🎤 Captured PCM audio chunk, size:', event.data.byteLength, 'bytes');
+          onAudioChunk(event.data);
         }
       };
 
-      mediaRecorder.onerror = (event) => {
-        console.error('❌ MediaRecorder error:', event);
-        setState(prev => ({ ...prev, error: 'Recording error', isRecording: false }));
-      };
+      // Connect stream to worklet
+      const source = audioContext.createMediaStreamSource(stream);
+      source.connect(workletNode);
+      workletNode.connect(audioContext.destination);
 
-      mediaRecorder.onstop = () => {
-        console.log('🎤 Recording stopped');
-        setState(prev => ({ ...prev, isRecording: false }));
-      };
+      // Store references for cleanup
+      (mediaRecorderRef.current as any) = { workletNode, source };
 
-      // Start recording with time slices for streaming
-      mediaRecorder.start(chunkDuration);
       setState(prev => ({ ...prev, isRecording: true, error: null }));
-
-      console.log('🎤 Recording started');
+      console.log('🎤 Recording started (AudioWorklet mode)');
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : 'Failed to start recording';
       console.error('❌ Failed to start recording:', errorMsg);
@@ -126,8 +128,22 @@ export function useAudioCapture(options: UseAudioCaptureOptions = {}): UseAudioC
    * Stop recording audio
    */
   const stopRecording = useCallback(() => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-      mediaRecorderRef.current.stop();
+    // Clean up AudioWorklet and AudioContext
+    if (mediaRecorderRef.current) {
+      const refs = mediaRecorderRef.current as any;
+      if (refs.workletNode) {
+        refs.workletNode.disconnect();
+        refs.source.disconnect();
+        console.log('🛑 AudioWorklet disconnected');
+      } else if (refs.processor) {
+        // Legacy ScriptProcessor cleanup
+        refs.processor.disconnect();
+        refs.source.disconnect();
+      } else if (mediaRecorderRef.current.state !== 'inactive') {
+        // Old MediaRecorder cleanup
+        mediaRecorderRef.current.stop();
+      }
+      mediaRecorderRef.current = null;
     }
 
     setState(prev => ({ ...prev, isRecording: false }));

@@ -4,11 +4,12 @@
  * Full-screen dialog for live voice/video calls with AI characters
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Button } from "./ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { PhoneOff, VideoOff } from "lucide-react";
 import { useLiveCall } from "../hooks/useLiveCall";
+import { useBossCall } from "../hooks/useBossCall";
 import { useAudioCapture, useVideoCapture } from "../hooks/useAudioCapture";
 import type { Contact } from "./WhatsAppInterface";
 
@@ -16,7 +17,9 @@ interface LiveCallDialogProps {
   contact: Contact;
   sessionId: string;
   isVideoCall: boolean;
-  onClose: () => void;
+  onClose: (duration?: number) => void;
+  reviewData?: any; // Optional review data for boss calls
+  language?: string; // Optional language preference
 }
 
 function formatCallDuration(seconds: number): string {
@@ -30,18 +33,26 @@ export function LiveCallDialog({
   sessionId,
   isVideoCall,
   onClose,
+  reviewData,
+  language,
 }: LiveCallDialogProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [characterSpeaking, setCharacterSpeaking] = useState<string | null>(null);
 
-  // Initialize live call
-  const {
-    state: callState,
-    startCall,
-    endCall,
-    sendAudioChunk,
-    sendVideoChunk,
-  } = useLiveCall({
+  const isBossCall = contact.id === "boss-pinned";
+
+  // Use ElevenLabs SDK for boss calls
+  const bossCall = useBossCall({
+    onCallEnded: (duration) => {
+      console.log("📞 Boss call ended, duration:", duration);
+      onClose(duration);
+    },
+    reviewData,
+    language,
+  });
+
+  // Use manual WebSocket for client calls (when Gemini works)
+  const clientCall = useLiveCall({
     sessionId,
     characterId: contact.id,
     onCallEnded: (reason) => {
@@ -57,10 +68,22 @@ export function LiveCallDialog({
     },
   });
 
-  // Initialize audio/video capture
+  // Select the appropriate call hook
+  const { state: callState, startCall, endCall, sendAudioChunk, sendVideoChunk } = isBossCall
+    ? { ...bossCall, sendAudioChunk: () => {}, sendVideoChunk: () => {} } // Boss call doesn't need these
+    : clientCall;
+
+  // Use ref to track call active state for audio callback (client calls only)
+  const isCallActiveRef = useRef(false);
+  useEffect(() => {
+    isCallActiveRef.current = callState.isCallActive;
+    console.log('📞 Call active state changed:', callState.isCallActive);
+  }, [callState.isCallActive]);
+
+  // Initialize audio/video capture (only for client calls, boss uses SDK)
   const audioCapture = useAudioCapture({
     onAudioChunk: (audioData) => {
-      if (callState.isCallActive) {
+      if (!isBossCall && isCallActiveRef.current) {
         sendAudioChunk(audioData);
       }
     },
@@ -68,7 +91,7 @@ export function LiveCallDialog({
 
   const videoCapture = useVideoCapture({
     onVideoChunk: (videoData) => {
-      if (callState.isCallActive && isVideoCall) {
+      if (!isBossCall && callState.isCallActive && isVideoCall) {
         sendVideoChunk(videoData);
       }
     },
@@ -78,21 +101,25 @@ export function LiveCallDialog({
   useEffect(() => {
     const initCall = async () => {
       try {
-        // Request permissions first
-        if (isVideoCall) {
-          await videoCapture.requestPermission();
+        if (isBossCall) {
+          // Boss call - SDK handles everything (including mic permission)
+          console.log("🎙️ Starting boss call with ElevenLabs SDK");
+          await startCall();
         } else {
-          await audioCapture.requestPermission();
-        }
+          // Client call - manual WebSocket + audio capture
+          if (isVideoCall) {
+            await videoCapture.requestPermission();
+          } else {
+            await audioCapture.requestPermission();
+          }
 
-        // Start the call
-        await startCall();
+          await startCall();
 
-        // Start recording
-        if (isVideoCall) {
-          await videoCapture.startRecording();
-        } else {
-          await audioCapture.startRecording();
+          if (isVideoCall) {
+            await videoCapture.startRecording();
+          } else {
+            await audioCapture.startRecording();
+          }
         }
       } catch (error) {
         console.error("❌ Failed to initialize call:", error);
@@ -104,18 +131,22 @@ export function LiveCallDialog({
 
     return () => {
       // Cleanup on unmount
-      audioCapture.stopRecording();
-      videoCapture.stopRecording();
+      if (!isBossCall) {
+        audioCapture.stopRecording();
+        videoCapture.stopRecording();
+      }
       endCall();
     };
   }, []);
 
   // Handle hang up
   const handleHangUp = () => {
-    audioCapture.stopRecording();
-    videoCapture.stopRecording();
+    if (!isBossCall) {
+      audioCapture.stopRecording();
+      videoCapture.stopRecording();
+    }
     endCall();
-    onClose();
+    onClose(callState.callDuration);
   };
 
   return (

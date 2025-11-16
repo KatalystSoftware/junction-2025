@@ -32,6 +32,7 @@ export interface LiveCallMessage {
 export interface UseLiveCallOptions {
   sessionId: string;
   characterId: string;
+  language?: "english" | "finnish" | "swedish";
   onCallEnded?: (reason: string) => void;
   onError?: (error: string) => void;
   onCharacterMessage?: (message: string, isFinal: boolean) => void;
@@ -49,7 +50,7 @@ export interface UseLiveCallReturn {
  * Hook for managing live AI calls with characters
  */
 export function useLiveCall(options: UseLiveCallOptions): UseLiveCallReturn {
-  const { sessionId, characterId, onCallEnded, onError, onCharacterMessage } = options;
+  const { sessionId, characterId, language = "english", onCallEnded, onError, onCharacterMessage } = options;
 
   const [state, setState] = useState<LiveCallState>({
     isConnected: false,
@@ -83,11 +84,12 @@ export function useLiveCall(options: UseLiveCallOptions): UseLiveCallReturn {
         console.log('✅ WebSocket connected');
         setState(prev => ({ ...prev, isConnected: true, error: null }));
 
-        // Send start call message
+        // Send start call message with language preference
         ws.send(JSON.stringify({
           type: "start_call",
           sessionId,
           characterId,
+          language,
         }));
       };
 
@@ -142,6 +144,7 @@ export function useLiveCall(options: UseLiveCallOptions): UseLiveCallReturn {
       case "audio_chunk":
         // Play audio chunk from AI character
         if (message.data) {
+          console.log('🎵 Received audio chunk, length:', message.data.length);
           playAudioChunk(message.data);
         }
         break;
@@ -205,11 +208,15 @@ export function useLiveCall(options: UseLiveCallOptions): UseLiveCallReturn {
       // Convert ArrayBuffer to base64
       const base64Audio = arrayBufferToBase64(audioData);
 
+      console.log('📤 Sending audio chunk to backend, size:', audioData.byteLength, 'bytes, base64 length:', base64Audio.length);
+
       wsRef.current.send(JSON.stringify({
         type: "audio_chunk",
         data: base64Audio,
         format: "pcm",
       }));
+    } else {
+      console.warn('⚠️ Cannot send audio - WebSocket not open, state:', wsRef.current?.readyState);
     }
   }, []);
 
@@ -233,24 +240,36 @@ export function useLiveCall(options: UseLiveCallOptions): UseLiveCallReturn {
    */
   const playAudioChunk = useCallback((base64Audio: string) => {
     try {
+      console.log('🔊 Attempting to play audio chunk...');
+
       // Initialize AudioContext if needed
       if (!audioContextRef.current) {
         audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+        console.log('🎵 Created new AudioContext');
       }
 
       const audioContext = audioContextRef.current;
 
-      // Decode base64 to ArrayBuffer
-      const audioData = base64ToArrayBuffer(base64Audio);
+      // Decode base64 to ArrayBuffer (raw PCM from ElevenLabs)
+      const pcmData = base64ToArrayBuffer(base64Audio);
+      console.log('📦 Decoded PCM data, size:', pcmData.byteLength, 'bytes');
+
+      // Convert raw PCM to WAV format (needed for AudioContext.decodeAudioData)
+      const wavData = pcmToWav(pcmData, 16000, 1); // 16kHz, mono
+      console.log('🎵 Converted to WAV, size:', wavData.byteLength, 'bytes');
 
       // Decode and play audio
-      audioContext.decodeAudioData(audioData).then((audioBuffer) => {
+      audioContext.decodeAudioData(wavData.slice(0)).then((audioBuffer) => {
+        console.log('✅ Audio decoded successfully, duration:', audioBuffer.duration, 's');
         const source = audioContext.createBufferSource();
         source.buffer = audioBuffer;
         source.connect(audioContext.destination);
         source.start(0);
+        console.log('▶️ Audio playing');
       }).catch((error) => {
-        console.error('❌ Failed to decode audio:', error);
+        console.error('❌ Failed to decode audio data:', error);
+        console.error('   WAV data size:', wavData.byteLength);
+        console.error('   First 20 bytes:', new Uint8Array(wavData.slice(0, 20)));
       });
     } catch (error) {
       console.error('❌ Failed to play audio chunk:', error);
@@ -327,4 +346,47 @@ function base64ToArrayBuffer(base64: string): ArrayBuffer {
     bytes[i] = binaryString.charCodeAt(i);
   }
   return bytes.buffer;
+}
+
+/**
+ * Helper: Convert raw PCM data to WAV format
+ * ElevenLabs sends PCM 16kHz mono audio, but browsers need WAV headers
+ */
+function pcmToWav(pcmData: ArrayBuffer, sampleRate: number, numChannels: number): ArrayBuffer {
+  const pcmBytes = new Int16Array(pcmData);
+  const wavHeaderSize = 44;
+  const wavBuffer = new ArrayBuffer(wavHeaderSize + pcmData.byteLength);
+  const view = new DataView(wavBuffer);
+
+  // Write WAV header
+  const writeString = (offset: number, string: string) => {
+    for (let i = 0; i < string.length; i++) {
+      view.setUint8(offset + i, string.charCodeAt(i));
+    }
+  };
+
+  // RIFF chunk descriptor
+  writeString(0, 'RIFF');
+  view.setUint32(4, 36 + pcmData.byteLength, true); // File size - 8
+  writeString(8, 'WAVE');
+
+  // fmt sub-chunk
+  writeString(12, 'fmt ');
+  view.setUint32(16, 16, true); // Subchunk1Size (16 for PCM)
+  view.setUint16(20, 1, true); // AudioFormat (1 for PCM)
+  view.setUint16(22, numChannels, true); // NumChannels
+  view.setUint32(24, sampleRate, true); // SampleRate
+  view.setUint32(28, sampleRate * numChannels * 2, true); // ByteRate
+  view.setUint16(32, numChannels * 2, true); // BlockAlign
+  view.setUint16(34, 16, true); // BitsPerSample
+
+  // data sub-chunk
+  writeString(36, 'data');
+  view.setUint32(40, pcmData.byteLength, true); // Subchunk2Size
+
+  // Copy PCM data
+  const wavBytes = new Int16Array(wavBuffer, wavHeaderSize);
+  wavBytes.set(pcmBytes);
+
+  return wavBuffer;
 }

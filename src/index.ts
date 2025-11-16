@@ -4,7 +4,6 @@
  * Standalone server that combines Mastra with custom game API routes
  */
 
-import { createServer } from "http";
 import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
@@ -67,30 +66,18 @@ initializeLeaderboard().catch((error) => {
 // Start portfolio impact background worker
 startPortfolioImpactWorker();
 
-// Create HTTP server for both Hono and WebSocket
-const server = createServer((req, res) => {
-  // Use Hono's fetch handler
-  app.fetch(req as any).then((response) => {
-    res.statusCode = response.status;
-    response.headers.forEach((value, key) => {
-      res.setHeader(key, value);
-    });
-    response.arrayBuffer().then((buffer) => {
-      res.end(Buffer.from(buffer));
-    });
-  });
+// Initialize WebSocket server for live calls
+const server = serve({
+  fetch: app.fetch,
+  port,
 });
 
-// Initialize WebSocket server for live calls
 const liveCallWss = initializeLiveCallWebSocket(server);
 console.log(
   `🎙️ Live Call WebSocket available at ws://localhost:${port}/api/game/live-call`
 );
 
-// Start server
-server.listen(port, () => {
-  console.log(`✅ Server running on http://localhost:${port}`);
-});
+console.log(`✅ Server running on http://localhost:${port}`);
 
 // Export for Mastra CLI compatibility
 export { mastra };
