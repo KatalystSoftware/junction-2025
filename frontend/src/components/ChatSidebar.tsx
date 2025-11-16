@@ -328,39 +328,41 @@ export function ChatSidebar({
               }
             }}
           >
-            <div className="relative" style={{ flexShrink: 0 }}>
+            <div style={{ flexShrink: 0 }}>
               <FollowingEyes
                 eyeSize={6}
                 pupilSize={3}
                 eyeSpacing={0.7}
                 eyeVerticalPosition={0.6}
               >
-                <Avatar className="w-12 h-12">
-                  <AvatarImage
-                    src={bossContact.avatarImage}
-                    alt={bossContact.name}
-                  />
-                  <AvatarFallback
-                    style={{
-                      backgroundColor: "var(--primary)",
-                      color: "var(--primary-foreground)",
-                      fontFamily: "Inter, sans-serif",
-                      fontWeight: "var(--font-weight-medium)",
-                    }}
-                  >
-                    {bossContact.avatar}
-                  </AvatarFallback>
-                </Avatar>
+                <div className="relative">
+                  <Avatar className="w-12 h-12">
+                    <AvatarImage
+                      src={bossContact.avatarImage}
+                      alt={bossContact.name}
+                    />
+                    <AvatarFallback
+                      style={{
+                        backgroundColor: "var(--primary)",
+                        color: "var(--primary-foreground)",
+                        fontFamily: "Inter, sans-serif",
+                        fontWeight: "var(--font-weight-medium)",
+                      }}
+                    >
+                      {bossContact.avatar}
+                    </AvatarFallback>
+                  </Avatar>
+                  {bossContact.online && (
+                    <div
+                      className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2"
+                      style={{
+                        backgroundColor: "var(--chart-1)",
+                        borderColor: "var(--card)",
+                      }}
+                    />
+                  )}
+                </div>
               </FollowingEyes>
-              {bossContact.online && (
-                <div
-                  className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2"
-                  style={{
-                    backgroundColor: "var(--chart-1)",
-                    borderColor: "var(--card)",
-                  }}
-                />
-              )}
             </div>
 
             <div

@@ -284,7 +284,7 @@ export function ChatWindow({
           </Button>
 
           <div
-            className="relative cursor-pointer"
+            className="cursor-pointer"
             onClick={() => setShowProfileModal(true)}
           >
             {contact.id === "boss-pinned" ? (
@@ -294,6 +294,33 @@ export function ChatWindow({
                 eyeSpacing={0.6}
                 eyeVerticalPosition={0.5}
               >
+                <div className="relative">
+                  <Avatar className="w-10 h-10">
+                    <AvatarImage src={contact.avatarImage} alt={contact.name} />
+                    <AvatarFallback
+                      style={{
+                        backgroundColor: "var(--primary)",
+                        color: "var(--primary-foreground)",
+                        fontFamily: "Inter, sans-serif",
+                        fontWeight: "var(--font-weight-medium)",
+                      }}
+                    >
+                      {contact.avatar}
+                    </AvatarFallback>
+                  </Avatar>
+                  {contact.online && (
+                    <div
+                      className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2"
+                      style={{
+                        backgroundColor: "var(--chart-1)",
+                        borderColor: "var(--card)",
+                      }}
+                    />
+                  )}
+                </div>
+              </FollowingEyes>
+            ) : (
+              <div className="relative">
                 <Avatar className="w-10 h-10">
                   <AvatarImage src={contact.avatarImage} alt={contact.name} />
                   <AvatarFallback
@@ -307,30 +334,16 @@ export function ChatWindow({
                     {contact.avatar}
                   </AvatarFallback>
                 </Avatar>
-              </FollowingEyes>
-            ) : (
-              <Avatar className="w-10 h-10">
-                <AvatarImage src={contact.avatarImage} alt={contact.name} />
-                <AvatarFallback
-                  style={{
-                    backgroundColor: "var(--primary)",
-                    color: "var(--primary-foreground)",
-                    fontFamily: "Inter, sans-serif",
-                    fontWeight: "var(--font-weight-medium)",
-                  }}
-                >
-                  {contact.avatar}
-                </AvatarFallback>
-              </Avatar>
-            )}
-            {contact.online && (
-              <div
-                className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2"
-                style={{
-                  backgroundColor: "var(--chart-1)",
-                  borderColor: "var(--card)",
-                }}
-              />
+                {contact.online && (
+                  <div
+                    className="absolute bottom-0 right-0 w-3 h-3 rounded-full border-2"
+                    style={{
+                      backgroundColor: "var(--chart-1)",
+                      borderColor: "var(--card)",
+                    }}
+                  />
+                )}
+              </div>
             )}
           </div>
           <div className="flex-1 min-w-0">
