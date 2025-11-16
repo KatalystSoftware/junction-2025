@@ -18,6 +18,7 @@ import type {
   FinancialTopic,
   Character,
 } from "../types/game-types.ts";
+import { wrapUserInput } from "../utils/prompt-guards.ts";
 
 /**
  * Helper: Load transaction context for evaluation
@@ -364,8 +365,7 @@ ${scenario.idealAdvice.map((point, idx) => `${idx + 1}. ${point}`).join("\n")}
 COMMON MISTAKES TO AVOID:
 ${scenario.commonMistakes.map((mistake, idx) => `${idx + 1}. ${mistake}`).join("\n")}
 
-ADVISOR'S ADVICE:
-"${advice}"
+${wrapUserInput(advice, "ADVISOR'S ADVICE")}
 
 ${
   conversationHistory && conversationHistory.length > 0
