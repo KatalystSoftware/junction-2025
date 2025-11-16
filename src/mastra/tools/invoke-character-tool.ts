@@ -157,7 +157,9 @@ export const invokeCharacterTool = {
                 `${character.characterId}_${userLanguage}_${message.substring(0, 50)}`,
                 translationPrompt,
                 async () => {
-                  const { getAgentModel } = await import("../agents/agent-model.ts");
+                  const { getAgentModel } = await import(
+                    "../agents/agent-model.ts"
+                  );
                   const modelName = getAgentModel();
                   const { generateText } = await import("ai");
                   const { google } = await import("@ai-sdk/google");

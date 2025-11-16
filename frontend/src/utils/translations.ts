@@ -99,11 +99,11 @@ export interface Translations {
 
   // Quality Levels
   qualityLevels: {
-    excellent: string;     // 9-10
-    good: string;          // 7-8
-    adequate: string;      // 5-6
-    belowAverage: string;  // 3-4
-    poor: string;          // 0-2
+    excellent: string; // 9-10
+    good: string; // 7-8
+    adequate: string; // 5-6
+    belowAverage: string; // 3-4
+    poor: string; // 0-2
   };
 
   // Achievements
@@ -170,13 +170,16 @@ const translations: Record<Language, Translations> = {
     bossOnboarding: {
       response1Action: "Acknowledge and express readiness",
       response1Outcome: "Start helping clients",
-      response1Full: "Understood! I'm ready to help clients and give them the best financial advice I can. Thanks for the overview!",
+      response1Full:
+        "Understood! I'm ready to help clients and give them the best financial advice I can. Thanks for the overview!",
       response2Action: "Show enthusiasm to begin",
       response2Outcome: "Get started immediately",
-      response2Full: "Got it! Let's get started. I'm excited to meet clients and help them with their financial challenges.",
+      response2Full:
+        "Got it! Let's get started. I'm excited to meet clients and help them with their financial challenges.",
       response3Action: "Express gratitude and commitment",
       response3Outcome: "Commit to doing well",
-      response3Full: "Thanks! I'll do my best to provide quality advice and keep learning. Looking forward to working with you!",
+      response3Full:
+        "Thanks! I'll do my best to provide quality advice and keep learning. Looking forward to working with you!",
     },
 
     stats: {
@@ -213,27 +216,87 @@ const translations: Record<Language, Translations> = {
     },
 
     achievements: {
-      first_client: { name: "First Steps", description: "Help your first client" },
+      first_client: {
+        name: "First Steps",
+        description: "Help your first client",
+      },
       ten_clients: { name: "Growing Practice", description: "Help 10 clients" },
-      fifty_clients: { name: "Trusted Advisor", description: "Help 50 clients" },
-      skill_level_3: { name: "Competent Advisor", description: "Reach skill level 3" },
-      skill_level_5: { name: "Expert Advisor", description: "Reach skill level 5" },
-      skill_level_8: { name: "Master Advisor", description: "Reach skill level 8" },
-      perfect_score: { name: "Flawless Advice", description: "Get a perfect 10/10 quality score" },
-      savings_10k: { name: "Savings Champion", description: "Help clients save €10,000" },
-      debt_crusher: { name: "Debt Crusher", description: "Help clients clear €5,000 in debt" },
-      millionaire_maker: { name: "Millionaire Maker", description: "Help clients save €100,000 total" },
-      trusted_friend: { name: "Trusted Friend", description: "Get a character recommendation" },
-      reputation_75: { name: "Well Respected", description: "Reach 75 reputation" },
-      reputation_100: { name: "Legendary Advisor", description: "Reach maximum reputation (100)" },
-      budget_master: { name: "Budget Master", description: "Reach level 7 in budgeting" },
-      debt_specialist: { name: "Debt Specialist", description: "Reach level 7 in debt management" },
-      investment_guru: { name: "Investment Guru", description: "Reach level 7 in investing" },
-      quick_learner: { name: "Quick Learner", description: "Pass a boss quiz with 100% score" },
-      coffee_connoisseur: { name: "Coffee Connoisseur", description: "Help a client reduce coffee spending by €50+/month" },
-      temu_terminator: { name: "Temu Terminator", description: "Stop a client's impulse online shopping habit" },
-      savings_champion: { name: "Savings Champion", description: "Help a client save 20%+ of their income" },
-      big_win: { name: "Big Win", description: "Help a client save €200+ in a single consultation" },
+      fifty_clients: {
+        name: "Trusted Advisor",
+        description: "Help 50 clients",
+      },
+      skill_level_3: {
+        name: "Competent Advisor",
+        description: "Reach skill level 3",
+      },
+      skill_level_5: {
+        name: "Expert Advisor",
+        description: "Reach skill level 5",
+      },
+      skill_level_8: {
+        name: "Master Advisor",
+        description: "Reach skill level 8",
+      },
+      perfect_score: {
+        name: "Flawless Advice",
+        description: "Get a perfect 10/10 quality score",
+      },
+      savings_10k: {
+        name: "Savings Champion",
+        description: "Help clients save €10,000",
+      },
+      debt_crusher: {
+        name: "Debt Crusher",
+        description: "Help clients clear €5,000 in debt",
+      },
+      millionaire_maker: {
+        name: "Millionaire Maker",
+        description: "Help clients save €100,000 total",
+      },
+      trusted_friend: {
+        name: "Trusted Friend",
+        description: "Get a character recommendation",
+      },
+      reputation_75: {
+        name: "Well Respected",
+        description: "Reach 75 reputation",
+      },
+      reputation_100: {
+        name: "Legendary Advisor",
+        description: "Reach maximum reputation (100)",
+      },
+      budget_master: {
+        name: "Budget Master",
+        description: "Reach level 7 in budgeting",
+      },
+      debt_specialist: {
+        name: "Debt Specialist",
+        description: "Reach level 7 in debt management",
+      },
+      investment_guru: {
+        name: "Investment Guru",
+        description: "Reach level 7 in investing",
+      },
+      quick_learner: {
+        name: "Quick Learner",
+        description: "Pass a boss quiz with 100% score",
+      },
+      coffee_connoisseur: {
+        name: "Coffee Connoisseur",
+        description: "Help a client reduce coffee spending by €50+/month",
+      },
+      temu_terminator: {
+        name: "Temu Terminator",
+        description: "Stop a client's impulse online shopping habit",
+      },
+      savings_champion: {
+        name: "Savings Champion",
+        description: "Help a client save 20%+ of their income",
+      },
+      big_win: {
+        name: "Big Win",
+        description: "Help a client save €200+ in a single consultation",
+      },
     },
   },
 
@@ -295,13 +358,16 @@ const translations: Record<Language, Translations> = {
     bossOnboarding: {
       response1Action: "Vahvista ja ilmaise valmiutesi",
       response1Outcome: "Aloita asiakkaiden auttaminen",
-      response1Full: "Ymmärretty! Olen valmis auttamaan asiakkaita ja antamaan heille parasta mahdollista taloudellista neuvontaa. Kiitos yleiskatsauksesta!",
+      response1Full:
+        "Ymmärretty! Olen valmis auttamaan asiakkaita ja antamaan heille parasta mahdollista taloudellista neuvontaa. Kiitos yleiskatsauksesta!",
       response2Action: "Osoita innostusta aloittamiseen",
       response2Outcome: "Aloita välittömästi",
-      response2Full: "Selvä! Aloitetaan. Odotan innolla tapaamista asiakkaiden kanssa ja heidän auttamistaan taloudellisissa haasteissaan.",
+      response2Full:
+        "Selvä! Aloitetaan. Odotan innolla tapaamista asiakkaiden kanssa ja heidän auttamistaan taloudellisissa haasteissaan.",
       response3Action: "Ilmaise kiitollisuutta ja sitoutumista",
       response3Outcome: "Sitoudu tekemään hyvin",
-      response3Full: "Kiitos! Teen parhaani antaakseni laadukasta neuvontaa ja jatkaakseni oppimista. Odotan innolla yhteistyötä kanssasi!",
+      response3Full:
+        "Kiitos! Teen parhaani antaakseni laadukasta neuvontaa ja jatkaakseni oppimista. Odotan innolla yhteistyötä kanssasi!",
     },
 
     stats: {
@@ -338,27 +404,87 @@ const translations: Record<Language, Translations> = {
     },
 
     achievements: {
-      first_client: { name: "Ensimmäiset Askeleet", description: "Auta ensimmäistä asiakastasi" },
-      ten_clients: { name: "Kasvava Käytäntö", description: "Auta 10 asiakasta" },
-      fifty_clients: { name: "Luotettu Neuvonantaja", description: "Auta 50 asiakasta" },
-      skill_level_3: { name: "Pätevä Neuvonantaja", description: "Saavuta taitotaso 3" },
-      skill_level_5: { name: "Asiantuntijaneuvonantaja", description: "Saavuta taitotaso 5" },
-      skill_level_8: { name: "Mestari Neuvonantaja", description: "Saavuta taitotaso 8" },
-      perfect_score: { name: "Virheeton Neuvo", description: "Saa täydellinen 10/10 laatupisteet" },
-      savings_10k: { name: "Säästömestari", description: "Auta asiakkaita säästämään €10,000" },
-      debt_crusher: { name: "Velkojen Murskaj", description: "Auta asiakkaita maksamaan €5,000 velkoja" },
-      millionaire_maker: { name: "Miljonäärin Tekijä", description: "Auta asiakkaita säästämään yhteensä €100,000" },
-      trusted_friend: { name: "Luotettu Ystävä", description: "Saa hahmon suositus" },
+      first_client: {
+        name: "Ensimmäiset Askeleet",
+        description: "Auta ensimmäistä asiakastasi",
+      },
+      ten_clients: {
+        name: "Kasvava Käytäntö",
+        description: "Auta 10 asiakasta",
+      },
+      fifty_clients: {
+        name: "Luotettu Neuvonantaja",
+        description: "Auta 50 asiakasta",
+      },
+      skill_level_3: {
+        name: "Pätevä Neuvonantaja",
+        description: "Saavuta taitotaso 3",
+      },
+      skill_level_5: {
+        name: "Asiantuntijaneuvonantaja",
+        description: "Saavuta taitotaso 5",
+      },
+      skill_level_8: {
+        name: "Mestari Neuvonantaja",
+        description: "Saavuta taitotaso 8",
+      },
+      perfect_score: {
+        name: "Virheeton Neuvo",
+        description: "Saa täydellinen 10/10 laatupisteet",
+      },
+      savings_10k: {
+        name: "Säästömestari",
+        description: "Auta asiakkaita säästämään €10,000",
+      },
+      debt_crusher: {
+        name: "Velkojen Murskaj",
+        description: "Auta asiakkaita maksamaan €5,000 velkoja",
+      },
+      millionaire_maker: {
+        name: "Miljonäärin Tekijä",
+        description: "Auta asiakkaita säästämään yhteensä €100,000",
+      },
+      trusted_friend: {
+        name: "Luotettu Ystävä",
+        description: "Saa hahmon suositus",
+      },
       reputation_75: { name: "Arvostettu", description: "Saavuta 75 maine" },
-      reputation_100: { name: "Legendaarinen Neuvonantaja", description: "Saavuta maksimimaine (100)" },
-      budget_master: { name: "Budjettimestari", description: "Saavuta taso 7 budjetoinnissa" },
-      debt_specialist: { name: "Velkaasiantuntija", description: "Saavuta taso 7 velkahallinnossa" },
-      investment_guru: { name: "Sijoitusguru", description: "Saavuta taso 7 sijoittamisessa" },
-      quick_learner: { name: "Nopea Oppija", description: "Läpäise pomovisa 100% tuloksella" },
-      coffee_connoisseur: { name: "Kahviasiantuntija", description: "Auta asiakasta vähentämään kahvikuluja €50+/kk" },
-      temu_terminator: { name: "Temu Terminaattori", description: "Lopeta asiakkaan impulsiivinen verkkokauppaostaminen" },
-      savings_champion: { name: "Säästömestari", description: "Auta asiakasta säästämään 20%+ tuloistaan" },
-      big_win: { name: "Iso Voitto", description: "Auta asiakasta säästämään €200+ yhdessä konsultaatiossa" },
+      reputation_100: {
+        name: "Legendaarinen Neuvonantaja",
+        description: "Saavuta maksimimaine (100)",
+      },
+      budget_master: {
+        name: "Budjettimestari",
+        description: "Saavuta taso 7 budjetoinnissa",
+      },
+      debt_specialist: {
+        name: "Velkaasiantuntija",
+        description: "Saavuta taso 7 velkahallinnossa",
+      },
+      investment_guru: {
+        name: "Sijoitusguru",
+        description: "Saavuta taso 7 sijoittamisessa",
+      },
+      quick_learner: {
+        name: "Nopea Oppija",
+        description: "Läpäise pomovisa 100% tuloksella",
+      },
+      coffee_connoisseur: {
+        name: "Kahviasiantuntija",
+        description: "Auta asiakasta vähentämään kahvikuluja €50+/kk",
+      },
+      temu_terminator: {
+        name: "Temu Terminaattori",
+        description: "Lopeta asiakkaan impulsiivinen verkkokauppaostaminen",
+      },
+      savings_champion: {
+        name: "Säästömestari",
+        description: "Auta asiakasta säästämään 20%+ tuloistaan",
+      },
+      big_win: {
+        name: "Iso Voitto",
+        description: "Auta asiakasta säästämään €200+ yhdessä konsultaatiossa",
+      },
     },
   },
 
@@ -417,13 +543,16 @@ const translations: Record<Language, Translations> = {
     bossOnboarding: {
       response1Action: "Bekräfta och uttryck beredskap",
       response1Outcome: "Börja hjälpa klienter",
-      response1Full: "Förstått! Jag är redo att hjälpa klienter och ge dem den bästa finansiella rådgivningen jag kan. Tack för överblicken!",
+      response1Full:
+        "Förstått! Jag är redo att hjälpa klienter och ge dem den bästa finansiella rådgivningen jag kan. Tack för överblicken!",
       response2Action: "Visa entusiasm att börja",
       response2Outcome: "Kom igång omedelbart",
-      response2Full: "Jag förstår! Låt oss komma igång. Jag ser fram emot att träffa klienter och hjälpa dem med deras ekonomiska utmaningar.",
+      response2Full:
+        "Jag förstår! Låt oss komma igång. Jag ser fram emot att träffa klienter och hjälpa dem med deras ekonomiska utmaningar.",
       response3Action: "Uttryck tacksamhet och engagemang",
       response3Outcome: "Förbind dig att göra bra ifrån dig",
-      response3Full: "Tack! Jag ska göra mitt bästa för att ge kvalitetsrådgivning och fortsätta lära mig. Ser fram emot att arbeta med dig!",
+      response3Full:
+        "Tack! Jag ska göra mitt bästa för att ge kvalitetsrådgivning och fortsätta lära mig. Ser fram emot att arbeta med dig!",
     },
 
     stats: {
@@ -460,27 +589,87 @@ const translations: Record<Language, Translations> = {
     },
 
     achievements: {
-      first_client: { name: "Första Stegen", description: "Hjälp din första klient" },
-      ten_clients: { name: "Växande Praktik", description: "Hjälp 10 klienter" },
-      fifty_clients: { name: "Betrodd Rådgivare", description: "Hjälp 50 klienter" },
-      skill_level_3: { name: "Kompetent Rådgivare", description: "Nå färdighetsnivå 3" },
-      skill_level_5: { name: "Expertrådgivare", description: "Nå färdighetsnivå 5" },
-      skill_level_8: { name: "Mästarrådgivare", description: "Nå färdighetsnivå 8" },
-      perfect_score: { name: "Felfritt Råd", description: "Få perfekt 10/10 kvalitetspoäng" },
-      savings_10k: { name: "Sparmästare", description: "Hjälp klienter spara €10,000" },
-      debt_crusher: { name: "Skuldkrossare", description: "Hjälp klienter betala €5,000 i skulder" },
-      millionaire_maker: { name: "Miljonärskapare", description: "Hjälp klienter spara totalt €100,000" },
-      trusted_friend: { name: "Betrodd Vän", description: "Få en karaktärsrekommendation" },
+      first_client: {
+        name: "Första Stegen",
+        description: "Hjälp din första klient",
+      },
+      ten_clients: {
+        name: "Växande Praktik",
+        description: "Hjälp 10 klienter",
+      },
+      fifty_clients: {
+        name: "Betrodd Rådgivare",
+        description: "Hjälp 50 klienter",
+      },
+      skill_level_3: {
+        name: "Kompetent Rådgivare",
+        description: "Nå färdighetsnivå 3",
+      },
+      skill_level_5: {
+        name: "Expertrådgivare",
+        description: "Nå färdighetsnivå 5",
+      },
+      skill_level_8: {
+        name: "Mästarrådgivare",
+        description: "Nå färdighetsnivå 8",
+      },
+      perfect_score: {
+        name: "Felfritt Råd",
+        description: "Få perfekt 10/10 kvalitetspoäng",
+      },
+      savings_10k: {
+        name: "Sparmästare",
+        description: "Hjälp klienter spara €10,000",
+      },
+      debt_crusher: {
+        name: "Skuldkrossare",
+        description: "Hjälp klienter betala €5,000 i skulder",
+      },
+      millionaire_maker: {
+        name: "Miljonärskapare",
+        description: "Hjälp klienter spara totalt €100,000",
+      },
+      trusted_friend: {
+        name: "Betrodd Vän",
+        description: "Få en karaktärsrekommendation",
+      },
       reputation_75: { name: "Väl Respekterad", description: "Nå 75 rykte" },
-      reputation_100: { name: "Legendarisk Rådgivare", description: "Nå maximalt rykte (100)" },
-      budget_master: { name: "Budgetmästare", description: "Nå nivå 7 i budgetering" },
-      debt_specialist: { name: "Skuldspecialist", description: "Nå nivå 7 i skuldhantering" },
-      investment_guru: { name: "Investeringsguru", description: "Nå nivå 7 i investeringar" },
-      quick_learner: { name: "Snabb Inlärare", description: "Klara chefens quiz med 100% poäng" },
-      coffee_connoisseur: { name: "Kaffekännare", description: "Hjälp en klient minska kaffeutgifter med €50+/månad" },
-      temu_terminator: { name: "Temu Terminator", description: "Stoppa en klients impulsiva näthandel" },
-      savings_champion: { name: "Sparmästare", description: "Hjälp en klient spara 20%+ av sin inkomst" },
-      big_win: { name: "Stor Vinst", description: "Hjälp en klient spara €200+ i en konsultation" },
+      reputation_100: {
+        name: "Legendarisk Rådgivare",
+        description: "Nå maximalt rykte (100)",
+      },
+      budget_master: {
+        name: "Budgetmästare",
+        description: "Nå nivå 7 i budgetering",
+      },
+      debt_specialist: {
+        name: "Skuldspecialist",
+        description: "Nå nivå 7 i skuldhantering",
+      },
+      investment_guru: {
+        name: "Investeringsguru",
+        description: "Nå nivå 7 i investeringar",
+      },
+      quick_learner: {
+        name: "Snabb Inlärare",
+        description: "Klara chefens quiz med 100% poäng",
+      },
+      coffee_connoisseur: {
+        name: "Kaffekännare",
+        description: "Hjälp en klient minska kaffeutgifter med €50+/månad",
+      },
+      temu_terminator: {
+        name: "Temu Terminator",
+        description: "Stoppa en klients impulsiva näthandel",
+      },
+      savings_champion: {
+        name: "Sparmästare",
+        description: "Hjälp en klient spara 20%+ av sin inkomst",
+      },
+      big_win: {
+        name: "Stor Vinst",
+        description: "Hjälp en klient spara €200+ i en konsultation",
+      },
     },
   },
 };

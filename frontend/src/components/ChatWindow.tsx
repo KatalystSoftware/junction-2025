@@ -34,7 +34,7 @@ import { useTranslation } from "../utils/translations";
 
 // Helper function to convert quality score (0-10) to quality level key
 function getQualityLevel(
-  score: number
+  score: number,
 ): "excellent" | "good" | "adequate" | "belowAverage" | "poor" {
   if (score >= 9) return "excellent";
   if (score >= 7) return "good";
@@ -568,7 +568,9 @@ export function ChatWindow({
                         </p>
                       ),
                       strong: ({ children }) => (
-                        <strong style={{ fontWeight: "var(--font-weight-semibold)" }}>
+                        <strong
+                          style={{ fontWeight: "var(--font-weight-semibold)" }}
+                        >
                           {children}
                         </strong>
                       ),
@@ -606,9 +608,10 @@ export function ChatWindow({
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{
-                            color: message.role === "user"
-                              ? "var(--primary-foreground)"
-                              : "var(--primary)",
+                            color:
+                              message.role === "user"
+                                ? "var(--primary-foreground)"
+                                : "var(--primary)",
                             textDecoration: "underline",
                           }}
                         >
@@ -939,12 +942,14 @@ export function ChatWindow({
                     }}
                   >
                     <strong>{t.consultationEnd.quality}</strong>{" "}
-                    {t.qualityLevels[
-                      getQualityLevel(
-                        conversationEndData.financialResults.evaluation
-                          .qualityScore || 5
-                      )
-                    ]}
+                    {
+                      t.qualityLevels[
+                        getQualityLevel(
+                          conversationEndData.financialResults.evaluation
+                            .qualityScore || 5,
+                        )
+                      ]
+                    }
                   </p>
                 </div>
               )}
@@ -971,9 +976,13 @@ export function ChatWindow({
                 <div className="space-y-1">
                   {conversationEndData.achievementsUnlocked.map(
                     (achievement: any, idx: number) => {
-                      const translatedAchievement = achievement.id && t.achievements[achievement.id]
-                        ? t.achievements[achievement.id]
-                        : { name: achievement.title || achievement.name, description: achievement.description };
+                      const translatedAchievement =
+                        achievement.id && t.achievements[achievement.id]
+                          ? t.achievements[achievement.id]
+                          : {
+                              name: achievement.title || achievement.name,
+                              description: achievement.description,
+                            };
 
                       return (
                         <div

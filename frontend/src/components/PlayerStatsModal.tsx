@@ -27,6 +27,7 @@ import { getPlayerAvatarUrl } from "../utils/avatarUtils";
 import { useTranslation } from "../utils/translations";
 import { RelationshipsPanel } from "./RelationshipsPanel";
 import { ProgressChart } from "./ProgressChart";
+import { useAnalytics } from "../hooks/useAnalytics";
 
 interface AdvisorState {
   advisorCoins: number;
@@ -79,7 +80,11 @@ export function PlayerStatsModal({
 
   // Handle restart game
   const handleRestartGame = () => {
-    if (confirm("Are you sure you want to restart the game? All progress will be lost.")) {
+    if (
+      confirm(
+        "Are you sure you want to restart the game? All progress will be lost.",
+      )
+    ) {
       localStorage.clear();
       window.location.reload();
     }
@@ -221,6 +226,9 @@ export function PlayerStatsModal({
 
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
 
+  // Load analytics data
+  const { data: analytics, isLoading: analyticsLoading } = useAnalytics();
+
   const stats = [
     {
       label: "Coins Earned",
@@ -279,8 +287,9 @@ export function PlayerStatsModal({
 
         <ScrollArea className="max-h-[calc(90vh-80px)]">
           <Tabs defaultValue="stats" className="px-6 py-4">
-            <TabsList className="grid grid-cols-3 w-full mb-6">
+            <TabsList className="grid grid-cols-4 w-full mb-6">
               <TabsTrigger value="stats">Stats</TabsTrigger>
+              <TabsTrigger value="performance">Performance</TabsTrigger>
               <TabsTrigger value="relationships">Relationships</TabsTrigger>
               <TabsTrigger value="progress">Progress</TabsTrigger>
             </TabsList>
@@ -725,6 +734,318 @@ export function PlayerStatsModal({
                   {t.stats.restartGame}
                 </Button>
               </div>
+            </TabsContent>
+
+            <TabsContent value="performance" className="space-y-6">
+              {analyticsLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center">
+                    <p style={{ color: "var(--muted-foreground)" }}>
+                      Loading analytics...
+                    </p>
+                  </div>
+                </div>
+              ) : !analytics ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center">
+                    <p style={{ color: "var(--muted-foreground)" }}>
+                      Complete more sessions to view analytics
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {/* Performance Overview */}
+                  <div>
+                    <h3
+                      style={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: "var(--text-lg)",
+                        fontWeight: "var(--font-weight-semibold)",
+                        color: "var(--card-foreground)",
+                        marginBottom: "var(--spacing-4)",
+                      }}
+                    >
+                      Performance Overview
+                    </h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div
+                        className="p-4 rounded-lg"
+                        style={{ backgroundColor: "var(--muted)" }}
+                      >
+                        <p
+                          style={{
+                            fontSize: "var(--text-sm)",
+                            color: "var(--muted-foreground)",
+                            marginBottom: "var(--spacing-1)",
+                          }}
+                        >
+                          Success Rate
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "var(--text-2xl)",
+                            fontWeight: "var(--font-weight-bold)",
+                            color: "var(--card-foreground)",
+                          }}
+                        >
+                          {analytics.performance.overallSuccessRate.toFixed(1)}%
+                        </p>
+                      </div>
+                      <div
+                        className="p-4 rounded-lg"
+                        style={{ backgroundColor: "var(--muted)" }}
+                      >
+                        <p
+                          style={{
+                            fontSize: "var(--text-sm)",
+                            color: "var(--muted-foreground)",
+                            marginBottom: "var(--spacing-1)",
+                          }}
+                        >
+                          Avg Quality
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "var(--text-2xl)",
+                            fontWeight: "var(--font-weight-bold)",
+                            color: "var(--card-foreground)",
+                          }}
+                        >
+                          {analytics.performance.averageQualityScore.toFixed(1)}
+                          /10
+                        </p>
+                      </div>
+                      <div
+                        className="p-4 rounded-lg"
+                        style={{ backgroundColor: "var(--muted)" }}
+                      >
+                        <p
+                          style={{
+                            fontSize: "var(--text-sm)",
+                            color: "var(--muted-foreground)",
+                            marginBottom: "var(--spacing-1)",
+                          }}
+                        >
+                          Trend
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "var(--text-lg)",
+                            fontWeight: "var(--font-weight-bold)",
+                            color:
+                              analytics.performance.qualityTrend === "improving"
+                                ? "var(--chart-1)"
+                                : analytics.performance.qualityTrend ===
+                                    "declining"
+                                  ? "var(--destructive)"
+                                  : "var(--muted-foreground)",
+                          }}
+                        >
+                          {analytics.performance.qualityTrend === "improving"
+                            ? "↗ Improving"
+                            : analytics.performance.qualityTrend === "declining"
+                              ? "↘ Declining"
+                              : "→ Stable"}
+                          {analytics.performance.trendPercentage > 0 &&
+                            ` (+${analytics.performance.trendPercentage.toFixed(1)}%)`}
+                        </p>
+                      </div>
+                      <div
+                        className="p-4 rounded-lg"
+                        style={{ backgroundColor: "var(--muted)" }}
+                      >
+                        <p
+                          style={{
+                            fontSize: "var(--text-sm)",
+                            color: "var(--muted-foreground)",
+                            marginBottom: "var(--spacing-1)",
+                          }}
+                        >
+                          Empathy Rate
+                        </p>
+                        <p
+                          style={{
+                            fontSize: "var(--text-2xl)",
+                            fontWeight: "var(--font-weight-bold)",
+                            color: "var(--card-foreground)",
+                          }}
+                        >
+                          {analytics.performance.empathyRate.toFixed(1)}%
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Topic Expertise */}
+                  <div>
+                    <h3
+                      style={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: "var(--text-lg)",
+                        fontWeight: "var(--font-weight-semibold)",
+                        color: "var(--card-foreground)",
+                        marginBottom: "var(--spacing-4)",
+                      }}
+                    >
+                      Topic Expertise
+                    </h3>
+                    <div className="space-y-3">
+                      {analytics.topicExpertise.topics
+                        .filter((t) => t.sessionCount > 0)
+                        .sort((a, b) => b.expertiseLevel - a.expertiseLevel)
+                        .slice(0, 5)
+                        .map((topic) => (
+                          <div
+                            key={topic.topic}
+                            className="flex items-center gap-3"
+                          >
+                            <div className="flex-1">
+                              <div className="flex justify-between mb-1">
+                                <span
+                                  style={{
+                                    fontSize: "var(--text-sm)",
+                                    fontWeight: "var(--font-weight-medium)",
+                                    color: "var(--card-foreground)",
+                                    textTransform: "capitalize",
+                                  }}
+                                >
+                                  {topic.topic.replace(/_/g, " ")}
+                                </span>
+                                <span
+                                  style={{
+                                    fontSize: "var(--text-sm)",
+                                    color: "var(--muted-foreground)",
+                                  }}
+                                >
+                                  {topic.expertiseLevel.toFixed(1)}/10
+                                </span>
+                              </div>
+                              <div
+                                className="w-full h-2 rounded-full"
+                                style={{ backgroundColor: "var(--muted)" }}
+                              >
+                                <div
+                                  className="h-full rounded-full transition-all"
+                                  style={{
+                                    width: `${(topic.expertiseLevel / 10) * 100}%`,
+                                    backgroundColor:
+                                      topic.expertiseLevel >= 7
+                                        ? "var(--chart-1)"
+                                        : topic.expertiseLevel >= 5
+                                          ? "var(--chart-3)"
+                                          : "var(--chart-2)",
+                                  }}
+                                />
+                              </div>
+                            </div>
+                            <span
+                              style={{
+                                fontSize: "var(--text-xs)",
+                                color: "var(--muted-foreground)",
+                              }}
+                            >
+                              {topic.sessionCount} sessions
+                            </span>
+                          </div>
+                        ))}
+                    </div>
+                    {analytics.topicExpertise.topics.filter(
+                      (t) => t.sessionCount > 0,
+                    ).length === 0 && (
+                      <p
+                        style={{
+                          fontSize: "var(--text-sm)",
+                          color: "var(--muted-foreground)",
+                          textAlign: "center",
+                          padding: "var(--spacing-8)",
+                        }}
+                      >
+                        Complete more sessions to see topic expertise
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Financial Impact by Topic */}
+                  <div>
+                    <h3
+                      style={{
+                        fontFamily: "Inter, sans-serif",
+                        fontSize: "var(--text-lg)",
+                        fontWeight: "var(--font-weight-semibold)",
+                        color: "var(--card-foreground)",
+                        marginBottom: "var(--spacing-4)",
+                      }}
+                    >
+                      Financial Impact by Topic
+                    </h3>
+                    <div className="space-y-2">
+                      {analytics.financialImpact.impactByTopic
+                        .filter((t) => t.sessionCount > 0)
+                        .sort(
+                          (a, b) =>
+                            b.totalSavings +
+                            b.totalDebtCleared -
+                            (a.totalSavings + a.totalDebtCleared),
+                        )
+                        .slice(0, 5)
+                        .map((topic) => (
+                          <div
+                            key={topic.topic}
+                            className="p-3 rounded-lg"
+                            style={{ backgroundColor: "var(--muted)" }}
+                          >
+                            <div className="flex justify-between items-center mb-1">
+                              <span
+                                style={{
+                                  fontSize: "var(--text-sm)",
+                                  fontWeight: "var(--font-weight-medium)",
+                                  color: "var(--card-foreground)",
+                                  textTransform: "capitalize",
+                                }}
+                              >
+                                {topic.topic.replace(/_/g, " ")}
+                              </span>
+                              <span
+                                style={{
+                                  fontSize: "var(--text-xs)",
+                                  color: "var(--muted-foreground)",
+                                }}
+                              >
+                                {topic.sessionCount} sessions
+                              </span>
+                            </div>
+                            <div className="flex gap-4 text-sm">
+                              <span style={{ color: "var(--chart-1)" }}>
+                                💰 €{topic.totalSavings.toLocaleString()} saved
+                              </span>
+                              {topic.totalDebtCleared > 0 && (
+                                <span style={{ color: "var(--chart-2)" }}>
+                                  ↓ €{topic.totalDebtCleared.toLocaleString()}{" "}
+                                  debt cleared
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                    {analytics.financialImpact.impactByTopic.filter(
+                      (t) => t.sessionCount > 0,
+                    ).length === 0 && (
+                      <p
+                        style={{
+                          fontSize: "var(--text-sm)",
+                          color: "var(--muted-foreground)",
+                          textAlign: "center)",
+                          padding: "var(--spacing-8)",
+                        }}
+                      >
+                        Complete more sessions to see financial impact
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
             </TabsContent>
 
             <TabsContent value="relationships">

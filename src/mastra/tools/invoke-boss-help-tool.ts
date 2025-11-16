@@ -175,9 +175,7 @@ export async function invokeBossHelpTool(params: {
     console.error("Boss help agent error:", error);
 
     // Provide fallback response
-    const isFinnish = advisorMessages.some((msg) =>
-      /[äö]/i.test(msg),
-    );
+    const isFinnish = advisorMessages.some((msg) => /[äö]/i.test(msg));
 
     const fallbackResponse = isFinnish
       ? `Pahoittelut, en pystynyt vastaamaan kysymykseesi juuri nyt. Voit kuitenkin jatkaa asiakkaan kanssa työskentelyä. Jos tarvitset apua, yritä kysyä uudelleen hetken kuluttua.`
