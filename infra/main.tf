@@ -4,7 +4,7 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 6.0"
+      version = "~> 7.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -45,11 +45,26 @@ resource "google_cloud_run_v2_service" "app" {
   template {
     service_account = google_service_account.cloud_run.email
 
+    volumes {
+      name = "audio-storage"
+      gcs {
+        bucket    = google_storage_bucket.audio.name
+        read_only = false
+      }
+    }
+
     containers {
       image = var.container_image
 
       ports {
         container_port = 80
+      }
+
+      resources {
+        limits = {
+          cpu    = "2000m"
+          memory = "4Gi"
+        }
       }
 
       env {
@@ -68,7 +83,7 @@ resource "google_cloud_run_v2_service" "app" {
       }
 
       env {
-        name  = "DATABASE_URL"
+        name = "DATABASE_URL"
         value = format(
           "postgresql://%s:%s@%s:5432/%s",
           urlencode(var.db_user),
@@ -76,6 +91,11 @@ resource "google_cloud_run_v2_service" "app" {
           google_sql_database_instance.app.private_ip_address,
           urlencode(var.db_name),
         )
+      }
+
+      volume_mounts {
+        name       = "audio-storage"
+        mount_path = "/usr/src/app/saves"
       }
     }
 
@@ -91,6 +111,7 @@ resource "google_cloud_run_v2_service" "app" {
   }
   scaling {
     min_instance_count = 0
+    max_instance_count = 1
   }
 
   lifecycle {

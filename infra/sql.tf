@@ -4,7 +4,7 @@ resource "google_sql_database_instance" "app" {
   region           = var.region
 
   settings {
-    tier    = "db-f1-micro"
+    tier    = "db-custom-1-3840"
     edition = "ENTERPRISE"
 
     ip_configuration {
