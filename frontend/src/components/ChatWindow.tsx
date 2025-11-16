@@ -33,6 +33,7 @@ import logoImage from "figma:asset/601ef144d16bf6e001c5324689cdddb5a7ea7f74.png"
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useTranslation } from "../utils/translations";
+import { LiveCallDialog } from "./LiveCallDialog";
 
 // Helper function to convert quality score (0-10) to quality level key
 function getQualityLevel(
@@ -63,6 +64,8 @@ interface ChatWindowProps {
   // Controlled input support (for boss intervention revisions)
   inputValue?: string;
   onInputChange?: (value: string) => void;
+  // Session ID for live calls
+  sessionId?: string;
 }
 
 // Helper functions to calculate financial data
@@ -134,6 +137,7 @@ export function ChatWindow({
   conversationEndData,
   inputValue: controlledInputValue,
   onInputChange,
+  sessionId,
 }: ChatWindowProps) {
   const t = useTranslation();
   // Use controlled input from parent if provided, otherwise local state
@@ -1456,184 +1460,24 @@ export function ChatWindow({
         </div>
       )}
 
-      {/* Call Dialog */}
-      {showCallDialog && (
-        <div
-          className="fixed inset-0 flex items-center justify-center z-50"
-          style={{
-            backgroundColor: "rgba(0, 0, 0, 0.8)",
-          }}
-        >
-          <div
-            className="w-full max-w-md mx-4 p-8 flex flex-col items-center"
-            style={{
-              backgroundColor: "var(--card)",
-              borderRadius: "var(--radius-card)",
-              boxShadow: "0px 8px 24px 0px rgba(10, 13, 18, 0.25)",
-            }}
-          >
-            <div className="mb-6">
-              <Avatar className="w-64 h-64">
-                <AvatarImage src={contact.avatarImage} alt={contact.name} />
-                <AvatarFallback
-                  style={{
-                    backgroundColor: "var(--primary)",
-                    color: "var(--primary-foreground)",
-                    fontFamily: "Inter, sans-serif",
-                    fontWeight: "var(--font-weight-medium)",
-                    fontSize: "4rem",
-                  }}
-                >
-                  {contact.avatar}
-                </AvatarFallback>
-              </Avatar>
-            </div>
-
-            <h3
-              className="mb-2"
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "var(--text-xl)",
-                fontWeight: "var(--font-weight-semibold)",
-                color: "var(--card-foreground)",
-              }}
-            >
-              {contact.name}
-            </h3>
-
-            <p
-              className="mb-6"
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "var(--text-lg)",
-                color: "var(--muted-foreground)",
-                fontWeight: "var(--font-weight-medium)",
-              }}
-            >
-              {formatCallDuration(callDuration)}
-            </p>
-
-            <div className="flex items-center gap-4 mb-4">
-              <div
-                className="w-3 h-3 rounded-full animate-pulse"
-                style={{
-                  backgroundColor: "var(--chart-1)",
-                }}
-              />
-              <p
-                style={{
-                  fontFamily: "Inter, sans-serif",
-                  fontSize: "var(--text-sm)",
-                  color: "var(--muted-foreground)",
-                }}
-              >
-                Call in progress...
-              </p>
-            </div>
-
-            <Button
-              onClick={() => setShowCallDialog(false)}
-              variant="destructive"
-              size="lg"
-              className="mt-4 w-16 h-16"
-              style={{
-                borderRadius: "9999px",
-              }}
-            >
-              <PhoneOff className="w-6 h-6" />
-            </Button>
-          </div>
-        </div>
+      {/* Live Call Dialog - Voice */}
+      {showCallDialog && contact && sessionId && (
+        <LiveCallDialog
+          contact={contact}
+          sessionId={sessionId}
+          isVideoCall={false}
+          onClose={() => setShowCallDialog(false)}
+        />
       )}
 
-      {/* Video Dialog */}
-      {showVideoDialog && (
-        <div
-          className="fixed inset-0 flex items-center justify-center z-50"
-          style={{
-            backgroundColor: "rgba(0, 0, 0, 0.8)",
-          }}
-        >
-          <div
-            className="w-full max-w-md mx-4 p-8 flex flex-col items-center"
-            style={{
-              backgroundColor: "var(--card)",
-              borderRadius: "var(--radius-card)",
-              boxShadow: "0px 8px 24px 0px rgba(10, 13, 18, 0.25)",
-            }}
-          >
-            <div className="mb-6">
-              <Avatar className="w-64 h-64">
-                <AvatarImage src={contact.avatarImage} alt={contact.name} />
-                <AvatarFallback
-                  style={{
-                    backgroundColor: "var(--primary)",
-                    color: "var(--primary-foreground)",
-                    fontFamily: "Inter, sans-serif",
-                    fontWeight: "var(--font-weight-medium)",
-                    fontSize: "4rem",
-                  }}
-                >
-                  {contact.avatar}
-                </AvatarFallback>
-              </Avatar>
-            </div>
-
-            <h3
-              className="mb-2"
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "var(--text-xl)",
-                fontWeight: "var(--font-weight-semibold)",
-                color: "var(--card-foreground)",
-              }}
-            >
-              {contact.name}
-            </h3>
-
-            <p
-              className="mb-6"
-              style={{
-                fontFamily: "Inter, sans-serif",
-                fontSize: "var(--text-lg)",
-                color: "var(--muted-foreground)",
-                fontWeight: "var(--font-weight-medium)",
-              }}
-            >
-              {formatVideoDuration(videoDuration)}
-            </p>
-
-            <div className="flex items-center gap-4 mb-4">
-              <div
-                className="w-3 h-3 rounded-full animate-pulse"
-                style={{
-                  backgroundColor: "var(--chart-1)",
-                }}
-              />
-              <p
-                style={{
-                  fontFamily: "Inter, sans-serif",
-                  fontSize: "var(--text-sm)",
-                  color: "var(--muted-foreground)",
-                }}
-              >
-                Video call in progress...
-              </p>
-            </div>
-
-            <Button
-              onClick={() => setShowVideoDialog(false)}
-              variant="destructive"
-              size="lg"
-              className="mt-4 w-16 h-16"
-              style={{
-                borderRadius: "9999px",
-              }}
-            >
-              <VideoOff className="w-6 h-6" />
-            </Button>
-          </div>
-        </div>
+      {/* Live Call Dialog - Video */}
+      {showVideoDialog && contact && sessionId && (
+        <LiveCallDialog
+          contact={contact}
+          sessionId={sessionId}
+          isVideoCall={true}
+          onClose={() => setShowVideoDialog(false)}
+        />
       )}
 
       {/* Profile Modal */}
