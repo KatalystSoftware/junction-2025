@@ -39,8 +39,9 @@ resource "google_service_account" "cloud_run" {
 }
 
 resource "google_cloud_run_v2_service" "app" {
-  name     = "financial-advisor-sim"
-  location = var.region
+  name                = "financial-advisor-sim"
+  location            = var.region
+  deletion_protection = false
 
   template {
     service_account = google_service_account.cloud_run.email

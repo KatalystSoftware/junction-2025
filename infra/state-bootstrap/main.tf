@@ -18,6 +18,7 @@ resource "google_storage_bucket" "tf_state" {
   name                        = var.state_bucket_name
   location                    = var.region
   uniform_bucket_level_access = true
+  force_destroy               = true
   versioning {
     enabled = true
   }
